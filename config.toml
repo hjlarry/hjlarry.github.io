@@ -1,0 +1,12 @@
+baseURL = "https://hjlarry.github.io/"
+languageCode = "zh-cn"
+title = "非法操作"
+theme = "manis"
+publishdir = "doc"
+paginate = 10
+
+[params]
+# Social Links
+	email = "ultrahe@gmail.com"
+	github = "https://github.com/hjlarry/"
+	twitter = "https://twitter.com/hjlarry"

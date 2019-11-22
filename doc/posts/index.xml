@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on 非法操作</title>
+    <link>http://hjlarry.github.io/posts/</link>
+    <description>Recent content in Posts on 非法操作</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 22 Nov 2019 14:59:52 +0800</lastBuildDate>
+    
+	<atom:link href="http://hjlarry.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>计算机科学基础知识之硬件部分</title>
+      <link>http://hjlarry.github.io/posts/my-first-post/</link>
+      <pubDate>Fri, 22 Nov 2019 14:59:52 +0800</pubDate>
+      
+      <guid>http://hjlarry.github.io/posts/my-first-post/</guid>
+      <description>现代计算机体系的基础理论部分仍然是70年代的，并没有多大突破，只是制造水平和加工工艺一直在提升。除非是量子计算、生物计算等发展成熟，才可能影响计算机基础理论。
+我们在应用软件开发领域，往往非常善于创造包装一些名词，但它们的本质就是那么回事，学习计算机体系的理论有助于我们抓住本质。
+体系结构 CPU要运行一个程序，它需要指令和数据，指令相当于你要干什么，数据是干这件事所需要的材料。
+冯诺依曼结构 冯诺依曼结构就是把指令也当做数据，把指令和数据放在一起。好处就是设计上会简单一些，可以使用一条总线集中存储；另外它还采用了二进制编码的线性地址空间。缺点就是它的数据传输效率远低于CPU的运算效率，因此需要缓存来提升效率。
+它的CPU有两套单元： * ALU：算术逻辑单元，实现多组算术和逻辑运算。由与门和或门组成，进行二进制的算术运算，包括加、减、乘、与、或、非、异或。 * CU：控制单元，用于程序流程的管理。从内存中取指令放入指令寄存器中分析并执行。
+PS：在系统层面上，我们说的内存并不是指物理上的两根内存条，那个叫主存。比如硬盘上的缓存也是内存、打印机上也有缓存等等。
+哈佛结构 哈佛结构将指令和数据分开处理，指令和数据拥有不同的总线和地址空间，并行能力非常强，早期的大型计算机就采用这种结构。缺点就是早期电子电路昂贵，成本的问题使得它不适合于通用计算机没有推广开来。 现在纯粹的哈佛结构多用于数字信号处理器（DSP）、单片机等特定领域，它们的指令相对简单也没有缓存。
+对比总结 实际上现代计算机是对两种架构做了一些折中的。在内存中指令和数据是在一起的，在CPU的L1缓存中，会区分指令缓存和数据缓存，最终执行的时候指令和数据是从两个不同的地方出来的。另外冯诺依曼统一的地址空间也便于我们实现操作系统内存的管理、动态加载程序、JIT等。</description>
+    </item>
+    
+  </channel>
+</rss>
