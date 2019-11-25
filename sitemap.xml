@@ -3,12 +3,17 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://hjlarry.github.io/posts/</loc>
+    <loc>https://hjlarry.github.io/docs/sicp/hardware-introduction/</loc>
     <lastmod>2019-11-22T14:59:52+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://hjlarry.github.io/posts/hardware-introduction/</loc>
+    <loc>https://hjlarry.github.io/docs/sicp/software-introduction/</loc>
+    <lastmod>2019-11-22T14:59:52+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hjlarry.github.io/docs/sicp/</loc>
     <lastmod>2019-11-22T14:59:52+08:00</lastmod>
   </url>
   
@@ -19,6 +24,10 @@
   
   <url>
     <loc>https://hjlarry.github.io/categories/</loc>
+  </url>
+  
+  <url>
+    <loc>https://hjlarry.github.io/docs/</loc>
   </url>
   
   <url>

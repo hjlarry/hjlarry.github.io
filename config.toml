@@ -1,11 +1,19 @@
 baseURL = "https://hjlarry.github.io/"
 languageCode = "zh-cn"
 title = "非法操作"
-theme = "manis"
+theme = "book"
 publishdir = "."
-paginate = 10
+
+# Book configuration
+disablePathToLower = true
+enableGitInfo = true
 
 [params]
+    BookToC = 3
+    BookLogo = 'logo.png'
+    BookRepo = 'https://github.com/hjlarry/hjlarry.github.io'
+    BookSearch = true
+
 # Social Links
 	email = "ultrahe@gmail.com"
 	github = "https://github.com/hjlarry/"
