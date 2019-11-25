@@ -1,7 +1,7 @@
 baseURL = "https://hjlarry.github.io/"
 languageCode = "zh-cn"
 title = "非法操作"
-theme = "book"
+theme = "hugo-book"
 publishdir = "."
 
 # Book configuration
