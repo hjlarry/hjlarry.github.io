@@ -3,8 +3,17 @@ headless: true
 bookMenuLevels: 1
 ---
 
-- [**Book Example**]({{< relref "/docs/sicp" >}})
-  - [硬件部分]({{< relref "/docs/sicp/hardware-introduction" >}})
-  - [软件部分]({{< relref "/docs/sicp/software-introduction" >}})
-- **Shortcodes**
-  - [hardware]({{< relref "/posts/hardware-introduction" >}})
+- **计算机基础**
+  - [硬件部分]({{< relref "/docs/sicp/hardware" >}})
+  - [软件部分]({{< relref "/docs/sicp/software" >}})
+- **GO语言**
+  - [闭包]({{< relref "/docs/sicp/software" >}})
+  - [defer]({{< relref "/docs/sicp/software" >}})
+  - [指针]({{< relref "/docs/sicp/software" >}})
+  - [垃圾回收]({{< relref "/docs/sicp/software" >}})
+  - [内存分配]({{< relref "/docs/sicp/software" >}})
+  - [并发]({{< relref "/docs/sicp/software" >}})
+- **Python语言**
+  - [描述符]({{< relref "/docs/sicp/software" >}})
+- **其他**
+  - [GDB使用]({{< relref "/docs/sicp/software" >}})

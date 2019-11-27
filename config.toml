@@ -3,16 +3,25 @@ languageCode = "zh-cn"
 title = "非法操作"
 theme = "hugo-book"
 publishdir = "."
+defaultContentLanguage = "cn"
 
 # Book configuration
 disablePathToLower = true
 enableGitInfo = true
+
+[languages]
+[languages.cn]
+  languageName = 'Chinese'
+  contentDir = 'content'
+  weight = 1
 
 [params]
     BookToC = 3
     BookLogo = 'logo.png'
     BookRepo = 'https://github.com/hjlarry/hjlarry.github.io'
     BookSearch = true
+    BookEditPath = 'edit/master/content'
+    BookMenuBundle = '/menu'
 
 # Social Links
 	email = "ultrahe@gmail.com"
