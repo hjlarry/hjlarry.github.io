@@ -1,6 +1,6 @@
 baseURL = "https://hjlarry.github.io/"
 languageCode = "zh-cn"
-title = "非法操作"
+title = "Home"
 theme = "hugo-book"
 publishdir = "."
 defaultContentLanguage = "cn"

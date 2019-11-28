@@ -8,7 +8,7 @@ bookMenuLevels: 1
   - [软件部分]({{< relref "/docs/sicp/software" >}})
 - **GO语言**
   - [闭包]({{< relref "/docs/sicp/software" >}})
-  - [defer]({{< relref "/docs/sicp/software" >}})
+  - [延迟调用]({{< relref "/docs/sicp/software" >}})
   - [指针]({{< relref "/docs/sicp/software" >}})
   - [垃圾回收]({{< relref "/docs/sicp/software" >}})
   - [内存分配]({{< relref "/docs/sicp/software" >}})
