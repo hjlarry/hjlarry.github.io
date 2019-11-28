@@ -12,7 +12,7 @@ bookMenuLevels: 1
   - [指针]({{< relref "/docs/sicp/software" >}})
   - [垃圾回收]({{< relref "/docs/sicp/software" >}})
   - [内存分配]({{< relref "/docs/sicp/software" >}})
-  - [并发]({{< relref "/docs/sicp/software" >}})
+  - [并发调度]({{< relref "/docs/go/goroutine" >}})
 - **Python语言**
   - [描述符]({{< relref "/docs/sicp/software" >}})
 - **其他**
