@@ -15,5 +15,9 @@ bookMenuLevels: 1
   - [并发调度]({{< relref "/docs/go/goroutine" >}})
 - **Python语言**
   - [描述符]({{< relref "/docs/sicp/software" >}})
+- **Mysql**
+  - [查询]({{< relref "/docs/mysql/query" >}})
+  - [索引]({{< relref "/docs/sicp/software" >}})
+  - [原理]({{< relref "/docs/sicp/software" >}})
 - **其他**
   - [GDB使用]({{< relref "/docs/sicp/software" >}})
