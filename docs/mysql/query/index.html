@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="cn">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Mysql查询"><meta property="og:title" content="Mysql查询" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://hjlarry.github.io/docs/mysql/query/" />
+
+<title>Mysql查询 | Home</title>
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
+
+
+<script defer src="/cn.search.min.c8d36afec2e65bc35c9637f640424eea301532f5df386e1229b7a517aa76c939.js" integrity="sha256-yNNq/sLmW8Ncljf2QEJO6jAVMvXfOG4SKbelF6p2yTk="></script>
+
+<link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/mysql/query/index.xml" title="Home" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
+<h2 class="book-brand">
+  <a href="https://hjlarry.github.io/"><img src="/logo.png" alt="Logo" /><span>Home</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+    <ul>
+<li><strong>计算机基础</strong>
+
+<ul>
+<li><a href="/docs/sicp/hardware/">硬件部分</a></li>
+<li><a href="/docs/sicp/software/">软件部分</a></li>
+</ul></li>
+<li><strong>GO语言</strong>
+
+<ul>
+<li>闭包</li>
+<li>延迟调用</li>
+<li>垃圾回收</li>
+<li>内存分配</li>
+<li><a href="/docs/go/goroutine/">并发调度</a></li>
+</ul></li>
+<li><strong>Python语言</strong>
+
+<ul>
+<li>描述符</li>
+</ul></li>
+<li><strong>Mysql</strong>
+
+<ul>
+<li><a href="/docs/mysql/query/"class=active>查询</a></li>
+<li>索引</li>
+<li>原理</li>
+</ul></li>
+<li><strong>其他</strong>
+
+<ul>
+<li>GDB使用</li>
+</ul></li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+    </aside>
+
+    <div class="book-page">
+      <header class="flex align-center justify-between book-header">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" alt="Menu" />
+  </label>
+  <strong>Mysql查询</strong>
+</header>
+
+      
+<article class="markdown">
+
+<h1 id="mysql常用查询整理">Mysql常用查询整理</h1>
+
+<h2 id="数据准备">数据准备</h2>
+
+<p>1、创建表格:</p>
+
+<pre><code>CREATE TABLE student_info (
+    number INT PRIMARY KEY,
+    name VARCHAR(5),
+    sex ENUM('男', '女'),
+    id_number CHAR(18),
+    department VARCHAR(30),
+    major VARCHAR(30),
+    enrollment_time DATE,
+    UNIQUE KEY (id_number)
+);
+
+CREATE TABLE student_score (
+    number INT,
+    subject VARCHAR(30),
+    score TINYINT,
+    PRIMARY KEY (number, subject),
+    CONSTRAINT FOREIGN KEY(number) REFERENCES student_info(number)
+);
+</code></pre>
+
+<p>2、填充数据:</p>
+
+<pre><code>INSERT INTO student_info(number, name, sex, id_number, department, major, enrollment_time) VALUES
+(20180101, '杜子腾', '男', '158177199901044792', '计算机学院', '计算机科学与工程', '2018-09-01'),
+(20180102, '杜琦燕', '女', '151008199801178529', '计算机学院', '计算机科学与工程', '2018-09-01'),
+(20180103, '范统', '男', '17156319980116959X', '计算机学院', '软件工程', '2018-09-01'),
+(20180104, '史珍香', '女', '141992199701078600', '计算机学院', '软件工程', '2018-09-01'),
+(20180105, '范剑', '男', '181048199308156368', '航天学院', '飞行器设计', '2018-09-01'),
+(20180106, '朱逸群', '男', '197995199501078445', '航天学院', '电子信息', '2018-09-01');
+
+INSERT INTO student_score (number, subject, score) VALUES
+(20180101, '母猪的产后护理', 78),
+(20180101, '论萨达姆的战争准备', 88),
+(20180102, '母猪的产后护理', 100),
+(20180102, '论萨达姆的战争准备', 98),
+(20180103, '母猪的产后护理', 59),
+(20180103, '论萨达姆的战争准备', 61),
+(20180104, '母猪的产后护理', 55),
+(20180104, '论萨达姆的战争准备', 46);
+</code></pre>
+
+<p>3、填充结果:</p>
+
+<p><strong>student_info表</strong></p>
+
+<table>
+<thead>
+<tr>
+<th>number</th>
+<th>&nbsp;name&nbsp;</th>
+<th>sex</th>
+<th>id_number</th>
+<th>department</th>
+<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;major&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+<th>enrollment_time</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>20180101</td>
+<td>杜子腾</td>
+<td>男</td>
+<td>158177199901044792</td>
+<td>计算机学院</td>
+<td>计算机科学与工程</td>
+<td>2018-09-01</td>
+</tr>
+
+<tr>
+<td>20180102</td>
+<td>杜琦燕</td>
+<td>女</td>
+<td>151008199801178529</td>
+<td>计算机学院</td>
+<td>计算机科学与工程</td>
+<td>2018-09-01</td>
+</tr>
+
+<tr>
+<td>20180103</td>
+<td>范统</td>
+<td>男</td>
+<td>17156319980116959X</td>
+<td>计算机学院</td>
+<td>软件工程</td>
+<td>2018-09-01</td>
+</tr>
+
+<tr>
+<td>20180104</td>
+<td>史珍香</td>
+<td>女</td>
+<td>141992199701078600</td>
+<td>计算机学院</td>
+<td>软件工程</td>
+<td>2018-09-01</td>
+</tr>
+
+<tr>
+<td>20180105</td>
+<td>范剑</td>
+<td>男</td>
+<td>181048199308156368</td>
+<td>航天学院</td>
+<td>飞行器设计</td>
+<td>2018-09-01</td>
+</tr>
+
+<tr>
+<td>20180106</td>
+<td>朱逸群</td>
+<td>男</td>
+<td>197995199501078445</td>
+<td>航天学院</td>
+<td>电子信息</td>
+<td>2018-09-01</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>student_score表</strong></p>
+
+<table>
+<thead>
+<tr>
+<th>number</th>
+<th>subject</th>
+<th>score</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>20180101</td>
+<td>母猪的产后护理</td>
+<td>78</td>
+</tr>
+
+<tr>
+<td>20180101</td>
+<td>论萨达姆的战争准备</td>
+<td>88</td>
+</tr>
+
+<tr>
+<td>20180102</td>
+<td>母猪的产后护理</td>
+<td>100</td>
+</tr>
+
+<tr>
+<td>20180102</td>
+<td>论萨达姆的战争准备</td>
+<td>98</td>
+</tr>
+
+<tr>
+<td>20180103</td>
+<td>母猪的产后护理</td>
+<td>59</td>
+</tr>
+
+<tr>
+<td>20180103</td>
+<td>论萨达姆的战争准备</td>
+<td>61</td>
+</tr>
+
+<tr>
+<td>20180104</td>
+<td>母猪的产后护理</td>
+<td>55</td>
+</tr>
+
+<tr>
+<td>20180104</td>
+<td>论萨达姆的战争准备</td>
+<td>46</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="基础查询">基础查询</h2>
+
+<h3 id="别名">别名</h3>
+
+<ul>
+<li>方式一:<code>select number as 学号 from student_score</code></li>
+<li>方式二:<code>select number 学号 from student_score</code><br /></li>
+</ul>
+
+<p>查询结果:</p>
+
+<pre><code>mysql&gt; select number 学号 from student_score;
++----------+
+| 学号     |
++----------+
+| 20180101 |
+| 20180101 |
+| 20180102 |
+| 20180102 |
+| 20180103 |
+| 20180103 |
+| 20180104 |
+| 20180104 |
++----------+
+8 rows in set (0.00 sec)
+</code></pre>
+
+<p>多列也可以:</p>
+
+<pre><code>mysql&gt; select number 学号, name 姓名 from student_info;
++----------+-----------+
+| 学号     | 姓名      |
++----------+-----------+
+| 20180101 | 杜子腾    |
+| 20180102 | 杜琦燕    |
+| 20180103 | 范统      |
+| 20180104 | 史珍香    |
+| 20180105 | 范剑      |
+| 20180106 | 朱逸群    |
++----------+-----------+
+6 rows in set (0.00 sec)
+</code></pre>
+
+<h3 id="去重">去重</h3>
+
+<p>单列去重:</p>
+
+<pre><code>mysql&gt; select distinct department from student_info;
++-----------------+
+| department      |
++-----------------+
+| 计算机学院      |
+| 航天学院        |
++-----------------+
+2 rows in set (0.00 sec)
+</code></pre>
+
+<p>多列去重:</p>
+
+<pre><code>mysql&gt; select distinct department,major from student_info;
++-----------------+--------------------------+
+| department      | major                    |
++-----------------+--------------------------+
+| 计算机学院      | 计算机科学与工程         |
+| 计算机学院      | 软件工程                 |
+| 航天学院        | 飞行器设计               |
+| 航天学院        | 电子信息                 |
++-----------------+--------------------------+
+4 rows in set (0.00 sec)
+</code></pre>
+
+<h3 id="限制查询结果条数">限制查询结果条数</h3>
+
+<p>使用<code>limit 从哪开始，多少条</code>，<code>从哪开始</code>可以省略，省略代表第0行。</p>
+
+<pre><code>mysql&gt; select * from student_info limit 3,8;
++----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
+| number   | name      | sex  | id_number          | department      | major           | enrollment_time |
++----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
+| 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程        | 2018-09-01      |
+| 20180105 | 范剑      | 男   | 181048199308156368 | 航天学院        | 飞行器设计      | 2018-09-01      |
+| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息        | 2018-09-01      |
++----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
+3 rows in set (0.00 sec)
+</code></pre>
+
+<h3 id="排序">排序</h3>
+
+<p>多列排序:</p>
+
+<pre><code>mysql&gt; select * from student_info order by name asc, number desc;
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+| number   | name      | sex  | id_number          | department      | major                    | enrollment_time |
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+| 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程                 | 2018-09-01      |
+| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息                 | 2018-09-01      |
+| 20180101 | 杜子腾    | 男   | 158177199901044792 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
+| 20180102 | 杜琦燕    | 女   | 151008199801178529 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
+| 20180105 | 范剑      | 男   | 181048199308156368 | 航天学院        | 飞行器设计               | 2018-09-01      |
+| 20180103 | 范统      | 男   | 17156319980116959X | 计算机学院      | 软件工程                 | 2018-09-01      |
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+6 rows in set (0.00 sec)
+
+mysql&gt; select * from student_info order by name desc, number desc;
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+| number   | name      | sex  | id_number          | department      | major                    | enrollment_time |
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+| 20180103 | 范统      | 男   | 17156319980116959X | 计算机学院      | 软件工程                 | 2018-09-01      |
+| 20180105 | 范剑      | 男   | 181048199308156368 | 航天学院        | 飞行器设计               | 2018-09-01      |
+| 20180102 | 杜琦燕    | 女   | 151008199801178529 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
+| 20180101 | 杜子腾    | 男   | 158177199901044792 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
+| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息                 | 2018-09-01      |
+| 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程                 | 2018-09-01      |
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+6 rows in set (0.00 sec)
+</code></pre>
+
+<h2 id="带条件查询">带条件查询</h2>
+
+<h3 id="简单搜索条件">简单搜索条件</h3>
+
+<p>不等于可以使用<code>&lt;&gt;</code>或<code>!=</code> :</p>
+
+<pre><code>mysql&gt; select * from student_info where department &lt;&gt; '计算机学院';
++----------+-----------+------+--------------------+--------------+-----------------+-----------------+
+| number   | name      | sex  | id_number          | department   | major           | enrollment_time |
++----------+-----------+------+--------------------+--------------+-----------------+-----------------+
+| 20180105 | 范剑      | 男   | 181048199308156368 | 航天学院     | 飞行器设计      | 2018-09-01      |
+| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院     | 电子信息        | 2018-09-01      |
++----------+-----------+------+--------------------+--------------+-----------------+-----------------+
+2 rows in set (0.00 sec)
+</code></pre>
+
+<p>区间内使用<code>between...and...</code>，不在某区间使用<code>not between...and...</code>:</p>
+
+<pre><code>mysql&gt; select * from student_info where number between 20180103 and 20180105;
++----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
+| number   | name      | sex  | id_number          | department      | major           | enrollment_time |
++----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
+| 20180103 | 范统      | 男   | 17156319980116959X | 计算机学院      | 软件工程        | 2018-09-01      |
+| 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程        | 2018-09-01      |
+| 20180105 | 范剑      | 男   | 181048199308156368 | 航天学院        | 飞行器设计      | 2018-09-01      |
++----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
+3 rows in set (0.01 sec)
+
+mysql&gt; select * from student_info where number not between 20180103 and 20180105;
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+| number   | name      | sex  | id_number          | department      | major                    | enrollment_time |
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+| 20180101 | 杜子腾    | 男   | 158177199901044792 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
+| 20180102 | 杜琦燕    | 女   | 151008199801178529 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
+| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息                 | 2018-09-01      |
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+3 rows in set (0.00 sec)
+</code></pre>
+
+<h3 id="匹配列表中的元素">匹配列表中的元素</h3>
+
+<p>使用<code>in (...)</code>和<code>not in</code>筛选出在某个列表中的记录:</p>
+
+<pre><code>mysql&gt; select * from student_info where major in ('软件工程',  '电子信息');
++----------+-----------+------+--------------------+-----------------+--------------+-----------------+
+| number   | name      | sex  | id_number          | department      | major        | enrollment_time |
++----------+-----------+------+--------------------+-----------------+--------------+-----------------+
+| 20180103 | 范统      | 男   | 17156319980116959X | 计算机学院      | 软件工程     | 2018-09-01      |
+| 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程     | 2018-09-01      |
+| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息     | 2018-09-01      |
++----------+-----------+------+--------------------+-----------------+--------------+-----------------+
+3 rows in set (0.00 sec)
+</code></pre>
+
+<p>使用<code>is null</code> 和 <code>is not null</code>可筛选出某列是NULL的记录，而不能使用普通的操作符例如等号来进行比较，NULL代表没有值。</p>
+
+<h3 id="多个搜索条件">多个搜索条件</h3>
+
+<p>AND优先级高于OR:</p>
+
+<pre><code>mysql&gt; SELECT * FROM student_score WHERE score &gt; 95 OR score &lt; 55 AND subject = '论萨达姆的战争准备';
++----------+-----------------------------+-------+
+| number   | subject                     | score |
++----------+-----------------------------+-------+
+| 20180102 | 母猪的产后护理              |   100 |
+| 20180102 | 论萨达姆的战争准备          |    98 |
+| 20180104 | 论萨达姆的战争准备          |    46 |
++----------+-----------------------------+-------+
+3 rows in set (0.00 sec)
+</code></pre>
+
+<h3 id="模糊查询">模糊查询</h3>
+
+<p>使用<code>like</code>和<code>not like</code>进行模糊匹配查询，<code>%</code>代表任意一个字符串，而<code>_</code>代表任意一个字符:</p>
+
+<pre><code>mysql&gt; select * from student_info where name like '杜_';
+Empty set (0.00 sec)
+
+mysql&gt; select * from student_info where name like '范_';
++----------+--------+------+--------------------+-----------------+-----------------+-----------------+
+| number   | name   | sex  | id_number          | department      | major           | enrollment_time |
++----------+--------+------+--------------------+-----------------+-----------------+-----------------+
+| 20180103 | 范统   | 男   | 17156319980116959X | 计算机学院      | 软件工程        | 2018-09-01      |
+| 20180105 | 范剑   | 男   | 181048199308156368 | 航天学院        | 飞行器设计      | 2018-09-01      |
++----------+--------+------+--------------------+-----------------+-----------------+-----------------+
+2 rows in set (0.00 sec)
+
+mysql&gt; select * from student_info where name like '%杜%';
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+| number   | name      | sex  | id_number          | department      | major                    | enrollment_time |
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+| 20180101 | 杜子腾    | 男   | 158177199901044792 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
+| 20180102 | 杜琦燕    | 女   | 151008199801178529 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+2 rows in set (0.00 sec)
+</code></pre>
+
+<h2 id="函数和表达式">函数和表达式</h2>
+
+<h3 id="表达式">表达式</h3>
+
+<p>可以将表达式放在查询列表中:</p>
+
+<pre><code>mysql&gt; select number,subject,score+100 from student_score;
++----------+-----------------------------+-----------+
+| number   | subject                     | score+100 |
++----------+-----------------------------+-----------+
+| 20180101 | 母猪的产后护理              |       178 |
+| 20180101 | 论萨达姆的战争准备          |       188 |
+| 20180102 | 母猪的产后护理              |       200 |
+| 20180102 | 论萨达姆的战争准备          |       198 |
+| 20180103 | 母猪的产后护理              |       159 |
+| 20180103 | 论萨达姆的战争准备          |       161 |
+| 20180104 | 母猪的产后护理              |       155 |
+| 20180104 | 论萨达姆的战争准备          |       146 |
++----------+-----------------------------+-----------+
+8 rows in set (0.00 sec)
+</code></pre>
+
+<p>也可以把表达式作为搜索的条件:</p>
+
+<pre><code>mysql&gt; select * from student_score where score%3=0;
++----------+-----------------------+-------+
+| number   | subject               | score |
++----------+-----------------------+-------+
+| 20180101 | 母猪的产后护理        |    78 |
++----------+-----------------------+-------+
+1 row in set (0.00 sec)
+</code></pre>
+
+<h3 id="文本处理">文本处理</h3>
+
+<p>连接字符串:</p>
+
+<pre><code>mysql&gt; select concat('学号为',number,'的学生在[',subject,']的成绩为',score) from student_score;
++--------------------------------------------------------------------------+
+| concat('学号为',number,'的学生在[',subject,']的成绩为',score)            |
++--------------------------------------------------------------------------+
+| 学号为20180101的学生在[母猪的产后护理]的成绩为78                         |
+| 学号为20180101的学生在[论萨达姆的战争准备]的成绩为88                     |
+| 学号为20180102的学生在[母猪的产后护理]的成绩为100                        |
+| 学号为20180102的学生在[论萨达姆的战争准备]的成绩为98                     |
+| 学号为20180103的学生在[母猪的产后护理]的成绩为59                         |
+| 学号为20180103的学生在[论萨达姆的战争准备]的成绩为61                     |
+| 学号为20180104的学生在[母猪的产后护理]的成绩为55                         |
+| 学号为20180104的学生在[论萨达姆的战争准备]的成绩为46                     |
++--------------------------------------------------------------------------+
+8 rows in set (0.00 sec)
+</code></pre>
+
+<p>子串:</p>
+
+<pre><code>mysql&gt; select substring(number, 4, 5) as 学号尾号 from student_info;
++--------------+
+| 学号尾号     |
++--------------+
+| 80104        |
+| 80102        |
+| 80101        |
+| 80103        |
+| 80105        |
+| 80106        |
++--------------+
+6 rows in set (0.00 sec)
+</code></pre>
+
+<h3 id="时间处理函数">时间处理函数</h3>
+
+<p>时间间隔:</p>
+
+<pre><code>mysql&gt; select date_add('2015-01-01 10:20:33', interval 2 minute);
++----------------------------------------------------+
+| date_add('2015-01-01 10:20:33', interval 2 minute) |
++----------------------------------------------------+
+| 2015-01-01 10:22:33                                |
++----------------------------------------------------+
+1 row in set (0.00 sec)
+</code></pre>
+
+<p>时间格式化:</p>
+
+<pre><code>mysql&gt; select date_format(now(), '%b/%d/%Y %h:%i:%s~%p');
++--------------------------------------------+
+| date_format(now(), '%b/%d/%Y %h:%i:%s~%p') |
++--------------------------------------------+
+| Dec/02/2019 04:57:31~PM                    |
++--------------------------------------------+
+1 row in set (0.00 sec)
+</code></pre>
+
+<h3 id="聚集函数">聚集函数</h3>
+
+<p>COUNT用来统计行数
+* <code>COUNT(*)</code>统计表中所有的行，包括NULL
+* <code>COUNT(列名)</code>统计表中某列的所有行，不包括NULL</p>
+
+<pre><code>mysql&gt; select count(*) from student_info;
++----------+
+| count(*) |
++----------+
+|        6 |
++----------+
+1 row in set (0.00 sec)
+
+mysql&gt; select count(distinct subject) from student_score;
++-------------------------+
+| count(distinct subject) |
++-------------------------+
+|                       2 |
++-------------------------+
+1 row in set (0.00 sec)
+</code></pre>
+
+<p>SUM和AVG:</p>
+
+<pre><code>mysql&gt; select sum(score) from student_score;
++------------+
+| sum(score) |
++------------+
+|        585 |
++------------+
+1 row in set (0.00 sec)
+
+mysql&gt; select avg(score) from student_score where subject=&quot;论萨达姆的战争准备&quot;;
++------------+
+| avg(score) |
++------------+
+|    73.2500 |
++------------+
+1 row in set (0.00 sec)
+</code></pre>
+
+<p>组合使用:</p>
+
+<pre><code>mysql&gt; select count(*) as 成绩记录总数, max(score) as 最高分, min(score) as 最低分,avg(score) as 平均分 from student_score;
++--------------------+-----------+-----------+-----------+
+| 成绩记录总数       | 最高分    | 最低分    | 平均分    |
++--------------------+-----------+-----------+-----------+
+|                  8 |       100 |        46 |   73.1250 |
++--------------------+-----------+-----------+-----------+
+1 row in set (0.00 sec)
+</code></pre>
+
+<h3 id="隐式类型转换">隐式类型转换</h3>
+
+<p>Mysql会尽量把值转换为表达式中需要的类型，而不是产生错误:</p>
+
+<pre><code>mysql&gt; select 1 + '2';
++---------+
+| 1 + '2' |
++---------+
+|       3 |
++---------+
+1 row in set (0.00 sec)
+
+mysql&gt; select '23sds'+17;
++------------+
+| '23sds'+17 |
++------------+
+|         40 |
++------------+
+1 row in set, 1 warning (0.00 sec)
+</code></pre>
+
+<p>但这种转换不能用于存储数据:</p>
+
+<pre><code>mysql&gt; insert into student_score(score,number,subject) values (100,20180101,300);
+Query OK, 1 row affected (0.00 sec)
+
+mysql&gt; insert into student_score(score,number,subject) values ('100',20180101,400);
+Query OK, 1 row affected (0.00 sec)
+
+mysql&gt; insert into student_score(score,number,subject) values ('asd',20180101,400);
+ERROR 1366 (HY000): Incorrect integer value: 'asd' for column 'score' at row 1
+</code></pre>
+
+<h2 id="分组查询">分组查询</h2>
+
+<h3 id="基础查询-1">基础查询</h3>
+
+<p>分组就是针对某个列，将该列的值相同的记录分到一个组中:</p>
+
+<pre><code>mysql&gt; select subject, sum(score) from student_score group by subject;
++-----------------------------+------------+
+| subject                     | sum(score) |
++-----------------------------+------------+
+| 母猪的产后护理              |        292 |
+| 论萨达姆的战争准备          |        293 |
++-----------------------------+------------+
+2 rows in set (0.00 sec)
+</code></pre>
+
+<p>把非分组列放入查询列表中会引起争议，导致结果不确定:</p>
+
+<pre><code>mysql&gt; select subject, sum(score),number from student_score group by subject;
+ERROR 1055 (42000): Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'student.student_score.number' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+</code></pre>
+
+<h3 id="分组和过滤条件">分组和过滤条件</h3>
+
+<p>是先过滤出符合条件的数据，在进行分组运算的:</p>
+
+<pre><code>mysql&gt; select subject, sum(score) from student_score where score&gt;70 group by subject;
++-----------------------------+------------+
+| subject                     | sum(score) |
++-----------------------------+------------+
+| 母猪的产后护理              |        178 |
+| 论萨达姆的战争准备          |        186 |
++-----------------------------+------------+
+2 rows in set (0.00 sec)
+</code></pre>
+
+<p>也可以分组后，在筛选出合适的分组:</p>
+
+<pre><code>mysql&gt; select subject, sum(score) from student_score group by subject having max(score)&gt;98;
++-----------------------+------------+
+| subject               | sum(score) |
++-----------------------+------------+
+| 母猪的产后护理        |        292 |
++-----------------------+------------+
+1 row in set (0.00 sec)
+</code></pre>
+
+<h3 id="分组和排序">分组和排序</h3>
+
+<pre><code>mysql&gt; select subject, sum(score) as sum_s from student_score group by subject order by sum_s desc;
++-----------------------------+-------+
+| subject                     | sum_s |
++-----------------------------+-------+
+| 论萨达姆的战争准备          |   293 |
+| 母猪的产后护理              |   292 |
++-----------------------------+-------+
+2 rows in set (0.00 sec)
+</code></pre>
+
+<h3 id="嵌套分组">嵌套分组</h3>
+
+<p>如下例，可先按department分成大组，再按major分为小组:</p>
+
+<pre><code>mysql&gt; select department, major, count(*) from student_info group by department, major;
++-----------------+--------------------------+----------+
+| department      | major                    | count(*) |
++-----------------+--------------------------+----------+
+| 航天学院        | 电子信息                 |        1 |
+| 航天学院        | 飞行器设计               |        1 |
+| 计算机学院      | 计算机科学与工程         |        2 |
+| 计算机学院      | 软件工程                 |        2 |
++-----------------+--------------------------+----------+
+4 rows in set (0.00 sec)
+</code></pre>
+
+<h3 id="注意事项">注意事项</h3>
+
+<ol>
+<li>如果分组列中有NULL值，那么NULL会作为一个独立的分组</li>
+<li>如果是嵌套分组，聚集函数将作用在最后的分组列上</li>
+<li>非分组列不能单独出现在检索列表中（可以被放到聚集函数中）</li>
+<li>GROUP BY子句后可以跟随表达式（但不能是聚集函数）</li>
+</ol>
+
+<p>简单查询语句中各子句的顺序为:</p>
+
+<pre><code>SELECT [DISTINCT] 查询列表
+[FROM 表名]
+[WHERE 布尔表达式]
+[GROUP BY 分组列表 ]
+[HAVING 分组过滤条件]
+[ORDER BY 排序列表]
+[LIMIT 开始行, 限制条数]
+</code></pre>
+
+<h2 id="子查询">子查询</h2>
+
+<h3 id="标量子查询">标量子查询</h3>
+
+<p>标量子查询单纯的代表一个值，可以作为表达式参与运算或作为搜索条件:</p>
+
+<pre><code>mysql&gt; select * from student_score where number=(select number from student_info where name='范统');
++----------+-----------------------------+-------+
+| number   | subject                     | score |
++----------+-----------------------------+-------+
+| 20180103 | 母猪的产后护理              |    59 |
+| 20180103 | 论萨达姆的战争准备          |    61 |
++----------+-----------------------------+-------+
+2 rows in set (0.00 sec)
+</code></pre>
+
+<h3 id="列子查询">列子查询</h3>
+
+<p>内层查询结果不是一个单独的值，而是一个列:</p>
+
+<pre><code>mysql&gt; select * from student_score where number=(select number from student_info where sex='男');
+ERROR 1242 (21000): Subquery returns more than 1 row
+
+mysql&gt; select * from student_score where number in (select number from student_info where sex='男');
++----------+-----------------------------+-------+
+| number   | subject                     | score |
++----------+-----------------------------+-------+
+| 20180101 | 母猪的产后护理              |    78 |
+| 20180101 | 论萨达姆的战争准备          |    88 |
+| 20180103 | 母猪的产后护理              |    59 |
+| 20180103 | 论萨达姆的战争准备          |    61 |
++----------+-----------------------------+-------+
+4 rows in set (0.00 sec)
+</code></pre>
+
+<p>而行子查询、表子查询不常用，省略。</p>
+
+<h3 id="exists和相关子查询">EXISTS和相关子查询</h3>
+
+<p>EXISTS和NOT EXISTS单独看很像一个函数，返回查询结果是否为空集:</p>
+
+<pre><code>mysql&gt; select exists (select * from student_info where number=20180101);
++-----------------------------------------------------------+
+| exists (select * from student_info where number=20180101) |
++-----------------------------------------------------------+
+|                                                         1 |
++-----------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql&gt; select not exists (select * from student_info where number=20180101);
++---------------------------------------------------------------+
+| not exists (select * from student_info where number=20180101) |
++---------------------------------------------------------------+
+|                                                             0 |
++---------------------------------------------------------------+
+1 row in set (0.00 sec)
+</code></pre>
+
+<p>之前我们尝试的都是不相关子查询，而相关子查询就是内层查询语句要用到外层查询语句的值，比如我们查学生的基本信息并要求这些学生有成绩的记录:</p>
+
+<pre><code>mysql&gt; select * from student_info where exists(select * from student_score where student_score.number=student_info.number);
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+| number   | name      | sex  | id_number          | department      | major                    | enrollment_time |
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+| 20180101 | 杜子腾    | 男   | 158177199901044792 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
+| 20180102 | 杜琦燕    | 女   | 151008199801178529 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
+| 20180103 | 范统      | 男   | 17156319980116959X | 计算机学院      | 软件工程                 | 2018-09-01      |
+| 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程                 | 2018-09-01      |
++----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
+4 rows in set (0.00 sec)
+</code></pre>
+
+<p>这个相关子查询的查询过程是:先执行外层查询获得到student_info表的第一条记录，发现它的number值是20180101。把20180101当作参数传入到子查询，此时子查询的意思是判断student_score表的number字段是否有20180101这个值存在，子查询的结果是该值存在，所以整个EXISTS表达式的值为TRUE，那么student_info表的第一条记录可以被加入到结果集。每条记录依次按这个过程执行。</p>
+
+<p>此外，子查询还可以应用于同一个表，比如我们去查student_score表中分数大于平均分的记录，第一印象可能是如下写法:</p>
+
+<pre><code>mysql&gt; select * from student_score where score &gt; avg(score);
+ERROR 1111 (HY000): Invalid use of group function
+</code></pre>
+
+<p>实际应该使用子查询来实现:</p>
+
+<pre><code>mysql&gt; select * from student_score where score &gt; (select avg(score) from student_score);
++----------+-----------------------------+-------+
+| number   | subject                     | score |
++----------+-----------------------------+-------+
+| 20180101 | 母猪的产后护理              |    78 |
+| 20180101 | 论萨达姆的战争准备          |    88 |
+| 20180102 | 母猪的产后护理              |   100 |
+| 20180102 | 论萨达姆的战争准备          |    98 |
++----------+-----------------------------+-------+
+4 rows in set (0.00 sec)
+</code></pre>
+
+<p>因为聚集函数不能用于WHERE子句，可以把上述写法看做是给student_score做了一个副本。</p>
+
+<h2 id="连接查询">连接查询</h2>
+
+<h3 id="基础概念">基础概念</h3>
+
+<p>连接的本质就是将各个表中的记录都拉取出来，依次匹配组合形成一个结果集，也就是笛卡尔积的方式。</p>
+
+<p>我们来看一个示例:</p>
+
+<pre><code>mysql&gt; create table t1(m1 int, n1 char(1));
+Query OK, 0 rows affected (0.02 sec)
+
+mysql&gt; create table t2(m2 int, n2 char(1));
+Query OK, 0 rows affected (0.02 sec)
+
+mysql&gt; insert into t1 values(1, 'a'),(2, 'b'),(3, 'c');
+Query OK, 3 rows affected (0.00 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql&gt; insert into t2 values(2, 'a'),(3, 'b'),(4, 'c');
+Query OK, 3 rows affected (0.00 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+</code></pre>
+
+<p>新建了两个表，并各插入了三条数据，那么连接可以这样做:</p>
+
+<pre><code>mysql&gt; select * from t1,t2;
++------+------+------+------+
+| m1   | n1   | m2   | n2   |
++------+------+------+------+
+|    1 | a    |    2 | a    |
+|    2 | b    |    2 | a    |
+|    3 | c    |    2 | a    |
+|    1 | a    |    3 | b    |
+|    2 | b    |    3 | b    |
+|    3 | c    |    3 | b    |
+|    1 | a    |    4 | c    |
+|    2 | b    |    4 | c    |
+|    3 | c    |    4 | c    |
++------+------+------+------+
+9 rows in set (0.00 sec)
+</code></pre>
+
+<p>使用以下写法连接都是可以的:</p>
+
+<ul>
+<li><code>select t1.m1,t1.n1,t2.m2,t2.n2 from t1, t2</code></li>
+<li><code>select m1,n1,m2,n2 from t1, t2</code></li>
+<li><code>select t1.*,t2.* from t1, t2</code></li>
+</ul>
+
+<h3 id="内外连接">内外连接</h3>
+
+<p>现在我们想通过一条语句既查到学生的基本信息，又查到他的成绩信息:</p>
+
+<pre><code>mysql&gt; select student_info.number,name,sex,subject,score from student_info, student_score where student_info.number = student_score.number;
++----------+-----------+------+-----------------------------+-------+
+| number   | name      | sex  | subject                     | score |
++----------+-----------+------+-----------------------------+-------+
+| 20180101 | 杜子腾    | 男   | 母猪的产后护理              |    78 |
+| 20180101 | 杜子腾    | 男   | 论萨达姆的战争准备          |    88 |
+| 20180102 | 杜琦燕    | 女   | 母猪的产后护理              |   100 |
+| 20180102 | 杜琦燕    | 女   | 论萨达姆的战争准备          |    98 |
+| 20180103 | 范统      | 男   | 母猪的产后护理              |    59 |
+| 20180103 | 范统      | 男   | 论萨达姆的战争准备          |    61 |
+| 20180104 | 史珍香    | 女   | 母猪的产后护理              |    55 |
+| 20180104 | 史珍香    | 女   | 论萨达姆的战争准备          |    46 |
++----------+-----------+------+-----------------------------+-------+
+8 rows in set (0.00 sec)
+</code></pre>
+
+<p>这时候我们发现有两个人没有成绩，所以他们没有显示在查询结果中。为了有办法让其显示出，就有了内连接和外连接的概念:</p>
+
+<ul>
+<li>内连接就是我们之前使用的，没有匹配的记录则结果不会加入到最后的结果集</li>
+<li>对于外连接的两个表，驱动表中的记录即使在被驱动表中没有匹配的记录，也仍然需要加入到结果集</li>
+</ul>
+
+<p>而外连接又分为左外连接，即左侧的表为驱动表。右外连接，即右侧的表为驱动表。</p>
+
+<p>此外，WHERE子句不论内外连接，凡是不符合WHERE条件的记录都不会在最后的结果集中。而对于外连接的驱动表，ON可以将被驱动表中找不到记录的对应驱动表记录加入到结果集，内连接中WHERE子句和ON子句是等价的。所以我们一般会把WHERE用于涉及单表的过滤条件，ON用于涉及多表的过滤条件。</p>
+
+<p>外连接的标准语法为: <code>select * from t1 left/right [outer] join t2 on 连接条件 [where 普通过滤条件]</code>，outer和where可省略。</p>
+
+<p>上例中使用外连接的结果为:</p>
+
+<pre><code>mysql&gt; select student_info.number,name,sex,subject,score from student_info left join student_score on student_info.number = student_score.number;
++----------+-----------+------+-----------------------------+-------+
+| number   | name      | sex  | subject                     | score |
++----------+-----------+------+-----------------------------+-------+
+| 20180101 | 杜子腾    | 男   | 母猪的产后护理              |    78 |
+| 20180101 | 杜子腾    | 男   | 论萨达姆的战争准备          |    88 |
+| 20180102 | 杜琦燕    | 女   | 母猪的产后护理              |   100 |
+| 20180102 | 杜琦燕    | 女   | 论萨达姆的战争准备          |    98 |
+| 20180103 | 范统      | 男   | 母猪的产后护理              |    59 |
+| 20180103 | 范统      | 男   | 论萨达姆的战争准备          |    61 |
+| 20180104 | 史珍香    | 女   | 母猪的产后护理              |    55 |
+| 20180104 | 史珍香    | 女   | 论萨达姆的战争准备          |    46 |
+| 20180105 | 范剑      | 男   | NULL                        |  NULL |
+| 20180106 | 朱逸群    | 男   | NULL                        |  NULL |
++----------+-----------+------+-----------------------------+-------+
+10 rows in set (0.00 sec)
+</code></pre>
+
+<p>内连接以下的写法是等价的:</p>
+
+<ul>
+<li><code>select * from t1, t2</code></li>
+<li><code>select * from t1 join t2</code></li>
+<li><code>select * from t1 inner join t2</code></li>
+<li><code>select * from t1 cross join t2</code></li>
+</ul>
+
+<p>综上，我们总结以下三种连接的结果差异:</p>
+
+<pre><code>mysql&gt; select * from t1 inner join t2 on t1.m1=t2.m2;
++------+------+------+------+
+| m1   | n1   | m2   | n2   |
++------+------+------+------+
+|    2 | b    |    2 | a    |
+|    3 | c    |    3 | b    |
++------+------+------+------+
+2 rows in set (0.00 sec)
+
+mysql&gt; select * from t1 left join t2 on t1.m1=t2.m2;
++------+------+------+------+
+| m1   | n1   | m2   | n2   |
++------+------+------+------+
+|    2 | b    |    2 | a    |
+|    3 | c    |    3 | b    |
+|    1 | a    | NULL | NULL |
++------+------+------+------+
+3 rows in set (0.00 sec)
+
+mysql&gt; select * from t1 right join t2 on t1.m1=t2.m2;
++------+------+------+------+
+| m1   | n1   | m2   | n2   |
++------+------+------+------+
+|    2 | b    |    2 | a    |
+|    3 | c    |    3 | b    |
+| NULL | NULL |    4 | c    |
++------+------+------+------+
+3 rows in set (0.00 sec)
+</code></pre>
+
+<h3 id="多表连接">多表连接</h3>
+
+<p>我们可以连接任意数量的表，我们再加入一张表试验:</p>
+
+<pre><code>mysql&gt; create table t3(m3 int, n3 char(1));
+Query OK, 0 rows affected (0.07 sec)
+
+mysql&gt; insert into t3 values(3, 'a'),(3, 'b'),(4, 'c');
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+</code></pre>
+
+<p>我们使用下面的语法查询是等价的:</p>
+
+<ul>
+<li><code>select * from t1 inner join t2 inner join t3 where t1.m1=t2.m2 and t2.m2=t3.m3;</code></li>
+<li><code>select * from t1 inner join t2 on t1.m1=t2.m2 inner join t3 on t1.m1=t3.m3;</code></li>
+</ul>
+
+<p>查询结果:</p>
+
+<pre><code>mysql&gt; select * from t1 inner join t2 on t1.m1=t2.m2 inner join t3 on t1.m1=t3.m3;
++------+------+------+------+------+------+
+| m1   | n1   | m2   | n2   | m3   | n3   |
++------+------+------+------+------+------+
+|    3 | c    |    3 | b    |    3 | a    |
+|    3 | c    |    3 | b    |    3 | b    |
++------+------+------+------+------+------+
+2 rows in set (0.00 sec)
+</code></pre>
+
+<p>也可以用伪代码来描述:</p>
+
+<pre><code>for each_row in t1{
+    for each_row in t2 which t1.m1=t2.m2{
+        for each_row in t3 which t2.m2=t3.m3{
+            add_result(each_row)
+        }
+    }
+}
+</code></pre>
+
+<h3 id="自连接">自连接</h3>
+
+<p>我们无法直接自连接，但可以通过别名:</p>
+
+<pre><code>mysql&gt; select * from t1, t1;
+ERROR 1066 (42000): Not unique table/alias: 't1'
+mysql&gt; select * from t1 as table1, t1 as table2;
++------+------+------+------+
+| m1   | n1   | m1   | n1   |
++------+------+------+------+
+|    1 | a    |    1 | a    |
+|    2 | b    |    1 | a    |
+|    3 | c    |    1 | a    |
+|    1 | a    |    2 | b    |
+|    2 | b    |    2 | b    |
+|    3 | c    |    2 | b    |
+|    1 | a    |    3 | c    |
+|    2 | b    |    3 | c    |
+|    3 | c    |    3 | c    |
++------+------+------+------+
+9 rows in set (0.00 sec)
+</code></pre>
+
+<p>而自连接的意义，比如要查询与&rsquo;范统&rsquo;的专业相同的同学:</p>
+
+<pre><code>mysql&gt; select * from student_info as s1, student_info as s2 where s1.name='范统' and s1.major=s2.major;
++----------+--------+------+--------------------+-----------------+--------------+-----------------+----------+-----------+------+--------------------+-----------------+--------------+-----------------+
+| number   | name   | sex  | id_number          | department      | major        | enrollment_time | number   | name      | sex  | id_number          | department      | major        | enrollment_time |
++----------+--------+------+--------------------+-----------------+--------------+-----------------+----------+-----------+------+--------------------+-----------------+--------------+-----------------+
+| 20180103 | 范统   | 男   | 17156319980116959X | 计算机学院      | 软件工程     | 2018-09-01      | 20180103 | 范统      | 男   | 17156319980116959X | 计算机学院      | 软件工程     | 2018-09-01      |
+| 20180103 | 范统   | 男   | 17156319980116959X | 计算机学院      | 软件工程     | 2018-09-01      | 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程     | 2018-09-01      |
++----------+--------+------+--------------------+-----------------+--------------+-----------------+----------+-----------+------+--------------------+-----------------+--------------+-----------------+
+2 rows in set (0.00 sec)
+</code></pre>
+
+<h3 id="与子查询转换">与子查询转换</h3>
+
+<p>有的需求既可以用连接查询，也可以用子查询:</p>
+
+<pre><code>mysql&gt; select * from student_score where number in (select number from student_info where major='软件工程');
++----------+-----------------------------+-------+
+| number   | subject                     | score |
++----------+-----------------------------+-------+
+| 20180103 | 母猪的产后护理              |    59 |
+| 20180103 | 论萨达姆的战争准备          |    61 |
+| 20180104 | 母猪的产后护理              |    55 |
+| 20180104 | 论萨达姆的战争准备          |    46 |
++----------+-----------------------------+-------+
+4 rows in set (0.00 sec)
+
+mysql&gt; select s2.* from student_score as s2, student_info as s1 where s1.number=s2.number and s1.major='软件工程';
++----------+-----------------------------+-------+
+| number   | subject                     | score |
++----------+-----------------------------+-------+
+| 20180103 | 母猪的产后护理              |    59 |
+| 20180103 | 论萨达姆的战争准备          |    61 |
+| 20180104 | 母猪的产后护理              |    55 |
+| 20180104 | 论萨达姆的战争准备          |    46 |
++----------+-----------------------------+-------+
+4 rows in set (0.00 sec)
+</code></pre>
+</article>
+
+      <div class="book-footer justify-between">
+  
+
+  
+  
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/ab0b743090257f5f02c0e7b0d909af4a4ff4dc23" title='Last modified by hjlarry | December 3, 2019' target="_blank">
+      <img src="/svg/calendar.svg" alt="Calendar" />
+      <span>December 3, 2019</span>
+    </a>
+  </div>
+  
+  
+
+  
+  <div>
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/mysql/query/_index.md" target="_blank">
+      <img src="/svg/edit.svg" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+  
+
+</div>
+
+      
+    </div>
+
+    
+  
+
+  <aside class="book-toc levels-3 fixed">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#mysql常用查询整理">Mysql常用查询整理</a>
+<ul>
+<li><a href="#数据准备">数据准备</a></li>
+<li><a href="#基础查询">基础查询</a>
+<ul>
+<li><a href="#别名">别名</a></li>
+<li><a href="#去重">去重</a></li>
+<li><a href="#限制查询结果条数">限制查询结果条数</a></li>
+<li><a href="#排序">排序</a></li>
+</ul></li>
+<li><a href="#带条件查询">带条件查询</a>
+<ul>
+<li><a href="#简单搜索条件">简单搜索条件</a></li>
+<li><a href="#匹配列表中的元素">匹配列表中的元素</a></li>
+<li><a href="#多个搜索条件">多个搜索条件</a></li>
+<li><a href="#模糊查询">模糊查询</a></li>
+</ul></li>
+<li><a href="#函数和表达式">函数和表达式</a>
+<ul>
+<li><a href="#表达式">表达式</a></li>
+<li><a href="#文本处理">文本处理</a></li>
+<li><a href="#时间处理函数">时间处理函数</a></li>
+<li><a href="#聚集函数">聚集函数</a></li>
+<li><a href="#隐式类型转换">隐式类型转换</a></li>
+</ul></li>
+<li><a href="#分组查询">分组查询</a>
+<ul>
+<li><a href="#基础查询-1">基础查询</a></li>
+<li><a href="#分组和过滤条件">分组和过滤条件</a></li>
+<li><a href="#分组和排序">分组和排序</a></li>
+<li><a href="#嵌套分组">嵌套分组</a></li>
+<li><a href="#注意事项">注意事项</a></li>
+</ul></li>
+<li><a href="#子查询">子查询</a>
+<ul>
+<li><a href="#标量子查询">标量子查询</a></li>
+<li><a href="#列子查询">列子查询</a></li>
+<li><a href="#exists和相关子查询">EXISTS和相关子查询</a></li>
+</ul></li>
+<li><a href="#连接查询">连接查询</a>
+<ul>
+<li><a href="#基础概念">基础概念</a></li>
+<li><a href="#内外连接">内外连接</a></li>
+<li><a href="#多表连接">多表连接</a></li>
+<li><a href="#自连接">自连接</a></li>
+<li><a href="#与子查询转换">与子查询转换</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </aside>
+
+
+
+  </main>
+
+  
+</body>
+
+</html>

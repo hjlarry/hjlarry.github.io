@@ -7,17 +7,16 @@ bookMenuLevels: 1
   - [硬件部分]({{< relref "/docs/sicp/hardware" >}})
   - [软件部分]({{< relref "/docs/sicp/software" >}})
 - **GO语言**
-  - [闭包]({{< relref "/docs/sicp/software" >}})
-  - [延迟调用]({{< relref "/docs/sicp/software" >}})
-  - [指针]({{< relref "/docs/sicp/software" >}})
-  - [垃圾回收]({{< relref "/docs/sicp/software" >}})
-  - [内存分配]({{< relref "/docs/sicp/software" >}})
+  - 闭包
+  - 延迟调用
+  - 垃圾回收
+  - 内存分配
   - [并发调度]({{< relref "/docs/go/goroutine" >}})
 - **Python语言**
-  - [描述符]({{< relref "/docs/sicp/software" >}})
+  - 描述符
 - **Mysql**
   - [查询]({{< relref "/docs/mysql/query" >}})
-  - [索引]({{< relref "/docs/sicp/software" >}})
-  - [原理]({{< relref "/docs/sicp/software" >}})
+  - 索引
+  - 原理
 - **其他**
-  - [GDB使用]({{< relref "/docs/sicp/software" >}})
+  - GDB使用
