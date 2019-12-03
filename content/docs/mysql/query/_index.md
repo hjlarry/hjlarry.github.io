@@ -473,3 +473,101 @@ Query OK, 1 row affected (0.00 sec)
 mysql> insert into student_score(score,number,subject) values ('asd',20180101,400);
 ERROR 1366 (HY000): Incorrect integer value: 'asd' for column 'score' at row 1
 ```
+
+分组查询
+-------
+
+### 基础查询
+
+分组就是针对某个列，将该列的值相同的记录分到一个组中:
+```
+mysql> select subject, sum(score) from student_score group by subject;
++-----------------------------+------------+
+| subject                     | sum(score) |
++-----------------------------+------------+
+| 母猪的产后护理              |        292 |
+| 论萨达姆的战争准备          |        293 |
++-----------------------------+------------+
+2 rows in set (0.00 sec)
+```
+
+把非分组列放入查询列表中会引起争议，导致结果不确定:
+```
+mysql> select subject, sum(score),number from student_score group by subject;
+ERROR 1055 (42000): Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'student.student_score.number' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+```
+
+### 分组和过滤条件
+
+是先过滤出符合条件的数据，在进行分组运算的:
+```
+mysql> select subject, sum(score) from student_score where score>70 group by subject;
++-----------------------------+------------+
+| subject                     | sum(score) |
++-----------------------------+------------+
+| 母猪的产后护理              |        178 |
+| 论萨达姆的战争准备          |        186 |
++-----------------------------+------------+
+2 rows in set (0.00 sec)
+```
+
+也可以分组后，在筛选出合适的分组:
+```
+mysql> select subject, sum(score) from student_score group by subject having max(score)>98;
++-----------------------+------------+
+| subject               | sum(score) |
++-----------------------+------------+
+| 母猪的产后护理        |        292 |
++-----------------------+------------+
+1 row in set (0.00 sec)
+```
+
+### 分组和排序
+
+```
+mysql> select subject, sum(score) as sum_s from student_score group by subject order by sum_s desc;
++-----------------------------+-------+
+| subject                     | sum_s |
++-----------------------------+-------+
+| 论萨达姆的战争准备          |   293 |
+| 母猪的产后护理              |   292 |
++-----------------------------+-------+
+2 rows in set (0.00 sec)
+```
+
+### 嵌套分组
+
+如下例，可先按department分成大组，再按major分为小组:
+```
+mysql> select department, major, count(*) from student_info group by department, major;
++-----------------+--------------------------+----------+
+| department      | major                    | count(*) |
++-----------------+--------------------------+----------+
+| 航天学院        | 电子信息                 |        1 |
+| 航天学院        | 飞行器设计               |        1 |
+| 计算机学院      | 计算机科学与工程         |        2 |
+| 计算机学院      | 软件工程                 |        2 |
++-----------------+--------------------------+----------+
+4 rows in set (0.00 sec)
+```
+
+### 注意事项
+
+1. 如果分组列中有NULL值，那么NULL会作为一个独立的分组
+2. 如果是嵌套分组，聚集函数将作用在最后的分组列上
+3. 非分组列不能单独出现在检索列表中（可以被放到聚集函数中）
+4. GROUP BY子句后可以跟随表达式（但不能是聚集函数）
+
+简单查询语句中各子句的顺序为:
+```
+SELECT [DISTINCT] 查询列表
+[FROM 表名]
+[WHERE 布尔表达式]
+[GROUP BY 分组列表 ]
+[HAVING 分组过滤条件]
+[ORDER BY 排序列表]
+[LIMIT 开始行, 限制条数]
+```
+
+子查询
+-------
