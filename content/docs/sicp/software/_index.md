@@ -43,3 +43,29 @@ draft: false
 
 ![kernel](./images/kernel.png)
 现代的操作系统往往是采用混合内核的，并不是泾渭分明的。
+
+
+系统调用
+-------
+系统调用是内核对外的接口，内核态的一些内核函数。应用程序只要和硬件打交道都会涉及到系统调用，向操作系统申请并等待回复，应该尽量避免或考虑优化，比如有些场景可以使用在用户空间的带buffer的文件替代操作系统提供的文件读写API。
+
+典型的系统调用汇编代码:
+```
+global _start 
+
+section .data
+    hello : db `hello, world!\n`
+section .text 
+    _start:
+        mov rax, 1      ; system call number should be store in rax
+        mov rdi, 1      ; argument #1 in rdi: where to write (descriptor)?
+        mov rsi, hello  ; argument #2 in rsi: where does the string start?
+        mov rdx, 14     ; argument #3 in rdx: how many bytes to write?
+        syscall         ; this instruction invokes a system call
+        
+        mov rax, 60     ; 'exit' syscall number
+        xor rdi, rdi
+        syscall
+```
+
+相比于call指令， int属于中断指令，需要栈切换并进行相关检查，开销更大一些。
