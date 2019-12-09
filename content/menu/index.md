@@ -19,4 +19,4 @@ bookMenuLevels: 1
   - 索引
   - 原理
 - **其他**
-  - 基础系统工具
+  - [基础系统工具]({{< relref "/docs/other/tools" >}})
