@@ -136,5 +136,24 @@ GNU通用的开发工具，也叫**binutils**，是一个标准，属于随身�
 
 GNU通用的调试工具，也叫**gdb**。binutils属于静态的观察，而gdb就可以动态的观察到每一个汇编指令的执行。[官方网站](https://www.gnu.org/software/gdb/)
 
-也可以使用一些带图形界面的类似工具，例如[gdbgui](https://www.gdbgui.com/)。
+也可以使用一些带图形界面的类似工具，例如[gdbgui](https://www.gdbgui.com/)。还有些[cheatsheet](https://kapeli.com/cheat_sheets/GDB.docset/Contents/Resources/Documents/index)很好用。
 
+
+构建工具
+-------
+
+GNU的自动构建工具为**make**，有些像脚本语言，把一堆命令放一起批量执行。使用它做编译属于增量编译，即通过对比修改时间来判断是否需要重新执行。[官方网站](https://www.gnu.org/software/make/)
+
+```
+hello: hello.s
+    nasm -g -f elf64 -o hello.o hello.s
+    ld -o $@ hello.o
+    
+clean:
+    -rm *.o
+    -rm hello
+    
+.PHONY: clean
+```
+
+对于这段构建代码，`hello:`后的部分就是告诉它要去检查哪些文件的修改时间；`$@`就表示当前这段的目标`hello`，`$<`表示这段的第一个依赖项，`$^`表示这段的所有依赖项；命令前加`-`表示该命令如有错误则忽略；`PHONY`表示没有目标，没有依赖，总是执行规则，在该例中，若恰好文件夹内有一个名为`clean`的文件，没有`PHONY`时则`make clean`不会执行；另外，由于历史原因makefile只能使用tab来缩进，不能使用空格。
