@@ -13,6 +13,11 @@
   </url>
   
   <url>
+    <loc>https://hjlarry.github.io/docs/other/tools/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://hjlarry.github.io/categories/</loc>
   </url>
   
@@ -37,6 +42,11 @@
   
   <url>
     <loc>https://hjlarry.github.io/tags/</loc>
+  </url>
+  
+  <url>
+    <loc>https://hjlarry.github.io/docs/go/map/</loc>
+    <lastmod>2019-12-11T10:08:44+08:00</lastmod>
   </url>
   
 </urlset>
