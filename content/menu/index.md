@@ -8,6 +8,7 @@ bookMenuLevels: 1
   - [软件部分]({{< relref "/docs/sicp/software" >}})
 - **GO语言**
   - 闭包
+  - [字典]({{< relref "/docs/go/map" >}})
   - 延迟调用
   - 垃圾回收
   - 内存分配
