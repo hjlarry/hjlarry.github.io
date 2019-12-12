@@ -18,7 +18,7 @@
 * 系统基本信息（中断的次数、上下文切换的次数）
 
 如下所示:
-```
+{{< highlight sh>}}
 [ubuntu] ~/.mac $ dstat
 You did not select any stats, using -cdngy by default.
 --total-cpu-usage-- -dsk/total- -net/total- ---paging-- ---system--
@@ -27,7 +27,7 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
   0   0 100   0   0|   0     0 |   0     0 |   0     0 | 140   323
   0   0 100   0   0|   0     0 |   0     0 |   0     0 | 163   376
   0   1 100   0   0|   0     0 |   0     0 |   0     0 | 169   391
-```
+{{< / highlight >}}
 
 生产环境下我们程序出错的时候，应该先从大的方面入手定位到具体是哪个方面的问题，看看当前的系统环境有没有问题，是不是我们的程序在当前的系统环境下水土不服。比如程序是IO密集型的，系统中有另一个程序在和它抢磁盘资源等。可以通过`dstat --list`查看它能对哪些细分项目查看其情况。[查看更多使用示例](http://dag.wiee.rs/home-made/dstat/)
 
@@ -35,7 +35,7 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
 ### sysstat
 
 通过定位了系统中哪个方面的问题之后，接着我们应该去定位我们自己程序哪个方面有问题。sysstat可以根据单个进程去检查它的各个方面，比如说我们定位到是内存方面的问题，接着去看自己程序中内存的问题:
-```
+{{< highlight sh>}}
 [ubuntu] ~/.mac $ pidstat -r -p `pidof tmux` 2
 Linux 4.9.184-linuxkit (cabd4e519687) 	12/09/19 	_x86_64_	(2 CPU)
 
@@ -44,7 +44,7 @@ Linux 4.9.184-linuxkit (cabd4e519687) 	12/09/19 	_x86_64_	(2 CPU)
 10:02:42        0        35      0.00      0.00   27424    4000   0.20  tmux: server
 10:02:44        0        35      0.00      0.00   27424    4000   0.20  tmux: server
 10:02:46        0        35      0.00      0.00   27424    4000   0.20  tmux: server
-```
+{{< / highlight >}}
 我们把tmux当做是自己写的某个程序，每2秒输出一次信息。minflt/s就代表一些小范围的缺页异常，可能是一些数据不需要了只要补上相应的物理内存即可。而majflt/s代表了需要从硬盘换入内存，这可能就意味着我们程序是不是有的任务优先级太低被操作系统换出到硬盘上了，我们可能需要通过系统调用告诉操作系统把某段内存锁死。
 
 更详细的使用方法，请参考[官方文档](http://sebastien.godard.pagesperso-orange.fr/documentation.html)。
@@ -52,16 +52,16 @@ Linux 4.9.184-linuxkit (cabd4e519687) 	12/09/19 	_x86_64_	(2 CPU)
 ### strace
 
 接着我们可以深入到自己程序的逻辑中去，比如使用strace检查我们程序的系统调用。可能只是一个简单的程序:
-```
+{{< highlight go>}}
 package main
 
 func main() {
 	println("hello world!")
 }
-```
+{{< / highlight >}}
 
 却涉及到大量的系统调用:
-```
+{{< highlight sh>}}
 [ubuntu] ~/.mac $ go build test.go
 [ubuntu] ~/.mac $ strace ~/.mac/test
 execve("/root/.mac/test", ["/root/.mac/test"], 0x7ffec1a0b740 /* 14 vars */) = 0
@@ -87,12 +87,12 @@ rt_sigaction(SIGINT, {sa_handler=0x44d8f0, sa_mask=~[], sa_flags=SA_RESTORER|SA_
 
 ......
 
-```
+{{< / highlight >}}
 
 打印输入输出必然会涉及系统调用，但如果我们使用一些第三方库时发现系统调用仍然很多，就可以去查找有没有优化替代的方案。
 
 一般，我们查看一些摘要信息即可:
-```
+{{< highlight sh>}}
 [ubuntu] ~/.mac $ strace -c ~/.mac/test
 hello world!
 % time     seconds  usecs/call     calls    errors syscall
@@ -111,7 +111,7 @@ hello world!
   0.00    0.000000           0         1         1 openat
 ------ ----------- ----------- --------- --------- ----------------
 100.00    0.000000                   140         1 total
-```
+{{< / highlight >}}
 
 开发工具
 -------
@@ -144,7 +144,7 @@ GNU通用的调试工具，也叫**gdb**。binutils属于静态的观察，而gd
 
 GNU的自动构建工具为**make**，有些像脚本语言，把一堆命令放一起批量执行。使用它做编译属于增量编译，即通过对比修改时间来判断是否需要重新执行。[官方网站](https://www.gnu.org/software/make/)
 
-```
+{{< highlight make>}}
 hello: hello.s
     nasm -g -f elf64 -o hello.o hello.s
     ld -o $@ hello.o
@@ -154,6 +154,6 @@ clean:
     -rm hello
     
 .PHONY: clean
-```
+{{< / highlight >}}
 
 对于这段构建代码，`hello:`后的部分就是告诉它要去检查哪些文件的修改时间；`$@`就表示当前这段的目标`hello`，`$<`表示这段的第一个依赖项，`$^`表示这段的所有依赖项；命令前加`-`表示该命令如有错误则忽略；`PHONY`表示没有目标，没有依赖，总是执行规则，在该例中，若恰好文件夹内有一个名为`clean`的文件，没有`PHONY`时则`make clean`不会执行；另外，由于历史原因makefile只能使用tab来缩进，不能使用空格。

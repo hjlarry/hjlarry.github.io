@@ -50,7 +50,7 @@ draft: false
 系统调用是内核对外的接口，内核态的一些内核函数。应用程序只要和硬件打交道都会涉及到系统调用，向操作系统申请并等待回复，应该尽量避免或考虑优化，比如有些场景可以使用在用户空间的带buffer的文件替代操作系统提供的文件读写API。
 
 典型的系统调用汇编代码:
-```
+{{< highlight asm>}}
 global _start 
 
 section .data
@@ -66,7 +66,7 @@ section .text
         mov rax, 60     ; 'exit' syscall number
         xor rdi, rdi
         syscall
-```
+{{< / highlight >}}
 
 相比于call指令， int属于中断指令，需要栈切换并进行相关检查，开销更大一些。
 
@@ -128,7 +128,7 @@ section .text
 假设某个程序需要内存分配器分配10MB的内存，那么操作系统会怎么做呢？首先会划分出一个虚拟地址范围，然后返回起始地址的指针。它此时没有必要通过MMU分配真实的物理内存，因为有可能这段内存后续根本没有读写发生。接下来若写入数据，也只会以页（8KB）为单位一点点的去写，每次写入的时候操作系统再去补物理内存，采用一种按需分配的机会主义原则。具体如何实现呢？当向一个虚拟地址写入数据时，就会去MMU找对应的物理地址，没有找到就说明没有建立映射关系还没有分配物理内存，就会引发一个缺页异常（page fault），操作系统内有专门的程序把这一页补上，来实现按需分配。
 
 我们通过程序可以模拟这种虚拟内存和物理内存的关系:
-```
+{{< highlight c>}}
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -155,10 +155,10 @@ int main()
     free(p);
     return EXIT_SUCCESS;
 }
-```
+{{< / highlight >}}
 
 观察运行结果:
-```
+{{< highlight sh>}}
 [ubuntu] ~/.mac $ pidstat -r -p `pidof test` 1
 │Linux 4.9.184-linuxkit (cabd4e519687)   12/06/19        _x86_64_        (2 CPU)│
 │11:10:18      UID       PID  minflt/s  majflt/s     VSZ     RSS   %MEM  Command
@@ -174,12 +174,12 @@ int main()
 │11:10:28        0       180      0.00      0.00  106908   52512   2.57  test
 │11:10:29        0       180      0.00      0.00  106908   52512   2.57  test
 │11:10:30        0       180   2560.00      0.00  106908   62544   3.06  test
-```
+{{< / highlight >}}
 VSZ表示虚拟内存，RSS表示物理内存，可以看到随用户的控制，数据不断写入，物理内存增加。
 
 ### 换入换出
 假设这10MB内存已经分配下来，该程序却长时间不用，操作系统就会把这10MB内存的数据保存到硬盘的交换分区上，并对这些内存页的状态做变更，MMU的映射地址做变更，这些内存就可以去给别的程序用，这就叫换出（swap out）。下次重新激活该程序时，会把硬盘上交换分区的数据重新放回某些空闲的页并重新建立映射，这就是换入（swap in）。我们可以通过监控工具观察到系统内的换入换出情况:
-```
+{{< highlight sh>}}
 [ubuntu] ~ $ dstat
 You did not select any stats, using -cdngy by default.
 --total-cpu-usage-- -dsk/total- -net/total- ---paging-- ---system--
@@ -190,7 +190,7 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
   0   0 100   0   0|   0     0 |   0     0 |   0     0 | 143   341
   
   // paging的in和out即为当前换入换出大小,int表示当前有多少中断,csw表示当前有多少上下文切换
-```
+{{< / highlight >}}
 当程序运行需要的内存大于机器的物理内存时，就可能造成频繁的换入换出，产生颠簸效应（thrashing）。
 
 ### 性能相关
@@ -207,7 +207,7 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
 
 ![ELF](./images/elf.png)  
 一个可执行程序看上去像是单个文件的数据库，里面分成不同的表。可查看其头部信息:
-```
+{{< highlight sh>}}
 [ubuntu] ~/.mac $ readelf -h test
 ELF Header:
   Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
@@ -229,10 +229,10 @@ ELF Header:
   Size of section headers:           64 (bytes)
   Number of section headers:         34
   Section header string table index: 33
-```
+{{< / highlight >}}
 
 还可以查看其内部的分布情况:
-```
+{{< highlight sh>}}
 [ubuntu] ~/.mac $ readelf -S test
 There are 34 section headers, starting at offset 0x22b0:
 
@@ -307,7 +307,7 @@ Section Headers:
        000000000000023f  0000000000000000           0     0     1
   [33] .shstrtab         STRTAB           0000000000000000  0000216f
        000000000000013e  0000000000000000           0     0     1
-```
+{{< / highlight >}}
 可以看出该文件有34个表，每个表有自己的名字、起始和终止的虚拟地址、长度信息、权限信息等。
 
 它等于是一个蓝图，执行时按这个蓝图虚拟存储器去规划并映射它的地址空间。

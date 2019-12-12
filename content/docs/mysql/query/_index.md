@@ -10,7 +10,7 @@ draft: false
 
 1、创建表格:
 
-```
+{{< highlight mysql>}}
 CREATE TABLE student_info (
     number INT PRIMARY KEY,
     name VARCHAR(5),
@@ -29,10 +29,10 @@ CREATE TABLE student_score (
     PRIMARY KEY (number, subject),
     CONSTRAINT FOREIGN KEY(number) REFERENCES student_info(number)
 );
-```
+{{< / highlight >}}
 
 2、填充数据:
-```
+{{< highlight mysql>}}
 INSERT INTO student_info(number, name, sex, id_number, department, major, enrollment_time) VALUES
 (20180101, '杜子腾', '男', '158177199901044792', '计算机学院', '计算机科学与工程', '2018-09-01'),
 (20180102, '杜琦燕', '女', '151008199801178529', '计算机学院', '计算机科学与工程', '2018-09-01'),
@@ -50,7 +50,7 @@ INSERT INTO student_score (number, subject, score) VALUES
 (20180103, '论萨达姆的战争准备', 61),
 (20180104, '母猪的产后护理', 55),
 (20180104, '论萨达姆的战争准备', 46);
-```
+{{< / highlight >}}
 
 3、填充结果:
 
@@ -87,7 +87,7 @@ INSERT INTO student_score (number, subject, score) VALUES
 * 方式二:`select number 学号 from student_score`    
 
 查询结果:
-```
+{{< highlight mysql>}}
 mysql> select number 学号 from student_score;
 +----------+
 | 学号     |
@@ -102,10 +102,10 @@ mysql> select number 学号 from student_score;
 | 20180104 |
 +----------+
 8 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 多列也可以:
-```
+{{< highlight mysql>}}
 mysql> select number 学号, name 姓名 from student_info;
 +----------+-----------+
 | 学号     | 姓名      |
@@ -118,12 +118,12 @@ mysql> select number 学号, name 姓名 from student_info;
 | 20180106 | 朱逸群    |
 +----------+-----------+
 6 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 去重
 
 单列去重:
-```
+{{< highlight mysql>}}
 mysql> select distinct department from student_info;
 +-----------------+
 | department      |
@@ -132,10 +132,10 @@ mysql> select distinct department from student_info;
 | 航天学院        |
 +-----------------+
 2 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 多列去重:
-```
+{{< highlight mysql>}}
 mysql> select distinct department,major from student_info;
 +-----------------+--------------------------+
 | department      | major                    |
@@ -146,13 +146,13 @@ mysql> select distinct department,major from student_info;
 | 航天学院        | 电子信息                 |
 +-----------------+--------------------------+
 4 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 限制查询结果条数
 
 使用`limit 从哪开始，多少条`，`从哪开始`可以省略，省略代表第0行。
 
-```
+{{< highlight mysql>}}
 mysql> select * from student_info limit 3,8;
 +----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
 | number   | name      | sex  | id_number          | department      | major           | enrollment_time |
@@ -162,12 +162,12 @@ mysql> select * from student_info limit 3,8;
 | 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息        | 2018-09-01      |
 +----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
 3 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 排序
 
 多列排序:
-```
+{{< highlight mysql>}}
 mysql> select * from student_info order by name asc, number desc;
 +----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
 | number   | name      | sex  | id_number          | department      | major                    | enrollment_time |
@@ -193,7 +193,7 @@ mysql> select * from student_info order by name desc, number desc;
 | 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程                 | 2018-09-01      |
 +----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
 6 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 带条件查询
 -------
@@ -201,7 +201,7 @@ mysql> select * from student_info order by name desc, number desc;
 ### 简单搜索条件
 
 不等于可以使用`<>`或`!=` :
-```
+{{< highlight mysql>}}
 mysql> select * from student_info where department <> '计算机学院';
 +----------+-----------+------+--------------------+--------------+-----------------+-----------------+
 | number   | name      | sex  | id_number          | department   | major           | enrollment_time |
@@ -210,10 +210,10 @@ mysql> select * from student_info where department <> '计算机学院';
 | 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院     | 电子信息        | 2018-09-01      |
 +----------+-----------+------+--------------------+--------------+-----------------+-----------------+
 2 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 区间内使用`between...and...`，不在某区间使用`not between...and...`:
-```
+{{< highlight mysql>}}
 mysql> select * from student_info where number between 20180103 and 20180105;
 +----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
 | number   | name      | sex  | id_number          | department      | major           | enrollment_time |
@@ -233,12 +233,12 @@ mysql> select * from student_info where number not between 20180103 and 20180105
 | 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息                 | 2018-09-01      |
 +----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
 3 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 匹配列表中的元素
 
 使用`in (...)`和`not in`筛选出在某个列表中的记录:
-```
+{{< highlight mysql>}}
 mysql> select * from student_info where major in ('软件工程',  '电子信息');
 +----------+-----------+------+--------------------+-----------------+--------------+-----------------+
 | number   | name      | sex  | id_number          | department      | major        | enrollment_time |
@@ -248,14 +248,14 @@ mysql> select * from student_info where major in ('软件工程',  '电子信息
 | 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息     | 2018-09-01      |
 +----------+-----------+------+--------------------+-----------------+--------------+-----------------+
 3 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 使用`is null` 和 `is not null`可筛选出某列是NULL的记录，而不能使用普通的操作符例如等号来进行比较，NULL代表没有值。
 
 ### 多个搜索条件
 
 AND优先级高于OR:
-```
+{{< highlight mysql>}}
 mysql> SELECT * FROM student_score WHERE score > 95 OR score < 55 AND subject = '论萨达姆的战争准备';
 +----------+-----------------------------+-------+
 | number   | subject                     | score |
@@ -265,12 +265,12 @@ mysql> SELECT * FROM student_score WHERE score > 95 OR score < 55 AND subject = 
 | 20180104 | 论萨达姆的战争准备          |    46 |
 +----------+-----------------------------+-------+
 3 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 模糊查询
 
 使用`like`和`not like`进行模糊匹配查询，`%`代表任意一个字符串，而`_`代表任意一个字符:
-```
+{{< highlight mysql>}}
 mysql> select * from student_info where name like '杜_';
 Empty set (0.00 sec)
 
@@ -291,7 +291,7 @@ mysql> select * from student_info where name like '%杜%';
 | 20180102 | 杜琦燕    | 女   | 151008199801178529 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
 +----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
 2 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 函数和表达式
 -------
@@ -299,7 +299,7 @@ mysql> select * from student_info where name like '%杜%';
 ### 表达式
 
 可以将表达式放在查询列表中:
-```
+{{< highlight mysql>}}
 mysql> select number,subject,score+100 from student_score;
 +----------+-----------------------------+-----------+
 | number   | subject                     | score+100 |
@@ -314,10 +314,10 @@ mysql> select number,subject,score+100 from student_score;
 | 20180104 | 论萨达姆的战争准备          |       146 |
 +----------+-----------------------------+-----------+
 8 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 也可以把表达式作为搜索的条件:
-```
+{{< highlight mysql>}}
 mysql> select * from student_score where score%3=0;
 +----------+-----------------------+-------+
 | number   | subject               | score |
@@ -325,12 +325,12 @@ mysql> select * from student_score where score%3=0;
 | 20180101 | 母猪的产后护理        |    78 |
 +----------+-----------------------+-------+
 1 row in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 文本处理
 
 连接字符串:
-```
+{{< highlight mysql>}}
 mysql> select concat('学号为',number,'的学生在[',subject,']的成绩为',score) from student_score;
 +--------------------------------------------------------------------------+
 | concat('学号为',number,'的学生在[',subject,']的成绩为',score)            |
@@ -345,10 +345,10 @@ mysql> select concat('学号为',number,'的学生在[',subject,']的成绩为',
 | 学号为20180104的学生在[论萨达姆的战争准备]的成绩为46                     |
 +--------------------------------------------------------------------------+
 8 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 子串:
-```
+{{< highlight mysql>}}
 mysql> select substring(number, 4, 5) as 学号尾号 from student_info;
 +--------------+
 | 学号尾号     |
@@ -361,12 +361,12 @@ mysql> select substring(number, 4, 5) as 学号尾号 from student_info;
 | 80106        |
 +--------------+
 6 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 时间处理函数
 
 时间间隔:
-```
+{{< highlight mysql>}}
 mysql> select date_add('2015-01-01 10:20:33', interval 2 minute);
 +----------------------------------------------------+
 | date_add('2015-01-01 10:20:33', interval 2 minute) |
@@ -374,10 +374,10 @@ mysql> select date_add('2015-01-01 10:20:33', interval 2 minute);
 | 2015-01-01 10:22:33                                |
 +----------------------------------------------------+
 1 row in set (0.00 sec)
-```
+{{< / highlight >}}
 
 时间格式化:
-```
+{{< highlight mysql>}}
 mysql> select date_format(now(), '%b/%d/%Y %h:%i:%s~%p');
 +--------------------------------------------+
 | date_format(now(), '%b/%d/%Y %h:%i:%s~%p') |
@@ -385,7 +385,7 @@ mysql> select date_format(now(), '%b/%d/%Y %h:%i:%s~%p');
 | Dec/02/2019 04:57:31~PM                    |
 +--------------------------------------------+
 1 row in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 聚集函数
 
@@ -393,7 +393,7 @@ COUNT用来统计行数
 * `COUNT(*)`统计表中所有的行，包括NULL
 * `COUNT(列名)`统计表中某列的所有行，不包括NULL
 
-```
+{{< highlight mysql>}}
 mysql> select count(*) from student_info;
 +----------+
 | count(*) |
@@ -409,10 +409,10 @@ mysql> select count(distinct subject) from student_score;
 |                       2 |
 +-------------------------+
 1 row in set (0.00 sec)
-```
+{{< / highlight >}}
 
 SUM和AVG:
-```
+{{< highlight mysql>}}
 mysql> select sum(score) from student_score;
 +------------+
 | sum(score) |
@@ -428,10 +428,10 @@ mysql> select avg(score) from student_score where subject="论萨达姆的战争
 |    73.2500 |
 +------------+
 1 row in set (0.00 sec)
-```
+{{< / highlight >}}
 
 组合使用:
-```
+{{< highlight mysql>}}
 mysql> select count(*) as 成绩记录总数, max(score) as 最高分, min(score) as 最低分,avg(score) as 平均分 from student_score;
 +--------------------+-----------+-----------+-----------+
 | 成绩记录总数       | 最高分    | 最低分    | 平均分    |
@@ -439,12 +439,12 @@ mysql> select count(*) as 成绩记录总数, max(score) as 最高分, min(score
 |                  8 |       100 |        46 |   73.1250 |
 +--------------------+-----------+-----------+-----------+
 1 row in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 隐式类型转换
 
 Mysql会尽量把值转换为表达式中需要的类型，而不是产生错误:
-```
+{{< highlight mysql>}}
 mysql> select 1 + '2';
 +---------+
 | 1 + '2' |
@@ -460,10 +460,10 @@ mysql> select '23sds'+17;
 |         40 |
 +------------+
 1 row in set, 1 warning (0.00 sec)
-```
+{{< / highlight >}}
 
 但这种转换不能用于存储数据:
-```
+{{< highlight mysql>}}
 mysql> insert into student_score(score,number,subject) values (100,20180101,300);
 Query OK, 1 row affected (0.00 sec)
 
@@ -472,7 +472,7 @@ Query OK, 1 row affected (0.00 sec)
 
 mysql> insert into student_score(score,number,subject) values ('asd',20180101,400);
 ERROR 1366 (HY000): Incorrect integer value: 'asd' for column 'score' at row 1
-```
+{{< / highlight >}}
 
 分组查询
 -------
@@ -480,7 +480,7 @@ ERROR 1366 (HY000): Incorrect integer value: 'asd' for column 'score' at row 1
 ### 基础查询
 
 分组就是针对某个列，将该列的值相同的记录分到一个组中:
-```
+{{< highlight mysql>}}
 mysql> select subject, sum(score) from student_score group by subject;
 +-----------------------------+------------+
 | subject                     | sum(score) |
@@ -489,18 +489,18 @@ mysql> select subject, sum(score) from student_score group by subject;
 | 论萨达姆的战争准备          |        293 |
 +-----------------------------+------------+
 2 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 把非分组列放入查询列表中会引起争议，导致结果不确定:
-```
+{{< highlight mysql>}}
 mysql> select subject, sum(score),number from student_score group by subject;
 ERROR 1055 (42000): Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'student.student_score.number' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
-```
+{{< / highlight >}}
 
 ### 分组和过滤条件
 
 是先过滤出符合条件的数据，在进行分组运算的:
-```
+{{< highlight mysql>}}
 mysql> select subject, sum(score) from student_score where score>70 group by subject;
 +-----------------------------+------------+
 | subject                     | sum(score) |
@@ -509,10 +509,10 @@ mysql> select subject, sum(score) from student_score where score>70 group by sub
 | 论萨达姆的战争准备          |        186 |
 +-----------------------------+------------+
 2 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 也可以分组后，在筛选出合适的分组:
-```
+{{< highlight mysql>}}
 mysql> select subject, sum(score) from student_score group by subject having max(score)>98;
 +-----------------------+------------+
 | subject               | sum(score) |
@@ -520,11 +520,11 @@ mysql> select subject, sum(score) from student_score group by subject having max
 | 母猪的产后护理        |        292 |
 +-----------------------+------------+
 1 row in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 分组和排序
 
-```
+{{< highlight mysql>}}
 mysql> select subject, sum(score) as sum_s from student_score group by subject order by sum_s desc;
 +-----------------------------+-------+
 | subject                     | sum_s |
@@ -533,12 +533,12 @@ mysql> select subject, sum(score) as sum_s from student_score group by subject o
 | 母猪的产后护理              |   292 |
 +-----------------------------+-------+
 2 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 嵌套分组
 
 如下例，可先按department分成大组，再按major分为小组:
-```
+{{< highlight mysql>}}
 mysql> select department, major, count(*) from student_info group by department, major;
 +-----------------+--------------------------+----------+
 | department      | major                    | count(*) |
@@ -549,7 +549,7 @@ mysql> select department, major, count(*) from student_info group by department,
 | 计算机学院      | 软件工程                 |        2 |
 +-----------------+--------------------------+----------+
 4 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 注意事项
 
@@ -559,7 +559,7 @@ mysql> select department, major, count(*) from student_info group by department,
 4. GROUP BY子句后可以跟随表达式（但不能是聚集函数）
 
 简单查询语句中各子句的顺序为:
-```
+{{< highlight mysql>}}
 SELECT [DISTINCT] 查询列表
 [FROM 表名]
 [WHERE 布尔表达式]
@@ -567,7 +567,7 @@ SELECT [DISTINCT] 查询列表
 [HAVING 分组过滤条件]
 [ORDER BY 排序列表]
 [LIMIT 开始行, 限制条数]
-```
+{{< / highlight >}}
 
 子查询
 -------
@@ -575,7 +575,7 @@ SELECT [DISTINCT] 查询列表
 ### 标量子查询
 
 标量子查询单纯的代表一个值，可以作为表达式参与运算或作为搜索条件:
-```
+{{< highlight mysql>}}
 mysql> select * from student_score where number=(select number from student_info where name='范统');
 +----------+-----------------------------+-------+
 | number   | subject                     | score |
@@ -584,12 +584,12 @@ mysql> select * from student_score where number=(select number from student_info
 | 20180103 | 论萨达姆的战争准备          |    61 |
 +----------+-----------------------------+-------+
 2 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 列子查询
 
 内层查询结果不是一个单独的值，而是一个列:
-```
+{{< highlight mysql>}}
 mysql> select * from student_score where number=(select number from student_info where sex='男');
 ERROR 1242 (21000): Subquery returns more than 1 row
 
@@ -603,14 +603,14 @@ mysql> select * from student_score where number in (select number from student_i
 | 20180103 | 论萨达姆的战争准备          |    61 |
 +----------+-----------------------------+-------+
 4 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 而行子查询、表子查询不常用，省略。
 
 ### EXISTS和相关子查询
 
 EXISTS和NOT EXISTS单独看很像一个函数，返回查询结果是否为空集:
-```
+{{< highlight mysql>}}
 mysql> select exists (select * from student_info where number=20180101);
 +-----------------------------------------------------------+
 | exists (select * from student_info where number=20180101) |
@@ -626,10 +626,10 @@ mysql> select not exists (select * from student_info where number=20180101);
 |                                                             0 |
 +---------------------------------------------------------------+
 1 row in set (0.00 sec)
-```
+{{< / highlight >}}
 
 之前我们尝试的都是不相关子查询，而相关子查询就是内层查询语句要用到外层查询语句的值，比如我们查学生的基本信息并要求这些学生有成绩的记录:
-```
+{{< highlight mysql>}}
 mysql> select * from student_info where exists(select * from student_score where student_score.number=student_info.number);
 +----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
 | number   | name      | sex  | id_number          | department      | major                    | enrollment_time |
@@ -640,18 +640,18 @@ mysql> select * from student_info where exists(select * from student_score where
 | 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程                 | 2018-09-01      |
 +----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
 4 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 这个相关子查询的查询过程是:先执行外层查询获得到student_info表的第一条记录，发现它的number值是20180101。把20180101当作参数传入到子查询，此时子查询的意思是判断student_score表的number字段是否有20180101这个值存在，子查询的结果是该值存在，所以整个EXISTS表达式的值为TRUE，那么student_info表的第一条记录可以被加入到结果集。每条记录依次按这个过程执行。
 
 此外，子查询还可以应用于同一个表，比如我们去查student_score表中分数大于平均分的记录，第一印象可能是如下写法:
-```
+{{< highlight mysql>}}
 mysql> select * from student_score where score > avg(score);
 ERROR 1111 (HY000): Invalid use of group function
-```
+{{< / highlight >}}
 
 实际应该使用子查询来实现:
-```
+{{< highlight mysql>}}
 mysql> select * from student_score where score > (select avg(score) from student_score);
 +----------+-----------------------------+-------+
 | number   | subject                     | score |
@@ -662,7 +662,7 @@ mysql> select * from student_score where score > (select avg(score) from student
 | 20180102 | 论萨达姆的战争准备          |    98 |
 +----------+-----------------------------+-------+
 4 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 因为聚集函数不能用于WHERE子句，可以把上述写法看做是给student_score做了一个副本。
 
 连接查询
@@ -672,7 +672,7 @@ mysql> select * from student_score where score > (select avg(score) from student
 连接的本质就是将各个表中的记录都拉取出来，依次匹配组合形成一个结果集，也就是笛卡尔积的方式。
 
 我们来看一个示例:
-```
+{{< highlight mysql>}}
 mysql> create table t1(m1 int, n1 char(1));
 Query OK, 0 rows affected (0.02 sec)
 
@@ -686,10 +686,10 @@ Records: 3  Duplicates: 0  Warnings: 0
 mysql> insert into t2 values(2, 'a'),(3, 'b'),(4, 'c');
 Query OK, 3 rows affected (0.00 sec)
 Records: 3  Duplicates: 0  Warnings: 0
-```
+{{< / highlight >}}
 
 新建了两个表，并各插入了三条数据，那么连接可以这样做:
-```
+{{< highlight mysql>}}
 mysql> select * from t1,t2;
 +------+------+------+------+
 | m1   | n1   | m2   | n2   |
@@ -705,7 +705,7 @@ mysql> select * from t1,t2;
 |    3 | c    |    4 | c    |
 +------+------+------+------+
 9 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 使用以下写法连接都是可以的:
 
@@ -716,7 +716,7 @@ mysql> select * from t1,t2;
 ### 内外连接
 
 现在我们想通过一条语句既查到学生的基本信息，又查到他的成绩信息:
-```
+{{< highlight mysql>}}
 mysql> select student_info.number,name,sex,subject,score from student_info, student_score where student_info.number = student_score.number;
 +----------+-----------+------+-----------------------------+-------+
 | number   | name      | sex  | subject                     | score |
@@ -731,7 +731,7 @@ mysql> select student_info.number,name,sex,subject,score from student_info, stud
 | 20180104 | 史珍香    | 女   | 论萨达姆的战争准备          |    46 |
 +----------+-----------+------+-----------------------------+-------+
 8 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 这时候我们发现有两个人没有成绩，所以他们没有显示在查询结果中。为了有办法让其显示出，就有了内连接和外连接的概念:
 
@@ -745,7 +745,7 @@ mysql> select student_info.number,name,sex,subject,score from student_info, stud
 外连接的标准语法为: `select * from t1 left/right [outer] join t2 on 连接条件 [where 普通过滤条件]`，outer和where可省略。
 
 上例中使用外连接的结果为:
-```
+{{< highlight mysql>}}
 mysql> select student_info.number,name,sex,subject,score from student_info left join student_score on student_info.number = student_score.number;
 +----------+-----------+------+-----------------------------+-------+
 | number   | name      | sex  | subject                     | score |
@@ -762,7 +762,7 @@ mysql> select student_info.number,name,sex,subject,score from student_info left 
 | 20180106 | 朱逸群    | 男   | NULL                        |  NULL |
 +----------+-----------+------+-----------------------------+-------+
 10 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 内连接以下的写法是等价的:
 
@@ -772,7 +772,7 @@ mysql> select student_info.number,name,sex,subject,score from student_info left 
 * `select * from t1 cross join t2`
 
 综上，我们总结以下三种连接的结果差异:
-```
+{{< highlight mysql>}}
 mysql> select * from t1 inner join t2 on t1.m1=t2.m2;
 +------+------+------+------+
 | m1   | n1   | m2   | n2   |
@@ -801,19 +801,19 @@ mysql> select * from t1 right join t2 on t1.m1=t2.m2;
 | NULL | NULL |    4 | c    |
 +------+------+------+------+
 3 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 多表连接
 
 我们可以连接任意数量的表，我们再加入一张表试验:
-```
+{{< highlight mysql>}}
 mysql> create table t3(m3 int, n3 char(1));
 Query OK, 0 rows affected (0.07 sec)
 
 mysql> insert into t3 values(3, 'a'),(3, 'b'),(4, 'c');
 Query OK, 3 rows affected (0.01 sec)
 Records: 3  Duplicates: 0  Warnings: 0
-```
+{{< / highlight >}}
 
 我们使用下面的语法查询是等价的:
 
@@ -821,7 +821,7 @@ Records: 3  Duplicates: 0  Warnings: 0
 * `select * from t1 inner join t2 on t1.m1=t2.m2 inner join t3 on t1.m1=t3.m3;`
 
 查询结果:
-```
+{{< highlight mysql>}}
 mysql> select * from t1 inner join t2 on t1.m1=t2.m2 inner join t3 on t1.m1=t3.m3;
 +------+------+------+------+------+------+
 | m1   | n1   | m2   | n2   | m3   | n3   |
@@ -830,9 +830,9 @@ mysql> select * from t1 inner join t2 on t1.m1=t2.m2 inner join t3 on t1.m1=t3.m
 |    3 | c    |    3 | b    |    3 | b    |
 +------+------+------+------+------+------+
 2 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 也可以用伪代码来描述:
-```
+{{< highlight python>}}
 for each_row in t1{
     for each_row in t2 which t1.m1=t2.m2{
         for each_row in t3 which t2.m2=t3.m3{
@@ -840,12 +840,12 @@ for each_row in t1{
         }
     }
 }
-```
+{{< / highlight >}}
 
 ### 自连接
 
 我们无法直接自连接，但可以通过别名:
-```
+{{< highlight mysql>}}
 mysql> select * from t1, t1;
 ERROR 1066 (42000): Not unique table/alias: 't1'
 mysql> select * from t1 as table1, t1 as table2;
@@ -863,10 +863,10 @@ mysql> select * from t1 as table1, t1 as table2;
 |    3 | c    |    3 | c    |
 +------+------+------+------+
 9 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 而自连接的意义，比如要查询与'范统'的专业相同的同学:
-```
+{{< highlight mysql>}}
 mysql> select * from student_info as s1, student_info as s2 where s1.name='范统' and s1.major=s2.major;
 +----------+--------+------+--------------------+-----------------+--------------+-----------------+----------+-----------+------+--------------------+-----------------+--------------+-----------------+
 | number   | name   | sex  | id_number          | department      | major        | enrollment_time | number   | name      | sex  | id_number          | department      | major        | enrollment_time |
@@ -875,12 +875,12 @@ mysql> select * from student_info as s1, student_info as s2 where s1.name='范�
 | 20180103 | 范统   | 男   | 17156319980116959X | 计算机学院      | 软件工程     | 2018-09-01      | 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程     | 2018-09-01      |
 +----------+--------+------+--------------------+-----------------+--------------+-----------------+----------+-----------+------+--------------------+-----------------+--------------+-----------------+
 2 rows in set (0.00 sec)
-```
+{{< / highlight >}}
 
 ### 与子查询转换
 
 有的需求既可以用连接查询，也可以用子查询:
-```
+{{< highlight mysql>}}
 mysql> select * from student_score where number in (select number from student_info where major='软件工程');
 +----------+-----------------------------+-------+
 | number   | subject                     | score |
@@ -902,4 +902,4 @@ mysql> select s2.* from student_score as s2, student_info as s1 where s1.number=
 | 20180104 | 论萨达姆的战争准备          |    46 |
 +----------+-----------------------------+-------+
 4 rows in set (0.00 sec)
-```
+{{< / highlight >}}

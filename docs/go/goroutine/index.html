@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
 
 
-<script defer src="/cn.search.min.01c7a6ed1a8f0928e0ba42bb328c2d7a2661b571663fa179e6c6d83af1aab327.js" integrity="sha256-Acem7RqPCSjgukK7MowteiZhtXFmP6F55sbYOvGqsyc="></script>
+<script defer src="/cn.search.min.f3fc3a1751b1550b85e53f5a72b6afb77b195d1124d845f3c1228e562fd0f472.js" integrity="sha256-8/w6F1GxVQuF5T9acravt3sZXREk2EXzwSKOVi/Q9HI="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/go/goroutine/index.xml" title="Home" />
 <!--
@@ -160,32 +160,30 @@ https://github.com/alex-shpak/hugo-book
 
 <p>这样的平衡方式也就决定了我们没有办法确定哪个方法先执行，哪个后执行，除非我们自己写逻辑去判断先后。我们再来看一个关于执行顺序的示例:</p>
 
-<pre><code class="language-GO">func main() {
-    runtime.GOMAXPROCS(1) // 设置P为1
-    for i := 0; i &lt; 10; i++ {
-        go func(id int) { // 创建10个G
-            time.Sleep(time.Second)
-            fmt.Println(id)
-        }(i)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#a6e22e">runtime</span>.<span style="color:#a6e22e">GOMAXPROCS</span>(<span style="color:#ae81ff">1</span>) <span style="color:#75715e">// 设置P为1
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#ae81ff">10</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
+        <span style="color:#66d9ef">go</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">id</span> <span style="color:#66d9ef">int</span>) { <span style="color:#75715e">// 创建10个G
+</span><span style="color:#75715e"></span>            <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+            <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">id</span>)
+        }(<span style="color:#a6e22e">i</span>)
     }
-    time.Sleep(time.Second * 2)
-}
-</code></pre>
+    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>)
+}</code></pre></div>
 
 <p>执行结果:</p>
 
-<pre><code class="language-shell">[ubuntu] ~/.mac/gocode $ go run goroutine.go
-9
-0
-1
-2
-3
-4
-5
-6
-7
-8
-</code></pre>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/gocode $ go run goroutine.go
+<span style="color:#ae81ff">9</span>
+<span style="color:#ae81ff">0</span>
+<span style="color:#ae81ff">1</span>
+<span style="color:#ae81ff">2</span>
+<span style="color:#ae81ff">3</span>
+<span style="color:#ae81ff">4</span>
+<span style="color:#ae81ff">5</span>
+<span style="color:#ae81ff">6</span>
+<span style="color:#ae81ff">7</span>
+<span style="color:#ae81ff">8</span></code></pre></div>
 
 <blockquote>
 <p>为什么当P为1的时候，它不是顺序输出的，9总是在第一个？</p>
@@ -237,58 +235,54 @@ https://github.com/alex-shpak/hugo-book
 
 <p>这就可能导致一个问题，创建出大量的空闲的M，不会被回收。M是会在操作系统内核中创建一个线程，尽管这种休眠状态下的M不会被CPU分配时间片，但仍然会占用管理资源，另外每个M上都带着G0内存，相当于资源泄漏了。我们通过如下代码来模拟这种情况：</p>
 
-<pre><code class="language-GO">func main(){
-    for i :=0;i&lt;1000;i++{
-        go func(){
-            runtime.LockOSThread() //通过锁模拟系统调用
-            defer runtime.UnlockOSThread()
-            time.Sleep(time.Second*5)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>(){
+    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">i</span>&lt;<span style="color:#ae81ff">1000</span>;<span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>{
+        <span style="color:#66d9ef">go</span> <span style="color:#66d9ef">func</span>(){
+            <span style="color:#a6e22e">runtime</span>.<span style="color:#a6e22e">LockOSThread</span>() <span style="color:#75715e">//通过锁模拟系统调用
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">runtime</span>.<span style="color:#a6e22e">UnlockOSThread</span>()
+            <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span><span style="color:#f92672">*</span><span style="color:#ae81ff">5</span>)
         }()
     }
-    time.Sleep(time.Minute)
-}
-</code></pre>
+    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Minute</span>)
+}</code></pre></div>
 
 <p>通过<code>go build test.go &amp;&amp; GODEBUG=schedtrace=1000 ./test</code>运行：</p>
 
-<pre><code class="language-shell">SCHED 0ms: gomaxprocs=4 idleprocs=2 threads=5 spinningthreads=1 idlethreads=2 runqueue=0 [0 0 0 0]
-SCHED 1002ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
-SCHED 2008ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
-SCHED 3013ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
-SCHED 4014ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
-SCHED 5015ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=127 runqueue=0 [0 0 0 0]
-SCHED 6017ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=1007 runqueue=0 [0 0 0 0]
-SCHED 7025ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=1007 runqueue=0 [0 0 0 0]
-SCHED 8027ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=1007 runqueue=0 [0 0 0 0]
-SCHED 9029ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=1007 runqueue=0 [0 0 0 0]
-SCHED 10031ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=1007 runqueue=0 [0 0 0 0]
-</code></pre>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">SCHED 0ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 1002ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 2008ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 3013ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 4014ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 5015ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">127</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 6017ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">1007</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 7025ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">1007</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 8027ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">1007</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 9029ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">1007</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 10031ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">1007</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span></code></pre></div>
 
 <p>我们发现任务开始的时候共创建了1010个线程，任务执行完以后，仍然有1007个休眠的线程。当我们把<code>runtime.LockOSThread()</code>注释掉，重新运行：</p>
 
-<pre><code class="language-shell">SCHED 0ms: gomaxprocs=4 idleprocs=1 threads=5 spinningthreads=1 idlethreads=1 runqueue=0 [48 49 133 0]
-SCHED 1004ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
-SCHED 2008ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
-SCHED 3010ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
-SCHED 4015ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
-SCHED 5026ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=7 runqueue=0 [0 0 0 0]
-SCHED 6031ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=7 runqueue=0 [0 0 0 0]
-</code></pre>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">SCHED 0ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">48</span> <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">133</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 1004ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">9</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 2008ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">9</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 3010ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">9</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 4015ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">9</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 5026ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">9</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">7</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 6031ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">9</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">7</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span></code></pre></div>
 
 <p>发现没有系统调用，那就根本不会有那么多线程。我们再把<code>runtime.LockOSThread()</code>保留，<code>defer runtime.UnlockOSThread()</code>去掉，运行结果如下：</p>
 
-<pre><code class="language-shell">SCHED 0ms: gomaxprocs=4 idleprocs=2 threads=5 spinningthreads=1 idlethreads=2 runqueue=0 [0 0 152 0]
-SCHED 1000ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
-SCHED 2001ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
-SCHED 3008ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
-SCHED 4016ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
-SCHED 5019ms: gomaxprocs=4 idleprocs=0 threads=938 spinningthreads=0 idlethreads=4 runqueue=0 [18 1 3 7]
-SCHED 6027ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=10 runqueue=0 [0 0 0 0]
-SCHED 7037ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=10 runqueue=0 [0 0 0 0]
-SCHED 8042ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=10 runqueue=0 [0 0 0 0]
-SCHED 9044ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=10 runqueue=0 [0 0 0 0]
-cSCHED 10047ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=10 runqueue=0 [0 0 0 0]
-</code></pre>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">SCHED 0ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">152</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 1000ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 2001ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 3008ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 4016ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">1010</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 5019ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">938</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">18</span> <span style="color:#ae81ff">1</span> <span style="color:#ae81ff">3</span> <span style="color:#ae81ff">7</span><span style="color:#f92672">]</span>
+SCHED 6027ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">13</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 7037ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">13</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 8042ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">13</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+SCHED 9044ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">13</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>
+cSCHED 10047ms: gomaxprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> idleprocs<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> threads<span style="color:#f92672">=</span><span style="color:#ae81ff">13</span> spinningthreads<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> idlethreads<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> runqueue<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span></code></pre></div>
 
 <p>我们发现那些创建的线程是会被回收的，线程没有被解锁意味着线程的状态没有被解除而陷入了死锁状态，线程不能再去接收新的任务没有存在的意义自然会被杀掉。</p>
 
@@ -298,55 +292,52 @@ cSCHED 10047ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethread
 
 <p>假设当前的P/M正在执行一个G，这时候G里面创建了一个G1，G1会被放到当前P的runnext中，但它可能迟迟得不到执行被饿死，因为G中可能还有大量的逻辑代码执行完才轮到runnext，这显然是不合理的。怎么解决这个问题呢？是否可以让当前这个P/M交替的执行G和G1？P不是真正的CPU，没法实现基于时间片的抢占式调度，只能实现类似于协程那样的协作式调度。很多语言里都使用类似于Gosched()这样的函数来主动交出执行权，但Go中却很少见；还有一种形式是runtime带一个计数器，每执行一个任务后累加计数，当到达一个指定的计数就会被认为是使用完了时间片，向当前执行的P/M发出一个抢占式的信号，然后G主动让出执行权限。Go到底是怎样做的？我们来看如下示例：</p>
 
-<pre><code class="language-GO">// GODEBUG=schedtrace=1000,scheddetail=1 ./test  可查看运行期GMP状态
-func main(){
-    runtime.GOMAXPROCS(1)
-    for i:=0;i&lt;3;i++{
-        go func(id int){
-            println(id)
-            x := 0
-            for{  // 死循环
-                x++
-                //print()
-            }
-        }(i)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// GODEBUG=schedtrace=1000,scheddetail=1 ./test  可查看运行期GMP状态
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>(){
+    <span style="color:#a6e22e">runtime</span>.<span style="color:#a6e22e">GOMAXPROCS</span>(<span style="color:#ae81ff">1</span>)
+    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span><span style="color:#f92672">:=</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">i</span>&lt;<span style="color:#ae81ff">3</span>;<span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>{
+        <span style="color:#66d9ef">go</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">id</span> <span style="color:#66d9ef">int</span>){
+            println(<span style="color:#a6e22e">id</span>)
+            <span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>
+            <span style="color:#66d9ef">for</span>{  <span style="color:#75715e">// 死循环
+</span><span style="color:#75715e"></span>                <span style="color:#a6e22e">x</span><span style="color:#f92672">++</span>
+                <span style="color:#75715e">//print()
+</span><span style="color:#75715e"></span>            }
+        }(<span style="color:#a6e22e">i</span>)
     }
-    time.Sleep(time.Second)
-}
-</code></pre>
+    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+}</code></pre></div>
 
 <p>我们模拟了只有一个P/M，这时候创建了3个G，让第一个G执行的过程中进入死循环，运行结果就是只打印出了任务0，其他G被饿死了。但当我们在死循环内x++后面加入一个函数，则任务0、1、2都会被打印出。问题就出在这个函数上。</p>
 
 <p>我们先使用一个简单的函数来观察：</p>
 
-<pre><code class="language-GO">//go:noinline
-func test(){
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">//go:noinline
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">test</span>(){
     println()
 }
 
-func main(){
-    test()
-}
-</code></pre>
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>(){
+    <span style="color:#a6e22e">test</span>()
+}</code></pre></div>
 
 <p>使用<code>go build &amp;&amp; go tool objdump -s &quot;main\.test&quot; test</code>反汇编：</p>
 
-<pre><code class="language-shell">TEXT main.test(SB) /mnt/hgfs/disk/test.go
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">TEXT main.test<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span> /mnt/hgfs/disk/test.go
   test.go:5		0x4525b0		64488b0c25f8ffffff	MOVQ FS:0xfffffff8, CX			
-  test.go:5		0x4525b9		483b6110		CMPQ 0x10(CX), SP			
-  test.go:5		0x4525bd		7624			JBE 0x4525e3				
+  test.go:5		0x4525b9		483b6110		CMPQ 0x10<span style="color:#f92672">(</span>CX<span style="color:#f92672">)</span>, SP			
+  test.go:5		0x4525bd		<span style="color:#ae81ff">7624</span>			JBE 0x4525e3				
   test.go:5		0x4525bf		4883ec08		SUBQ $0x8, SP				
-  test.go:5		0x4525c3		48892c24		MOVQ BP, 0(SP)				
-  test.go:5		0x4525c7		488d2c24		LEAQ 0(SP), BP				
-  test.go:6		0x4525cb		e80031fdff		CALL runtime.printlock(SB)		
-  test.go:6		0x4525d0		e88b33fdff		CALL runtime.printnl(SB)		
-  test.go:6		0x4525d5		e87631fdff		CALL runtime.printunlock(SB)		
-  test.go:7		0x4525da		488b2c24		MOVQ 0(SP), BP				
+  test.go:5		0x4525c3		48892c24		MOVQ BP, <span style="color:#ae81ff">0</span><span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>				
+  test.go:5		0x4525c7		488d2c24		LEAQ <span style="color:#ae81ff">0</span><span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>, BP				
+  test.go:6		0x4525cb		e80031fdff		CALL runtime.printlock<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>		
+  test.go:6		0x4525d0		e88b33fdff		CALL runtime.printnl<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>		
+  test.go:6		0x4525d5		e87631fdff		CALL runtime.printunlock<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>		
+  test.go:7		0x4525da		488b2c24		MOVQ <span style="color:#ae81ff">0</span><span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>, BP				
   test.go:7		0x4525de		4883c408		ADDQ $0x8, SP				
   test.go:7		0x4525e2		c3			RET					
-  test.go:5		0x4525e3		e8187bffff		CALL runtime.morestack_noctxt(SB)	
-  test.go:5		0x4525e8		ebc6			JMP main.test(SB)	
-</code></pre>
+  test.go:5		0x4525e3		e8187bffff		CALL runtime.morestack_noctxt<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>	
+  test.go:5		0x4525e8		ebc6			JMP main.test<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>	</code></pre></div>
 
 <p>我们发现头部的三条指令和尾部的两条指令都是编译器插入的。<code>runtime.morestack_noctxt</code>会做两件事情，一是检查当前栈帧空间是否足够，如果不够可以帮助扩容；二是检查是否有人发出了抢占式调度信号，如果发现了信号，它就让出执行权限。函数前使用<code>go:nosplit</code>可以禁止编译器插入这样的指令。</p>
 </article>

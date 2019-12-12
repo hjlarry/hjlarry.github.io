@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
 
 
-<script defer src="/cn.search.min.01c7a6ed1a8f0928e0ba42bb328c2d7a2661b571663fa179e6c6d83af1aab327.js" integrity="sha256-Acem7RqPCSjgukK7MowteiZhtXFmP6F55sbYOvGqsyc="></script>
+<script defer src="/cn.search.min.f3fc3a1751b1550b85e53f5a72b6afb77b195d1124d845f3c1228e562fd0f472.js" integrity="sha256-8/w6F1GxVQuF5T9acravt3sZXREk2EXzwSKOVi/Q9HI="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/go/defer/index.xml" title="Home" />
 <!--
@@ -119,193 +119,182 @@ https://github.com/alex-shpak/hugo-book
 
 <p>defer是GO语言中独有的特性，在其他语言中可能采用<code>try...finally</code>这样的方式来实现，两者还是有很大区别的。finally是立即执行的，而defer会延迟执行，且defer可以分割很多的逻辑。延迟调用最大的优势是即便函数执行出错，依然能保证回收资源等操作得以执行。</p>
 
-<p>我们看到很多的文章中是这样描述defer执行方式的，参数首先会被复制进<code>defer func</code>中，然后执行原函数，然后执行<code>defer func</code>，最后再执行return。那么真的是这样么？这似乎解释不了如下示例:</p>
-
-<pre><code>func test1() int {
-	x := 100
-	defer func() {
-		x++
+<p>我们看到很多的文章中是这样描述defer执行方式的，参数首先会被复制进<code>defer func</code>中，然后执行原函数，然后执行<code>defer func</code>，最后再执行return。那么真的是这样么？这似乎解释不了如下示例:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">test1</span>() <span style="color:#66d9ef">int</span> {
+	<span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">100</span>
+	<span style="color:#66d9ef">defer</span> <span style="color:#66d9ef">func</span>() {
+		<span style="color:#a6e22e">x</span><span style="color:#f92672">++</span>
 	}()
-	return x
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>
 }
 
-func test2() (x int) {
-	x = 100
-	defer func() {
-		x++
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">test2</span>() (<span style="color:#a6e22e">x</span> <span style="color:#66d9ef">int</span>) {
+	<span style="color:#a6e22e">x</span> = <span style="color:#ae81ff">100</span>
+	<span style="color:#66d9ef">defer</span> <span style="color:#66d9ef">func</span>() {
+		<span style="color:#a6e22e">x</span><span style="color:#f92672">++</span>
 	}()
-	return 100
+	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">100</span>
 }
 
-func main() {
-	println(&quot;test1:&quot;, test1())
-	println(&quot;test2:&quot;, test2())
-}
-
-[ubuntu] ~/.mac $ go run test.go
-test1: 100
-test2: 101
-</code></pre>
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	println(<span style="color:#e6db74">&#34;test1:&#34;</span>, <span style="color:#a6e22e">test1</span>())
+	println(<span style="color:#e6db74">&#34;test2:&#34;</span>, <span style="color:#a6e22e">test2</span>())
+}</code></pre></div>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ go run test.go
+test1: <span style="color:#ae81ff">100</span>
+test2: <span style="color:#ae81ff">101</span></code></pre></div></p>
 
 <p>按照这个观点，似乎test1()的执行过程应该是x等于100，然后x++，然后返回x=101；test2()应该是x等于100，然后x++，然后返回100。但执行结果却都和我们预想的不一样，带着这样的疑问，我们来深入了解defer的执行机制。</p>
 
-<p>我们先来看一个简单的例子:</p>
-
-<pre><code>func test(a, b int) {
-	println(&quot;test: &quot;, a, b)
+<p>我们先来看一个简单的例子:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#66d9ef">int</span>) {
+	println(<span style="color:#e6db74">&#34;test: &#34;</span>, <span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span>)
 }
-func main() {
-	a, b := 0x11, 0x22
-	defer test(a, b)
-	a++
-	b++
-	println(&quot;main: &quot;, a, b)
-}
-</code></pre>
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0x11</span>, <span style="color:#ae81ff">0x22</span>
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span>)
+	<span style="color:#a6e22e">a</span><span style="color:#f92672">++</span>
+	<span style="color:#a6e22e">b</span><span style="color:#f92672">++</span>
+	println(<span style="color:#e6db74">&#34;main: &#34;</span>, <span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span>)
+}</code></pre></div></p>
 
-<p>然后反汇编看看它的执行过程:</p>
-
-<pre><code>[ubuntu] ~/.mac $ go build test.go
-[ubuntu] ~/.mac $ go tool objdump -s &quot;main\.main&quot; test
-TEXT main.main(SB) /root/.mac/test.go
+<p>然后反汇编看看它的执行过程:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ go build test.go
+<span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ go tool objdump -s <span style="color:#e6db74">&#34;main\.main&#34;</span> test
+TEXT main.main<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span> /root/.mac/test.go
   test.go:6		0x4523b0		64488b0c25f8ffffff	MOVQ FS:0xfffffff8, CX
-  test.go:6		0x4523b9		483b6110		CMPQ 0x10(CX), SP
+  test.go:6		0x4523b9		483b6110		CMPQ 0x10<span style="color:#f92672">(</span>CX<span style="color:#f92672">)</span>, SP
   test.go:6		0x4523bd		0f86ad000000		JBE 0x452470
   test.go:6		0x4523c3		4883ec58		SUBQ $0x58, SP
-  test.go:6		0x4523c7		48896c2450		MOVQ BP, 0x50(SP)
-  test.go:6		0x4523cc		488d6c2450		LEAQ 0x50(SP), BP
-  test.go:8		0x4523d1		c744241010000000	MOVL $0x10, 0x10(SP)
-  test.go:8		0x4523d9		488d05705a0200		LEAQ 0x25a70(IP), AX
-  test.go:8		0x4523e0		4889442428		MOVQ AX, 0x28(SP)
-  test.go:8		0x4523e5		48c744244011000000	MOVQ $0x11, 0x40(SP)
-  test.go:8		0x4523ee		48c744244822000000	MOVQ $0x22, 0x48(SP)
-  test.go:8		0x4523f7		488d442410		LEAQ 0x10(SP), AX
-  test.go:8		0x4523fc		48890424		MOVQ AX, 0(SP)
-  test.go:8		0x452400		e87b16fdff		CALL runtime.deferprocStack(SB)
-  test.go:8		0x452405		85c0			TESTL AX, AX
-  test.go:8		0x452407		7557			JNE 0x452460
-  test.go:11		0x452409		e8a230fdff		CALL runtime.printlock(SB)
-  test.go:11		0x45240e		488d0583130200		LEAQ 0x21383(IP), AX
-  test.go:11		0x452415		48890424		MOVQ AX, 0(SP)
-  test.go:11		0x452419		48c744240807000000	MOVQ $0x7, 0x8(SP)
-  test.go:11		0x452422		e8c939fdff		CALL runtime.printstring(SB)
-  test.go:11		0x452427		48c7042412000000	MOVQ $0x12, 0(SP)
-  test.go:11		0x45242f		e8fc37fdff		CALL runtime.printint(SB)
-  test.go:11		0x452434		e8b732fdff		CALL runtime.printsp(SB)
-  test.go:11		0x452439		48c7042423000000	MOVQ $0x23, 0(SP)
-  test.go:11		0x452441		e8ea37fdff		CALL runtime.printint(SB)
-  test.go:11		0x452446		e8f532fdff		CALL runtime.printnl(SB)
-  test.go:11		0x45244b		e8e030fdff		CALL runtime.printunlock(SB)
-  test.go:12		0x452450		90			NOPL
-  test.go:12		0x452451		e82a1cfdff		CALL runtime.deferreturn(SB)
-  test.go:12		0x452456		488b6c2450		MOVQ 0x50(SP), BP
+  test.go:6		0x4523c7		48896c2450		MOVQ BP, 0x50<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
+  test.go:6		0x4523cc		488d6c2450		LEAQ 0x50<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>, BP
+  test.go:8		0x4523d1		c744241010000000	MOVL $0x10, 0x10<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
+  test.go:8		0x4523d9		488d05705a0200		LEAQ 0x25a70<span style="color:#f92672">(</span>IP<span style="color:#f92672">)</span>, AX
+  test.go:8		0x4523e0		<span style="color:#ae81ff">4889442428</span>		MOVQ AX, 0x28<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
+  test.go:8		0x4523e5		48c744244011000000	MOVQ $0x11, 0x40<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
+  test.go:8		0x4523ee		48c744244822000000	MOVQ $0x22, 0x48<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
+  test.go:8		0x4523f7		488d442410		LEAQ 0x10<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>, AX
+  test.go:8		0x4523fc		<span style="color:#ae81ff">48890424</span>		MOVQ AX, <span style="color:#ae81ff">0</span><span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
+<span style="display:block;width:100%;background-color:#3c3d38">  test.go:8		0x452400		e87b16fdff		CALL runtime.deferprocStack<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
+</span>  test.go:8		0x452405		85c0			TESTL AX, AX
+  test.go:8		0x452407		<span style="color:#ae81ff">7557</span>			JNE 0x452460
+  test.go:11		0x452409		e8a230fdff		CALL runtime.printlock<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
+  test.go:11		0x45240e		488d0583130200		LEAQ 0x21383<span style="color:#f92672">(</span>IP<span style="color:#f92672">)</span>, AX
+  test.go:11		0x452415		<span style="color:#ae81ff">48890424</span>		MOVQ AX, <span style="color:#ae81ff">0</span><span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
+  test.go:11		0x452419		48c744240807000000	MOVQ $0x7, 0x8<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
+  test.go:11		0x452422		e8c939fdff		CALL runtime.printstring<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
+  test.go:11		0x452427		48c7042412000000	MOVQ $0x12, <span style="color:#ae81ff">0</span><span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
+  test.go:11		0x45242f		e8fc37fdff		CALL runtime.printint<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
+  test.go:11		0x452434		e8b732fdff		CALL runtime.printsp<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
+  test.go:11		0x452439		48c7042423000000	MOVQ $0x23, <span style="color:#ae81ff">0</span><span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
+  test.go:11		0x452441		e8ea37fdff		CALL runtime.printint<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
+  test.go:11		0x452446		e8f532fdff		CALL runtime.printnl<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
+  test.go:11		0x45244b		e8e030fdff		CALL runtime.printunlock<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
+  test.go:12		0x452450		<span style="color:#ae81ff">90</span>			NOPL
+<span style="display:block;width:100%;background-color:#3c3d38">  test.go:12		0x452451		e82a1cfdff		CALL runtime.deferreturn<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
+</span>  test.go:12		0x452456		488b6c2450		MOVQ 0x50<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>, BP
   test.go:12		0x45245b		4883c458		ADDQ $0x58, SP
   test.go:12		0x45245f		c3			RET
-  test.go:8		0x452460		90			NOPL
-  test.go:8		0x452461		e81a1cfdff		CALL runtime.deferreturn(SB)
-  test.go:8		0x452466		488b6c2450		MOVQ 0x50(SP), BP
+  test.go:8		0x452460		<span style="color:#ae81ff">90</span>			NOPL
+<span style="display:block;width:100%;background-color:#3c3d38">  test.go:8		0x452461		e81a1cfdff		CALL runtime.deferreturn<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
+</span>  test.go:8		0x452466		488b6c2450		MOVQ 0x50<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>, BP
   test.go:8		0x45246b		4883c458		ADDQ $0x58, SP
   test.go:8		0x45246f		c3			RET
-  test.go:6		0x452470		e82b7affff		CALL runtime.morestack_noctxt(SB)
-  test.go:6		0x452475		e936ffffff		JMP main.main(SB)
-</code></pre>
+  test.go:6		0x452470		e82b7affff		CALL runtime.morestack_noctxt<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
+  test.go:6		0x452475		e936ffffff		JMP main.main<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span></code></pre></div></p>
 
 <p>我们发现<code>defer test(a, b)</code>实际上会被转化为<code>CALL runtime.deferproc(SB)</code>（Go1.13才使用deferprocStack，这里先以deferproc为例），之后进行的<code>a++</code>已经不会影响到它，而在main函数执行完之后，才会去通过<code>CALL runtime.deferreturn(SB)</code>调用它。</p>
 
 <p>我们再来看看<code>runtime.deferproc</code>干了些什么，我在这里也把源码中重要的注释翻译了过来:</p>
 
-<pre><code>// go/src/runtime/panic.go
-// siz表示fn方法中参数需要占用多少个字节，使用siz创建了一个deferred的方法fn
-// 编译器将一个defer语句转化为一个对此方法的调用
-func deferproc(siz int32, fn *funcval) {  // fn之后紧跟着fn的参数
-	if getg().m.curg != getg() {
-		throw(&quot;defer on system stack&quot;)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// go/src/runtime/panic.go
+</span><span style="color:#75715e">// siz表示fn方法中参数需要占用多少个字节，使用siz创建了一个deferred的方法fn
+</span><span style="color:#75715e">// 编译器将一个defer语句转化为一个对此方法的调用
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">deferproc</span>(<span style="color:#a6e22e">siz</span> <span style="color:#66d9ef">int32</span>, <span style="color:#a6e22e">fn</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">funcval</span>) {  <span style="color:#75715e">// fn之后紧跟着fn的参数
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">getg</span>().<span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">curg</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">getg</span>() {
+		<span style="color:#a6e22e">throw</span>(<span style="color:#e6db74">&#34;defer on system stack&#34;</span>)
 	}
     
-  //fn的参数处于一个危险的状态，deferproc的stack map并没有复制它们。所以我们不能让垃圾回收器或者栈复制触发，直到我们把这些参数复制到一个安全的地方。下面的内存复制会做到这一点。在复制完成前，我们只能调用nosplit routines。
-	sp := getcallersp()
-	argp := uintptr(unsafe.Pointer(&amp;fn)) + unsafe.Sizeof(fn)
-	callerpc := getcallerpc()
+  <span style="color:#75715e">//fn的参数处于一个危险的状态，deferproc的stack map并没有复制它们。所以我们不能让垃圾回收器或者栈复制触发，直到我们把这些参数复制到一个安全的地方。下面的内存复制会做到这一点。在复制完成前，我们只能调用nosplit routines。
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">sp</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">getcallersp</span>()
+	<span style="color:#a6e22e">argp</span> <span style="color:#f92672">:=</span> uintptr(<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">fn</span>)) <span style="color:#f92672">+</span> <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Sizeof</span>(<span style="color:#a6e22e">fn</span>)
+	<span style="color:#a6e22e">callerpc</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">getcallerpc</span>()
 
-	d := newdefer(siz)
-	if d._panic != nil {
-		throw(&quot;deferproc: d.panic != nil after newdefer&quot;)
+<span style="display:block;width:100%;background-color:#3c3d38">	<span style="color:#a6e22e">d</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">newdefer</span>(<span style="color:#a6e22e">siz</span>)
+</span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">_panic</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#a6e22e">throw</span>(<span style="color:#e6db74">&#34;deferproc: d.panic != nil after newdefer&#34;</span>)
 	}
-	d.fn = fn
-	d.pc = callerpc
-	d.sp = sp
-	switch siz {
-	case 0:
-		// Do nothing.
-	case sys.PtrSize:
-		*(*uintptr)(deferArgs(d)) = *(*uintptr)(unsafe.Pointer(argp))
-	default:
-		memmove(deferArgs(d), unsafe.Pointer(argp), uintptr(siz))
+<span style="display:block;width:100%;background-color:#3c3d38">	<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">fn</span> = <span style="color:#a6e22e">fn</span>
+</span><span style="display:block;width:100%;background-color:#3c3d38">	<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">pc</span> = <span style="color:#a6e22e">callerpc</span>
+</span><span style="display:block;width:100%;background-color:#3c3d38">	<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">sp</span> = <span style="color:#a6e22e">sp</span>
+</span>	<span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">siz</span> {
+	<span style="color:#66d9ef">case</span> <span style="color:#ae81ff">0</span>:
+		<span style="color:#75715e">// Do nothing.
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">case</span> <span style="color:#a6e22e">sys</span>.<span style="color:#a6e22e">PtrSize</span>:
+		<span style="color:#f92672">*</span>(<span style="color:#f92672">*</span><span style="color:#66d9ef">uintptr</span>)(<span style="color:#a6e22e">deferArgs</span>(<span style="color:#a6e22e">d</span>)) = <span style="color:#f92672">*</span>(<span style="color:#f92672">*</span><span style="color:#66d9ef">uintptr</span>)(<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>(<span style="color:#a6e22e">argp</span>))
+	<span style="color:#66d9ef">default</span>:
+		<span style="color:#a6e22e">memmove</span>(<span style="color:#a6e22e">deferArgs</span>(<span style="color:#a6e22e">d</span>), <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>(<span style="color:#a6e22e">argp</span>), uintptr(<span style="color:#a6e22e">siz</span>))
 	}
-	return0()
-}
-</code></pre>
+	<span style="color:#a6e22e">return0</span>()
+}</code></pre></div>
 
-<p>我们发现newdefer函数返回的是一个这样的结构体:</p>
+<p>我们发现newdefer函数返回的是一个这样的结构体:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// go/src/runtime/runtime2.go
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">_defer</span> <span style="color:#66d9ef">struct</span> {
+	<span style="color:#a6e22e">siz</span>     <span style="color:#66d9ef">int32</span> <span style="color:#75715e">// includes both arguments and results
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">started</span> <span style="color:#66d9ef">bool</span>
+	<span style="color:#a6e22e">heap</span>    <span style="color:#66d9ef">bool</span>
+	<span style="color:#a6e22e">openDefer</span> <span style="color:#66d9ef">bool</span>
+	<span style="color:#a6e22e">sp</span>        <span style="color:#66d9ef">uintptr</span>  <span style="color:#75715e">// sp at time of defer
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">pc</span>        <span style="color:#66d9ef">uintptr</span>  <span style="color:#75715e">// pc at time of defer
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">fn</span>        <span style="color:#f92672">*</span><span style="color:#a6e22e">funcval</span> <span style="color:#75715e">// can be nil for open-coded defers
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">_panic</span>    <span style="color:#f92672">*</span><span style="color:#a6e22e">_panic</span>  <span style="color:#75715e">// panic that is running defer
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">link</span>      <span style="color:#f92672">*</span><span style="color:#a6e22e">_defer</span>
 
-<pre><code>// go/src/runtime/runtime2.go
-type _defer struct {
-	siz     int32 // includes both arguments and results
-	started bool
-	heap    bool
-	openDefer bool
-	sp        uintptr  // sp at time of defer
-	pc        uintptr  // pc at time of defer
-	fn        *funcval // can be nil for open-coded defers
-	_panic    *_panic  // panic that is running defer
-	link      *_defer
-
-	fd   unsafe.Pointer // funcdata for the function associated with the frame
-	varp uintptr        // value of varp for the stack frame
-
-	framepc uintptr
-}
-</code></pre>
+	<span style="color:#a6e22e">fd</span>   <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span> <span style="color:#75715e">// funcdata for the function associated with the frame
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">varp</span> <span style="color:#66d9ef">uintptr</span>        <span style="color:#75715e">// value of varp for the stack frame
+</span><span style="color:#75715e"></span>
+	<span style="color:#a6e22e">framepc</span> <span style="color:#66d9ef">uintptr</span>
+}</code></pre></div></p>
 
 <p>鉴于篇幅，我删除了其注释，但可根据这些注释得出结论，<code>defer func()</code>这个语句会被保存在当前Goroutine中，把它的参数、所需要的栈大小等保存为一个_defer对象，把多个_defer形成一个链表，也就是一个FILO的队列。</p>
 
 <p>但是Goroutine和函数执行没什么直接的关系，如果是A嵌套B，B嵌套C，A、B、C都有各自的defer语句，那么它们都会被保存在这个Goroutine的_defer链表中，它怎么保证执行C的时候不把B的defer执行掉，这个秘密藏在<code>CALL runtime.deferreturn(SB)</code>中:</p>
 
-<pre><code>func deferreturn(arg0 uintptr) {
-	gp := getg()
-	d := gp._defer
-	if d == nil {
-		return
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">deferreturn</span>(<span style="color:#a6e22e">arg0</span> <span style="color:#66d9ef">uintptr</span>) {
+	<span style="color:#a6e22e">gp</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">getg</span>()
+	<span style="color:#a6e22e">d</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">gp</span>.<span style="color:#a6e22e">_defer</span>
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">d</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#66d9ef">return</span>
 	}
-	sp := getcallersp()
-	if d.sp != sp {
-		return
+	<span style="color:#a6e22e">sp</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">getcallersp</span>()
+<span style="display:block;width:100%;background-color:#3c3d38">	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">sp</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">sp</span> {
+</span>		<span style="color:#66d9ef">return</span>
 	}
-	if d.openDefer {
-		done := runOpenDeferFrame(gp, d)
-		if !done {
-			throw(&quot;unfinished open-coded defers in deferreturn&quot;)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">openDefer</span> {
+		<span style="color:#a6e22e">done</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">runOpenDeferFrame</span>(<span style="color:#a6e22e">gp</span>, <span style="color:#a6e22e">d</span>)
+		<span style="color:#66d9ef">if</span> !<span style="color:#a6e22e">done</span> {
+			<span style="color:#a6e22e">throw</span>(<span style="color:#e6db74">&#34;unfinished open-coded defers in deferreturn&#34;</span>)
 		}
-		gp._defer = d.link
-		freedefer(d)
-		return
+		<span style="color:#a6e22e">gp</span>.<span style="color:#a6e22e">_defer</span> = <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">link</span>
+		<span style="color:#a6e22e">freedefer</span>(<span style="color:#a6e22e">d</span>)
+		<span style="color:#66d9ef">return</span>
 	}
 
-	switch d.siz {
-	case 0:
-		// Do nothing.
-	case sys.PtrSize:
-		*(*uintptr)(unsafe.Pointer(&amp;arg0)) = *(*uintptr)(deferArgs(d))
-	default:
-		memmove(unsafe.Pointer(&amp;arg0), deferArgs(d), uintptr(d.siz))
+	<span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">siz</span> {
+	<span style="color:#66d9ef">case</span> <span style="color:#ae81ff">0</span>:
+		<span style="color:#75715e">// Do nothing.
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">case</span> <span style="color:#a6e22e">sys</span>.<span style="color:#a6e22e">PtrSize</span>:
+		<span style="color:#f92672">*</span>(<span style="color:#f92672">*</span><span style="color:#66d9ef">uintptr</span>)(<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">arg0</span>)) = <span style="color:#f92672">*</span>(<span style="color:#f92672">*</span><span style="color:#66d9ef">uintptr</span>)(<span style="color:#a6e22e">deferArgs</span>(<span style="color:#a6e22e">d</span>))
+	<span style="color:#66d9ef">default</span>:
+		<span style="color:#a6e22e">memmove</span>(<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">arg0</span>), <span style="color:#a6e22e">deferArgs</span>(<span style="color:#a6e22e">d</span>), uintptr(<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">siz</span>))
 	}
-	fn := d.fn
-	d.fn = nil
-	gp._defer = d.link
-	freedefer(d)
-	jmpdefer(fn, uintptr(unsafe.Pointer(&amp;arg0)))
-}
-</code></pre>
+	<span style="color:#a6e22e">fn</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">fn</span>
+	<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">fn</span> = <span style="color:#66d9ef">nil</span>
+	<span style="color:#a6e22e">gp</span>.<span style="color:#a6e22e">_defer</span> = <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">link</span>
+	<span style="color:#a6e22e">freedefer</span>(<span style="color:#a6e22e">d</span>)
+	<span style="color:#a6e22e">jmpdefer</span>(<span style="color:#a6e22e">fn</span>, uintptr(<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">arg0</span>)))
+}</code></pre></div>
 
 <p>函数执行调用这个指令的时候，它先拿到当前Goroutine的_defer链表，然后依次检查它的SP就行了，这个SP是执行deferproc时存进去的当前这个函数的栈顶，只要不一致那肯定是父函数的栈了。</p>
 

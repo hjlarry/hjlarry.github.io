@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
 
 
-<script defer src="/cn.search.min.01c7a6ed1a8f0928e0ba42bb328c2d7a2661b571663fa179e6c6d83af1aab327.js" integrity="sha256-Acem7RqPCSjgukK7MowteiZhtXFmP6F55sbYOvGqsyc="></script>
+<script defer src="/cn.search.min.f3fc3a1751b1550b85e53f5a72b6afb77b195d1124d845f3c1228e562fd0f472.js" integrity="sha256-8/w6F1GxVQuF5T9acravt3sZXREk2EXzwSKOVi/Q9HI="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/other/tools/index.xml" title="Home" />
 <!--
@@ -135,101 +135,89 @@ https://github.com/alex-shpak/hugo-book
 <li>系统基本信息（中断的次数、上下文切换的次数）</li>
 </ul>
 
-<p>如下所示:</p>
-
-<pre><code>[ubuntu] ~/.mac $ dstat
-You did not select any stats, using -cdngy by default.
+<p>如下所示:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ dstat
+You did not <span style="color:#66d9ef">select</span> any stats, using -cdngy by default.
 --total-cpu-usage-- -dsk/total- -net/total- ---paging-- ---system--
 usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
-  0   0 100   0   0|2797B  597B|   0     0 |   0     0 |  90   236
-  0   0 100   0   0|   0     0 |   0     0 |   0     0 | 140   323
-  0   0 100   0   0|   0     0 |   0     0 |   0     0 | 163   376
-  0   1 100   0   0|   0     0 |   0     0 |   0     0 | 169   391
-</code></pre>
+  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span>|2797B  597B|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |  <span style="color:#ae81ff">90</span>   <span style="color:#ae81ff">236</span>
+  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span>|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">140</span>   <span style="color:#ae81ff">323</span>
+  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span>|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">163</span>   <span style="color:#ae81ff">376</span>
+  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">1</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span>|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">169</span>   <span style="color:#ae81ff">391</span></code></pre></div></p>
 
 <p>生产环境下我们程序出错的时候，应该先从大的方面入手定位到具体是哪个方面的问题，看看当前的系统环境有没有问题，是不是我们的程序在当前的系统环境下水土不服。比如程序是IO密集型的，系统中有另一个程序在和它抢磁盘资源等。可以通过<code>dstat --list</code>查看它能对哪些细分项目查看其情况。<a href="http://dag.wiee.rs/home-made/dstat/">查看更多使用示例</a></p>
 
 <h3 id="sysstat">sysstat</h3>
 
-<p>通过定位了系统中哪个方面的问题之后，接着我们应该去定位我们自己程序哪个方面有问题。sysstat可以根据单个进程去检查它的各个方面，比如说我们定位到是内存方面的问题，接着去看自己程序中内存的问题:</p>
+<p>通过定位了系统中哪个方面的问题之后，接着我们应该去定位我们自己程序哪个方面有问题。sysstat可以根据单个进程去检查它的各个方面，比如说我们定位到是内存方面的问题，接着去看自己程序中内存的问题:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ pidstat -r -p <span style="color:#e6db74">`</span>pidof tmux<span style="color:#e6db74">`</span> <span style="color:#ae81ff">2</span>
+Linux <span style="color:#ae81ff">4</span>.9.184-linuxkit <span style="color:#f92672">(</span>cabd4e519687<span style="color:#f92672">)</span> 	<span style="color:#ae81ff">12</span>/09/19 	_x86_64_	<span style="color:#f92672">(</span><span style="color:#ae81ff">2</span> CPU<span style="color:#f92672">)</span>
 
-<pre><code>[ubuntu] ~/.mac $ pidstat -r -p `pidof tmux` 2
-Linux 4.9.184-linuxkit (cabd4e519687) 	12/09/19 	_x86_64_	(2 CPU)
-
-10:02:38      UID       PID  minflt/s  majflt/s     VSZ     RSS   %MEM  Command
-10:02:40        0        35      0.00      0.00   27424    4000   0.20  tmux: server
-10:02:42        0        35      0.00      0.00   27424    4000   0.20  tmux: server
-10:02:44        0        35      0.00      0.00   27424    4000   0.20  tmux: server
-10:02:46        0        35      0.00      0.00   27424    4000   0.20  tmux: server
-</code></pre>
-
-<p>我们把tmux当做是自己写的某个程序，每2秒输出一次信息。minflt/s就代表一些小范围的缺页异常，可能是一些数据不需要了只要补上相应的物理内存即可。而majflt/s代表了需要从硬盘换入内存，这可能就意味着我们程序是不是有的任务优先级太低被操作系统换出到硬盘上了，我们可能需要通过系统调用告诉操作系统把某段内存锁死。</p>
+<span style="color:#ae81ff">10</span>:02:38      UID       PID  minflt/s  majflt/s     VSZ     RSS   %MEM  Command
+<span style="color:#ae81ff">10</span>:02:40        <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">35</span>      <span style="color:#ae81ff">0</span>.00      <span style="color:#ae81ff">0</span>.00   <span style="color:#ae81ff">27424</span>    <span style="color:#ae81ff">4000</span>   <span style="color:#ae81ff">0</span>.20  tmux: server
+<span style="color:#ae81ff">10</span>:02:42        <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">35</span>      <span style="color:#ae81ff">0</span>.00      <span style="color:#ae81ff">0</span>.00   <span style="color:#ae81ff">27424</span>    <span style="color:#ae81ff">4000</span>   <span style="color:#ae81ff">0</span>.20  tmux: server
+<span style="color:#ae81ff">10</span>:02:44        <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">35</span>      <span style="color:#ae81ff">0</span>.00      <span style="color:#ae81ff">0</span>.00   <span style="color:#ae81ff">27424</span>    <span style="color:#ae81ff">4000</span>   <span style="color:#ae81ff">0</span>.20  tmux: server
+<span style="color:#ae81ff">10</span>:02:46        <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">35</span>      <span style="color:#ae81ff">0</span>.00      <span style="color:#ae81ff">0</span>.00   <span style="color:#ae81ff">27424</span>    <span style="color:#ae81ff">4000</span>   <span style="color:#ae81ff">0</span>.20  tmux: server</code></pre></div>
+我们把tmux当做是自己写的某个程序，每2秒输出一次信息。minflt/s就代表一些小范围的缺页异常，可能是一些数据不需要了只要补上相应的物理内存即可。而majflt/s代表了需要从硬盘换入内存，这可能就意味着我们程序是不是有的任务优先级太低被操作系统换出到硬盘上了，我们可能需要通过系统调用告诉操作系统把某段内存锁死。</p>
 
 <p>更详细的使用方法，请参考<a href="http://sebastien.godard.pagesperso-orange.fr/documentation.html">官方文档</a>。</p>
 
 <h3 id="strace">strace</h3>
 
-<p>接着我们可以深入到自己程序的逻辑中去，比如使用strace检查我们程序的系统调用。可能只是一个简单的程序:</p>
+<p>接着我们可以深入到自己程序的逻辑中去，比如使用strace检查我们程序的系统调用。可能只是一个简单的程序:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 
-<pre><code>package main
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	println(<span style="color:#e6db74">&#34;hello world!&#34;</span>)
+}</code></pre></div></p>
 
-func main() {
-	println(&quot;hello world!&quot;)
-}
-</code></pre>
+<p>却涉及到大量的系统调用:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ go build test.go
+<span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ strace ~/.mac/test
+execve<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/root/.mac/test&#34;</span>, <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/root/.mac/test&#34;</span><span style="color:#f92672">]</span>, 0x7ffec1a0b740 /* <span style="color:#ae81ff">14</span> vars */<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+arch_prctl<span style="color:#f92672">(</span>ARCH_SET_FS, 0x4c5650<span style="color:#f92672">)</span>       <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+sched_getaffinity<span style="color:#f92672">(</span><span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">8192</span>, <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span><span style="color:#f92672">])</span>      <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span>
+openat<span style="color:#f92672">(</span>AT_FDCWD, <span style="color:#e6db74">&#34;/sys/kernel/mm/transparent_hugepage/hpage_pmd_size&#34;</span>, O_RDONLY<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> -1 ENOENT <span style="color:#f92672">(</span>No such file or directory<span style="color:#f92672">)</span>
+mmap<span style="color:#f92672">(</span>NULL, <span style="color:#ae81ff">262144</span>, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd246a01000
+mmap<span style="color:#f92672">(</span>0xc000000000, <span style="color:#ae81ff">67108864</span>, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0xc000000000
+mmap<span style="color:#f92672">(</span>0xc000000000, <span style="color:#ae81ff">67108864</span>, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0xc000000000
+mmap<span style="color:#f92672">(</span>NULL, <span style="color:#ae81ff">33554432</span>, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd244a01000
+mmap<span style="color:#f92672">(</span>NULL, <span style="color:#ae81ff">2164736</span>, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd2447f0000
+mmap<span style="color:#f92672">(</span>NULL, <span style="color:#ae81ff">65536</span>, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd2447e0000
+mmap<span style="color:#f92672">(</span>NULL, <span style="color:#ae81ff">65536</span>, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd2447d0000
+rt_sigprocmask<span style="color:#f92672">(</span>SIG_SETMASK, NULL, <span style="color:#f92672">[]</span>, <span style="color:#ae81ff">8</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+sigaltstack<span style="color:#f92672">(</span>NULL, <span style="color:#f92672">{</span>ss_sp<span style="color:#f92672">=</span>NULL, ss_flags<span style="color:#f92672">=</span>SS_DISABLE, ss_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#f92672">})</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+sigaltstack<span style="color:#f92672">({</span>ss_sp<span style="color:#f92672">=</span>0xc000002000, ss_flags<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, ss_size<span style="color:#f92672">=</span><span style="color:#ae81ff">32768</span><span style="color:#f92672">}</span>, NULL<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+rt_sigprocmask<span style="color:#f92672">(</span>SIG_SETMASK, <span style="color:#f92672">[]</span>, NULL, <span style="color:#ae81ff">8</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+gettid<span style="color:#f92672">()</span>                                <span style="color:#f92672">=</span> <span style="color:#ae81ff">394</span>
+rt_sigaction<span style="color:#f92672">(</span>SIGHUP, NULL, <span style="color:#f92672">{</span>sa_handler<span style="color:#f92672">=</span>SIG_DFL, sa_mask<span style="color:#f92672">=[]</span>, sa_flags<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#f92672">}</span>, <span style="color:#ae81ff">8</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+rt_sigaction<span style="color:#f92672">(</span>SIGHUP, <span style="color:#f92672">{</span>sa_handler<span style="color:#f92672">=</span>0x44d8f0, sa_mask<span style="color:#f92672">=</span>~<span style="color:#f92672">[]</span>, sa_flags<span style="color:#f92672">=</span>SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer<span style="color:#f92672">=</span>0x44da20<span style="color:#f92672">}</span>, NULL, <span style="color:#ae81ff">8</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+rt_sigaction<span style="color:#f92672">(</span>SIGINT, NULL, <span style="color:#f92672">{</span>sa_handler<span style="color:#f92672">=</span>SIG_DFL, sa_mask<span style="color:#f92672">=[]</span>, sa_flags<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#f92672">}</span>, <span style="color:#ae81ff">8</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+rt_sigaction<span style="color:#f92672">(</span>SIGINT, <span style="color:#f92672">{</span>sa_handler<span style="color:#f92672">=</span>0x44d8f0, sa_mask<span style="color:#f92672">=</span>~<span style="color:#f92672">[]</span>, sa_flags<span style="color:#f92672">=</span>SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer<span style="color:#f92672">=</span>0x44da20<span style="color:#f92672">}</span>, NULL, <span style="color:#ae81ff">8</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
 
-<p>却涉及到大量的系统调用:</p>
-
-<pre><code>[ubuntu] ~/.mac $ go build test.go
-[ubuntu] ~/.mac $ strace ~/.mac/test
-execve(&quot;/root/.mac/test&quot;, [&quot;/root/.mac/test&quot;], 0x7ffec1a0b740 /* 14 vars */) = 0
-arch_prctl(ARCH_SET_FS, 0x4c5650)       = 0
-sched_getaffinity(0, 8192, [0, 1])      = 16
-openat(AT_FDCWD, &quot;/sys/kernel/mm/transparent_hugepage/hpage_pmd_size&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)
-mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fd246a01000
-mmap(0xc000000000, 67108864, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0xc000000000
-mmap(0xc000000000, 67108864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0xc000000000
-mmap(NULL, 33554432, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fd244a01000
-mmap(NULL, 2164736, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fd2447f0000
-mmap(NULL, 65536, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fd2447e0000
-mmap(NULL, 65536, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fd2447d0000
-rt_sigprocmask(SIG_SETMASK, NULL, [], 8) = 0
-sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
-sigaltstack({ss_sp=0xc000002000, ss_flags=0, ss_size=32768}, NULL) = 0
-rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
-gettid()                                = 394
-rt_sigaction(SIGHUP, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
-rt_sigaction(SIGHUP, {sa_handler=0x44d8f0, sa_mask=~[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x44da20}, NULL, 8) = 0
-rt_sigaction(SIGINT, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
-rt_sigaction(SIGINT, {sa_handler=0x44d8f0, sa_mask=~[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x44da20}, NULL, 8) = 0
-
-......
-
-</code></pre>
+......</code></pre></div></p>
 
 <p>打印输入输出必然会涉及系统调用，但如果我们使用一些第三方库时发现系统调用仍然很多，就可以去查找有没有优化替代的方案。</p>
 
-<p>一般，我们查看一些摘要信息即可:</p>
-
-<pre><code>[ubuntu] ~/.mac $ strace -c ~/.mac/test
+<p>一般，我们查看一些摘要信息即可:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ strace -c ~/.mac/test
 hello world!
 % time     seconds  usecs/call     calls    errors syscall
 ------ ----------- ----------- --------- --------- ----------------
-  0.00    0.000000           0         1           write
-  0.00    0.000000           0         7           mmap
-  0.00    0.000000           0       114           rt_sigaction
-  0.00    0.000000           0         6           rt_sigprocmask
-  0.00    0.000000           0         2           clone
-  0.00    0.000000           0         1           execve
-  0.00    0.000000           0         2           sigaltstack
-  0.00    0.000000           0         1           arch_prctl
-  0.00    0.000000           0         1           gettid
-  0.00    0.000000           0         3           futex
-  0.00    0.000000           0         1           sched_getaffinity
-  0.00    0.000000           0         1         1 openat
+  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           write
+  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">7</span>           mmap
+  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">114</span>           rt_sigaction
+  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">6</span>           rt_sigprocmask
+  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">2</span>           clone
+  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           execve
+  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">2</span>           sigaltstack
+  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           arch_prctl
+  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           gettid
+  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">3</span>           futex
+  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           sched_getaffinity
+  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">1</span> openat
 ------ ----------- ----------- --------- --------- ----------------
-100.00    0.000000                   140         1 total
-</code></pre>
+<span style="color:#ae81ff">100</span>.00    <span style="color:#ae81ff">0</span>.000000                   <span style="color:#ae81ff">140</span>         <span style="color:#ae81ff">1</span> total</code></pre></div></p>
 
 <h2 id="开发工具">开发工具</h2>
 
@@ -260,16 +248,16 @@ hello world!
 
 <p>GNU的自动构建工具为<strong>make</strong>，有些像脚本语言，把一堆命令放一起批量执行。使用它做编译属于增量编译，即通过对比修改时间来判断是否需要重新执行。<a href="https://www.gnu.org/software/make/">官方网站</a></p>
 
-<pre><code>hello: hello.s
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-make" data-lang="make"><span style="color:#a6e22e">hello</span><span style="color:#f92672">:</span> hello.s
     nasm -g -f elf64 -o hello.o hello.s
     ld -o $@ hello.o
     
-clean:
+<span style="color:#a6e22e">clean</span><span style="color:#f92672">:</span>
     -rm *.o
     -rm hello
     
-.PHONY: clean
-</code></pre>
+<span style="color:#a6e22e">.PHONY</span><span style="color:#f92672">:</span> clean
+</code></pre></div>
 
 <p>对于这段构建代码，<code>hello:</code>后的部分就是告诉它要去检查哪些文件的修改时间；<code>$@</code>就表示当前这段的目标<code>hello</code>，<code>$&lt;</code>表示这段的第一个依赖项，<code>$^</code>表示这段的所有依赖项；命令前加<code>-</code>表示该命令如有错误则忽略；<code>PHONY</code>表示没有目标，没有依赖，总是执行规则，在该例中，若恰好文件夹内有一个名为<code>clean</code>的文件，没有<code>PHONY</code>时则<code>make clean</code>不会执行；另外，由于历史原因makefile只能使用tab来缩进，不能使用空格。</p>
 </article>

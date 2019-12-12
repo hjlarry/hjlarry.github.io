@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
 
 
-<script defer src="/cn.search.min.01c7a6ed1a8f0928e0ba42bb328c2d7a2661b571663fa179e6c6d83af1aab327.js" integrity="sha256-Acem7RqPCSjgukK7MowteiZhtXFmP6F55sbYOvGqsyc="></script>
+<script defer src="/cn.search.min.f3fc3a1751b1550b85e53f5a72b6afb77b195d1124d845f3c1228e562fd0f472.js" integrity="sha256-8/w6F1GxVQuF5T9acravt3sZXREk2EXzwSKOVi/Q9HI="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/mysql/query/index.xml" title="Home" />
 <!--
@@ -121,46 +121,43 @@ https://github.com/alex-shpak/hugo-book
 
 <p>1、创建表格:</p>
 
-<pre><code>CREATE TABLE student_info (
-    number INT PRIMARY KEY,
-    name VARCHAR(5),
-    sex ENUM('男', '女'),
-    id_number CHAR(18),
-    department VARCHAR(30),
-    major VARCHAR(30),
-    enrollment_time DATE,
-    UNIQUE KEY (id_number)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#a6e22e">student_info</span> (
+    number <span style="color:#66d9ef">INT</span> <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span>,
+    name <span style="color:#66d9ef">VARCHAR</span>(<span style="color:#ae81ff">5</span>),
+    sex <span style="color:#66d9ef">ENUM</span>(<span style="color:#e6db74">&#39;男&#39;</span>, <span style="color:#e6db74">&#39;女&#39;</span>),
+    id_number <span style="color:#66d9ef">CHAR</span>(<span style="color:#ae81ff">18</span>),
+    department <span style="color:#66d9ef">VARCHAR</span>(<span style="color:#ae81ff">30</span>),
+    major <span style="color:#66d9ef">VARCHAR</span>(<span style="color:#ae81ff">30</span>),
+    enrollment_time <span style="color:#66d9ef">DATE</span>,
+    <span style="color:#66d9ef">UNIQUE</span> <span style="color:#66d9ef">KEY</span> (id_number)
 );
 
-CREATE TABLE student_score (
-    number INT,
-    subject VARCHAR(30),
-    score TINYINT,
-    PRIMARY KEY (number, subject),
-    CONSTRAINT FOREIGN KEY(number) REFERENCES student_info(number)
-);
-</code></pre>
+<span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#a6e22e">student_score</span> (
+    number <span style="color:#66d9ef">INT</span>,
+    subject <span style="color:#66d9ef">VARCHAR</span>(<span style="color:#ae81ff">30</span>),
+    score <span style="color:#66d9ef">TINYINT</span>,
+    <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span> (number, subject),
+    <span style="color:#66d9ef">CONSTRAINT</span> <span style="color:#66d9ef">FOREIGN</span> <span style="color:#66d9ef">KEY</span>(number) <span style="color:#66d9ef">REFERENCES</span> <span style="color:#a6e22e">student_info</span>(number)
+);</code></pre></div>
 
-<p>2、填充数据:</p>
+<p>2、填充数据:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#a6e22e">student_info</span>(number, name, sex, id_number, department, major, enrollment_time) <span style="color:#66d9ef">VALUES</span>
+(<span style="color:#ae81ff">20180101</span>, <span style="color:#e6db74">&#39;杜子腾&#39;</span>, <span style="color:#e6db74">&#39;男&#39;</span>, <span style="color:#e6db74">&#39;158177199901044792&#39;</span>, <span style="color:#e6db74">&#39;计算机学院&#39;</span>, <span style="color:#e6db74">&#39;计算机科学与工程&#39;</span>, <span style="color:#e6db74">&#39;2018-09-01&#39;</span>),
+(<span style="color:#ae81ff">20180102</span>, <span style="color:#e6db74">&#39;杜琦燕&#39;</span>, <span style="color:#e6db74">&#39;女&#39;</span>, <span style="color:#e6db74">&#39;151008199801178529&#39;</span>, <span style="color:#e6db74">&#39;计算机学院&#39;</span>, <span style="color:#e6db74">&#39;计算机科学与工程&#39;</span>, <span style="color:#e6db74">&#39;2018-09-01&#39;</span>),
+(<span style="color:#ae81ff">20180103</span>, <span style="color:#e6db74">&#39;范统&#39;</span>, <span style="color:#e6db74">&#39;男&#39;</span>, <span style="color:#e6db74">&#39;17156319980116959X&#39;</span>, <span style="color:#e6db74">&#39;计算机学院&#39;</span>, <span style="color:#e6db74">&#39;软件工程&#39;</span>, <span style="color:#e6db74">&#39;2018-09-01&#39;</span>),
+(<span style="color:#ae81ff">20180104</span>, <span style="color:#e6db74">&#39;史珍香&#39;</span>, <span style="color:#e6db74">&#39;女&#39;</span>, <span style="color:#e6db74">&#39;141992199701078600&#39;</span>, <span style="color:#e6db74">&#39;计算机学院&#39;</span>, <span style="color:#e6db74">&#39;软件工程&#39;</span>, <span style="color:#e6db74">&#39;2018-09-01&#39;</span>),
+(<span style="color:#ae81ff">20180105</span>, <span style="color:#e6db74">&#39;范剑&#39;</span>, <span style="color:#e6db74">&#39;男&#39;</span>, <span style="color:#e6db74">&#39;181048199308156368&#39;</span>, <span style="color:#e6db74">&#39;航天学院&#39;</span>, <span style="color:#e6db74">&#39;飞行器设计&#39;</span>, <span style="color:#e6db74">&#39;2018-09-01&#39;</span>),
+(<span style="color:#ae81ff">20180106</span>, <span style="color:#e6db74">&#39;朱逸群&#39;</span>, <span style="color:#e6db74">&#39;男&#39;</span>, <span style="color:#e6db74">&#39;197995199501078445&#39;</span>, <span style="color:#e6db74">&#39;航天学院&#39;</span>, <span style="color:#e6db74">&#39;电子信息&#39;</span>, <span style="color:#e6db74">&#39;2018-09-01&#39;</span>);
 
-<pre><code>INSERT INTO student_info(number, name, sex, id_number, department, major, enrollment_time) VALUES
-(20180101, '杜子腾', '男', '158177199901044792', '计算机学院', '计算机科学与工程', '2018-09-01'),
-(20180102, '杜琦燕', '女', '151008199801178529', '计算机学院', '计算机科学与工程', '2018-09-01'),
-(20180103, '范统', '男', '17156319980116959X', '计算机学院', '软件工程', '2018-09-01'),
-(20180104, '史珍香', '女', '141992199701078600', '计算机学院', '软件工程', '2018-09-01'),
-(20180105, '范剑', '男', '181048199308156368', '航天学院', '飞行器设计', '2018-09-01'),
-(20180106, '朱逸群', '男', '197995199501078445', '航天学院', '电子信息', '2018-09-01');
-
-INSERT INTO student_score (number, subject, score) VALUES
-(20180101, '母猪的产后护理', 78),
-(20180101, '论萨达姆的战争准备', 88),
-(20180102, '母猪的产后护理', 100),
-(20180102, '论萨达姆的战争准备', 98),
-(20180103, '母猪的产后护理', 59),
-(20180103, '论萨达姆的战争准备', 61),
-(20180104, '母猪的产后护理', 55),
-(20180104, '论萨达姆的战争准备', 46);
-</code></pre>
+<span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#a6e22e">student_score</span> (number, subject, score) <span style="color:#66d9ef">VALUES</span>
+(<span style="color:#ae81ff">20180101</span>, <span style="color:#e6db74">&#39;母猪的产后护理&#39;</span>, <span style="color:#ae81ff">78</span>),
+(<span style="color:#ae81ff">20180101</span>, <span style="color:#e6db74">&#39;论萨达姆的战争准备&#39;</span>, <span style="color:#ae81ff">88</span>),
+(<span style="color:#ae81ff">20180102</span>, <span style="color:#e6db74">&#39;母猪的产后护理&#39;</span>, <span style="color:#ae81ff">100</span>),
+(<span style="color:#ae81ff">20180102</span>, <span style="color:#e6db74">&#39;论萨达姆的战争准备&#39;</span>, <span style="color:#ae81ff">98</span>),
+(<span style="color:#ae81ff">20180103</span>, <span style="color:#e6db74">&#39;母猪的产后护理&#39;</span>, <span style="color:#ae81ff">59</span>),
+(<span style="color:#ae81ff">20180103</span>, <span style="color:#e6db74">&#39;论萨达姆的战争准备&#39;</span>, <span style="color:#ae81ff">61</span>),
+(<span style="color:#ae81ff">20180104</span>, <span style="color:#e6db74">&#39;母猪的产后护理&#39;</span>, <span style="color:#ae81ff">55</span>),
+(<span style="color:#ae81ff">20180104</span>, <span style="color:#e6db74">&#39;论萨达姆的战争准备&#39;</span>, <span style="color:#ae81ff">46</span>);</code></pre></div></p>
 
 <p>3、填充结果:</p>
 
@@ -313,303 +310,270 @@ INSERT INTO student_score (number, subject, score) VALUES
 <li>方式二:<code>select number 学号 from student_score</code><br /></li>
 </ul>
 
-<p>查询结果:</p>
+<p>查询结果:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> number <span style="color:#960050;background-color:#1e0010">学号</span> <span style="color:#66d9ef">from</span> student_score;
+<span style="color:#f92672">+----------+</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">学号</span>     <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+</span>
+<span style="color:#ae81ff">8</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
-<pre><code>mysql&gt; select number 学号 from student_score;
-+----------+
-| 学号     |
-+----------+
-| 20180101 |
-| 20180101 |
-| 20180102 |
-| 20180102 |
-| 20180103 |
-| 20180103 |
-| 20180104 |
-| 20180104 |
-+----------+
-8 rows in set (0.00 sec)
-</code></pre>
-
-<p>多列也可以:</p>
-
-<pre><code>mysql&gt; select number 学号, name 姓名 from student_info;
-+----------+-----------+
-| 学号     | 姓名      |
-+----------+-----------+
-| 20180101 | 杜子腾    |
-| 20180102 | 杜琦燕    |
-| 20180103 | 范统      |
-| 20180104 | 史珍香    |
-| 20180105 | 范剑      |
-| 20180106 | 朱逸群    |
-+----------+-----------+
-6 rows in set (0.00 sec)
-</code></pre>
+<p>多列也可以:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> number <span style="color:#960050;background-color:#1e0010">学号</span>, name <span style="color:#960050;background-color:#1e0010">姓名</span> <span style="color:#66d9ef">from</span> student_info;
+<span style="color:#f92672">+----------+-----------+</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">学号</span>     <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">姓名</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜子腾</span>    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜琦燕</span>    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">史珍香</span>    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180105</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范剑</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180106</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">朱逸群</span>    <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+</span>
+<span style="color:#ae81ff">6</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="去重">去重</h3>
 
-<p>单列去重:</p>
+<p>单列去重:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#66d9ef">distinct</span> department <span style="color:#66d9ef">from</span> student_info;
+<span style="color:#f92672">+-----------------+</span>
+<span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
-<pre><code>mysql&gt; select distinct department from student_info;
-+-----------------+
-| department      |
-+-----------------+
-| 计算机学院      |
-| 航天学院        |
-+-----------------+
-2 rows in set (0.00 sec)
-</code></pre>
-
-<p>多列去重:</p>
-
-<pre><code>mysql&gt; select distinct department,major from student_info;
-+-----------------+--------------------------+
-| department      | major                    |
-+-----------------+--------------------------+
-| 计算机学院      | 计算机科学与工程         |
-| 计算机学院      | 软件工程                 |
-| 航天学院        | 飞行器设计               |
-| 航天学院        | 电子信息                 |
-+-----------------+--------------------------+
-4 rows in set (0.00 sec)
-</code></pre>
+<p>多列去重:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#66d9ef">distinct</span> department,major <span style="color:#66d9ef">from</span> student_info;
+<span style="color:#f92672">+-----------------+--------------------------+</span>
+<span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major                    <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------+--------------------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机科学与工程</span>         <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>                 <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">飞行器设计</span>               <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">电子信息</span>                 <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------+--------------------------+</span>
+<span style="color:#ae81ff">4</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="限制查询结果条数">限制查询结果条数</h3>
 
 <p>使用<code>limit 从哪开始，多少条</code>，<code>从哪开始</code>可以省略，省略代表第0行。</p>
 
-<pre><code>mysql&gt; select * from student_info limit 3,8;
-+----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
-| number   | name      | sex  | id_number          | department      | major           | enrollment_time |
-+----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
-| 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程        | 2018-09-01      |
-| 20180105 | 范剑      | 男   | 181048199308156368 | 航天学院        | 飞行器设计      | 2018-09-01      |
-| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息        | 2018-09-01      |
-+----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
-3 rows in set (0.00 sec)
-</code></pre>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">limit</span> <span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">8</span>;
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+-----------------+-----------------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name      <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> id_number          <span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major           <span style="color:#f92672">|</span> enrollment_time <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+-----------------+-----------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">史珍香</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">141992199701078600</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>        <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180105</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范剑</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">181048199308156368</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">飞行器设计</span>      <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180106</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">朱逸群</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">197995199501078445</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">电子信息</span>        <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+-----------------+-----------------+</span>
+<span style="color:#ae81ff">3</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div>
 
 <h3 id="排序">排序</h3>
 
-<p>多列排序:</p>
+<p>多列排序:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">order</span> <span style="color:#66d9ef">by</span> name <span style="color:#66d9ef">asc</span>, number <span style="color:#66d9ef">desc</span>;
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name      <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> id_number          <span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major                    <span style="color:#f92672">|</span> enrollment_time <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">史珍香</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">141992199701078600</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>                 <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180106</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">朱逸群</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">197995199501078445</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">电子信息</span>                 <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜子腾</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">158177199901044792</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机科学与工程</span>         <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜琦燕</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">151008199801178529</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机科学与工程</span>         <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180105</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范剑</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">181048199308156368</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">飞行器设计</span>               <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">17156319980116959</span>X <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>                 <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#ae81ff">6</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
 
-<pre><code>mysql&gt; select * from student_info order by name asc, number desc;
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-| number   | name      | sex  | id_number          | department      | major                    | enrollment_time |
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-| 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程                 | 2018-09-01      |
-| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息                 | 2018-09-01      |
-| 20180101 | 杜子腾    | 男   | 158177199901044792 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
-| 20180102 | 杜琦燕    | 女   | 151008199801178529 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
-| 20180105 | 范剑      | 男   | 181048199308156368 | 航天学院        | 飞行器设计               | 2018-09-01      |
-| 20180103 | 范统      | 男   | 17156319980116959X | 计算机学院      | 软件工程                 | 2018-09-01      |
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-6 rows in set (0.00 sec)
-
-mysql&gt; select * from student_info order by name desc, number desc;
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-| number   | name      | sex  | id_number          | department      | major                    | enrollment_time |
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-| 20180103 | 范统      | 男   | 17156319980116959X | 计算机学院      | 软件工程                 | 2018-09-01      |
-| 20180105 | 范剑      | 男   | 181048199308156368 | 航天学院        | 飞行器设计               | 2018-09-01      |
-| 20180102 | 杜琦燕    | 女   | 151008199801178529 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
-| 20180101 | 杜子腾    | 男   | 158177199901044792 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
-| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息                 | 2018-09-01      |
-| 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程                 | 2018-09-01      |
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-6 rows in set (0.00 sec)
-</code></pre>
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">order</span> <span style="color:#66d9ef">by</span> name <span style="color:#66d9ef">desc</span>, number <span style="color:#66d9ef">desc</span>;
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name      <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> id_number          <span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major                    <span style="color:#f92672">|</span> enrollment_time <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">17156319980116959</span>X <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>                 <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180105</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范剑</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">181048199308156368</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">飞行器设计</span>               <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜琦燕</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">151008199801178529</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机科学与工程</span>         <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜子腾</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">158177199901044792</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机科学与工程</span>         <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180106</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">朱逸群</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">197995199501078445</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">电子信息</span>                 <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">史珍香</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">141992199701078600</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>                 <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#ae81ff">6</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h2 id="带条件查询">带条件查询</h2>
 
 <h3 id="简单搜索条件">简单搜索条件</h3>
 
-<p>不等于可以使用<code>&lt;&gt;</code>或<code>!=</code> :</p>
+<p>不等于可以使用<code>&lt;&gt;</code>或<code>!=</code> :
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> department <span style="color:#f92672">&lt;&gt;</span> <span style="color:#e6db74">&#39;计算机学院&#39;</span>;
+<span style="color:#f92672">+----------+-----------+------+--------------------+--------------+-----------------+-----------------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name      <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> id_number          <span style="color:#f92672">|</span> department   <span style="color:#f92672">|</span> major           <span style="color:#f92672">|</span> enrollment_time <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+--------------+-----------------+-----------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180105</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范剑</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">181048199308156368</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>     <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">飞行器设计</span>      <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180106</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">朱逸群</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">197995199501078445</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>     <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">电子信息</span>        <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+--------------+-----------------+-----------------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
-<pre><code>mysql&gt; select * from student_info where department &lt;&gt; '计算机学院';
-+----------+-----------+------+--------------------+--------------+-----------------+-----------------+
-| number   | name      | sex  | id_number          | department   | major           | enrollment_time |
-+----------+-----------+------+--------------------+--------------+-----------------+-----------------+
-| 20180105 | 范剑      | 男   | 181048199308156368 | 航天学院     | 飞行器设计      | 2018-09-01      |
-| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院     | 电子信息        | 2018-09-01      |
-+----------+-----------+------+--------------------+--------------+-----------------+-----------------+
-2 rows in set (0.00 sec)
-</code></pre>
+<p>区间内使用<code>between...and...</code>，不在某区间使用<code>not between...and...</code>:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> number <span style="color:#66d9ef">between</span> <span style="color:#ae81ff">20180103</span> <span style="color:#66d9ef">and</span> <span style="color:#ae81ff">20180105</span>;
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+-----------------+-----------------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name      <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> id_number          <span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major           <span style="color:#f92672">|</span> enrollment_time <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+-----------------+-----------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">17156319980116959</span>X <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>        <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">史珍香</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">141992199701078600</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>        <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180105</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范剑</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">181048199308156368</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">飞行器设计</span>      <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+-----------------+-----------------+</span>
+<span style="color:#ae81ff">3</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">01</span> sec)
 
-<p>区间内使用<code>between...and...</code>，不在某区间使用<code>not between...and...</code>:</p>
-
-<pre><code>mysql&gt; select * from student_info where number between 20180103 and 20180105;
-+----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
-| number   | name      | sex  | id_number          | department      | major           | enrollment_time |
-+----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
-| 20180103 | 范统      | 男   | 17156319980116959X | 计算机学院      | 软件工程        | 2018-09-01      |
-| 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程        | 2018-09-01      |
-| 20180105 | 范剑      | 男   | 181048199308156368 | 航天学院        | 飞行器设计      | 2018-09-01      |
-+----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
-3 rows in set (0.01 sec)
-
-mysql&gt; select * from student_info where number not between 20180103 and 20180105;
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-| number   | name      | sex  | id_number          | department      | major                    | enrollment_time |
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-| 20180101 | 杜子腾    | 男   | 158177199901044792 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
-| 20180102 | 杜琦燕    | 女   | 151008199801178529 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
-| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息                 | 2018-09-01      |
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-3 rows in set (0.00 sec)
-</code></pre>
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> number <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">between</span> <span style="color:#ae81ff">20180103</span> <span style="color:#66d9ef">and</span> <span style="color:#ae81ff">20180105</span>;
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name      <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> id_number          <span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major                    <span style="color:#f92672">|</span> enrollment_time <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜子腾</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">158177199901044792</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机科学与工程</span>         <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜琦燕</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">151008199801178529</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机科学与工程</span>         <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180106</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">朱逸群</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">197995199501078445</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">电子信息</span>                 <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#ae81ff">3</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="匹配列表中的元素">匹配列表中的元素</h3>
 
-<p>使用<code>in (...)</code>和<code>not in</code>筛选出在某个列表中的记录:</p>
-
-<pre><code>mysql&gt; select * from student_info where major in ('软件工程',  '电子信息');
-+----------+-----------+------+--------------------+-----------------+--------------+-----------------+
-| number   | name      | sex  | id_number          | department      | major        | enrollment_time |
-+----------+-----------+------+--------------------+-----------------+--------------+-----------------+
-| 20180103 | 范统      | 男   | 17156319980116959X | 计算机学院      | 软件工程     | 2018-09-01      |
-| 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程     | 2018-09-01      |
-| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息     | 2018-09-01      |
-+----------+-----------+------+--------------------+-----------------+--------------+-----------------+
-3 rows in set (0.00 sec)
-</code></pre>
+<p>使用<code>in (...)</code>和<code>not in</code>筛选出在某个列表中的记录:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> major <span style="color:#66d9ef">in</span> (<span style="color:#e6db74">&#39;软件工程&#39;</span>,  <span style="color:#e6db74">&#39;电子信息&#39;</span>);
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------+-----------------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name      <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> id_number          <span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major        <span style="color:#f92672">|</span> enrollment_time <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------+-----------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">17156319980116959</span>X <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>     <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">史珍香</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">141992199701078600</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>     <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180106</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">朱逸群</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">197995199501078445</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">电子信息</span>     <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------+-----------------+</span>
+<span style="color:#ae81ff">3</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <p>使用<code>is null</code> 和 <code>is not null</code>可筛选出某列是NULL的记录，而不能使用普通的操作符例如等号来进行比较，NULL代表没有值。</p>
 
 <h3 id="多个搜索条件">多个搜索条件</h3>
 
-<p>AND优先级高于OR:</p>
-
-<pre><code>mysql&gt; SELECT * FROM student_score WHERE score &gt; 95 OR score &lt; 55 AND subject = '论萨达姆的战争准备';
-+----------+-----------------------------+-------+
-| number   | subject                     | score |
-+----------+-----------------------------+-------+
-| 20180102 | 母猪的产后护理              |   100 |
-| 20180102 | 论萨达姆的战争准备          |    98 |
-| 20180104 | 论萨达姆的战争准备          |    46 |
-+----------+-----------------------------+-------+
-3 rows in set (0.00 sec)
-</code></pre>
+<p>AND优先级高于OR:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> student_score <span style="color:#66d9ef">WHERE</span> score <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">95</span> <span style="color:#66d9ef">OR</span> score <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">55</span> <span style="color:#66d9ef">AND</span> subject <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;论萨达姆的战争准备&#39;</span>;
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> subject                     <span style="color:#f92672">|</span> score <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>   <span style="color:#ae81ff">100</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">98</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">46</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#ae81ff">3</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="模糊查询">模糊查询</h3>
 
-<p>使用<code>like</code>和<code>not like</code>进行模糊匹配查询，<code>%</code>代表任意一个字符串，而<code>_</code>代表任意一个字符:</p>
+<p>使用<code>like</code>和<code>not like</code>进行模糊匹配查询，<code>%</code>代表任意一个字符串，而<code>_</code>代表任意一个字符:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> name <span style="color:#66d9ef">like</span> <span style="color:#e6db74">&#39;杜_&#39;</span>;
+Empty <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
 
-<pre><code>mysql&gt; select * from student_info where name like '杜_';
-Empty set (0.00 sec)
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> name <span style="color:#66d9ef">like</span> <span style="color:#e6db74">&#39;范_&#39;</span>;
+<span style="color:#f92672">+----------+--------+------+--------------------+-----------------+-----------------+-----------------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name   <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> id_number          <span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major           <span style="color:#f92672">|</span> enrollment_time <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+--------+------+--------------------+-----------------+-----------------+-----------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">17156319980116959</span>X <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>        <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180105</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范剑</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">181048199308156368</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">飞行器设计</span>      <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+--------+------+--------------------+-----------------+-----------------+-----------------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
 
-mysql&gt; select * from student_info where name like '范_';
-+----------+--------+------+--------------------+-----------------+-----------------+-----------------+
-| number   | name   | sex  | id_number          | department      | major           | enrollment_time |
-+----------+--------+------+--------------------+-----------------+-----------------+-----------------+
-| 20180103 | 范统   | 男   | 17156319980116959X | 计算机学院      | 软件工程        | 2018-09-01      |
-| 20180105 | 范剑   | 男   | 181048199308156368 | 航天学院        | 飞行器设计      | 2018-09-01      |
-+----------+--------+------+--------------------+-----------------+-----------------+-----------------+
-2 rows in set (0.00 sec)
-
-mysql&gt; select * from student_info where name like '%杜%';
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-| number   | name      | sex  | id_number          | department      | major                    | enrollment_time |
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-| 20180101 | 杜子腾    | 男   | 158177199901044792 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
-| 20180102 | 杜琦燕    | 女   | 151008199801178529 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-2 rows in set (0.00 sec)
-</code></pre>
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> name <span style="color:#66d9ef">like</span> <span style="color:#e6db74">&#39;%杜%&#39;</span>;
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name      <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> id_number          <span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major                    <span style="color:#f92672">|</span> enrollment_time <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜子腾</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">158177199901044792</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机科学与工程</span>         <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜琦燕</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">151008199801178529</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机科学与工程</span>         <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h2 id="函数和表达式">函数和表达式</h2>
 
 <h3 id="表达式">表达式</h3>
 
-<p>可以将表达式放在查询列表中:</p>
+<p>可以将表达式放在查询列表中:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> number,subject,score<span style="color:#f92672">+</span><span style="color:#ae81ff">100</span> <span style="color:#66d9ef">from</span> student_score;
+<span style="color:#f92672">+----------+-----------------------------+-----------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> subject                     <span style="color:#f92672">|</span> score<span style="color:#f92672">+</span><span style="color:#ae81ff">100</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-----------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>       <span style="color:#ae81ff">178</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>       <span style="color:#ae81ff">188</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>       <span style="color:#ae81ff">200</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>       <span style="color:#ae81ff">198</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>       <span style="color:#ae81ff">159</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>       <span style="color:#ae81ff">161</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>       <span style="color:#ae81ff">155</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>       <span style="color:#ae81ff">146</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-----------+</span>
+<span style="color:#ae81ff">8</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
-<pre><code>mysql&gt; select number,subject,score+100 from student_score;
-+----------+-----------------------------+-----------+
-| number   | subject                     | score+100 |
-+----------+-----------------------------+-----------+
-| 20180101 | 母猪的产后护理              |       178 |
-| 20180101 | 论萨达姆的战争准备          |       188 |
-| 20180102 | 母猪的产后护理              |       200 |
-| 20180102 | 论萨达姆的战争准备          |       198 |
-| 20180103 | 母猪的产后护理              |       159 |
-| 20180103 | 论萨达姆的战争准备          |       161 |
-| 20180104 | 母猪的产后护理              |       155 |
-| 20180104 | 论萨达姆的战争准备          |       146 |
-+----------+-----------------------------+-----------+
-8 rows in set (0.00 sec)
-</code></pre>
-
-<p>也可以把表达式作为搜索的条件:</p>
-
-<pre><code>mysql&gt; select * from student_score where score%3=0;
-+----------+-----------------------+-------+
-| number   | subject               | score |
-+----------+-----------------------+-------+
-| 20180101 | 母猪的产后护理        |    78 |
-+----------+-----------------------+-------+
-1 row in set (0.00 sec)
-</code></pre>
+<p>也可以把表达式作为搜索的条件:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">where</span> score<span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>;
+<span style="color:#f92672">+----------+-----------------------+-------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> subject               <span style="color:#f92672">|</span> score <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------+-------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>        <span style="color:#f92672">|</span>    <span style="color:#ae81ff">78</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------+-------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="文本处理">文本处理</h3>
 
-<p>连接字符串:</p>
+<p>连接字符串:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#a6e22e">concat</span>(<span style="color:#e6db74">&#39;学号为&#39;</span>,number,<span style="color:#e6db74">&#39;的学生在[&#39;</span>,subject,<span style="color:#e6db74">&#39;]的成绩为&#39;</span>,score) <span style="color:#66d9ef">from</span> student_score;
+<span style="color:#f92672">+--------------------------------------------------------------------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#a6e22e">concat</span>(<span style="color:#e6db74">&#39;学号为&#39;</span>,number,<span style="color:#e6db74">&#39;的学生在[&#39;</span>,subject,<span style="color:#e6db74">&#39;]的成绩为&#39;</span>,score)            <span style="color:#f92672">|</span>
+<span style="color:#f92672">+--------------------------------------------------------------------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">学号为</span><span style="color:#ae81ff">20180101</span><span style="color:#960050;background-color:#1e0010">的学生在</span>[<span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>]<span style="color:#960050;background-color:#1e0010">的成绩为</span><span style="color:#ae81ff">78</span>                         <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">学号为</span><span style="color:#ae81ff">20180101</span><span style="color:#960050;background-color:#1e0010">的学生在</span>[<span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>]<span style="color:#960050;background-color:#1e0010">的成绩为</span><span style="color:#ae81ff">88</span>                     <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">学号为</span><span style="color:#ae81ff">20180102</span><span style="color:#960050;background-color:#1e0010">的学生在</span>[<span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>]<span style="color:#960050;background-color:#1e0010">的成绩为</span><span style="color:#ae81ff">100</span>                        <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">学号为</span><span style="color:#ae81ff">20180102</span><span style="color:#960050;background-color:#1e0010">的学生在</span>[<span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>]<span style="color:#960050;background-color:#1e0010">的成绩为</span><span style="color:#ae81ff">98</span>                     <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">学号为</span><span style="color:#ae81ff">20180103</span><span style="color:#960050;background-color:#1e0010">的学生在</span>[<span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>]<span style="color:#960050;background-color:#1e0010">的成绩为</span><span style="color:#ae81ff">59</span>                         <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">学号为</span><span style="color:#ae81ff">20180103</span><span style="color:#960050;background-color:#1e0010">的学生在</span>[<span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>]<span style="color:#960050;background-color:#1e0010">的成绩为</span><span style="color:#ae81ff">61</span>                     <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">学号为</span><span style="color:#ae81ff">20180104</span><span style="color:#960050;background-color:#1e0010">的学生在</span>[<span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>]<span style="color:#960050;background-color:#1e0010">的成绩为</span><span style="color:#ae81ff">55</span>                         <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">学号为</span><span style="color:#ae81ff">20180104</span><span style="color:#960050;background-color:#1e0010">的学生在</span>[<span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>]<span style="color:#960050;background-color:#1e0010">的成绩为</span><span style="color:#ae81ff">46</span>                     <span style="color:#f92672">|</span>
+<span style="color:#f92672">+--------------------------------------------------------------------------+</span>
+<span style="color:#ae81ff">8</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
-<pre><code>mysql&gt; select concat('学号为',number,'的学生在[',subject,']的成绩为',score) from student_score;
-+--------------------------------------------------------------------------+
-| concat('学号为',number,'的学生在[',subject,']的成绩为',score)            |
-+--------------------------------------------------------------------------+
-| 学号为20180101的学生在[母猪的产后护理]的成绩为78                         |
-| 学号为20180101的学生在[论萨达姆的战争准备]的成绩为88                     |
-| 学号为20180102的学生在[母猪的产后护理]的成绩为100                        |
-| 学号为20180102的学生在[论萨达姆的战争准备]的成绩为98                     |
-| 学号为20180103的学生在[母猪的产后护理]的成绩为59                         |
-| 学号为20180103的学生在[论萨达姆的战争准备]的成绩为61                     |
-| 学号为20180104的学生在[母猪的产后护理]的成绩为55                         |
-| 学号为20180104的学生在[论萨达姆的战争准备]的成绩为46                     |
-+--------------------------------------------------------------------------+
-8 rows in set (0.00 sec)
-</code></pre>
-
-<p>子串:</p>
-
-<pre><code>mysql&gt; select substring(number, 4, 5) as 学号尾号 from student_info;
-+--------------+
-| 学号尾号     |
-+--------------+
-| 80104        |
-| 80102        |
-| 80101        |
-| 80103        |
-| 80105        |
-| 80106        |
-+--------------+
-6 rows in set (0.00 sec)
-</code></pre>
+<p>子串:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#a6e22e">substring</span>(number, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>) <span style="color:#66d9ef">as</span> <span style="color:#960050;background-color:#1e0010">学号尾号</span> <span style="color:#66d9ef">from</span> student_info;
+<span style="color:#f92672">+--------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">学号尾号</span>     <span style="color:#f92672">|</span>
+<span style="color:#f92672">+--------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">80104</span>        <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">80102</span>        <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">80101</span>        <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">80103</span>        <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">80105</span>        <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">80106</span>        <span style="color:#f92672">|</span>
+<span style="color:#f92672">+--------------+</span>
+<span style="color:#ae81ff">6</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="时间处理函数">时间处理函数</h3>
 
-<p>时间间隔:</p>
+<p>时间间隔:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#a6e22e">date_add</span>(<span style="color:#e6db74">&#39;2015-01-01 10:20:33&#39;</span>, <span style="color:#66d9ef">interval</span> <span style="color:#ae81ff">2</span> minute);
+<span style="color:#f92672">+----------------------------------------------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#a6e22e">date_add</span>(<span style="color:#e6db74">&#39;2015-01-01 10:20:33&#39;</span>, <span style="color:#66d9ef">interval</span> <span style="color:#ae81ff">2</span> minute) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------------------------------------------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">2015</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span> <span style="color:#ae81ff">10</span>:<span style="color:#ae81ff">22</span>:<span style="color:#ae81ff">33</span>                                <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------------------------------------------------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
-<pre><code>mysql&gt; select date_add('2015-01-01 10:20:33', interval 2 minute);
-+----------------------------------------------------+
-| date_add('2015-01-01 10:20:33', interval 2 minute) |
-+----------------------------------------------------+
-| 2015-01-01 10:22:33                                |
-+----------------------------------------------------+
-1 row in set (0.00 sec)
-</code></pre>
-
-<p>时间格式化:</p>
-
-<pre><code>mysql&gt; select date_format(now(), '%b/%d/%Y %h:%i:%s~%p');
-+--------------------------------------------+
-| date_format(now(), '%b/%d/%Y %h:%i:%s~%p') |
-+--------------------------------------------+
-| Dec/02/2019 04:57:31~PM                    |
-+--------------------------------------------+
-1 row in set (0.00 sec)
-</code></pre>
+<p>时间格式化:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#a6e22e">date_format</span>(<span style="color:#a6e22e">now</span>(), <span style="color:#e6db74">&#39;%b/%d/%Y %h:%i:%s~%p&#39;</span>);
+<span style="color:#f92672">+--------------------------------------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#a6e22e">date_format</span>(<span style="color:#a6e22e">now</span>(), <span style="color:#e6db74">&#39;%b/%d/%Y %h:%i:%s~%p&#39;</span>) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+--------------------------------------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#66d9ef">Dec</span><span style="color:#f92672">/</span><span style="color:#ae81ff">02</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2019</span> <span style="color:#ae81ff">04</span>:<span style="color:#ae81ff">57</span>:<span style="color:#ae81ff">31</span><span style="color:#f92672">~</span>PM                    <span style="color:#f92672">|</span>
+<span style="color:#f92672">+--------------------------------------------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="聚集函数">聚集函数</h3>
 
@@ -617,160 +581,140 @@ mysql&gt; select * from student_info where name like '%杜%';
 * <code>COUNT(*)</code>统计表中所有的行，包括NULL
 * <code>COUNT(列名)</code>统计表中某列的所有行，不包括NULL</p>
 
-<pre><code>mysql&gt; select count(*) from student_info;
-+----------+
-| count(*) |
-+----------+
-|        6 |
-+----------+
-1 row in set (0.00 sec)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#a6e22e">count</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">from</span> student_info;
+<span style="color:#f92672">+----------+</span>
+<span style="color:#f92672">|</span> <span style="color:#a6e22e">count</span>(<span style="color:#f92672">*</span>) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+</span>
+<span style="color:#f92672">|</span>        <span style="color:#ae81ff">6</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
 
-mysql&gt; select count(distinct subject) from student_score;
-+-------------------------+
-| count(distinct subject) |
-+-------------------------+
-|                       2 |
-+-------------------------+
-1 row in set (0.00 sec)
-</code></pre>
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#a6e22e">count</span>(<span style="color:#66d9ef">distinct</span> subject) <span style="color:#66d9ef">from</span> student_score;
+<span style="color:#f92672">+-------------------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#a6e22e">count</span>(<span style="color:#66d9ef">distinct</span> subject) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-------------------------+</span>
+<span style="color:#f92672">|</span>                       <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-------------------------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div>
 
-<p>SUM和AVG:</p>
+<p>SUM和AVG:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#a6e22e">sum</span>(score) <span style="color:#66d9ef">from</span> student_score;
+<span style="color:#f92672">+------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#a6e22e">sum</span>(score) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------------+</span>
+<span style="color:#f92672">|</span>        <span style="color:#ae81ff">585</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
 
-<pre><code>mysql&gt; select sum(score) from student_score;
-+------------+
-| sum(score) |
-+------------+
-|        585 |
-+------------+
-1 row in set (0.00 sec)
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#a6e22e">avg</span>(score) <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">where</span> subject<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;论萨达姆的战争准备&#34;</span>;
+<span style="color:#f92672">+------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#a6e22e">avg</span>(score) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------------+</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">73</span>.<span style="color:#ae81ff">2500</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
-mysql&gt; select avg(score) from student_score where subject=&quot;论萨达姆的战争准备&quot;;
-+------------+
-| avg(score) |
-+------------+
-|    73.2500 |
-+------------+
-1 row in set (0.00 sec)
-</code></pre>
-
-<p>组合使用:</p>
-
-<pre><code>mysql&gt; select count(*) as 成绩记录总数, max(score) as 最高分, min(score) as 最低分,avg(score) as 平均分 from student_score;
-+--------------------+-----------+-----------+-----------+
-| 成绩记录总数       | 最高分    | 最低分    | 平均分    |
-+--------------------+-----------+-----------+-----------+
-|                  8 |       100 |        46 |   73.1250 |
-+--------------------+-----------+-----------+-----------+
-1 row in set (0.00 sec)
-</code></pre>
+<p>组合使用:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#a6e22e">count</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">as</span> <span style="color:#960050;background-color:#1e0010">成绩记录总数</span>, <span style="color:#a6e22e">max</span>(score) <span style="color:#66d9ef">as</span> <span style="color:#960050;background-color:#1e0010">最高分</span>, <span style="color:#a6e22e">min</span>(score) <span style="color:#66d9ef">as</span> <span style="color:#960050;background-color:#1e0010">最低分</span>,<span style="color:#a6e22e">avg</span>(score) <span style="color:#66d9ef">as</span> <span style="color:#960050;background-color:#1e0010">平均分</span> <span style="color:#66d9ef">from</span> student_score;
+<span style="color:#f92672">+--------------------+-----------+-----------+-----------+</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">成绩记录总数</span>       <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">最高分</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">最低分</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">平均分</span>    <span style="color:#f92672">|</span>
+<span style="color:#f92672">+--------------------+-----------+-----------+-----------+</span>
+<span style="color:#f92672">|</span>                  <span style="color:#ae81ff">8</span> <span style="color:#f92672">|</span>       <span style="color:#ae81ff">100</span> <span style="color:#f92672">|</span>        <span style="color:#ae81ff">46</span> <span style="color:#f92672">|</span>   <span style="color:#ae81ff">73</span>.<span style="color:#ae81ff">1250</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+--------------------+-----------+-----------+-----------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="隐式类型转换">隐式类型转换</h3>
 
-<p>Mysql会尽量把值转换为表达式中需要的类型，而不是产生错误:</p>
+<p>Mysql会尽量把值转换为表达式中需要的类型，而不是产生错误:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;2&#39;</span>;
+<span style="color:#f92672">+---------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;2&#39;</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+---------+</span>
+<span style="color:#f92672">|</span>       <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+---------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
 
-<pre><code>mysql&gt; select 1 + '2';
-+---------+
-| 1 + '2' |
-+---------+
-|       3 |
-+---------+
-1 row in set (0.00 sec)
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#e6db74">&#39;23sds&#39;</span><span style="color:#f92672">+</span><span style="color:#ae81ff">17</span>;
+<span style="color:#f92672">+------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#e6db74">&#39;23sds&#39;</span><span style="color:#f92672">+</span><span style="color:#ae81ff">17</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------------+</span>
+<span style="color:#f92672">|</span>         <span style="color:#ae81ff">40</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span>, <span style="color:#ae81ff">1</span> <span style="color:#a6e22e">warning</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
-mysql&gt; select '23sds'+17;
-+------------+
-| '23sds'+17 |
-+------------+
-|         40 |
-+------------+
-1 row in set, 1 warning (0.00 sec)
-</code></pre>
+<p>但这种转换不能用于存储数据:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> <span style="color:#a6e22e">student_score</span>(score,number,subject) <span style="color:#66d9ef">values</span> (<span style="color:#ae81ff">100</span>,<span style="color:#ae81ff">20180101</span>,<span style="color:#ae81ff">300</span>);
+Query OK, <span style="color:#ae81ff">1</span> row <span style="color:#a6e22e">affected</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
 
-<p>但这种转换不能用于存储数据:</p>
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> <span style="color:#a6e22e">student_score</span>(score,number,subject) <span style="color:#66d9ef">values</span> (<span style="color:#e6db74">&#39;100&#39;</span>,<span style="color:#ae81ff">20180101</span>,<span style="color:#ae81ff">400</span>);
+Query OK, <span style="color:#ae81ff">1</span> row <span style="color:#a6e22e">affected</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
 
-<pre><code>mysql&gt; insert into student_score(score,number,subject) values (100,20180101,300);
-Query OK, 1 row affected (0.00 sec)
-
-mysql&gt; insert into student_score(score,number,subject) values ('100',20180101,400);
-Query OK, 1 row affected (0.00 sec)
-
-mysql&gt; insert into student_score(score,number,subject) values ('asd',20180101,400);
-ERROR 1366 (HY000): Incorrect integer value: 'asd' for column 'score' at row 1
-</code></pre>
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> <span style="color:#a6e22e">student_score</span>(score,number,subject) <span style="color:#66d9ef">values</span> (<span style="color:#e6db74">&#39;asd&#39;</span>,<span style="color:#ae81ff">20180101</span>,<span style="color:#ae81ff">400</span>);
+ERROR <span style="color:#ae81ff">1366</span> (HY000): Incorrect <span style="color:#66d9ef">integer</span> value: <span style="color:#e6db74">&#39;asd&#39;</span> <span style="color:#66d9ef">for</span> <span style="color:#66d9ef">column</span> <span style="color:#e6db74">&#39;score&#39;</span> at row <span style="color:#ae81ff">1</span></code></pre></div></p>
 
 <h2 id="分组查询">分组查询</h2>
 
 <h3 id="基础查询-1">基础查询</h3>
 
-<p>分组就是针对某个列，将该列的值相同的记录分到一个组中:</p>
+<p>分组就是针对某个列，将该列的值相同的记录分到一个组中:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> subject, <span style="color:#a6e22e">sum</span>(score) <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">group</span> <span style="color:#66d9ef">by</span> subject;
+<span style="color:#f92672">+-----------------------------+------------+</span>
+<span style="color:#f92672">|</span> subject                     <span style="color:#f92672">|</span> <span style="color:#a6e22e">sum</span>(score) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------------------+------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>        <span style="color:#ae81ff">292</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>        <span style="color:#ae81ff">293</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------------------+------------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
-<pre><code>mysql&gt; select subject, sum(score) from student_score group by subject;
-+-----------------------------+------------+
-| subject                     | sum(score) |
-+-----------------------------+------------+
-| 母猪的产后护理              |        292 |
-| 论萨达姆的战争准备          |        293 |
-+-----------------------------+------------+
-2 rows in set (0.00 sec)
-</code></pre>
-
-<p>把非分组列放入查询列表中会引起争议，导致结果不确定:</p>
-
-<pre><code>mysql&gt; select subject, sum(score),number from student_score group by subject;
-ERROR 1055 (42000): Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'student.student_score.number' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
-</code></pre>
+<p>把非分组列放入查询列表中会引起争议，导致结果不确定:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> subject, <span style="color:#a6e22e">sum</span>(score),number <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">group</span> <span style="color:#66d9ef">by</span> subject;
+ERROR <span style="color:#ae81ff">1055</span> (<span style="color:#ae81ff">42000</span>): Expression <span style="color:#75715e">#3 of SELECT list is not in GROUP BY clause and contains nonaggregated column &#39;student.student_score.number&#39; which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by</span></code></pre></div></p>
 
 <h3 id="分组和过滤条件">分组和过滤条件</h3>
 
-<p>是先过滤出符合条件的数据，在进行分组运算的:</p>
+<p>是先过滤出符合条件的数据，在进行分组运算的:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> subject, <span style="color:#a6e22e">sum</span>(score) <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">where</span> score<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">70</span> <span style="color:#66d9ef">group</span> <span style="color:#66d9ef">by</span> subject;
+<span style="color:#f92672">+-----------------------------+------------+</span>
+<span style="color:#f92672">|</span> subject                     <span style="color:#f92672">|</span> <span style="color:#a6e22e">sum</span>(score) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------------------+------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>        <span style="color:#ae81ff">178</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>        <span style="color:#ae81ff">186</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------------------+------------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
-<pre><code>mysql&gt; select subject, sum(score) from student_score where score&gt;70 group by subject;
-+-----------------------------+------------+
-| subject                     | sum(score) |
-+-----------------------------+------------+
-| 母猪的产后护理              |        178 |
-| 论萨达姆的战争准备          |        186 |
-+-----------------------------+------------+
-2 rows in set (0.00 sec)
-</code></pre>
-
-<p>也可以分组后，在筛选出合适的分组:</p>
-
-<pre><code>mysql&gt; select subject, sum(score) from student_score group by subject having max(score)&gt;98;
-+-----------------------+------------+
-| subject               | sum(score) |
-+-----------------------+------------+
-| 母猪的产后护理        |        292 |
-+-----------------------+------------+
-1 row in set (0.00 sec)
-</code></pre>
+<p>也可以分组后，在筛选出合适的分组:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> subject, <span style="color:#a6e22e">sum</span>(score) <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">group</span> <span style="color:#66d9ef">by</span> subject <span style="color:#66d9ef">having</span> <span style="color:#a6e22e">max</span>(score)<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">98</span>;
+<span style="color:#f92672">+-----------------------+------------+</span>
+<span style="color:#f92672">|</span> subject               <span style="color:#f92672">|</span> <span style="color:#a6e22e">sum</span>(score) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------------+------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>        <span style="color:#f92672">|</span>        <span style="color:#ae81ff">292</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------------+------------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="分组和排序">分组和排序</h3>
 
-<pre><code>mysql&gt; select subject, sum(score) as sum_s from student_score group by subject order by sum_s desc;
-+-----------------------------+-------+
-| subject                     | sum_s |
-+-----------------------------+-------+
-| 论萨达姆的战争准备          |   293 |
-| 母猪的产后护理              |   292 |
-+-----------------------------+-------+
-2 rows in set (0.00 sec)
-</code></pre>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> subject, <span style="color:#a6e22e">sum</span>(score) <span style="color:#66d9ef">as</span> sum_s <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">group</span> <span style="color:#66d9ef">by</span> subject <span style="color:#66d9ef">order</span> <span style="color:#66d9ef">by</span> sum_s <span style="color:#66d9ef">desc</span>;
+<span style="color:#f92672">+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> subject                     <span style="color:#f92672">|</span> sum_s <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>   <span style="color:#ae81ff">293</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>   <span style="color:#ae81ff">292</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------------------+-------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div>
 
 <h3 id="嵌套分组">嵌套分组</h3>
 
-<p>如下例，可先按department分成大组，再按major分为小组:</p>
-
-<pre><code>mysql&gt; select department, major, count(*) from student_info group by department, major;
-+-----------------+--------------------------+----------+
-| department      | major                    | count(*) |
-+-----------------+--------------------------+----------+
-| 航天学院        | 电子信息                 |        1 |
-| 航天学院        | 飞行器设计               |        1 |
-| 计算机学院      | 计算机科学与工程         |        2 |
-| 计算机学院      | 软件工程                 |        2 |
-+-----------------+--------------------------+----------+
-4 rows in set (0.00 sec)
-</code></pre>
+<p>如下例，可先按department分成大组，再按major分为小组:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> department, major, <span style="color:#a6e22e">count</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">group</span> <span style="color:#66d9ef">by</span> department, major;
+<span style="color:#f92672">+-----------------+--------------------------+----------+</span>
+<span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major                    <span style="color:#f92672">|</span> <span style="color:#a6e22e">count</span>(<span style="color:#f92672">*</span>) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------+--------------------------+----------+</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">电子信息</span>                 <span style="color:#f92672">|</span>        <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">航天学院</span>        <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">飞行器设计</span>               <span style="color:#f92672">|</span>        <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机科学与工程</span>         <span style="color:#f92672">|</span>        <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>                 <span style="color:#f92672">|</span>        <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------+--------------------------+----------+</span>
+<span style="color:#ae81ff">4</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="注意事项">注意事项</h3>
 
@@ -781,112 +725,97 @@ ERROR 1055 (42000): Expression #3 of SELECT list is not in GROUP BY clause and c
 <li>GROUP BY子句后可以跟随表达式（但不能是聚集函数）</li>
 </ol>
 
-<p>简单查询语句中各子句的顺序为:</p>
-
-<pre><code>SELECT [DISTINCT] 查询列表
-[FROM 表名]
-[WHERE 布尔表达式]
-[GROUP BY 分组列表 ]
-[HAVING 分组过滤条件]
-[ORDER BY 排序列表]
-[LIMIT 开始行, 限制条数]
-</code></pre>
+<p>简单查询语句中各子句的顺序为:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">SELECT</span> [<span style="color:#66d9ef">DISTINCT</span>] <span style="color:#960050;background-color:#1e0010">查询列表</span>
+[<span style="color:#66d9ef">FROM</span> <span style="color:#960050;background-color:#1e0010">表名</span>]
+[<span style="color:#66d9ef">WHERE</span> <span style="color:#960050;background-color:#1e0010">布尔表达式</span>]
+[<span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> <span style="color:#960050;background-color:#1e0010">分组列表</span> ]
+[<span style="color:#66d9ef">HAVING</span> <span style="color:#960050;background-color:#1e0010">分组过滤条件</span>]
+[<span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> <span style="color:#960050;background-color:#1e0010">排序列表</span>]
+[<span style="color:#66d9ef">LIMIT</span> <span style="color:#960050;background-color:#1e0010">开始行</span>, <span style="color:#960050;background-color:#1e0010">限制条数</span>]</code></pre></div></p>
 
 <h2 id="子查询">子查询</h2>
 
 <h3 id="标量子查询">标量子查询</h3>
 
-<p>标量子查询单纯的代表一个值，可以作为表达式参与运算或作为搜索条件:</p>
-
-<pre><code>mysql&gt; select * from student_score where number=(select number from student_info where name='范统');
-+----------+-----------------------------+-------+
-| number   | subject                     | score |
-+----------+-----------------------------+-------+
-| 20180103 | 母猪的产后护理              |    59 |
-| 20180103 | 论萨达姆的战争准备          |    61 |
-+----------+-----------------------------+-------+
-2 rows in set (0.00 sec)
-</code></pre>
+<p>标量子查询单纯的代表一个值，可以作为表达式参与运算或作为搜索条件:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">where</span> number<span style="color:#f92672">=</span>(<span style="color:#66d9ef">select</span> number <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;范统&#39;</span>);
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> subject                     <span style="color:#f92672">|</span> score <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">59</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">61</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="列子查询">列子查询</h3>
 
-<p>内层查询结果不是一个单独的值，而是一个列:</p>
+<p>内层查询结果不是一个单独的值，而是一个列:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">where</span> number<span style="color:#f92672">=</span>(<span style="color:#66d9ef">select</span> number <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> sex<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;男&#39;</span>);
+ERROR <span style="color:#ae81ff">1242</span> (<span style="color:#ae81ff">21000</span>): Subquery returns more than <span style="color:#ae81ff">1</span> row
 
-<pre><code>mysql&gt; select * from student_score where number=(select number from student_info where sex='男');
-ERROR 1242 (21000): Subquery returns more than 1 row
-
-mysql&gt; select * from student_score where number in (select number from student_info where sex='男');
-+----------+-----------------------------+-------+
-| number   | subject                     | score |
-+----------+-----------------------------+-------+
-| 20180101 | 母猪的产后护理              |    78 |
-| 20180101 | 论萨达姆的战争准备          |    88 |
-| 20180103 | 母猪的产后护理              |    59 |
-| 20180103 | 论萨达姆的战争准备          |    61 |
-+----------+-----------------------------+-------+
-4 rows in set (0.00 sec)
-</code></pre>
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">where</span> number <span style="color:#66d9ef">in</span> (<span style="color:#66d9ef">select</span> number <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> sex<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;男&#39;</span>);
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> subject                     <span style="color:#f92672">|</span> score <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">78</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">88</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">59</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">61</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#ae81ff">4</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <p>而行子查询、表子查询不常用，省略。</p>
 
 <h3 id="exists和相关子查询">EXISTS和相关子查询</h3>
 
-<p>EXISTS和NOT EXISTS单独看很像一个函数，返回查询结果是否为空集:</p>
+<p>EXISTS和NOT EXISTS单独看很像一个函数，返回查询结果是否为空集:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#66d9ef">exists</span> (<span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> number<span style="color:#f92672">=</span><span style="color:#ae81ff">20180101</span>);
+<span style="color:#f92672">+-----------------------------------------------------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#66d9ef">exists</span> (<span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> number<span style="color:#f92672">=</span><span style="color:#ae81ff">20180101</span>) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------------------------------------------------+</span>
+<span style="color:#f92672">|</span>                                                         <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+-----------------------------------------------------------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
 
-<pre><code>mysql&gt; select exists (select * from student_info where number=20180101);
-+-----------------------------------------------------------+
-| exists (select * from student_info where number=20180101) |
-+-----------------------------------------------------------+
-|                                                         1 |
-+-----------------------------------------------------------+
-1 row in set (0.00 sec)
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">exists</span> (<span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> number<span style="color:#f92672">=</span><span style="color:#ae81ff">20180101</span>);
+<span style="color:#f92672">+---------------------------------------------------------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">exists</span> (<span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> number<span style="color:#f92672">=</span><span style="color:#ae81ff">20180101</span>) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+---------------------------------------------------------------+</span>
+<span style="color:#f92672">|</span>                                                             <span style="color:#ae81ff">0</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+---------------------------------------------------------------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
-mysql&gt; select not exists (select * from student_info where number=20180101);
-+---------------------------------------------------------------+
-| not exists (select * from student_info where number=20180101) |
-+---------------------------------------------------------------+
-|                                                             0 |
-+---------------------------------------------------------------+
-1 row in set (0.00 sec)
-</code></pre>
-
-<p>之前我们尝试的都是不相关子查询，而相关子查询就是内层查询语句要用到外层查询语句的值，比如我们查学生的基本信息并要求这些学生有成绩的记录:</p>
-
-<pre><code>mysql&gt; select * from student_info where exists(select * from student_score where student_score.number=student_info.number);
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-| number   | name      | sex  | id_number          | department      | major                    | enrollment_time |
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-| 20180101 | 杜子腾    | 男   | 158177199901044792 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
-| 20180102 | 杜琦燕    | 女   | 151008199801178529 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
-| 20180103 | 范统      | 男   | 17156319980116959X | 计算机学院      | 软件工程                 | 2018-09-01      |
-| 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程                 | 2018-09-01      |
-+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
-4 rows in set (0.00 sec)
-</code></pre>
+<p>之前我们尝试的都是不相关子查询，而相关子查询就是内层查询语句要用到外层查询语句的值，比如我们查学生的基本信息并要求这些学生有成绩的记录:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> <span style="color:#66d9ef">exists</span>(<span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">where</span> student_score.number<span style="color:#f92672">=</span>student_info.number);
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name      <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> id_number          <span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major                    <span style="color:#f92672">|</span> enrollment_time <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜子腾</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">158177199901044792</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机科学与工程</span>         <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜琦燕</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">151008199801178529</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机科学与工程</span>         <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">17156319980116959</span>X <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>                 <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">史珍香</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">141992199701078600</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>                 <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+</span>
+<span style="color:#ae81ff">4</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <p>这个相关子查询的查询过程是:先执行外层查询获得到student_info表的第一条记录，发现它的number值是20180101。把20180101当作参数传入到子查询，此时子查询的意思是判断student_score表的number字段是否有20180101这个值存在，子查询的结果是该值存在，所以整个EXISTS表达式的值为TRUE，那么student_info表的第一条记录可以被加入到结果集。每条记录依次按这个过程执行。</p>
 
-<p>此外，子查询还可以应用于同一个表，比如我们去查student_score表中分数大于平均分的记录，第一印象可能是如下写法:</p>
+<p>此外，子查询还可以应用于同一个表，比如我们去查student_score表中分数大于平均分的记录，第一印象可能是如下写法:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">where</span> score <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">avg</span>(score);
+ERROR <span style="color:#ae81ff">1111</span> (HY000): Invalid <span style="color:#66d9ef">use</span> of <span style="color:#66d9ef">group</span> function</code></pre></div></p>
 
-<pre><code>mysql&gt; select * from student_score where score &gt; avg(score);
-ERROR 1111 (HY000): Invalid use of group function
-</code></pre>
-
-<p>实际应该使用子查询来实现:</p>
-
-<pre><code>mysql&gt; select * from student_score where score &gt; (select avg(score) from student_score);
-+----------+-----------------------------+-------+
-| number   | subject                     | score |
-+----------+-----------------------------+-------+
-| 20180101 | 母猪的产后护理              |    78 |
-| 20180101 | 论萨达姆的战争准备          |    88 |
-| 20180102 | 母猪的产后护理              |   100 |
-| 20180102 | 论萨达姆的战争准备          |    98 |
-+----------+-----------------------------+-------+
-4 rows in set (0.00 sec)
-</code></pre>
-
-<p>因为聚集函数不能用于WHERE子句，可以把上述写法看做是给student_score做了一个副本。</p>
+<p>实际应该使用子查询来实现:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">where</span> score <span style="color:#f92672">&gt;</span> (<span style="color:#66d9ef">select</span> <span style="color:#a6e22e">avg</span>(score) <span style="color:#66d9ef">from</span> student_score);
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> subject                     <span style="color:#f92672">|</span> score <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">78</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">88</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>   <span style="color:#ae81ff">100</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">98</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#ae81ff">4</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div>
+因为聚集函数不能用于WHERE子句，可以把上述写法看做是给student_score做了一个副本。</p>
 
 <h2 id="连接查询">连接查询</h2>
 
@@ -894,41 +823,37 @@ ERROR 1111 (HY000): Invalid use of group function
 
 <p>连接的本质就是将各个表中的记录都拉取出来，依次匹配组合形成一个结果集，也就是笛卡尔积的方式。</p>
 
-<p>我们来看一个示例:</p>
+<p>我们来看一个示例:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">create</span> <span style="color:#66d9ef">table</span> <span style="color:#a6e22e">t1</span>(m1 <span style="color:#66d9ef">int</span>, n1 <span style="color:#66d9ef">char</span>(<span style="color:#ae81ff">1</span>));
+Query OK, <span style="color:#ae81ff">0</span> rows <span style="color:#a6e22e">affected</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">02</span> sec)
 
-<pre><code>mysql&gt; create table t1(m1 int, n1 char(1));
-Query OK, 0 rows affected (0.02 sec)
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">create</span> <span style="color:#66d9ef">table</span> <span style="color:#a6e22e">t2</span>(m2 <span style="color:#66d9ef">int</span>, n2 <span style="color:#66d9ef">char</span>(<span style="color:#ae81ff">1</span>));
+Query OK, <span style="color:#ae81ff">0</span> rows <span style="color:#a6e22e">affected</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">02</span> sec)
 
-mysql&gt; create table t2(m2 int, n2 char(1));
-Query OK, 0 rows affected (0.02 sec)
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> t1 <span style="color:#66d9ef">values</span>(<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;a&#39;</span>),(<span style="color:#ae81ff">2</span>, <span style="color:#e6db74">&#39;b&#39;</span>),(<span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#39;c&#39;</span>);
+Query OK, <span style="color:#ae81ff">3</span> rows <span style="color:#a6e22e">affected</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
+Records: <span style="color:#ae81ff">3</span>  Duplicates: <span style="color:#ae81ff">0</span>  Warnings: <span style="color:#ae81ff">0</span>
 
-mysql&gt; insert into t1 values(1, 'a'),(2, 'b'),(3, 'c');
-Query OK, 3 rows affected (0.00 sec)
-Records: 3  Duplicates: 0  Warnings: 0
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> t2 <span style="color:#66d9ef">values</span>(<span style="color:#ae81ff">2</span>, <span style="color:#e6db74">&#39;a&#39;</span>),(<span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#39;b&#39;</span>),(<span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#39;c&#39;</span>);
+Query OK, <span style="color:#ae81ff">3</span> rows <span style="color:#a6e22e">affected</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
+Records: <span style="color:#ae81ff">3</span>  Duplicates: <span style="color:#ae81ff">0</span>  Warnings: <span style="color:#ae81ff">0</span></code></pre></div></p>
 
-mysql&gt; insert into t2 values(2, 'a'),(3, 'b'),(4, 'c');
-Query OK, 3 rows affected (0.00 sec)
-Records: 3  Duplicates: 0  Warnings: 0
-</code></pre>
-
-<p>新建了两个表，并各插入了三条数据，那么连接可以这样做:</p>
-
-<pre><code>mysql&gt; select * from t1,t2;
-+------+------+------+------+
-| m1   | n1   | m2   | n2   |
-+------+------+------+------+
-|    1 | a    |    2 | a    |
-|    2 | b    |    2 | a    |
-|    3 | c    |    2 | a    |
-|    1 | a    |    3 | b    |
-|    2 | b    |    3 | b    |
-|    3 | c    |    3 | b    |
-|    1 | a    |    4 | c    |
-|    2 | b    |    4 | c    |
-|    3 | c    |    4 | c    |
-+------+------+------+------+
-9 rows in set (0.00 sec)
-</code></pre>
+<p>新建了两个表，并各插入了三条数据，那么连接可以这样做:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> t1,t2;
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#f92672">|</span> m1   <span style="color:#f92672">|</span> n1   <span style="color:#f92672">|</span> m2   <span style="color:#f92672">|</span> n2   <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">4</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">4</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">4</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#ae81ff">9</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <p>使用以下写法连接都是可以的:</p>
 
@@ -940,23 +865,21 @@ Records: 3  Duplicates: 0  Warnings: 0
 
 <h3 id="内外连接">内外连接</h3>
 
-<p>现在我们想通过一条语句既查到学生的基本信息，又查到他的成绩信息:</p>
-
-<pre><code>mysql&gt; select student_info.number,name,sex,subject,score from student_info, student_score where student_info.number = student_score.number;
-+----------+-----------+------+-----------------------------+-------+
-| number   | name      | sex  | subject                     | score |
-+----------+-----------+------+-----------------------------+-------+
-| 20180101 | 杜子腾    | 男   | 母猪的产后护理              |    78 |
-| 20180101 | 杜子腾    | 男   | 论萨达姆的战争准备          |    88 |
-| 20180102 | 杜琦燕    | 女   | 母猪的产后护理              |   100 |
-| 20180102 | 杜琦燕    | 女   | 论萨达姆的战争准备          |    98 |
-| 20180103 | 范统      | 男   | 母猪的产后护理              |    59 |
-| 20180103 | 范统      | 男   | 论萨达姆的战争准备          |    61 |
-| 20180104 | 史珍香    | 女   | 母猪的产后护理              |    55 |
-| 20180104 | 史珍香    | 女   | 论萨达姆的战争准备          |    46 |
-+----------+-----------+------+-----------------------------+-------+
-8 rows in set (0.00 sec)
-</code></pre>
+<p>现在我们想通过一条语句既查到学生的基本信息，又查到他的成绩信息:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> student_info.number,name,sex,subject,score <span style="color:#66d9ef">from</span> student_info, student_score <span style="color:#66d9ef">where</span> student_info.number <span style="color:#f92672">=</span> student_score.number;
+<span style="color:#f92672">+----------+-----------+------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name      <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> subject                     <span style="color:#f92672">|</span> score <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜子腾</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">78</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜子腾</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">88</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜琦燕</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>   <span style="color:#ae81ff">100</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜琦燕</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">98</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">59</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">61</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">史珍香</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">55</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">史珍香</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">46</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+-----------------------------+-------+</span>
+<span style="color:#ae81ff">8</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <p>这时候我们发现有两个人没有成绩，所以他们没有显示在查询结果中。为了有办法让其显示出，就有了内连接和外连接的概念:</p>
 
@@ -971,25 +894,23 @@ Records: 3  Duplicates: 0  Warnings: 0
 
 <p>外连接的标准语法为: <code>select * from t1 left/right [outer] join t2 on 连接条件 [where 普通过滤条件]</code>，outer和where可省略。</p>
 
-<p>上例中使用外连接的结果为:</p>
-
-<pre><code>mysql&gt; select student_info.number,name,sex,subject,score from student_info left join student_score on student_info.number = student_score.number;
-+----------+-----------+------+-----------------------------+-------+
-| number   | name      | sex  | subject                     | score |
-+----------+-----------+------+-----------------------------+-------+
-| 20180101 | 杜子腾    | 男   | 母猪的产后护理              |    78 |
-| 20180101 | 杜子腾    | 男   | 论萨达姆的战争准备          |    88 |
-| 20180102 | 杜琦燕    | 女   | 母猪的产后护理              |   100 |
-| 20180102 | 杜琦燕    | 女   | 论萨达姆的战争准备          |    98 |
-| 20180103 | 范统      | 男   | 母猪的产后护理              |    59 |
-| 20180103 | 范统      | 男   | 论萨达姆的战争准备          |    61 |
-| 20180104 | 史珍香    | 女   | 母猪的产后护理              |    55 |
-| 20180104 | 史珍香    | 女   | 论萨达姆的战争准备          |    46 |
-| 20180105 | 范剑      | 男   | NULL                        |  NULL |
-| 20180106 | 朱逸群    | 男   | NULL                        |  NULL |
-+----------+-----------+------+-----------------------------+-------+
-10 rows in set (0.00 sec)
-</code></pre>
+<p>上例中使用外连接的结果为:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> student_info.number,name,sex,subject,score <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">left</span> <span style="color:#66d9ef">join</span> student_score <span style="color:#66d9ef">on</span> student_info.number <span style="color:#f92672">=</span> student_score.number;
+<span style="color:#f92672">+----------+-----------+------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name      <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> subject                     <span style="color:#f92672">|</span> score <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜子腾</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">78</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180101</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜子腾</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">88</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜琦燕</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>   <span style="color:#ae81ff">100</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180102</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">杜琦燕</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">98</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">59</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">61</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">史珍香</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">55</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">史珍香</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">46</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180105</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范剑</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>                        <span style="color:#f92672">|</span>  <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180106</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">朱逸群</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>                        <span style="color:#f92672">|</span>  <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------+------+-----------------------------+-------+</span>
+<span style="color:#ae81ff">10</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <p>内连接以下的写法是等价的:</p>
 
@@ -1000,49 +921,45 @@ Records: 3  Duplicates: 0  Warnings: 0
 <li><code>select * from t1 cross join t2</code></li>
 </ul>
 
-<p>综上，我们总结以下三种连接的结果差异:</p>
+<p>综上，我们总结以下三种连接的结果差异:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> t1 <span style="color:#66d9ef">inner</span> <span style="color:#66d9ef">join</span> t2 <span style="color:#66d9ef">on</span> t1.m1<span style="color:#f92672">=</span>t2.m2;
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#f92672">|</span> m1   <span style="color:#f92672">|</span> n1   <span style="color:#f92672">|</span> m2   <span style="color:#f92672">|</span> n2   <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
 
-<pre><code>mysql&gt; select * from t1 inner join t2 on t1.m1=t2.m2;
-+------+------+------+------+
-| m1   | n1   | m2   | n2   |
-+------+------+------+------+
-|    2 | b    |    2 | a    |
-|    3 | c    |    3 | b    |
-+------+------+------+------+
-2 rows in set (0.00 sec)
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> t1 <span style="color:#66d9ef">left</span> <span style="color:#66d9ef">join</span> t2 <span style="color:#66d9ef">on</span> t1.m1<span style="color:#f92672">=</span>t2.m2;
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#f92672">|</span> m1   <span style="color:#f92672">|</span> n1   <span style="color:#f92672">|</span> m2   <span style="color:#f92672">|</span> n2   <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#ae81ff">3</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
 
-mysql&gt; select * from t1 left join t2 on t1.m1=t2.m2;
-+------+------+------+------+
-| m1   | n1   | m2   | n2   |
-+------+------+------+------+
-|    2 | b    |    2 | a    |
-|    3 | c    |    3 | b    |
-|    1 | a    | NULL | NULL |
-+------+------+------+------+
-3 rows in set (0.00 sec)
-
-mysql&gt; select * from t1 right join t2 on t1.m1=t2.m2;
-+------+------+------+------+
-| m1   | n1   | m2   | n2   |
-+------+------+------+------+
-|    2 | b    |    2 | a    |
-|    3 | c    |    3 | b    |
-| NULL | NULL |    4 | c    |
-+------+------+------+------+
-3 rows in set (0.00 sec)
-</code></pre>
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> t1 <span style="color:#66d9ef">right</span> <span style="color:#66d9ef">join</span> t2 <span style="color:#66d9ef">on</span> t1.m1<span style="color:#f92672">=</span>t2.m2;
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#f92672">|</span> m1   <span style="color:#f92672">|</span> n1   <span style="color:#f92672">|</span> m2   <span style="color:#f92672">|</span> n2   <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span>    <span style="color:#ae81ff">4</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#ae81ff">3</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="多表连接">多表连接</h3>
 
-<p>我们可以连接任意数量的表，我们再加入一张表试验:</p>
+<p>我们可以连接任意数量的表，我们再加入一张表试验:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">create</span> <span style="color:#66d9ef">table</span> <span style="color:#a6e22e">t3</span>(m3 <span style="color:#66d9ef">int</span>, n3 <span style="color:#66d9ef">char</span>(<span style="color:#ae81ff">1</span>));
+Query OK, <span style="color:#ae81ff">0</span> rows <span style="color:#a6e22e">affected</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">07</span> sec)
 
-<pre><code>mysql&gt; create table t3(m3 int, n3 char(1));
-Query OK, 0 rows affected (0.07 sec)
-
-mysql&gt; insert into t3 values(3, 'a'),(3, 'b'),(4, 'c');
-Query OK, 3 rows affected (0.01 sec)
-Records: 3  Duplicates: 0  Warnings: 0
-</code></pre>
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> t3 <span style="color:#66d9ef">values</span>(<span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#39;a&#39;</span>),(<span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#39;b&#39;</span>),(<span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#39;c&#39;</span>);
+Query OK, <span style="color:#ae81ff">3</span> rows <span style="color:#a6e22e">affected</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">01</span> sec)
+Records: <span style="color:#ae81ff">3</span>  Duplicates: <span style="color:#ae81ff">0</span>  Warnings: <span style="color:#ae81ff">0</span></code></pre></div></p>
 
 <p>我们使用下面的语法查询是等价的:</p>
 
@@ -1051,90 +968,79 @@ Records: 3  Duplicates: 0  Warnings: 0
 <li><code>select * from t1 inner join t2 on t1.m1=t2.m2 inner join t3 on t1.m1=t3.m3;</code></li>
 </ul>
 
-<p>查询结果:</p>
-
-<pre><code>mysql&gt; select * from t1 inner join t2 on t1.m1=t2.m2 inner join t3 on t1.m1=t3.m3;
-+------+------+------+------+------+------+
-| m1   | n1   | m2   | n2   | m3   | n3   |
-+------+------+------+------+------+------+
-|    3 | c    |    3 | b    |    3 | a    |
-|    3 | c    |    3 | b    |    3 | b    |
-+------+------+------+------+------+------+
-2 rows in set (0.00 sec)
-</code></pre>
-
-<p>也可以用伪代码来描述:</p>
-
-<pre><code>for each_row in t1{
-    for each_row in t2 which t1.m1=t2.m2{
-        for each_row in t3 which t2.m2=t3.m3{
+<p>查询结果:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> t1 <span style="color:#66d9ef">inner</span> <span style="color:#66d9ef">join</span> t2 <span style="color:#66d9ef">on</span> t1.m1<span style="color:#f92672">=</span>t2.m2 <span style="color:#66d9ef">inner</span> <span style="color:#66d9ef">join</span> t3 <span style="color:#66d9ef">on</span> t1.m1<span style="color:#f92672">=</span>t3.m3;
+<span style="color:#f92672">+------+------+------+------+------+------+</span>
+<span style="color:#f92672">|</span> m1   <span style="color:#f92672">|</span> n1   <span style="color:#f92672">|</span> m2   <span style="color:#f92672">|</span> n2   <span style="color:#f92672">|</span> m3   <span style="color:#f92672">|</span> n3   <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------+------+------+------+------+------+</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------+------+------+------+------+------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div>
+也可以用伪代码来描述:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">for</span> each_row <span style="color:#f92672">in</span> t1{
+    <span style="color:#66d9ef">for</span> each_row <span style="color:#f92672">in</span> t2 which t1<span style="color:#f92672">.</span>m1<span style="color:#f92672">=</span>t2<span style="color:#f92672">.</span>m2{
+        <span style="color:#66d9ef">for</span> each_row <span style="color:#f92672">in</span> t3 which t2<span style="color:#f92672">.</span>m2<span style="color:#f92672">=</span>t3<span style="color:#f92672">.</span>m3{
             add_result(each_row)
         }
     }
-}
-</code></pre>
+}</code></pre></div></p>
 
 <h3 id="自连接">自连接</h3>
 
-<p>我们无法直接自连接，但可以通过别名:</p>
+<p>我们无法直接自连接，但可以通过别名:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> t1, t1;
+ERROR <span style="color:#ae81ff">1066</span> (<span style="color:#ae81ff">42000</span>): <span style="color:#66d9ef">Not</span> <span style="color:#66d9ef">unique</span> <span style="color:#66d9ef">table</span><span style="color:#f92672">/</span>alias: <span style="color:#e6db74">&#39;t1&#39;</span>
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> t1 <span style="color:#66d9ef">as</span> table1, t1 <span style="color:#66d9ef">as</span> table2;
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#f92672">|</span> m1   <span style="color:#f92672">|</span> n1   <span style="color:#f92672">|</span> m1   <span style="color:#f92672">|</span> n1   <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> a    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>
+<span style="color:#f92672">+------+------+------+------+</span>
+<span style="color:#ae81ff">9</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
-<pre><code>mysql&gt; select * from t1, t1;
-ERROR 1066 (42000): Not unique table/alias: 't1'
-mysql&gt; select * from t1 as table1, t1 as table2;
-+------+------+------+------+
-| m1   | n1   | m1   | n1   |
-+------+------+------+------+
-|    1 | a    |    1 | a    |
-|    2 | b    |    1 | a    |
-|    3 | c    |    1 | a    |
-|    1 | a    |    2 | b    |
-|    2 | b    |    2 | b    |
-|    3 | c    |    2 | b    |
-|    1 | a    |    3 | c    |
-|    2 | b    |    3 | c    |
-|    3 | c    |    3 | c    |
-+------+------+------+------+
-9 rows in set (0.00 sec)
-</code></pre>
-
-<p>而自连接的意义，比如要查询与&rsquo;范统&rsquo;的专业相同的同学:</p>
-
-<pre><code>mysql&gt; select * from student_info as s1, student_info as s2 where s1.name='范统' and s1.major=s2.major;
-+----------+--------+------+--------------------+-----------------+--------------+-----------------+----------+-----------+------+--------------------+-----------------+--------------+-----------------+
-| number   | name   | sex  | id_number          | department      | major        | enrollment_time | number   | name      | sex  | id_number          | department      | major        | enrollment_time |
-+----------+--------+------+--------------------+-----------------+--------------+-----------------+----------+-----------+------+--------------------+-----------------+--------------+-----------------+
-| 20180103 | 范统   | 男   | 17156319980116959X | 计算机学院      | 软件工程     | 2018-09-01      | 20180103 | 范统      | 男   | 17156319980116959X | 计算机学院      | 软件工程     | 2018-09-01      |
-| 20180103 | 范统   | 男   | 17156319980116959X | 计算机学院      | 软件工程     | 2018-09-01      | 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程     | 2018-09-01      |
-+----------+--------+------+--------------------+-----------------+--------------+-----------------+----------+-----------+------+--------------------+-----------------+--------------+-----------------+
-2 rows in set (0.00 sec)
-</code></pre>
+<p>而自连接的意义，比如要查询与&rsquo;范统&rsquo;的专业相同的同学:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">as</span> s1, student_info <span style="color:#66d9ef">as</span> s2 <span style="color:#66d9ef">where</span> s1.name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;范统&#39;</span> <span style="color:#66d9ef">and</span> s1.major<span style="color:#f92672">=</span>s2.major;
+<span style="color:#f92672">+----------+--------+------+--------------------+-----------------+--------------+-----------------+----------+-----------+------+--------------------+-----------------+--------------+-----------------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name   <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> id_number          <span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major        <span style="color:#f92672">|</span> enrollment_time <span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> name      <span style="color:#f92672">|</span> sex  <span style="color:#f92672">|</span> id_number          <span style="color:#f92672">|</span> department      <span style="color:#f92672">|</span> major        <span style="color:#f92672">|</span> enrollment_time <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+--------+------+--------------------+-----------------+--------------+-----------------+----------+-----------+------+--------------------+-----------------+--------------+-----------------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">17156319980116959</span>X <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>     <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">17156319980116959</span>X <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>     <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">范统</span>   <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">男</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">17156319980116959</span>X <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>     <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">史珍香</span>    <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">女</span>   <span style="color:#f92672">|</span> <span style="color:#ae81ff">141992199701078600</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">计算机学院</span>      <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">软件工程</span>     <span style="color:#f92672">|</span> <span style="color:#ae81ff">2018</span><span style="color:#f92672">-</span><span style="color:#ae81ff">09</span><span style="color:#f92672">-</span><span style="color:#ae81ff">01</span>      <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+--------+------+--------------------+-----------------+--------------+-----------------+----------+-----------+------+--------------------+-----------------+--------------+-----------------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 
 <h3 id="与子查询转换">与子查询转换</h3>
 
-<p>有的需求既可以用连接查询，也可以用子查询:</p>
+<p>有的需求既可以用连接查询，也可以用子查询:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">where</span> number <span style="color:#66d9ef">in</span> (<span style="color:#66d9ef">select</span> number <span style="color:#66d9ef">from</span> student_info <span style="color:#66d9ef">where</span> major<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;软件工程&#39;</span>);
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> subject                     <span style="color:#f92672">|</span> score <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">59</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">61</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">55</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">46</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#ae81ff">4</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)
 
-<pre><code>mysql&gt; select * from student_score where number in (select number from student_info where major='软件工程');
-+----------+-----------------------------+-------+
-| number   | subject                     | score |
-+----------+-----------------------------+-------+
-| 20180103 | 母猪的产后护理              |    59 |
-| 20180103 | 论萨达姆的战争准备          |    61 |
-| 20180104 | 母猪的产后护理              |    55 |
-| 20180104 | 论萨达姆的战争准备          |    46 |
-+----------+-----------------------------+-------+
-4 rows in set (0.00 sec)
-
-mysql&gt; select s2.* from student_score as s2, student_info as s1 where s1.number=s2.number and s1.major='软件工程';
-+----------+-----------------------------+-------+
-| number   | subject                     | score |
-+----------+-----------------------------+-------+
-| 20180103 | 母猪的产后护理              |    59 |
-| 20180103 | 论萨达姆的战争准备          |    61 |
-| 20180104 | 母猪的产后护理              |    55 |
-| 20180104 | 论萨达姆的战争准备          |    46 |
-+----------+-----------------------------+-------+
-4 rows in set (0.00 sec)
-</code></pre>
+mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select</span> s2.<span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> student_score <span style="color:#66d9ef">as</span> s2, student_info <span style="color:#66d9ef">as</span> s1 <span style="color:#66d9ef">where</span> s1.number<span style="color:#f92672">=</span>s2.number <span style="color:#66d9ef">and</span> s1.major<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;软件工程&#39;</span>;
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> number   <span style="color:#f92672">|</span> subject                     <span style="color:#f92672">|</span> score <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">59</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180103</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">61</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">母猪的产后护理</span>              <span style="color:#f92672">|</span>    <span style="color:#ae81ff">55</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#ae81ff">20180104</span> <span style="color:#f92672">|</span> <span style="color:#960050;background-color:#1e0010">论萨达姆的战争准备</span>          <span style="color:#f92672">|</span>    <span style="color:#ae81ff">46</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----------+-----------------------------+-------+</span>
+<span style="color:#ae81ff">4</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 </article>
 
       <div class="book-footer justify-between">
