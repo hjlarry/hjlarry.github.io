@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="cn">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="defer实现方式"><meta property="og:title" content="defer实现方式" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://hjlarry.github.io/docs/go/defer/" />
+
+<title>defer实现方式 | Home</title>
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
+
+
+<script defer src="/cn.search.min.01c7a6ed1a8f0928e0ba42bb328c2d7a2661b571663fa179e6c6d83af1aab327.js" integrity="sha256-Acem7RqPCSjgukK7MowteiZhtXFmP6F55sbYOvGqsyc="></script>
+
+<link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/go/defer/index.xml" title="Home" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
+<h2 class="book-brand">
+  <a href="https://hjlarry.github.io/"><img src="/logo.png" alt="Logo" /><span>Home</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+    <ul>
+<li><strong>计算机基础</strong>
+
+<ul>
+<li><a href="/docs/sicp/hardware/">硬件部分</a></li>
+<li><a href="/docs/sicp/software/">软件部分</a></li>
+</ul></li>
+<li><strong>GO语言</strong>
+
+<ul>
+<li>闭包</li>
+<li><a href="/docs/go/map/">字典</a></li>
+<li><a href="/docs/go/defer/"class=active>延迟调用</a></li>
+<li>垃圾回收</li>
+<li>内存分配</li>
+<li><a href="/docs/go/goroutine/">并发调度</a></li>
+</ul></li>
+<li><strong>Python语言</strong>
+
+<ul>
+<li>描述符</li>
+</ul></li>
+<li><strong>Mysql</strong>
+
+<ul>
+<li><a href="/docs/mysql/query/">查询</a></li>
+<li>索引</li>
+<li>原理</li>
+</ul></li>
+<li><strong>其他</strong>
+
+<ul>
+<li><a href="/docs/other/tools/">基础系统工具</a></li>
+</ul></li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+    </aside>
+
+    <div class="book-page">
+      <header class="flex align-center justify-between book-header">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" alt="Menu" />
+  </label>
+  <strong>defer实现方式</strong>
+</header>
+
+      
+<article class="markdown">
+
+<h1 id="defer延迟调用">Defer延迟调用</h1>
+
+<p>defer是GO语言中独有的特性，在其他语言中可能采用<code>try...finally</code>这样的方式来实现，两者还是有很大区别的。finally是立即执行的，而defer会延迟执行，且defer可以分割很多的逻辑。延迟调用最大的优势是即便函数执行出错，依然能保证回收资源等操作得以执行。</p>
+
+<p>我们看到很多的文章中是这样描述defer执行方式的，参数首先会被复制进<code>defer func</code>中，然后执行原函数，然后执行<code>defer func</code>，最后再执行return。那么真的是这样么？这似乎解释不了如下示例:</p>
+
+<pre><code>func test1() int {
+	x := 100
+	defer func() {
+		x++
+	}()
+	return x
+}
+
+func test2() (x int) {
+	x = 100
+	defer func() {
+		x++
+	}()
+	return 100
+}
+
+func main() {
+	println(&quot;test1:&quot;, test1())
+	println(&quot;test2:&quot;, test2())
+}
+
+[ubuntu] ~/.mac $ go run test.go
+test1: 100
+test2: 101
+</code></pre>
+
+<p>按照这个观点，似乎test1()的执行过程应该是x等于100，然后x++，然后返回x=101；test2()应该是x等于100，然后x++，然后返回100。但执行结果却都和我们预想的不一样，带着这样的疑问，我们来深入了解defer的执行机制。</p>
+
+<p>我们先来看一个简单的例子:</p>
+
+<pre><code>func test(a, b int) {
+	println(&quot;test: &quot;, a, b)
+}
+func main() {
+	a, b := 0x11, 0x22
+	defer test(a, b)
+	a++
+	b++
+	println(&quot;main: &quot;, a, b)
+}
+</code></pre>
+
+<p>然后反汇编看看它的执行过程:</p>
+
+<pre><code>[ubuntu] ~/.mac $ go build test.go
+[ubuntu] ~/.mac $ go tool objdump -s &quot;main\.main&quot; test
+TEXT main.main(SB) /root/.mac/test.go
+  test.go:6		0x4523b0		64488b0c25f8ffffff	MOVQ FS:0xfffffff8, CX
+  test.go:6		0x4523b9		483b6110		CMPQ 0x10(CX), SP
+  test.go:6		0x4523bd		0f86ad000000		JBE 0x452470
+  test.go:6		0x4523c3		4883ec58		SUBQ $0x58, SP
+  test.go:6		0x4523c7		48896c2450		MOVQ BP, 0x50(SP)
+  test.go:6		0x4523cc		488d6c2450		LEAQ 0x50(SP), BP
+  test.go:8		0x4523d1		c744241010000000	MOVL $0x10, 0x10(SP)
+  test.go:8		0x4523d9		488d05705a0200		LEAQ 0x25a70(IP), AX
+  test.go:8		0x4523e0		4889442428		MOVQ AX, 0x28(SP)
+  test.go:8		0x4523e5		48c744244011000000	MOVQ $0x11, 0x40(SP)
+  test.go:8		0x4523ee		48c744244822000000	MOVQ $0x22, 0x48(SP)
+  test.go:8		0x4523f7		488d442410		LEAQ 0x10(SP), AX
+  test.go:8		0x4523fc		48890424		MOVQ AX, 0(SP)
+  test.go:8		0x452400		e87b16fdff		CALL runtime.deferprocStack(SB)
+  test.go:8		0x452405		85c0			TESTL AX, AX
+  test.go:8		0x452407		7557			JNE 0x452460
+  test.go:11		0x452409		e8a230fdff		CALL runtime.printlock(SB)
+  test.go:11		0x45240e		488d0583130200		LEAQ 0x21383(IP), AX
+  test.go:11		0x452415		48890424		MOVQ AX, 0(SP)
+  test.go:11		0x452419		48c744240807000000	MOVQ $0x7, 0x8(SP)
+  test.go:11		0x452422		e8c939fdff		CALL runtime.printstring(SB)
+  test.go:11		0x452427		48c7042412000000	MOVQ $0x12, 0(SP)
+  test.go:11		0x45242f		e8fc37fdff		CALL runtime.printint(SB)
+  test.go:11		0x452434		e8b732fdff		CALL runtime.printsp(SB)
+  test.go:11		0x452439		48c7042423000000	MOVQ $0x23, 0(SP)
+  test.go:11		0x452441		e8ea37fdff		CALL runtime.printint(SB)
+  test.go:11		0x452446		e8f532fdff		CALL runtime.printnl(SB)
+  test.go:11		0x45244b		e8e030fdff		CALL runtime.printunlock(SB)
+  test.go:12		0x452450		90			NOPL
+  test.go:12		0x452451		e82a1cfdff		CALL runtime.deferreturn(SB)
+  test.go:12		0x452456		488b6c2450		MOVQ 0x50(SP), BP
+  test.go:12		0x45245b		4883c458		ADDQ $0x58, SP
+  test.go:12		0x45245f		c3			RET
+  test.go:8		0x452460		90			NOPL
+  test.go:8		0x452461		e81a1cfdff		CALL runtime.deferreturn(SB)
+  test.go:8		0x452466		488b6c2450		MOVQ 0x50(SP), BP
+  test.go:8		0x45246b		4883c458		ADDQ $0x58, SP
+  test.go:8		0x45246f		c3			RET
+  test.go:6		0x452470		e82b7affff		CALL runtime.morestack_noctxt(SB)
+  test.go:6		0x452475		e936ffffff		JMP main.main(SB)
+</code></pre>
+
+<p>我们发现<code>defer test(a, b)</code>实际上会被转化为<code>CALL runtime.deferproc(SB)</code>（Go1.13才使用deferprocStack，这里先以deferproc为例），之后进行的<code>a++</code>已经不会影响到它，而在main函数执行完之后，才会去通过<code>CALL runtime.deferreturn(SB)</code>调用它。</p>
+
+<p>我们再来看看<code>runtime.deferproc</code>干了些什么，我在这里也把源码中重要的注释翻译了过来:</p>
+
+<pre><code>// go/src/runtime/panic.go
+// siz表示fn方法中参数需要占用多少个字节，使用siz创建了一个deferred的方法fn
+// 编译器将一个defer语句转化为一个对此方法的调用
+func deferproc(siz int32, fn *funcval) {  // fn之后紧跟着fn的参数
+	if getg().m.curg != getg() {
+		throw(&quot;defer on system stack&quot;)
+	}
+    
+  //fn的参数处于一个危险的状态，deferproc的stack map并没有复制它们。所以我们不能让垃圾回收器或者栈复制触发，直到我们把这些参数复制到一个安全的地方。下面的内存复制会做到这一点。在复制完成前，我们只能调用nosplit routines。
+	sp := getcallersp()
+	argp := uintptr(unsafe.Pointer(&amp;fn)) + unsafe.Sizeof(fn)
+	callerpc := getcallerpc()
+
+	d := newdefer(siz)
+	if d._panic != nil {
+		throw(&quot;deferproc: d.panic != nil after newdefer&quot;)
+	}
+	d.fn = fn
+	d.pc = callerpc
+	d.sp = sp
+	switch siz {
+	case 0:
+		// Do nothing.
+	case sys.PtrSize:
+		*(*uintptr)(deferArgs(d)) = *(*uintptr)(unsafe.Pointer(argp))
+	default:
+		memmove(deferArgs(d), unsafe.Pointer(argp), uintptr(siz))
+	}
+	return0()
+}
+</code></pre>
+
+<p>我们发现newdefer函数返回的是一个这样的结构体:</p>
+
+<pre><code>// go/src/runtime/runtime2.go
+type _defer struct {
+	siz     int32 // includes both arguments and results
+	started bool
+	heap    bool
+	openDefer bool
+	sp        uintptr  // sp at time of defer
+	pc        uintptr  // pc at time of defer
+	fn        *funcval // can be nil for open-coded defers
+	_panic    *_panic  // panic that is running defer
+	link      *_defer
+
+	fd   unsafe.Pointer // funcdata for the function associated with the frame
+	varp uintptr        // value of varp for the stack frame
+
+	framepc uintptr
+}
+</code></pre>
+
+<p>鉴于篇幅，我删除了其注释，但可根据这些注释得出结论，<code>defer func()</code>这个语句会被保存在当前Goroutine中，把它的参数、所需要的栈大小等保存为一个_defer对象，把多个_defer形成一个链表，也就是一个FILO的队列。</p>
+
+<p>但是Goroutine和函数执行没什么直接的关系，如果是A嵌套B，B嵌套C，A、B、C都有各自的defer语句，那么它们都会被保存在这个Goroutine的_defer链表中，它怎么保证执行C的时候不把B的defer执行掉，这个秘密藏在<code>CALL runtime.deferreturn(SB)</code>中:</p>
+
+<pre><code>func deferreturn(arg0 uintptr) {
+	gp := getg()
+	d := gp._defer
+	if d == nil {
+		return
+	}
+	sp := getcallersp()
+	if d.sp != sp {
+		return
+	}
+	if d.openDefer {
+		done := runOpenDeferFrame(gp, d)
+		if !done {
+			throw(&quot;unfinished open-coded defers in deferreturn&quot;)
+		}
+		gp._defer = d.link
+		freedefer(d)
+		return
+	}
+
+	switch d.siz {
+	case 0:
+		// Do nothing.
+	case sys.PtrSize:
+		*(*uintptr)(unsafe.Pointer(&amp;arg0)) = *(*uintptr)(deferArgs(d))
+	default:
+		memmove(unsafe.Pointer(&amp;arg0), deferArgs(d), uintptr(d.siz))
+	}
+	fn := d.fn
+	d.fn = nil
+	gp._defer = d.link
+	freedefer(d)
+	jmpdefer(fn, uintptr(unsafe.Pointer(&amp;arg0)))
+}
+</code></pre>
+
+<p>函数执行调用这个指令的时候，它先拿到当前Goroutine的_defer链表，然后依次检查它的SP就行了，这个SP是执行deferproc时存进去的当前这个函数的栈顶，只要不一致那肯定是父函数的栈了。</p>
+
+<p>回到最初的问题，我们发现反编译之后，函数的整个执行顺序是这样的，函数调用方已经分配好了被调用方的参数和返回值相对于栈顶的地址，然后执行函数，遇到defer语句时先存在Goroutine的_defer链表中接着执行函数，执行完函数后回过头来执行_defer的func，最后调用RET指令并恢复现场。套用到test1()中，就是先定义了返回值(return_val)是个整数并给它了个地址，然后执行x:=100，然后return x被翻译为了return_val=x，然后执行x++，最后调用RET指令。在test2()中，return_val直接叫x，然后给它赋值100，return 100已经没有意义，然后执行return_val_x++，最后调用RET指令。</p>
+
+<p>整个defer的执行核心过程如下图所示:
+<img src="images/defer.jpg" alt="defer" /></p>
+
+<p>此外，我们在挖掘源码的时候发现defer是有很多堆上内存分配行为的，这会影响性能。在Go1.13中编译器会判断如果没有发生内存逃逸，就调用<code>deferprocStack</code>把_defer对象建在栈上，这个对象的heap属性就是描述它是否在堆上分配的。具体是如何判断的，初步了解是defer func是顶级函数时就分配到栈上，如果它外层有迭代循环之类的将会被分配到堆上，之后再详细了解。</p>
+</article>
+
+      <div class="book-footer justify-between">
+  
+
+  
+  
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/3b47d6218394ac5a7661d1f7dda65a5dcd9c17fc" title='Last modified by hjlarry | December 12, 2019' target="_blank">
+      <img src="/svg/calendar.svg" alt="Calendar" />
+      <span>December 12, 2019</span>
+    </a>
+  </div>
+  
+  
+
+  
+  <div>
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/go/defer/_index.md" target="_blank">
+      <img src="/svg/edit.svg" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+  
+
+</div>
+
+      
+    </div>
+
+    
+  
+
+
+
+  </main>
+
+  
+</body>
+
+</html>
