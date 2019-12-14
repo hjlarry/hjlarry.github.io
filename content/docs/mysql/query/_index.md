@@ -832,7 +832,7 @@ mysql> select * from t1 inner join t2 on t1.m1=t2.m2 inner join t3 on t1.m1=t3.m
 2 rows in set (0.00 sec)
 {{< / highlight >}}
 也可以用伪代码来描述:
-{{< highlight python>}}
+```
 for each_row in t1{
     for each_row in t2 which t1.m1=t2.m2{
         for each_row in t3 which t2.m2=t3.m3{
@@ -840,7 +840,7 @@ for each_row in t1{
         }
     }
 }
-{{< / highlight >}}
+```
 
 ### 自连接
 
