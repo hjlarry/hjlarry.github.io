@@ -71,4 +71,137 @@ CPU是不会和内存直接交互的，它和内存之间的读写都是通过L1
 
 当CPU2要去写某一行数据的时候，它就会向总线发出一个请求: CPU2要独占某一段地址。CPU1、CPU3、CPU4一直都在嗅探总线去接收总线的通知，然后去检查自己的缓存中有没有这行数据，如果CPU3有且这行状态是共享的，那就把CPU3的这行变为失效状态；但如果CPU1那行已经是独占的，这个CPU2就得等，等到CPU1修改完数据回写到主存当中会解除CPU1的独占状态，CPU2重新从主存刷新自己的缓存再把它修改为独占状态。修改了数据就需要改为modify，因为需要一批数据一同刷入主存。
 
-这种通过四种状态保证缓存一致性的方式和我们日常见到的锁的原理差不多，数据库修改某行的时候也是加行锁，其他人要修改该行就得排队，要修改其他行就不受影响。
+这种通过四种状态保证缓存一致性的方式和我们日常见到的锁的原理差不多，数据库修改某行的时候也是加行锁，其他人要修改该行就得排队，要修改其他行就不受影响。 
+
+
+Go语言中的锁
+-------
+
+### Futex
+
+锁的本质是通过某种操作实现休眠、唤醒等操作，那它就一定要由操作系统来实现，由OS实现才能避免对于休眠的单位不去分配时间片。那么锁就需要进行系统调用，它的效率就会非常低？Linux在很早期的版本就提供了一种锁[Futex](https://zh.wikipedia.org/wiki/Futex)，虽然是由操作系统提供的，但它是在用户空间实现的，是一种特殊的系统调用，大部分情况下不需要进入内核空间，避免了通常的系统调用所需的用户态内核态之间的切换。Futex其实就是一块内存空间，通常是一个整型变量，大家通过原子操作对它做修改，要么就修改成功执行逻辑，要么就修改失败等待它。
+
+Linux手册中提供了这种锁的[调用方式](http://man7.org/linux/man-pages/man2/futex.2.html)，包括锁定、等待、唤醒等参数。Go中调用其API:
+
+{{< highlight go>}}
+// src/runtime/os_linux.go
+
+func futex(addr unsafe.Pointer, op int32, val uint32, ts, addr2 unsafe.Pointer, val3 uint32) int32
+
+// Linux futex.
+//
+//	futexsleep(uint32 *addr, uint32 val)
+//	futexwakeup(uint32 *addr)
+//
+// Futexsleep atomically checks if *addr == val and if so, sleeps on addr.
+// Futexwakeup wakes up threads sleeping on addr.
+// Futexsleep is allowed to wake up spuriously.
+
+
+func futexsleep(addr *uint32, val uint32, ns int64) {
+	if ns < 0 {
+		futex(unsafe.Pointer(addr), _FUTEX_WAIT_PRIVATE, val, nil, nil, 0)
+		return
+	}
+
+	var ts timespec
+	ts.setNsec(ns)
+	futex(unsafe.Pointer(addr), _FUTEX_WAIT_PRIVATE, val, unsafe.Pointer(&ts), nil, 0)
+}
+
+func futexwakeup(addr *uint32, cnt uint32) {
+	ret := futex(unsafe.Pointer(addr), _FUTEX_WAKE_PRIVATE, cnt, nil, nil, 0)
+	if ret >= 0 {
+		return
+	}
+
+	systemstack(func() {
+		print("futexwakeup addr=", addr, " returned ", ret, "\n")
+	})
+
+	*(*int32)(unsafe.Pointer(uintptr(0x1006))) = 0x1006
+}
+{{< / highlight >}}
+
+有了API，并不能直接用，还要对其进行包装:
+
+{{< highlight go>}}
+// src/runtime/lock_futex.go
+
+func lock(l *mutex) {
+	gp := getg()
+
+	if gp.m.locks < 0 {
+		throw("runtime·lock: lock count")
+	}
+	gp.m.locks++
+
+	// 尝试原子操作修改l.key的值为锁定状态
+	v := atomic.Xchg(key32(&l.key), mutex_locked)
+	if v == mutex_unlocked {
+		return
+	}
+    // 尝试失败则进入自旋状态
+	wait := v
+	spin := 0
+	if ncpu > 1 {
+		spin = active_spin
+	}
+	for {
+		// 每自旋一次尝试拿一次锁
+		for i := 0; i < spin; i++ {
+			for l.key == mutex_unlocked {
+				if atomic.Cas(key32(&l.key), mutex_unlocked, wait) {
+					return
+				}
+			}
+			procyield(active_spin_cnt)
+		}
+
+		// 在rescheduling状态进行尝试拿锁
+		for i := 0; i < passive_spin; i++ {
+			for l.key == mutex_unlocked {
+				if atomic.Cas(key32(&l.key), mutex_unlocked, wait) {
+					return
+				}
+			}
+			osyield()
+		}
+
+		// 尝试进入睡眠状态
+		v = atomic.Xchg(key32(&l.key), mutex_sleeping)
+		if v == mutex_unlocked {
+			return
+		}
+        // 进入futex睡眠状态
+		wait = mutex_sleeping
+		futexsleep(key32(&l.key), mutex_sleeping, -1)
+	}
+}
+
+func unlock(l *mutex) {
+	v := atomic.Xchg(key32(&l.key), mutex_unlocked)
+	if v == mutex_unlocked {
+		throw("unlock of unlocked lock")
+	}
+    // futex唤醒操作
+	if v == mutex_sleeping {
+		futexwakeup(key32(&l.key), 1)
+	}
+
+	gp := getg()
+	gp.m.locks--
+	if gp.m.locks < 0 {
+		throw("runtime·unlock: lock count")
+	}
+	if gp.m.locks == 0 && gp.preempt { // restore the preemption request in case we've cleared it in newstack
+		gp.stackguard0 = stackPreempt
+	}
+}
+{{< / highlight >}}
+
+其一开始尝试拿锁属于投机，先以最乐观的情况考虑，如果没人竞争就能直接拿到锁，这种概率并不低，我们自己做性能设计时也可以参考它先设计乐观的情况。尝试失败则进入自旋状态，自旋状态打个比方，就是你在火车上上厕所，发现厕所有人，你在外面焦急的转圈等待；它是次一级的理想状态，因为厕所的人出来你马上就能进去，若是回到座位上可能被人插队；`procyield(active_spin_cnt)`背后会调用一个专门的CPU指令[PAUSE](http://c9x.me/x86/html/file_module_x86_id_232.html)，它可以降低自旋状态时CPU的功耗并进入一个短暂的等待。自旋时没拿到锁则进入另一个状态，相当于回到座位上但是盯着厕所的门，这个状态下执行的`osyield()`是操作系统提供的等待，这种等待的时长就比CPU指令长很多，同时涉及到状态切换开销也会大很多。这种积极的尝试如果仍然失败，则进入睡眠状态，等待厕所里面的人出来唤醒它，唤醒后重新进入这个循环。
+
+尽管做了这样的包装，这种锁仍然属于较低层次的，不能给用户用的。
+
+### 
