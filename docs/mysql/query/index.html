@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
 
 
-<script defer src="/cn.search.min.f3fc3a1751b1550b85e53f5a72b6afb77b195d1124d845f3c1228e562fd0f472.js" integrity="sha256-8/w6F1GxVQuF5T9acravt3sZXREk2EXzwSKOVi/Q9HI="></script>
+<script defer src="/cn.search.min.183eb4dddbd7582e428c9b6385697b483851662dbbd439d1b9c5901e9d4f168a.js" integrity="sha256-GD603dvXWC5CjJtjhWl7SDhRZi271DnRucWQHp1PFoo="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/mysql/query/index.xml" title="Home" />
 <!--
@@ -59,12 +59,13 @@ https://github.com/alex-shpak/hugo-book
 <li><strong>GO语言</strong>
 
 <ul>
-<li>闭包</li>
 <li><a href="/docs/go/map/">字典</a></li>
+<li>闭包</li>
 <li><a href="/docs/go/defer/">延迟调用</a></li>
 <li>垃圾回收</li>
 <li>内存分配</li>
 <li><a href="/docs/go/goroutine/">并发调度</a></li>
+<li><a href="/docs/go/lock/">锁</a></li>
 </ul></li>
 <li><strong>Python语言</strong>
 
@@ -977,14 +978,16 @@ Records: <span style="color:#ae81ff">3</span>  Duplicates: <span style="color:#a
 <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> c    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span> b    <span style="color:#f92672">|</span>
 <span style="color:#f92672">+------+------+------+------+------+------+</span>
 <span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div>
-也可以用伪代码来描述:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">for</span> each_row <span style="color:#f92672">in</span> t1{
-    <span style="color:#66d9ef">for</span> each_row <span style="color:#f92672">in</span> t2 which t1<span style="color:#f92672">.</span>m1<span style="color:#f92672">=</span>t2<span style="color:#f92672">.</span>m2{
-        <span style="color:#66d9ef">for</span> each_row <span style="color:#f92672">in</span> t3 which t2<span style="color:#f92672">.</span>m2<span style="color:#f92672">=</span>t3<span style="color:#f92672">.</span>m3{
+也可以用伪代码来描述:</p>
+
+<pre><code>for each_row in t1{
+    for each_row in t2 which t1.m1=t2.m2{
+        for each_row in t3 which t2.m2=t3.m3{
             add_result(each_row)
         }
     }
-}</code></pre></div></p>
+}
+</code></pre>
 
 <h3 id="自连接">自连接</h3>
 
@@ -1050,9 +1053,9 @@ mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">select<
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/ab0b743090257f5f02c0e7b0d909af4a4ff4dc23" title='Last modified by hjlarry | December 3, 2019' target="_blank">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/ecdbf04b3ae920705a1bf34b61086c2ac82e3935" title='Last modified by hjlarry | December 14, 2019' target="_blank">
       <img src="/svg/calendar.svg" alt="Calendar" />
-      <span>December 3, 2019</span>
+      <span>December 14, 2019</span>
     </a>
   </div>
   
