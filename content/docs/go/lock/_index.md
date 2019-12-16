@@ -265,7 +265,7 @@ func cansemacquire(addr *uint32) bool {
 		}
 	}
 }
-{{< / highlight >}}
+{{< /highlight >}}
 首先尝试去锁定，并给等待者的数量加上1，然后通过`cansemacquire`检查一下能不能获得这把锁，能获得则减1退出循环。不能获得则加入到队列中，`goparkunlock`休眠。信号量归根结底是用原子操作来维护某个地址上的信号量加减，用一个锁来维护一个等待者计数器，这里的`&root.lock`是为了保护对计数器的操作和入队的操作。
 
 接着我们看看释放:
@@ -307,8 +307,118 @@ func semrelease1(addr *uint32, handoff bool, skipframes int) {
 		}
 	}
 }
-{{< / highlight >}}
+{{< /highlight >}}
 
 首先，释放必然使地址上的信号量加1。其次，去查看是否有人等，没人等则直接退出；如果有人等，则从队列中dequeue一个等待者、计数器减一，等待者可能是按地址排序的，但这属于其内部实现，我们没法确定弹出的是谁。最后如果传入的`handoff`为true表示要进行权限转移，会给这个弹出的等待者发一张票，之前`semacquire1`的for循环中`goparkunlock`休眠后被唤醒的第一件事就是检查有没有拿到票，拿到了则可以短路出去，没必要再走一次for循环和别人竞争抢锁`&root.lock`。
 
 信号量结合了它的特征，在一些短路的设计上值得我们学习。它仍然是runtime层面的，还不是交给用户去使用的。
+
+
+### Mutex
+
+给用户使用的锁在标准库中，我们来看看它的实现:
+{{< highlight go>}}
+// src/sync/mutex.go 
+type Mutex struct {
+	state int32
+	sema  uint32
+}
+const (
+	mutexLocked = 1 << iota // mutex is locked
+	mutexWoken
+	mutexStarving
+	mutexWaiterShift = iota
+)
+{{< /highlight >}}
+
+Mutex结构包括一个状态和一个计数，这个状态分为四种，即锁定、唤醒(这里可以理解为自旋)、饥饿、等待者转移。怎样会出现饥饿状态呢？比如A、B竞争一把锁的时候，A拿到了，B经过不断尝试最终进入了睡眠状态，A释放锁的时候又有C去竞争锁，C此时可能处于自旋状态，同理C后面可能还有D、E，B就一直拿不到锁处于饥饿状态。这种状态在并发编程中并不少见。
+
+接着我们看看其锁定的过程:
+{{< highlight go>}}
+func (m *Mutex) Lock() {
+	// 进入快速路径，乐观状态，没有竞争
+	if atomic.CompareAndSwapInt32(&m.state, 0, mutexLocked) {
+		if race.Enabled {
+			race.Acquire(unsafe.Pointer(m))
+		}
+		return
+	}
+	// 进入慢速方式
+	m.lockSlow()
+}
+
+func (m *Mutex) lockSlow() {
+	var waitStartTime int64
+	starving := false
+	awoke := false
+	iter := 0
+	old := m.state
+	for { // 依然通过循环处理
+        // 判断没有人处于饥饿状态，且还有可自旋次数，则进入自旋状态去尝试拿这把锁
+		if old&(mutexLocked|mutexStarving) == mutexLocked && runtime_canSpin(iter) {
+			if !awoke && old&mutexWoken == 0 && old>>mutexWaiterShift != 0 &&
+				atomic.CompareAndSwapInt32(&m.state, old, old|mutexWoken) {
+				awoke = true
+			}
+			runtime_doSpin()
+			iter++
+			old = m.state
+            // 拿到锁则是mutexLocked状态，接着向下走；没拿到重新看可自旋次数。
+			continue
+		}
+        // 从这开始就有两种可能，要么拿到锁了，要么自旋次数用完了
+		new := old
+        // 接着主要做一些状态变更和处理
+		if old&mutexStarving == 0 {
+			new |= mutexLocked
+		}
+		if old&(mutexLocked|mutexStarving) != 0 {
+			new += 1 << mutexWaiterShift
+		}
+		if starving && old&mutexLocked != 0 {
+			new |= mutexStarving
+		}
+		if awoke {
+			if new&mutexWoken == 0 {
+				throw("sync: inconsistent mutex state")
+			}
+			new &^= mutexWoken
+		}
+		if atomic.CompareAndSwapInt32(&m.state, old, new) {
+            // 没人上锁且没有饥饿状态的，则可以拿到锁跳出整个循环
+			if old&(mutexLocked|mutexStarving) == 0 {
+				break // locked the mutex with CAS
+			}
+			// 如果我之前已经在等待了，则排在队列的最前面
+			queueLifo := waitStartTime != 0
+			if waitStartTime == 0 {
+				waitStartTime = runtime_nanotime()
+			}
+			runtime_SemacquireMutex(&m.sema, queueLifo, 1)
+            // 判断时间是不是超出了饥饿状态的时间阈值
+			starving = starving || runtime_nanotime()-waitStartTime > starvationThresholdNs
+			old = m.state
+            // 如果我自己就是饥饿的，那么我拿到锁，做相关状态修改，退出循环
+			if old&mutexStarving != 0 {
+				if old&(mutexLocked|mutexWoken) != 0 || old>>mutexWaiterShift == 0 {
+					throw("sync: inconsistent mutex state")
+				}
+				delta := int32(mutexLocked - 1<<mutexWaiterShift)
+				if !starving || old>>mutexWaiterShift == 1 {
+					delta -= mutexStarving
+				}
+				atomic.AddInt32(&m.state, delta)
+				break
+			}
+			awoke = true
+			iter = 0
+		} else {
+			old = m.state
+		}
+	}
+
+	if race.Enabled {
+		race.Acquire(unsafe.Pointer(m))
+	}
+}
+{{< /highlight >}}
