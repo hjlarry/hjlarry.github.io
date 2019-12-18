@@ -10,7 +10,7 @@ bookMenuLevels: 1
   - [字典]({{< relref "/docs/go/map" >}})
   - 闭包
   - [延迟调用]({{< relref "/docs/go/defer" >}})
-  - 垃圾回收
+  - [垃圾回收]({{< relref "/docs/go/gc" >}})
   - 内存分配
   - [并发调度]({{< relref "/docs/go/goroutine" >}})
   - [锁]({{< relref "/docs/go/lock" >}})
