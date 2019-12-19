@@ -50,3 +50,87 @@ worker分为三种，第一种属于正式工，专门做垃圾回收；第二�
 * 垃圾回收不能影响用户代码的执行
 
 在一个垃圾回收的周期内，会有一个controller来收集信息，它会收集完成这个周期花了多少物理时间，花了多少CPU时间，开始和结束的时候堆的大小，使用的正式工、临时工、小时工的数量。通过这些信息，controller就会去推算下一个周期垃圾回收的阈值应升高还是降低，比如nextGC当前是4MB，下一次就应该是8MB，通过controller推算出应该降低10%，那最终触发的阈值就是7.2MB；另外，controller也会去推算多少正式工、临时工、小时工参与是合理的。这些推算都是概率问题，属于局部性原则的一种应用，本次垃圾回收的压力大，那么下次垃圾回收压力大的概率就高一些。这种简单的策略为垃圾回收增加了一些灵活性，比僵化的阈值设定要好一些。
+
+
+标记
+-------
+
+### 三色标记
+
+启动之后就要开始执行标记操作，标记有一个基本的规则叫三色标记原则。
+
+我们把任一段代码编译之后，会发现编译器插入一些例如`PCDATA`这样的指令，它属于伪指令，是为了在编译时记录对象的相关信息以及一些元数据信息，这些信息可以用来给内存分配器提供参考:当在堆上分配一个对象的时候，除了去分配相应的内存（比如起始位置0x100100），还会在一个位图中查找到索引0x100100的位置，按照元数据中的类型信息标记出该对象的第几个位置是指针。
+
+而一个对象要么是从全局变量引用下来，要么是从栈上引用下来，自然就会有根对象，这个根对象就是位图中的指针。垃圾回收的时候就是先去查看位图有没有指针，根据指针一路追踪扫描下去。
+
+在一次扫描开始时，会认为所有的对象是白色的。根对象一定是活的，那么被它引用的对象也一定是活的，就把它标记为灰色的，并把它的引用放在一个队列中去。接着把这个队列的灰色对象依次拿出来，比如先拿出了灰色的A，看A引用的对象是什么，把A引用的对象重新加到队列中去，并把A标记为黑色。重复执行这个过程，那么最终就只会剩下两种对象，黑色的和白色的，黑色的是活着的，白色的是死掉的。
+
+### 写屏障
+
+但还有个问题没有解决，标记的同时用户代码也在执行，如果已经标记为黑色的对象又引用了一个白色对象C怎么办，因为不会对黑色对象进行二次扫描，在最终清理时就会把这个C也误杀掉。为了解决这个问题，在编译期编译器就会对指针写操作的语句插入一段**写屏障**代码，这段代码会判断如果当前正在垃圾回收，指针的写操作不会立即执行，而是先执行写屏障逻辑。写屏障逻辑会判断这个指针若是黑色的，就把它重新变成灰色的加入队列进行二次扫描。
+
+具体如何加入写屏障的，我们可以看如下示例:
+{{< highlight go>}}
+var x *int
+func main(){
+    x = new(int)
+    println(x)
+}
+{{< /highlight >}}
+
+然后我们编译并反汇编:
+{{< highlight sh "hl_lines=11-14 25-27">}}
+[ubuntu] ~/.mac $ go tool objdump -s "main\.main" test
+TEXT main.main(SB) /root/.mac/test.go
+  test.go:5		0x452330		64488b0c25f8ffffff	MOVQ FS:0xfffffff8, CX
+  test.go:5		0x452339		483b6110		CMPQ 0x10(CX), SP
+  test.go:5		0x45233d		766a			JBE 0x4523a9
+  test.go:5		0x45233f		4883ec18		SUBQ $0x18, SP
+  test.go:5		0x452343		48896c2410		MOVQ BP, 0x10(SP)
+  test.go:5		0x452348		488d6c2410		LEAQ 0x10(SP), BP
+  test.go:6		0x45234d		488d052cbc0000		LEAQ 0xbc2c(IP), AX
+  test.go:6		0x452354		48890424		MOVQ AX, 0(SP)
+  test.go:6		0x452358		e8038afbff		CALL runtime.newobject(SB)
+  test.go:6		0x45235d		488b442408		MOVQ 0x8(SP), AX
+  test.go:6		0x452362		833d37dd080000		CMPL $0x0, runtime.writeBarrier(SB)
+  test.go:6		0x452369		7530			JNE 0x45239b
+  test.go:6		0x45236b		4889058e270700		MOVQ AX, main.x(SB)
+  test.go:7		0x452372		e83931fdff		CALL runtime.printlock(SB)
+  test.go:7		0x452377		488b0582270700		MOVQ main.x(SB), AX
+  test.go:7		0x45237e		48890424		MOVQ AX, 0(SP)
+  test.go:7		0x452382		e8293afdff		CALL runtime.printpointer(SB)
+  test.go:7		0x452387		e8b433fdff		CALL runtime.printnl(SB)
+  test.go:7		0x45238c		e89f31fdff		CALL runtime.printunlock(SB)
+  test.go:8		0x452391		488b6c2410		MOVQ 0x10(SP), BP
+  test.go:8		0x452396		4883c418		ADDQ $0x18, SP
+  test.go:8		0x45239a		c3			RET
+  test.go:6		0x45239b		488d3d5e270700		LEAQ main.x(SB), DI
+  test.go:6		0x4523a2		e8f998ffff		CALL runtime.gcWriteBarrier(SB)
+  test.go:6		0x4523a7		ebc9			JMP 0x452372
+  test.go:5		0x4523a9		e8f27affff		CALL runtime.morestack_noctxt(SB)
+  test.go:5		0x4523ae		eb80			JMP main.main(SB)
+{{< /highlight >}}
+
+我们看到`new(int)`对应`CALL runtime.newobject(SB)`，之后通过`CMPL $0x0, runtime.writeBarrier(SB)`进行比较，比较结果为真则跳转至下面的`CALL runtime.gcWriteBarrier(SB)`，执行完了再跳转回去继续赋值。
+
+{{< highlight go>}}
+var writeBarrier struct {
+	enabled bool    // compiler emits a check of this before calling write barrier
+	pad     [3]byte // compiler uses 32-bit load for "enabled" field
+	needed  bool    // whether we need a write barrier for current GC phase
+	cgo     bool    // whether we need a write barrier for a cgo check
+	alignme uint64  // guarantee alignment so that compiler can use a 32 or 64-bit load
+}
+{{< /highlight >}}
+
+我们通过写屏障的定义也就知道了`$0x0`是和这里的enabled进行比较的，这种简单的比较对性能的影响是非常小的。
+
+### 挣工分
+
+还有一个问题，用户代码中分配对象的速度远大于回收的速度，造成垃圾回收无法结束。这种情况如何处理呢？
+
+每次分配对象的时候，会去检查若当前正在垃圾回收，则每个G对象都会有一个信用值，分配一个size大小的对象，就把这个信用值减去size，直到这个信用值为负数，则把这个执行一半的G暂停并保存上下文丢回给调度器，其绑定的P/M来帮助进行垃圾回收挣工分，工分挣到一定程度比如3倍的信用值则接着去执行用户代码（这个可能就不会接着之前暂停的G、可能是任意G）。
+
+但是仅这种挣工分来还债再接着执行用户代码的方式效率可能会很低，因为本身垃圾回收器就有worker，这些worker可能突然执行效率很高，导致来协助挣工分的P/M挣不到，于是就有了一个公用的信用值来存储垃圾回收器中workder挣的工分。所以当公用的信用值还有额度的时候，说明垃圾回收的压力还不大，用户G会先去尝试扣减这个公用信用值，如果不够扣才会去帮助垃圾回收。
+
+我们发现垃圾回收器的设计中有大量的平衡操作，在时间和空间中找到平衡
