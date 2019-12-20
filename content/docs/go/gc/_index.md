@@ -117,6 +117,7 @@ TEXT main.main(SB) /root/.mac/test.go
 我们看到`new(int)`对应`CALL runtime.newobject(SB)`，之后通过`CMPL $0x0, runtime.writeBarrier(SB)`进行比较，比较结果为真则跳转至下面的`CALL runtime.gcWriteBarrier(SB)`，执行完了再跳转回去继续赋值。
 
 {{< highlight go>}}
+// src/runtime/mgc.go 
 var writeBarrier struct {
 	enabled bool    // compiler emits a check of this before calling write barrier
 	pad     [3]byte // compiler uses 32-bit load for "enabled" field
