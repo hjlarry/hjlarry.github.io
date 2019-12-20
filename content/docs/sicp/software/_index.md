@@ -206,32 +206,9 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
 -------
 
 ![ELF](./images/elf.png)  
-一个可执行程序看上去像是单个文件的数据库，里面分成不同的表。可查看其头部信息:
-{{< highlight sh>}}
-[ubuntu] ~/.mac $ readelf -h test
-ELF Header:
-  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
-  Class:                             ELF64   // 一个64位程序
-  Data:                              2's complement, little endian  // 大小端情况
-  Version:                           1 (current)
-  OS/ABI:                            UNIX - System V   // 哪个平台使用
-  ABI Version:                       0
-  Type:                              DYN (Shared object file)
-  Machine:                           Advanced Micro Devices X86-64
-  Version:                           0x1
-  Entry point address:               0x610  //入口地址
-  Start of program headers:          64 (bytes into file)
-  Start of section headers:          8880 (bytes into file)
-  Flags:                             0x0
-  Size of this header:               64 (bytes)
-  Size of program headers:           56 (bytes)
-  Number of program headers:         9
-  Size of section headers:           64 (bytes)
-  Number of section headers:         34
-  Section header string table index: 33
-{{< / highlight >}}
 
-还可以查看其内部的分布情况:
+一个可执行程序看上去像是单个文件的数据库，里面分成不同的表:
+
 {{< highlight sh>}}
 [ubuntu] ~/.mac $ readelf -S test
 There are 34 section headers, starting at offset 0x22b0:

@@ -131,6 +131,111 @@ GNU通用的开发工具，也叫**binutils**，是一个标准，属于随身�
 
 当我们不熟悉一门语言写的程序时，我们可以把它翻译成汇编语言，在把汇编语言翻译成C语言，也许这个C语言无法运行，但方便了我们阅读和理解程序的思路。
 
+### readelf
+
+查看elf文件的头部信息:
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ readelf -h hello
+ELF Header:
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
+  Class:                             ELF64          // ELF文件的格式
+  Data:                              2's complement, little endian  // 大小端情况
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V    // 哪个平台使用
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)     // 哪种类型，可执行的还是需重定位的等
+  Machine:                           Advanced Micro Devices X86-64
+  Version:                           0x1
+  Entry point address:               0x4000b0       //入口地址
+  Start of program headers:          64 (bytes into file)
+  Start of section headers:          736 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         2
+  Size of section headers:           64 (bytes)
+  Number of section headers:         8
+  Section header string table index: 7
+{{< /highlight >}}
+
+查看其执行时需要向内存（进程）中载入哪些信息:
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ readelf -l hello
+Elf file type is EXEC (Executable file)
+Entry point 0x4000b0
+There are 2 program headers, starting at offset 64
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
+                 0x00000000000000d5 0x00000000000000d5  R E    0x200000
+  LOAD           0x00000000000000d8 0x00000000006000d8 0x00000000006000d8
+                 0x000000000000000e 0x000000000000000e  RW     0x200000
+ Section to Segment mapping:
+  Segment Sections...
+   00     .text
+   01     .data
+{{< /highlight >}}
+
+查看其本身的section信息:
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ readelf -S hello
+There are 8 section headers, starting at offset 0x2e0:
+Section Headers:
+  [Nr] Name              Type             Address           Offset
+       Size              EntSize          Flags  Link  Info  Align
+  [ 0]                   NULL             0000000000000000  00000000
+       0000000000000000  0000000000000000           0     0     0
+  [ 1] .text             PROGBITS         00000000004000b0  000000b0
+       0000000000000025  0000000000000000  AX       0     0     16
+  [ 2] .data             PROGBITS         00000000006000d8  000000d8
+       000000000000000e  0000000000000000  WA       0     0     4
+  [ 3] .stab             PROGBITS         0000000000000000  000000e8
+       0000000000000084  0000000000000014           4     0     4
+  [ 4] .stabstr          STRTAB           0000000000000000  0000016c
+       0000000000000009  0000000000000000           0     0     1
+  [ 5] .symtab           SYMTAB           0000000000000000  00000178
+       0000000000000108  0000000000000018           6     7     8
+  [ 6] .strtab           STRTAB           0000000000000000  00000280
+       0000000000000027  0000000000000000           0     0     1
+  [ 7] .shstrtab         STRTAB           0000000000000000  000002a7
+       0000000000000036  0000000000000000           0     0     1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+  L (link order), O (extra OS processing required), G (group), T (TLS),
+  C (compressed), x (unknown), o (OS specific), E (exclude),
+  l (large), p (processor specific)
+{{< /highlight >}}
+
+查看其section的内容，例如我们想看其`.data`段的，它是第2个段，可以使用16进制和字符串的方式:
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ readelf -x 2 hello
+Hex dump of section '.data':
+  0x006000d8 68656c6c 6f2c2077 6f726c64 210a     hello, world!.
+[ubuntu] ~/.mac/assem $ readelf -p 2 hello
+String dump of section '.data':
+  [     0]  hello, world!
+{{< /highlight >}}
+
+查看其符号表信息:
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ readelf -s hello
+Symbol table '.symtab' contains 11 entries:
+   Num:    Value          Size Type    Bind   Vis      Ndx Name
+     0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND
+     1: 00000000004000b0     0 SECTION LOCAL  DEFAULT    1
+     2: 00000000006000d8     0 SECTION LOCAL  DEFAULT    2
+     3: 0000000000000000     0 SECTION LOCAL  DEFAULT    3
+     4: 0000000000000000     0 SECTION LOCAL  DEFAULT    4
+     5: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS hello.s
+     6: 00000000006000d8     1 OBJECT  LOCAL  DEFAULT    2 hello
+     7: 00000000004000b0     0 NOTYPE  GLOBAL DEFAULT    1 _start
+     8: 00000000006000e6     0 NOTYPE  GLOBAL DEFAULT    2 __bss_start
+     9: 00000000006000e6     0 NOTYPE  GLOBAL DEFAULT    2 _edata
+    10: 00000000006000e8     0 NOTYPE  GLOBAL DEFAULT    2 _end
+{{< /highlight >}}
+此外，`-e`代表同时加上`-h -l -S`三个参数。
+
 调试工具
 -------
 
