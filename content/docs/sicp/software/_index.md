@@ -207,9 +207,9 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
 
 ![ELF](./images/elf.png)  
 
-一个可执行程序看上去像是单个文件的数据库。
+一个可执行程序看上去像是单个文件的数据库，我们以ELF格式的可执行文件为例，它包括头部元数据、Section header table、Program header table和各个section段。
 
-### 头部
+### Head
 
 文件头部包含一些元数据，用于进程加载找入口地址等:
 
@@ -239,7 +239,7 @@ ELF Header:
 
 ### Section
 
-头部之后紧跟着各种各样的表，我们称之为Section(段):
+头部之后紧跟着各种各样的表，我们称之为Section(段)，各个section被计入可执行文件的Section header table中，我们可以这样查看:
 
 {{< highlight sh>}}
 [ubuntu] ~/.mac/assem $ readelf -S hello
@@ -278,4 +278,27 @@ Key to Flags:
 
 `.symtab`表示符号表，源码中的字面量、全局变量、函数名、类型名、文件名等会作为符号记录在该表中，会记录它们的类型、作用域和内存地址。对于程序运行来讲，符号表没有什么用，CPU不管什么符号、类型，它只需要内存地址。符号就相当于是内存地址的助记符，主要是便于我们调试和反汇编使用的。
 
-它等于是一个蓝图，执行时按这个蓝图虚拟存储器去规划并映射它的地址空间。
+
+### Segment
+
+执行的时候，我们需要告诉操作系统，有哪些section需要载入为内存中的segment，这个信息被链接器放在Program header table中，操作系统的载入器以此信息来安排程序在内存中的样子，我们可以这样查看:
+
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ readelf -l hello
+Elf file type is EXEC (Executable file)
+Entry point 0x4000b0
+There are 2 program headers, starting at offset 64
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
+                 0x00000000000000d5 0x00000000000000d5  R E    0x200000
+  LOAD           0x00000000000000d8 0x00000000006000d8 0x00000000006000d8
+                 0x000000000000000e 0x000000000000000e  RW     0x200000
+ Section to Segment mapping:
+  Segment Sections...
+   00     .text
+   01     .data
+{{< /highlight >}}
+
+上面的section to segment mapping就表示把section中的`.text`段的内容放在内存中`00`号的segment上。在可执行文件中会把section分的很细，但在内存中可能会把一些section合并起来，忽略掉一些section，起到节约内存的目的。
