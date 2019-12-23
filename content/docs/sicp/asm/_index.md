@@ -118,3 +118,90 @@ rm -r $WORK/b001/
 {{< /highlight >}}
 
 它也有自己的编译器和链接器，只是它的目标文件通过`-pack`参数进行了打包，打包为一个个`.a`格式再进行链接。
+
+
+源码结构
+-------
+
+汇编语言都是对内存的处理，其本身没有函数的概念，为了便于维护和写跳转之类的语句，就有了标签代表相应的内存地址，放在不同的section中。
+
+### 标签
+
+{{< highlight asm>}}
+global _start 
+
+section .text 
+    main:
+        mov rax, 60
+        xor rdi, rdi
+        syscall
+    _start:
+        jmp main 
+{{< /highlight >}}
+
+上述源码中`main`与`_start`称为标签，可以使用`jmp`跳转至某个标签，或者`call`调用某个标签的内容。
+
+标签会被编译器翻译为内存地址，我们通过符号表也能看到它。使用global可以把这个标签声明为全局的标签。
+
+
+### 本地标签
+
+{{< highlight asm>}}
+section .text 
+    main:
+        jmp .hello
+    .hello:
+        mov rax, 60
+        xor rdi, rdi
+        syscall
+{{< /highlight >}}
+
+以`.`开头的称为本地标签，例如上面的`.hello`，编译器会把它翻译为其前一个标签+本地标签，即`main.hello`，这样就形成了一种类似于名字空间的效果。让大段的逻辑分成多个片段，不需要担心命名上的冲突，属于汇编这门语言提供的一个功能。它和本地符号无关，`main.hello`也可以是一个全局的符号，代表的一种身份，而`.hello`依然是一个本地标签，相当于一个称谓。
+
+
+### 入口标签
+
+GNU的链接器默认使用一个特殊符号`_start`当做程序的入口，如果我们没定义这样的名字或者把它改为一个其他名字，那么链接器链接的时候就会用一个默认的地址，这个地址可能是程序`.text`段的第一行，同时链接器会提示:`ld: warning: cannot find entry symbol _start; defaulting to 00000000004000b0`。链接器允许使用`ld -e`自行指定一个入口标签，当然这个标签必须是全局的。
+
+
+### 段标签与内存地址
+
+可以使用`$`表示当前这行指令的内存地址，`$$`表示当前section的起始地址，同时我们也可以通过反汇编观察到跳转时标签和内存地址一一对应的关系:
+{{< highlight asm>}}
+global _start 
+section .text 
+    main:
+        mov rax, main 
+        mov rbx, .exit
+        mov rcx, $
+        mov rdx, $$
+    .exit:    
+        mov rax, 60
+        xor rdi, rdi
+        syscall
+    _start:
+        jmp main
+{{< /highlight >}}
+
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ nasm -g -F dwarf -f elf64 -o hello.o hello.s
+[ubuntu] ~/.mac/assem $ ld -o hello hello.o
+[ubuntu] ~/.mac/assem $ objdump -d -M intel hello
+hello:     file format elf64-x86-64
+Disassembly of section .text:
+0000000000400080 <main>:
+  400080:	48 b8 80 00 40 00 00 	movabs rax,0x400080
+  400087:	00 00 00
+  40008a:	48 bb a8 00 40 00 00 	movabs rbx,0x4000a8
+  400091:	00 00 00
+  400094:	48 b9 94 00 40 00 00 	movabs rcx,0x400094
+  40009b:	00 00 00
+  40009e:	48 ba 80 00 40 00 00 	movabs rdx,0x400080
+  4000a5:	00 00 00
+00000000004000a8 <main.exit>:
+  4000a8:	b8 3c 00 00 00       	mov    eax,0x3c
+  4000ad:	48 31 ff             	xor    rdi,rdi
+  4000b0:	0f 05                	syscall
+00000000004000b2 <_start>:
+  4000b2:	eb cc                	jmp    400080 <main>
+{{< /highlight >}}
