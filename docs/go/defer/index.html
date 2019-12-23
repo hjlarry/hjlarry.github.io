@@ -204,7 +204,7 @@ TEXT main.main<span style="color:#f92672">(</span>SB<span style="color:#f92672">
   test.go:6		0x452470		e82b7affff		CALL runtime.morestack_noctxt<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
   test.go:6		0x452475		e936ffffff		JMP main.main<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span></code></pre></div></p>
 
-<p>我们发现<code>defer test(a, b)</code>实际上会被转化为<code>CALL runtime.deferproc(SB)</code>（Go1.13才使用deferprocStack，这里先以deferproc为例），之后进行的<code>a++</code>已经不会影响到它，而在main函数执行完之后，才会去通过<code>CALL runtime.deferreturn(SB)</code>调用它。</p>
+<p>我们发现<code>defer test(a, b)</code>实际上会被转化为<code>CALL runtime.deferproc(SB)</code>(Go1.13才使用deferprocStack，这里先以deferproc为例)，之后进行的<code>a++</code>已经不会影响到它，而在main函数执行完之后，才会去通过<code>CALL runtime.deferreturn(SB)</code>调用它。</p>
 
 <p>我们再来看看<code>runtime.deferproc</code>干了些什么，我在这里也把源码中重要的注释翻译了过来:</p>
 

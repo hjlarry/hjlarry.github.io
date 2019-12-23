@@ -130,18 +130,18 @@ https://github.com/alex-shpak/hugo-book
 <li>移动端: Android, Windows CE</li>
 </ul>
 
-<p>因为Unix商业版权的原因，必须完全符合UNIX标准才能称为UNIX系统，其他的BSD/Linux只能称为UNIX-like。学术上的操作系统和我们日常口中说的操作系统不太一样，我们一般说的windows严格来说属于一个操作系统产品或者说一个操作系统的发行版，它是系统本身和一些软件（浏览器、扫雷）的打包，而学术上的操作系统指的是内核和一些必要的服务。</p>
+<p>因为Unix商业版权的原因，必须完全符合UNIX标准才能称为UNIX系统，其他的BSD/Linux只能称为UNIX-like。学术上的操作系统和我们日常口中说的操作系统不太一样，我们一般说的windows严格来说属于一个操作系统产品或者说一个操作系统的发行版，它是系统本身和一些软件(浏览器、扫雷)的打包，而学术上的操作系统指的是内核和一些必要的服务。</p>
 
 <p>现代操作系统的基本功能包括:</p>
 
 <ul>
-<li>内存管理（memory management）</li>
-<li>进程管理（process management）</li>
-<li>中断处理（interrupt handling）</li>
-<li>文件系统（file system)</li>
-<li>安全机制（protection and security）</li>
-<li>进程通信（inter-process communications）</li>
-<li>设备驱动（device driver）</li>
+<li>内存管理(memory management)</li>
+<li>进程管理(process management)</li>
+<li>中断处理(interrupt handling)</li>
+<li>文件系统(file system)</li>
+<li>安全机制(protection and security)</li>
+<li>进程通信(inter-process communications)</li>
+<li>设备驱动(device driver)</li>
 </ul>
 
 <h2 id="内核">内核</h2>
@@ -150,7 +150,7 @@ https://github.com/alex-shpak/hugo-book
 
 <p>在内核中运行的程序使用的内存，叫内核空间，也叫内核态。其他程序运行在用户空间，也叫用户态。用户态的代码需要在内核态运行时，并不是直接放在内核态中运行的，这样安全没法保证，首先会做权限检查，通过之后相当于提交了申请，内核运行完成以后返回结果唤醒用户态的程序，这就又涉及到了上下文切换和状态保存。所以用户态和内核态的切换会消耗大量的资源。</p>
 
-<p>微内核的优点就是内核很小，裁剪起来方便，裁剪不同的基础服务就可以形成不同的版本面向不同的用户，另外就是其中某个服务崩溃的话不会影响到内核，内核可以重启改服务。当然缺点就是由于处于不同的地址空间，基础服务和内核通信时得使用类似于IPC（Inter-Process Communication）的方式通讯，效率相对会差一些。</p>
+<p>微内核的优点就是内核很小，裁剪起来方便，裁剪不同的基础服务就可以形成不同的版本面向不同的用户，另外就是其中某个服务崩溃的话不会影响到内核，内核可以重启改服务。当然缺点就是由于处于不同的地址空间，基础服务和内核通信时得使用类似于IPC(Inter-Process Communication)的方式通讯，效率相对会差一些。</p>
 
 <p>微内核的典型代表是学术上的windows和macOS，而不是Linux，早期的Linux为了性能考虑采用了宏内核。</p>
 
@@ -193,7 +193,7 @@ https://github.com/alex-shpak/hugo-book
 <p>进程不是执行单位，而是一个资源边界。相当于在内存这个世界里面，进程圈了一块地，这块地有很多的属性，比如虚拟地址空间、PID等，而地上的工人、流水线才是执行单位，我们称为线程。所以每个进程都有一个主线程。</p>
 
 <ul>
-<li>进程是程序的运行期实例（但不同操作系统对进程定义可能不同）</li>
+<li>进程是程序的运行期实例(但不同操作系统对进程定义可能不同)</li>
 <li>是系统动态执行基本单元</li>
 <li>是系统资源分配单位</li>
 <li>是线程的容器</li>
@@ -204,7 +204,7 @@ https://github.com/alex-shpak/hugo-book
 <h3 id="状态">状态</h3>
 
 <ul>
-<li>ready:除分配CPU外，其他准备就绪（按优先级排队调度）</li>
+<li>ready:除分配CPU外，其他准备就绪(按优先级排队调度)</li>
 <li>running:占用处理器资源，正在执行</li>
 <li>waiting:因IO blocking、sync等原因⽆无法继续执⾏</li>
 </ul>
@@ -215,7 +215,7 @@ https://github.com/alex-shpak/hugo-book
 
 <h2 id="线程">线程</h2>
 
-<p>也称轻量级进程（LWP），是进程中的实际执行单位，由程序计数器、寄存器、栈内存组成。</p>
+<p>也称轻量级进程(LWP)，是进程中的实际执行单位，由程序计数器、寄存器、栈内存组成。</p>
 
 <ul>
 <li>进程拥有一到多个线程</li>
@@ -232,7 +232,7 @@ https://github.com/alex-shpak/hugo-book
 
 <h3 id="基础概念-1">基础概念</h3>
 
-<p>操作系统会有一个很大的地址空间，也叫虚拟地址空间。这个空间的前面一大段是操作系统用的，之后的每个进程也都会有一个独立的很大的地址空间。这样不同的程序可以使用相同的虚拟地址，当程序在运行时访问这个地址就是访问进程内的虚拟地址，通过内存管理单元（MMU）翻译映射到一个物理地址。这样的好处就是无论在程序内的地址空间怎么折腾都不会影响到其他的程序，对编译器也更友好更方便，可以提前分配。</p>
+<p>操作系统会有一个很大的地址空间，也叫虚拟地址空间。这个空间的前面一大段是操作系统用的，之后的每个进程也都会有一个独立的很大的地址空间。这样不同的程序可以使用相同的虚拟地址，当程序在运行时访问这个地址就是访问进程内的虚拟地址，通过内存管理单元(MMU)翻译映射到一个物理地址。这样的好处就是无论在程序内的地址空间怎么折腾都不会影响到其他的程序，对编译器也更友好更方便，可以提前分配。</p>
 
 <p>我们在编译时看到的都是虚拟地址，物理地址在运行期才能看到。虚拟地址空间未必会全部映射到主存中，也会给各个设备保留一段空间。</p>
 
@@ -240,7 +240,7 @@ https://github.com/alex-shpak/hugo-book
 
 <h3 id="内存分配过程">内存分配过程</h3>
 
-<p>假设某个程序需要内存分配器分配10MB的内存，那么操作系统会怎么做呢？首先会划分出一个虚拟地址范围，然后返回起始地址的指针。它此时没有必要通过MMU分配真实的物理内存，因为有可能这段内存后续根本没有读写发生。接下来若写入数据，也只会以页（8KB）为单位一点点的去写，每次写入的时候操作系统再去补物理内存，采用一种按需分配的机会主义原则。具体如何实现呢？当向一个虚拟地址写入数据时，就会去MMU找对应的物理地址，没有找到就说明没有建立映射关系还没有分配物理内存，就会引发一个缺页异常（page fault），操作系统内有专门的程序把这一页补上，来实现按需分配。</p>
+<p>假设某个程序需要内存分配器分配10MB的内存，那么操作系统会怎么做呢？首先会划分出一个虚拟地址范围，然后返回起始地址的指针。它此时没有必要通过MMU分配真实的物理内存，因为有可能这段内存后续根本没有读写发生。接下来若写入数据，也只会以页(8KB)为单位一点点的去写，每次写入的时候操作系统再去补物理内存，采用一种按需分配的机会主义原则。具体如何实现呢？当向一个虚拟地址写入数据时，就会去MMU找对应的物理地址，没有找到就说明没有建立映射关系还没有分配物理内存，就会引发一个缺页异常(page fault)，操作系统内有专门的程序把这一页补上，来实现按需分配。</p>
 
 <p>我们通过程序可以模拟这种虚拟内存和物理内存的关系:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
@@ -290,7 +290,7 @@ VSZ表示虚拟内存，RSS表示物理内存，可以看到随用户的控制�
 
 <h3 id="换入换出">换入换出</h3>
 
-<p>假设这10MB内存已经分配下来，该程序却长时间不用，操作系统就会把这10MB内存的数据保存到硬盘的交换分区上，并对这些内存页的状态做变更，MMU的映射地址做变更，这些内存就可以去给别的程序用，这就叫换出（swap out）。下次重新激活该程序时，会把硬盘上交换分区的数据重新放回某些空闲的页并重新建立映射，这就是换入（swap in）。我们可以通过监控工具观察到系统内的换入换出情况:
+<p>假设这10MB内存已经分配下来，该程序却长时间不用，操作系统就会把这10MB内存的数据保存到硬盘的交换分区上，并对这些内存页的状态做变更，MMU的映射地址做变更，这些内存就可以去给别的程序用，这就叫换出(swap out)。下次重新激活该程序时，会把硬盘上交换分区的数据重新放回某些空闲的页并重新建立映射，这就是换入(swap in)。我们可以通过监控工具观察到系统内的换入换出情况:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~ $ dstat
 You did not <span style="color:#66d9ef">select</span> any stats, using -cdngy by default.
 --total-cpu-usage-- -dsk/total- -net/total- ---paging-- ---system--
@@ -301,13 +301,13 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
   <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span>|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">143</span>   <span style="color:#ae81ff">341</span>
   
   // paging的in和out即为当前换入换出大小,int表示当前有多少中断,csw表示当前有多少上下文切换</code></pre></div>
-当程序运行需要的内存大于机器的物理内存时，就可能造成频繁的换入换出，产生颠簸效应（thrashing）。</p>
+当程序运行需要的内存大于机器的物理内存时，就可能造成频繁的换入换出，产生颠簸效应(thrashing)。</p>
 
 <h3 id="性能相关">性能相关</h3>
 
 <p>如果程序需要性能更高、速度要有保障，就需要向操作系统申请锁死这段内存。同时，缺页异常属于内核级别的，有一定的开销，所以为了追求性能的极致，有的C程序会先进行一个初始化操作，缺页异常仍然会有只是会提前，在执行具体的算法时就会更高效不受缺页异常的影响，而一些高级语言可能会由于编译器的优化使得提前初始化写入被优化忽略掉。</p>
 
-<p>物理内存分配还采用了写入时复制（copy-on-write）的机制，即A若引用一块内存，那么复制A到B的时候并不会复制这块内存，只有当去写入A或B的时候才会去复制这块内存，起到节约内存的目的。</p>
+<p>物理内存分配还采用了写入时复制(copy-on-write)的机制，即A若引用一块内存，那么复制A到B的时候并不会复制这块内存，只有当去写入A或B的时候才会去复制这块内存，起到节约内存的目的。</p>
 
 <p>对于服务器来讲，假设物理内存有8G，当前运行的程序只有4G，操作系统就会拿另外4G当做自己的cache用，比如缓存文件读写等，程序需要使用时再从cache里还回来。但对于桌面端用户来讲，GUI程序居多，占用内存也多，所以往往会有足够的内存来让用户载入一个程序的速度更快。服务器往往运行的程序数量和时间更长更稳定，所以不同操作系统的分配内存策略也不同。</p>
 

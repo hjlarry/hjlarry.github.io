@@ -320,7 +320,7 @@ func compareAndSwap(addr int, old int, new int) bool{
 </span><span style="color:#75715e"></span>	<span style="color:#a6e22e">nwait</span> <span style="color:#66d9ef">uint32</span> <span style="color:#75715e">// Number of waiters. Read w/o the lock.
 </span><span style="color:#75715e"></span>}</code></pre></div></p>
 
-<p><code>lock</code> 就是之前设计的那种锁，在这之上提供了一个<code>treap</code>这样的平衡树结构，它是等待人（G对象）的列表，还有<code>nwait</code>计数器存储等待人的数量。</p>
+<p><code>lock</code> 就是之前设计的那种锁，在这之上提供了一个<code>treap</code>这样的平衡树结构，它是等待人(G对象)的列表，还有<code>nwait</code>计数器存储等待人的数量。</p>
 
 <p>它的核心获取锁的逻辑:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">semacquire1</span>(<span style="color:#a6e22e">addr</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">uint32</span>, <span style="color:#a6e22e">lifo</span> <span style="color:#66d9ef">bool</span>, <span style="color:#a6e22e">profile</span> <span style="color:#a6e22e">semaProfileFlags</span>, <span style="color:#a6e22e">skipframes</span> <span style="color:#66d9ef">int</span>) {

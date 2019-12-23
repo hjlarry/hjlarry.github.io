@@ -30,12 +30,12 @@ func main() {
 	println("test1:", test1())
 	println("test2:", test2())
 }
-{{< / highlight >}}
+{{< /highlight >}}
 {{< highlight sh>}}
 [ubuntu] ~/.mac $ go run test.go
 test1: 100
 test2: 101
-{{< / highlight >}}
+{{< /highlight >}}
 
 按照这个观点，似乎test1()的执行过程应该是x等于100，然后x++，然后返回x=101；test2()应该是x等于100，然后x++，然后返回100。但执行结果却都和我们预想的不一样，带着这样的疑问，我们来深入了解defer的执行机制。
 
@@ -51,7 +51,7 @@ func main() {
 	b++
 	println("main: ", a, b)
 }
-{{< / highlight >}}
+{{< /highlight >}}
 
 然后反汇编看看它的执行过程:
 {{< highlight sh "hl_lines=17 33 38">}}
@@ -98,9 +98,9 @@ TEXT main.main(SB) /root/.mac/test.go
   test.go:8		0x45246f		c3			RET
   test.go:6		0x452470		e82b7affff		CALL runtime.morestack_noctxt(SB)
   test.go:6		0x452475		e936ffffff		JMP main.main(SB)
-{{< / highlight >}}
+{{< /highlight >}}
 
-我们发现`defer test(a, b)`实际上会被转化为`CALL runtime.deferproc(SB)`（Go1.13才使用deferprocStack，这里先以deferproc为例），之后进行的`a++`已经不会影响到它，而在main函数执行完之后，才会去通过`CALL runtime.deferreturn(SB)`调用它。
+我们发现`defer test(a, b)`实际上会被转化为`CALL runtime.deferproc(SB)`(Go1.13才使用deferprocStack，这里先以deferproc为例)，之后进行的`a++`已经不会影响到它，而在main函数执行完之后，才会去通过`CALL runtime.deferreturn(SB)`调用它。
 
 我们再来看看`runtime.deferproc`干了些什么，我在这里也把源码中重要的注释翻译了过来:
 
@@ -135,7 +135,7 @@ func deferproc(siz int32, fn *funcval) {  // fn之后紧跟着fn的参数
 	}
 	return0()
 }
-{{< / highlight >}}
+{{< /highlight >}}
 
 我们发现newdefer函数返回的是一个这样的结构体:
 {{< highlight go>}}
@@ -156,7 +156,7 @@ type _defer struct {
 
 	framepc uintptr
 }
-{{< / highlight >}}
+{{< /highlight >}}
 
 鉴于篇幅，我删除了其注释，但可根据这些注释得出结论，`defer func()`这个语句会被保存在当前Goroutine中，把它的参数、所需要的栈大小等保存为一个_defer对象，把多个_defer形成一个链表，也就是一个FILO的队列。
 
@@ -197,7 +197,7 @@ func deferreturn(arg0 uintptr) {
 	freedefer(d)
 	jmpdefer(fn, uintptr(unsafe.Pointer(&arg0)))
 }
-{{< / highlight >}}
+{{< /highlight >}}
 
 函数执行调用这个指令的时候，它先拿到当前Goroutine的_defer链表，然后依次检查它的SP就行了，这个SP是执行deferproc时存进去的当前这个函数的栈顶，只要不一致那肯定是父函数的栈了。
 

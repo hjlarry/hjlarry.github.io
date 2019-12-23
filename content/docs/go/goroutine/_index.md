@@ -26,15 +26,15 @@ GO和其他语言不同的就是我们很少在GO中听到多线程的概念，�
 运行时
 -------
 
-现代的编程语言创建一个线程往往是使用一个标准库或者第三方库提供API的，分配内存也往往会向操作系统提前申请一大块内存，通过这样一层抽象来减少用户态和内核态的切换来提升效率，我们把这层抽象叫做**runtime**（运行时）。它就像一个弱化版的操作系统，可以针对用户空间内的代码，结合当前语言的特性做大量的优化。
+现代的编程语言创建一个线程往往是使用一个标准库或者第三方库提供API的，分配内存也往往会向操作系统提前申请一大块内存，通过这样一层抽象来减少用户态和内核态的切换来提升效率，我们把这层抽象叫做**runtime**(运行时)。它就像一个弱化版的操作系统，可以针对用户空间内的代码，结合当前语言的特性做大量的优化。
 
-Go运行时第一个抽象出的概念就是P（Processor），相当于处理器。物理上有多少个CPU、有多少个核，runtime并不关心，它是在OS上的一层抽象，os才是在硬件的上一层抽象。runtime认为在当前的环境内只有一个程序，所以我们可以通过P来设定并发的数量，同时能执行这个程序内的多少个并发任务。
+Go运行时第一个抽象出的概念就是P(Processor)，相当于处理器。物理上有多少个CPU、有多少个核，runtime并不关心，它是在OS上的一层抽象，os才是在硬件的上一层抽象。runtime认为在当前的环境内只有一个程序，所以我们可以通过P来设定并发的数量，同时能执行这个程序内的多少个并发任务。
 
-第二个抽象是M（Machine），对应了一个系统线程，是对线程的包装，也就是说P控制了同时有多少个M在执行。它是实际执行体，和P绑定，以调度循环方式不断执行G并发任务。
+第二个抽象是M(Machine)，对应了一个系统线程，是对线程的包装，也就是说P控制了同时有多少个M在执行。它是实际执行体，和P绑定，以调度循环方式不断执行G并发任务。
 
-第三个抽象就是G（Goroutine），实际上就是任务载体，或者说资源包，包括了函数地址，需要的参数，所需的内存。当我们使用`go func(){}()`时，实际上就是创建了一个G对象。
+第三个抽象就是G(Goroutine)，实际上就是任务载体，或者说资源包，包括了函数地址，需要的参数，所需的内存。当我们使用`go func(){}()`时，实际上就是创建了一个G对象。
 
-为什么G需要内存，按说M相当于线程也就应该有了栈内存？实际上它们都有自己的内存，G中的内存为G.stack（默认大小2KB），M中的内存为G0。G在M上运行，就像是列车在线路上运行，线路本身也需要去投入资源维护。而把两块内存分开，是因为M所需的内存比较连续、相对固定、逻辑完整，G却会因为各种各样的原因或者异常可能会调度到别的M上去。
+为什么G需要内存，按说M相当于线程也就应该有了栈内存？实际上它们都有自己的内存，G中的内存为G.stack(默认大小2KB)，M中的内存为G0。G在M上运行，就像是列车在线路上运行，线路本身也需要去投入资源维护。而把两块内存分开，是因为M所需的内存比较连续、相对固定、逻辑完整，G却会因为各种各样的原因或者异常可能会调度到别的M上去。
 
 *G、M、P共同构成了多任务并发执行的基本模式，P用来控制同时有多少个并发任务执行，M对应到某个线程，G代表了go func语句翻译的一个任务包，最终还得有个调度器统合起来，把G放到合适的M上去执行。*
 
@@ -43,11 +43,11 @@ Go运行时第一个抽象出的概念就是P（Processor），相当于处理�
 
 ### 正向分析
 
-当我们在一个for循环中创建了成千上万个并发任务时，它们并不是立即执行的，而是打包成一个个G对象保存在两个队列中（P本地队列和G全局队列）。
+当我们在一个for循环中创建了成千上万个并发任务时，它们并不是立即执行的，而是打包成一个个G对象保存在两个队列中(P本地队列和G全局队列)。
 
 假设当前只有4个P，在main函数执行的时候就需要一个P1/M1绑定体，main中创建的其他go func就会打包成G对象放在P1.queue中。也就是说任一M内创建的G都会保存在当前这个P的本地队列中，为什么不能放在P2、P3、P4的队列中？放在别的队列就需要去判断这个P是不是闲置的，还可能需要加锁等等，会变得很复杂。
 
-那么如果在main中创建了1000个G，它们就得等P1/M1中当前的任务执行完了才会得到执行，可能P2、P3、P4都是闲置的，这明显不合理。如何在多个P之间去平衡任务呢？使用了两种方法，一种是规定了每个P本地队列只能放256个G，一次放的过多时会按一定规则比如放一半到全局队列中去；另一种是某个P若闲置了就会在全局队列中去找（可能有很多P都在全局中找，就需要排队去找），找到了就把一部分任务移动到自己的本地队列中，没有找到就会去其他P中偷一部分任务过来，从全局队里或其他P中偷都是需要加锁的，效率相对会低一些。
+那么如果在main中创建了1000个G，它们就得等P1/M1中当前的任务执行完了才会得到执行，可能P2、P3、P4都是闲置的，这明显不合理。如何在多个P之间去平衡任务呢？使用了两种方法，一种是规定了每个P本地队列只能放256个G，一次放的过多时会按一定规则比如放一半到全局队列中去；另一种是某个P若闲置了就会在全局队列中去找(可能有很多P都在全局中找，就需要排队去找)，找到了就把一部分任务移动到自己的本地队列中，没有找到就会去其他P中偷一部分任务过来，从全局队里或其他P中偷都是需要加锁的，效率相对会低一些。
 
 这样的平衡方式也就决定了我们没有办法确定哪个方法先执行，哪个后执行，除非我们自己写逻辑去判断先后。我们再来看一个关于执行顺序的示例:
 
@@ -62,7 +62,7 @@ func main() {
     }
     time.Sleep(time.Second * 2)
 }
-{{< / highlight >}}
+{{< /highlight >}}
 
 执行结果:
 
@@ -78,7 +78,7 @@ func main() {
 6
 7
 8
-{{< / highlight >}}
+{{< /highlight >}}
 
 > 为什么当P为1的时候，它不是顺序输出的，9总是在第一个？  
 
@@ -92,7 +92,7 @@ func main() {
 
 因为放在runnext以后我们无法保证还有多少逻辑执行完才轮到它，就可能会runq中的任务都被偷走了且执行完了G0才会执行，这对G0很不公平。
 
-*显然任务被分成了三个性能层次，runnext是完全私有的，runq属于原子操作（原子操作对CPU来讲也是锁，锁的是地址总线），Global属于一定要加mutex锁的，这三个层次产生资源竞争的可能性逐步增大。*
+*显然任务被分成了三个性能层次，runnext是完全私有的，runq属于原子操作(原子操作对CPU来讲也是锁，锁的是地址总线)，Global属于一定要加mutex锁的，这三个层次产生资源竞争的可能性逐步增大。*
 
 ### 逆向分析
 
@@ -118,7 +118,7 @@ func main() {
 
 那么M是怎样变为休眠状态的？
 
-当一个P和M绑定之后，它会进入到一个调度程序（Schedule函数），调度程序会去找G对象（按runnext、runq、Global、other P的顺序），找到之后内存由G0上执行切换到G.stack上去执行，执行完成之后进入收尾阶段，清理现场把G当做一个包装对象让它能重复使用。然后重新回到Schedule函数形成一个调度循环。
+当一个P和M绑定之后，它会进入到一个调度程序(Schedule函数)，调度程序会去找G对象(按runnext、runq、Global、other P的顺序)，找到之后内存由G0上执行切换到G.stack上去执行，执行完成之后进入收尾阶段，清理现场把G当做一个包装对象让它能重复使用。然后重新回到Schedule函数形成一个调度循环。
 
 这个循环可能因为找不到G对象而中断，比如说当前就只有一个任务。那么P和M就会解绑，M会进入休眠状态。
 
@@ -137,7 +137,7 @@ func main(){
     }
     time.Sleep(time.Minute)
 }
-{{< / highlight >}}
+{{< /highlight >}}
 
 通过`go build test.go && GODEBUG=schedtrace=1000 ./test`运行：
 
@@ -153,7 +153,7 @@ SCHED 7025ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethread
 SCHED 8027ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=1007 runqueue=0 [0 0 0 0]
 SCHED 9029ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=1007 runqueue=0 [0 0 0 0]
 SCHED 10031ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=1007 runqueue=0 [0 0 0 0]
-{{< / highlight >}}
+{{< /highlight >}}
 
 我们发现任务开始的时候共创建了1010个线程，任务执行完以后，仍然有1007个休眠的线程。当我们把`runtime.LockOSThread()`注释掉，重新运行：
 
@@ -165,7 +165,7 @@ SCHED 3010ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=4
 SCHED 4015ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
 SCHED 5026ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=7 runqueue=0 [0 0 0 0]
 SCHED 6031ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=7 runqueue=0 [0 0 0 0]
-{{< / highlight >}}
+{{< /highlight >}}
 
 发现没有系统调用，那就根本不会有那么多线程。我们再把`runtime.LockOSThread()`保留，`defer runtime.UnlockOSThread()`去掉，运行结果如下：
 
@@ -181,7 +181,7 @@ SCHED 7037ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=
 SCHED 8042ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=10 runqueue=0 [0 0 0 0]
 SCHED 9044ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=10 runqueue=0 [0 0 0 0]
 cSCHED 10047ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=10 runqueue=0 [0 0 0 0]
-{{< / highlight >}}
+{{< /highlight >}}
 
 我们发现那些创建的线程是会被回收的，线程没有被解锁意味着线程的状态没有被解除而陷入了死锁状态，线程不能再去接收新的任务没有存在的意义自然会被杀掉。
 
@@ -207,7 +207,7 @@ func main(){
     }
     time.Sleep(time.Second)
 }
-{{< / highlight >}}
+{{< /highlight >}}
 
 我们模拟了只有一个P/M，这时候创建了3个G，让第一个G执行的过程中进入死循环，运行结果就是只打印出了任务0，其他G被饿死了。但当我们在死循环内x++后面加入一个函数，则任务0、1、2都会被打印出。问题就出在这个函数上。
 
@@ -222,7 +222,7 @@ func test(){
 func main(){
     test()
 }
-{{< / highlight >}}
+{{< /highlight >}}
 
 使用`go build && go tool objdump -s "main\.test" test`反汇编：
 
@@ -242,6 +242,6 @@ TEXT main.test(SB) /mnt/hgfs/disk/test.go
   test.go:7		0x4525e2		c3			RET					
   test.go:5		0x4525e3		e8187bffff		CALL runtime.morestack_noctxt(SB)	
   test.go:5		0x4525e8		ebc6			JMP main.test(SB)	
-{{< / highlight >}}
+{{< /highlight >}}
 
 我们发现头部的三条指令和尾部的两条指令都是编译器插入的。`runtime.morestack_noctxt`会做两件事情，一是检查当前栈帧空间是否足够，如果不够可以帮助扩容；二是检查是否有人发出了抢占式调度信号，如果发现了信号，它就让出执行权限。函数前使用`go:nosplit`可以禁止编译器插入这样的指令。
