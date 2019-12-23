@@ -125,7 +125,7 @@ GNU通用的开发工具，也叫**binutils**，是一个标准，属于随身�
 * addr2line : 将地址转换为文件行号信息。
 * nm : 查看符号表。
 * strip : 删除符号表。
-* objcopy : 拷⻉数据到⽬标⽂文件。
+* objcopy : 拷⻉数据到⽬标文件。
 * strings : 输出字符串。
 * size : 查看各段⼤小。
 
@@ -273,6 +273,38 @@ Symbol table '.symtab' contains 8 entries:
 nm: hello: no symbols
 {{< /highlight >}}
 
+### objcopy
+
+可以在可执行文件中自己创建section，藏一些东西，比如背景mp3文件等。我们就可以用到objcopy工具:
+
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ objcopy --add-section .abc=addr.c --set-section-flags .abc=noload,readonly hello hello2
+[ubuntu] ~/.mac/assem $ readelf -S hello2
+There are 5 section headers, starting at offset 0x190:
+Section Headers:
+  [Nr] Name              Type             Address           Offset
+       Size              EntSize          Flags  Link  Info  Align
+  [ 0]                   NULL             0000000000000000  00000000
+       0000000000000000  0000000000000000           0     0     0
+  [ 1] .text             PROGBITS         00000000004000b0  000000b0
+       0000000000000025  0000000000000000  AX       0     0     16
+  [ 2] .data             PROGBITS         00000000006000d8  000000d8
+       000000000000000e  0000000000000000  WA       0     0     4
+  [ 3] .abc              PROGBITS         0000000000000000  000000e6
+       0000000000000088  0000000000000000           0     0     1
+  [ 4] .shstrtab         STRTAB           0000000000000000  0000016e
+       000000000000001c  0000000000000000           0     0     1
+[ubuntu] ~/.mac/assem $ readelf -p .abc hello2
+String dump of section '.abc':
+  [     0]  // 查看基址变址的寻址方式^J#include <stdio.h>^J^Jint main(){^J    int x[3];^J    for(int i=0;i<3;i++){^J        x[i]= 0x22;^J
+{{< /highlight >}}
+
+我们为可执行文件hello新增了一个`.abc`的段，它的内容读取自`addr.c`文件，它的权限是只读的且无需载入的，并且把它另存为了hello2。此外，我们也可以使用别的文件的内容来更新某个section，或者对section进行重命名、删除等操作:
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ objcopy --rename-section .abc=.demo hello2
+[ubuntu] ~/.mac/assem $ objcopy --update-section .demo=makefile hello2
+[ubuntu] ~/.mac/assem $ objcopy --remove-section .demo hello2
+{{< /highlight >}}
 
 调试工具
 -------
