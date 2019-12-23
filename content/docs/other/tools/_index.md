@@ -137,7 +137,7 @@ GNU通用的开发工具，也叫**binutils**，是一个标准，属于随身�
 {{< highlight sh>}}
 [ubuntu] ~/.mac/assem $ readelf -h hello
 ELF Header:
-  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00      // 魔法数，可以快速读取出来用于预判整个文件是不是一个合法的内容
   Class:                             ELF64          // ELF文件的格式
   Data:                              2's complement, little endian  // 大小端情况
   Version:                           1 (current)

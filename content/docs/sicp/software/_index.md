@@ -207,84 +207,75 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
 
 ![ELF](./images/elf.png)  
 
-一个可执行程序看上去像是单个文件的数据库，里面分成不同的表:
+一个可执行程序看上去像是单个文件的数据库。
+
+### 头部
+
+文件头部包含一些元数据，用于进程加载找入口地址等:
 
 {{< highlight sh>}}
-[ubuntu] ~/.mac $ readelf -S test
-There are 34 section headers, starting at offset 0x22b0:
+[ubuntu] ~/.mac/assem $ readelf -h hello
+ELF Header:
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00      // 魔法数，可以快速读取出来用于预判整个文件是不是一个合法的内容
+  Class:                             ELF64          // ELF文件的格式
+  Data:                              2's complement, little endian  // 大小端情况
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V    // 哪个平台使用
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)     // 哪种类型，可执行的还是需重定位的等
+  Machine:                           Advanced Micro Devices X86-64
+  Version:                           0x1
+  Entry point address:               0x4000b0       //入口地址
+  Start of program headers:          64 (bytes into file)
+  Start of section headers:          736 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         2
+  Size of section headers:           64 (bytes)
+  Number of section headers:         8
+  Section header string table index: 7
+{{< /highlight >}}
 
+### Section
+
+头部之后紧跟着各种各样的表，我们称之为Section(段):
+
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ readelf -S hello
+There are 8 section headers, starting at offset 0x2e0:
 Section Headers:
   [Nr] Name              Type             Address           Offset
        Size              EntSize          Flags  Link  Info  Align
   [ 0]                   NULL             0000000000000000  00000000
        0000000000000000  0000000000000000           0     0     0
-  [ 1] .interp           PROGBITS         0000000000000238  00000238
-       000000000000001c  0000000000000000   A       0     0     1
-  [ 2] .note.ABI-tag     NOTE             0000000000000254  00000254
-       0000000000000020  0000000000000000   A       0     0     4
-  [ 3] .note.gnu.build-i NOTE             0000000000000274  00000274
-       0000000000000024  0000000000000000   A       0     0     4
-  [ 4] .gnu.hash         GNU_HASH         0000000000000298  00000298
-       000000000000001c  0000000000000000   A       5     0     8
-  [ 5] .dynsym           DYNSYM           00000000000002b8  000002b8
-       00000000000000f0  0000000000000018   A       6     1     8
-  [ 6] .dynstr           STRTAB           00000000000003a8  000003a8
-       0000000000000098  0000000000000000   A       0     0     1
-  [ 7] .gnu.version      VERSYM           0000000000000440  00000440
-       0000000000000014  0000000000000002   A       5     0     2
-  [ 8] .gnu.version_r    VERNEED          0000000000000458  00000458
-       0000000000000020  0000000000000000   A       6     1     8
-  [ 9] .rela.dyn         RELA             0000000000000478  00000478
-       00000000000000c0  0000000000000018   A       5     0     8
-  [10] .rela.plt         RELA             0000000000000538  00000538
-       0000000000000060  0000000000000018  AI       5    22     8
-  [11] .init             PROGBITS         0000000000000598  00000598
-       0000000000000017  0000000000000000  AX       0     0     4
-  [12] .plt              PROGBITS         00000000000005b0  000005b0
-       0000000000000050  0000000000000010  AX       0     0     16
-  [13] .plt.got          PROGBITS         0000000000000600  00000600
-       0000000000000008  0000000000000008  AX       0     0     8
-  [14] .text             PROGBITS         0000000000000610  00000610
-       0000000000000222  0000000000000000  AX       0     0     16
-  [15] .fini             PROGBITS         0000000000000834  00000834
-       0000000000000009  0000000000000000  AX       0     0     4
-  [16] .rodata           PROGBITS         0000000000000840  00000840
-       0000000000000008  0000000000000000   A       0     0     4
-  [17] .eh_frame_hdr     PROGBITS         0000000000000848  00000848
-       000000000000003c  0000000000000000   A       0     0     4
-  [18] .eh_frame         PROGBITS         0000000000000888  00000888
-       0000000000000108  0000000000000000   A       0     0     8
-  [19] .init_array       INIT_ARRAY       0000000000200da0  00000da0
-       0000000000000008  0000000000000008  WA       0     0     8
-  [20] .fini_array       FINI_ARRAY       0000000000200da8  00000da8
-       0000000000000008  0000000000000008  WA       0     0     8
-  [21] .dynamic          DYNAMIC          0000000000200db0  00000db0
-       00000000000001f0  0000000000000010  WA       6     0     8
-  [22] .got              PROGBITS         0000000000200fa0  00000fa0
-       0000000000000060  0000000000000008  WA       0     0     8
-  [23] .data             PROGBITS         0000000000201000  00001000
-       0000000000000010  0000000000000000  WA       0     0     8
-  [24] .bss              NOBITS           0000000000201010  00001010
-       0000000000000008  0000000000000000  WA       0     0     1
-  [25] .comment          PROGBITS         0000000000000000  00001010
-       000000000000002b  0000000000000001  MS       0     0     1
-  [26] .debug_aranges    PROGBITS         0000000000000000  0000103b
-       0000000000000030  0000000000000000           0     0     1
-  [27] .debug_info       PROGBITS         0000000000000000  0000106b
-       000000000000038d  0000000000000000           0     0     1
-  [28] .debug_abbrev     PROGBITS         0000000000000000  000013f8
-       0000000000000109  0000000000000000           0     0     1
-  [29] .debug_line       PROGBITS         0000000000000000  00001501
-       00000000000000ee  0000000000000000           0     0     1
-  [30] .debug_str        PROGBITS         0000000000000000  000015ef
-       0000000000000295  0000000000000001  MS       0     0     1
-  [31] .symtab           SYMTAB           0000000000000000  00001888
-       00000000000006a8  0000000000000018          32    48     8
-  [32] .strtab           STRTAB           0000000000000000  00001f30
-       000000000000023f  0000000000000000           0     0     1
-  [33] .shstrtab         STRTAB           0000000000000000  0000216f
-       000000000000013e  0000000000000000           0     0     1
-{{< / highlight >}}
-可以看出该文件有34个表，每个表有自己的名字、起始和终止的虚拟地址、长度信息、权限信息等。
+  [ 1] .text             PROGBITS         00000000004000b0  000000b0
+       0000000000000025  0000000000000000  AX       0     0     16
+  [ 2] .data             PROGBITS         00000000006000d8  000000d8
+       000000000000000e  0000000000000000  WA       0     0     4
+  [ 3] .stab             PROGBITS         0000000000000000  000000e8
+       0000000000000084  0000000000000014           4     0     4
+  [ 4] .stabstr          STRTAB           0000000000000000  0000016c
+       0000000000000009  0000000000000000           0     0     1
+  [ 5] .symtab           SYMTAB           0000000000000000  00000178
+       0000000000000108  0000000000000018           6     7     8
+  [ 6] .strtab           STRTAB           0000000000000000  00000280
+       0000000000000027  0000000000000000           0     0     1
+  [ 7] .shstrtab         STRTAB           0000000000000000  000002a7
+       0000000000000036  0000000000000000           0     0     1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+  L (link order), O (extra OS processing required), G (group), T (TLS),
+  C (compressed), x (unknown), o (OS specific), E (exclude),
+  l (large), p (processor specific)
+{{< /highlight >}}
+
+其中，`Address`表示这个section加载到进程中的虚拟内存地址，`Offset`表示这个section相对于文件头部的偏移量，有了`Offset`+`Size`进程才知道如何安排相应的虚拟地址即`Address`。`Flags`表示权限标志位，`A`表示这个section的内容需要在内存中载入，`X`表示可执行的权限，`W`表示可写入的权限。
+
+`.text`用于存放二进制的执行代码（指令）。我们可以看到这个段的地址恰好是文件头中的Entry point address。
+
+`.data`用于存放所有已经初始化过的全局变量的数据，`.bss`用于存放未初始化的全局变量数据，虽然他们在内存中都需要相应的起始地址和内存区域，但在可执行文件中没必要用一定区域去记下`.bss`中的零值。`.rodata`专门用于保存只读数据，例如字符串的字面量，在很多语言中它都是只读的。
+
+`.symtab`表示符号表，源码中的字面量、全局变量、函数名、类型名、文件名等会作为符号记录在该表中，会记录它们的类型、作用域和内存地址。对于程序运行来讲，符号表没有什么用，CPU不管什么符号、类型，它只需要内存地址。符号就相当于是内存地址的助记符，主要是便于我们调试和反汇编使用的。
 
 它等于是一个蓝图，执行时按这个蓝图虚拟存储器去规划并映射它的地址空间。
