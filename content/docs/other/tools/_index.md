@@ -236,6 +236,44 @@ Symbol table '.symtab' contains 11 entries:
 {{< /highlight >}}
 此外，`-e`代表同时加上`-h -l -S`三个参数。
 
+### nm
+
+使用nm也可查看其符号表信息:
+
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ nm hello
+00000000006000e6 D __bss_start
+00000000006000e6 D _edata
+00000000006000e8 D _end
+00000000004000b0 T _start
+00000000006000d8 d hello
+{{< /highlight >}}
+
+其中，`00000000006000e6`表示链接器安排给这个符号的虚拟内存地址；`D`表示它的类型，大写是全局的、可以跨文件访问到的，小写表示本地的。
+
+### strip
+
+使用strip可以剔除其符号表，减少文件本身的大小。默认为`-s`剔除的符号，也可以`-S`仅剔除掉调试用的符号。
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ strip -S hello
+[ubuntu] ~/.mac/assem $ readelf -s hello
+Symbol table '.symtab' contains 8 entries:
+   Num:    Value          Size Type    Bind   Vis      Ndx Name
+     0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND
+     1: 00000000006000d8     1 OBJECT  LOCAL  DEFAULT    2 hello
+     2: 00000000004000b0     0 SECTION LOCAL  DEFAULT    1
+     3: 00000000006000d8     0 SECTION LOCAL  DEFAULT    2
+     4: 00000000004000b0     0 NOTYPE  GLOBAL DEFAULT    1 _start
+     5: 00000000006000e6     0 NOTYPE  GLOBAL DEFAULT    2 __bss_start
+     6: 00000000006000e6     0 NOTYPE  GLOBAL DEFAULT    2 _edata
+     7: 00000000006000e8     0 NOTYPE  GLOBAL DEFAULT    2 _end
+[ubuntu] ~/.mac/assem $ strip -s hello
+[ubuntu] ~/.mac/assem $ readelf -s hello
+[ubuntu] ~/.mac/assem $ nm hello
+nm: hello: no symbols
+{{< /highlight >}}
+
+
 调试工具
 -------
 
