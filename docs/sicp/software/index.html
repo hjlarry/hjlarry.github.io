@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
 
 
-<script defer src="/cn.search.min.7018d7caef37523c82b63f28c1f169ed320bc9f95808b92ce0fc2e5a8235c0f0.js" integrity="sha256-cBjXyu83UjyCtj8owfFp7TILyflYCLks4PwuWoI1wPA="></script>
+<script defer src="/cn.search.min.dce3ff0b0b2b83cd74359f99d35715b9b9efb58136eb0054f9b180e3b1d910c4.js" integrity="sha256-3OP/Cwsrg810NZ&#43;Z01cVubnvtYE26wBU&#43;bGA47HZEMQ="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/sicp/software/index.xml" title="Home" />
 <!--
@@ -54,8 +54,9 @@ https://github.com/alex-shpak/hugo-book
 <li><strong>计算机基础</strong>
 
 <ul>
-<li><a href="/docs/sicp/hardware/">硬件部分</a></li>
-<li><a href="/docs/sicp/software/"class=active>软件部分</a></li>
+<li><a href="/docs/sicp/hardware/">硬件</a></li>
+<li><a href="/docs/sicp/software/"class=active>软件</a></li>
+<li><a href="/docs/sicp/asm/">汇编</a></li>
 </ul></li>
 <li><strong>GO语言</strong>
 
@@ -315,108 +316,96 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
 
 <h2 id="可执行文件">可执行文件</h2>
 
-<p><img src="./images/elf.png" alt="ELF" /><br />
-一个可执行程序看上去像是单个文件的数据库，里面分成不同的表。可查看其头部信息:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ readelf -h test
+<p><img src="./images/elf.png" alt="ELF" /></p>
+
+<p>一个可执行程序看上去像是单个文件的数据库，我们以ELF格式的可执行文件为例，它包括头部元数据、Section header table、Program header table和各个section段。</p>
+
+<h3 id="head">Head</h3>
+
+<p>文件头部包含一些元数据，用于进程加载找入口地址等:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -h hello
 ELF Header:
-  Magic:   7f <span style="color:#ae81ff">45</span> 4c <span style="color:#ae81ff">46</span> <span style="color:#ae81ff">02</span> <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>
-  Class:                             ELF64   // 一个64位程序
+  Magic:   7f <span style="color:#ae81ff">45</span> 4c <span style="color:#ae81ff">46</span> <span style="color:#ae81ff">02</span> <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>      // 魔法数，可以快速读取出来用于预判整个文件是不是一个合法的内容
+  Class:                             ELF64          // ELF文件的格式
   Data:                              <span style="color:#ae81ff">2</span><span style="color:#960050;background-color:#1e0010">&#39;</span>s complement, little endian  // 大小端情况
   Version:                           <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>current<span style="color:#f92672">)</span>
-  OS/ABI:                            UNIX - System V   // 哪个平台使用
+  OS/ABI:                            UNIX - System V    // 哪个平台使用
   ABI Version:                       <span style="color:#ae81ff">0</span>
-  Type:                              DYN <span style="color:#f92672">(</span>Shared object file<span style="color:#f92672">)</span>
+  Type:                              EXEC <span style="color:#f92672">(</span>Executable file<span style="color:#f92672">)</span>     // 哪种类型，可执行的还是需重定位的等
   Machine:                           Advanced Micro Devices X86-64
   Version:                           0x1
-  Entry point address:               0x610  //入口地址
+  Entry point address:               0x4000b0       //入口地址
   Start of program headers:          <span style="color:#ae81ff">64</span> <span style="color:#f92672">(</span>bytes into file<span style="color:#f92672">)</span>
-  Start of section headers:          <span style="color:#ae81ff">8880</span> <span style="color:#f92672">(</span>bytes into file<span style="color:#f92672">)</span>
+  Start of section headers:          <span style="color:#ae81ff">736</span> <span style="color:#f92672">(</span>bytes into file<span style="color:#f92672">)</span>
   Flags:                             0x0
   Size of this header:               <span style="color:#ae81ff">64</span> <span style="color:#f92672">(</span>bytes<span style="color:#f92672">)</span>
   Size of program headers:           <span style="color:#ae81ff">56</span> <span style="color:#f92672">(</span>bytes<span style="color:#f92672">)</span>
-  Number of program headers:         <span style="color:#ae81ff">9</span>
+  Number of program headers:         <span style="color:#ae81ff">2</span>
   Size of section headers:           <span style="color:#ae81ff">64</span> <span style="color:#f92672">(</span>bytes<span style="color:#f92672">)</span>
-  Number of section headers:         <span style="color:#ae81ff">34</span>
-  Section header string table index: <span style="color:#ae81ff">33</span></code></pre></div></p>
+  Number of section headers:         <span style="color:#ae81ff">8</span>
+  Section header string table index: <span style="color:#ae81ff">7</span></code></pre></div>
 
-<p>还可以查看其内部的分布情况:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ readelf -S test
-There are <span style="color:#ae81ff">34</span> section headers, starting at offset 0x22b0:
+<h3 id="section">Section</h3>
 
+<p>头部之后紧跟着各种各样的表，我们称之为Section(段)，各个section被计入可执行文件的Section header table中，我们可以这样查看:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -S hello
+There are <span style="color:#ae81ff">8</span> section headers, starting at offset 0x2e0:
 Section Headers:
   <span style="color:#f92672">[</span>Nr<span style="color:#f92672">]</span> Name              Type             Address           Offset
        Size              EntSize          Flags  Link  Info  Align
   <span style="color:#f92672">[</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>                   NULL             <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000000</span>
        <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">]</span> .interp           PROGBITS         <span style="color:#ae81ff">0000000000000238</span>  <span style="color:#ae81ff">00000238</span>
-       000000000000001c  <span style="color:#ae81ff">0000000000000000</span>   A       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">]</span> .note.ABI-tag     NOTE             <span style="color:#ae81ff">0000000000000254</span>  <span style="color:#ae81ff">00000254</span>
-       <span style="color:#ae81ff">0000000000000020</span>  <span style="color:#ae81ff">0000000000000000</span>   A       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">3</span><span style="color:#f92672">]</span> .note.gnu.build-i NOTE             <span style="color:#ae81ff">0000000000000274</span>  <span style="color:#ae81ff">00000274</span>
-       <span style="color:#ae81ff">0000000000000024</span>  <span style="color:#ae81ff">0000000000000000</span>   A       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">4</span><span style="color:#f92672">]</span> .gnu.hash         GNU_HASH         <span style="color:#ae81ff">0000000000000298</span>  <span style="color:#ae81ff">00000298</span>
-       000000000000001c  <span style="color:#ae81ff">0000000000000000</span>   A       <span style="color:#ae81ff">5</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">5</span><span style="color:#f92672">]</span> .dynsym           DYNSYM           00000000000002b8  000002b8
-       00000000000000f0  <span style="color:#ae81ff">0000000000000018</span>   A       <span style="color:#ae81ff">6</span>     <span style="color:#ae81ff">1</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">6</span><span style="color:#f92672">]</span> .dynstr           STRTAB           00000000000003a8  000003a8
-       <span style="color:#ae81ff">0000000000000098</span>  <span style="color:#ae81ff">0000000000000000</span>   A       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">7</span><span style="color:#f92672">]</span> .gnu.version      VERSYM           <span style="color:#ae81ff">0000000000000440</span>  <span style="color:#ae81ff">00000440</span>
-       <span style="color:#ae81ff">0000000000000014</span>  <span style="color:#ae81ff">0000000000000002</span>   A       <span style="color:#ae81ff">5</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">2</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">8</span><span style="color:#f92672">]</span> .gnu.version_r    VERNEED          <span style="color:#ae81ff">0000000000000458</span>  <span style="color:#ae81ff">00000458</span>
-       <span style="color:#ae81ff">0000000000000020</span>  <span style="color:#ae81ff">0000000000000000</span>   A       <span style="color:#ae81ff">6</span>     <span style="color:#ae81ff">1</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">9</span><span style="color:#f92672">]</span> .rela.dyn         RELA             <span style="color:#ae81ff">0000000000000478</span>  <span style="color:#ae81ff">00000478</span>
-       00000000000000c0  <span style="color:#ae81ff">0000000000000018</span>   A       <span style="color:#ae81ff">5</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">10</span><span style="color:#f92672">]</span> .rela.plt         RELA             <span style="color:#ae81ff">0000000000000538</span>  <span style="color:#ae81ff">00000538</span>
-       <span style="color:#ae81ff">0000000000000060</span>  <span style="color:#ae81ff">0000000000000018</span>  AI       <span style="color:#ae81ff">5</span>    <span style="color:#ae81ff">22</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">11</span><span style="color:#f92672">]</span> .init             PROGBITS         <span style="color:#ae81ff">0000000000000598</span>  <span style="color:#ae81ff">00000598</span>
-       <span style="color:#ae81ff">0000000000000017</span>  <span style="color:#ae81ff">0000000000000000</span>  AX       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">12</span><span style="color:#f92672">]</span> .plt              PROGBITS         00000000000005b0  000005b0
-       <span style="color:#ae81ff">0000000000000050</span>  <span style="color:#ae81ff">0000000000000010</span>  AX       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">16</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">13</span><span style="color:#f92672">]</span> .plt.got          PROGBITS         <span style="color:#ae81ff">0000000000000600</span>  <span style="color:#ae81ff">00000600</span>
-       <span style="color:#ae81ff">0000000000000008</span>  <span style="color:#ae81ff">0000000000000008</span>  AX       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">14</span><span style="color:#f92672">]</span> .text             PROGBITS         <span style="color:#ae81ff">0000000000000610</span>  <span style="color:#ae81ff">00000610</span>
-       <span style="color:#ae81ff">0000000000000222</span>  <span style="color:#ae81ff">0000000000000000</span>  AX       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">16</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">15</span><span style="color:#f92672">]</span> .fini             PROGBITS         <span style="color:#ae81ff">0000000000000834</span>  <span style="color:#ae81ff">00000834</span>
-       <span style="color:#ae81ff">0000000000000009</span>  <span style="color:#ae81ff">0000000000000000</span>  AX       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">16</span><span style="color:#f92672">]</span> .rodata           PROGBITS         <span style="color:#ae81ff">0000000000000840</span>  <span style="color:#ae81ff">00000840</span>
-       <span style="color:#ae81ff">0000000000000008</span>  <span style="color:#ae81ff">0000000000000000</span>   A       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">17</span><span style="color:#f92672">]</span> .eh_frame_hdr     PROGBITS         <span style="color:#ae81ff">0000000000000848</span>  <span style="color:#ae81ff">00000848</span>
-       000000000000003c  <span style="color:#ae81ff">0000000000000000</span>   A       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">18</span><span style="color:#f92672">]</span> .eh_frame         PROGBITS         <span style="color:#ae81ff">0000000000000888</span>  <span style="color:#ae81ff">00000888</span>
-       <span style="color:#ae81ff">0000000000000108</span>  <span style="color:#ae81ff">0000000000000000</span>   A       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">19</span><span style="color:#f92672">]</span> .init_array       INIT_ARRAY       0000000000200da0  00000da0
-       <span style="color:#ae81ff">0000000000000008</span>  <span style="color:#ae81ff">0000000000000008</span>  WA       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">20</span><span style="color:#f92672">]</span> .fini_array       FINI_ARRAY       0000000000200da8  00000da8
-       <span style="color:#ae81ff">0000000000000008</span>  <span style="color:#ae81ff">0000000000000008</span>  WA       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">21</span><span style="color:#f92672">]</span> .dynamic          DYNAMIC          0000000000200db0  00000db0
-       00000000000001f0  <span style="color:#ae81ff">0000000000000010</span>  WA       <span style="color:#ae81ff">6</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">22</span><span style="color:#f92672">]</span> .got              PROGBITS         0000000000200fa0  00000fa0
-       <span style="color:#ae81ff">0000000000000060</span>  <span style="color:#ae81ff">0000000000000008</span>  WA       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">23</span><span style="color:#f92672">]</span> .data             PROGBITS         <span style="color:#ae81ff">0000000000201000</span>  <span style="color:#ae81ff">00001000</span>
-       <span style="color:#ae81ff">0000000000000010</span>  <span style="color:#ae81ff">0000000000000000</span>  WA       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">24</span><span style="color:#f92672">]</span> .bss              NOBITS           <span style="color:#ae81ff">0000000000201010</span>  <span style="color:#ae81ff">00001010</span>
-       <span style="color:#ae81ff">0000000000000008</span>  <span style="color:#ae81ff">0000000000000000</span>  WA       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">25</span><span style="color:#f92672">]</span> .comment          PROGBITS         <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00001010</span>
-       000000000000002b  <span style="color:#ae81ff">0000000000000001</span>  MS       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">26</span><span style="color:#f92672">]</span> .debug_aranges    PROGBITS         <span style="color:#ae81ff">0000000000000000</span>  0000103b
-       <span style="color:#ae81ff">0000000000000030</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">27</span><span style="color:#f92672">]</span> .debug_info       PROGBITS         <span style="color:#ae81ff">0000000000000000</span>  0000106b
-       000000000000038d  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">28</span><span style="color:#f92672">]</span> .debug_abbrev     PROGBITS         <span style="color:#ae81ff">0000000000000000</span>  000013f8
-       <span style="color:#ae81ff">0000000000000109</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">29</span><span style="color:#f92672">]</span> .debug_line       PROGBITS         <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00001501</span>
-       00000000000000ee  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">30</span><span style="color:#f92672">]</span> .debug_str        PROGBITS         <span style="color:#ae81ff">0000000000000000</span>  000015ef
-       <span style="color:#ae81ff">0000000000000295</span>  <span style="color:#ae81ff">0000000000000001</span>  MS       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">31</span><span style="color:#f92672">]</span> .symtab           SYMTAB           <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00001888</span>
-       00000000000006a8  <span style="color:#ae81ff">0000000000000018</span>          <span style="color:#ae81ff">32</span>    <span style="color:#ae81ff">48</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">32</span><span style="color:#f92672">]</span> .strtab           STRTAB           <span style="color:#ae81ff">0000000000000000</span>  00001f30
-       000000000000023f  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span><span style="color:#ae81ff">33</span><span style="color:#f92672">]</span> .shstrtab         STRTAB           <span style="color:#ae81ff">0000000000000000</span>  0000216f
-       000000000000013e  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span></code></pre></div>
-可以看出该文件有34个表，每个表有自己的名字、起始和终止的虚拟地址、长度信息、权限信息等。</p>
+  <span style="color:#f92672">[</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">]</span> .text             PROGBITS         00000000004000b0  000000b0
+       <span style="color:#ae81ff">0000000000000025</span>  <span style="color:#ae81ff">0000000000000000</span>  AX       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">16</span>
+  <span style="color:#f92672">[</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">]</span> .data             PROGBITS         00000000006000d8  000000d8
+       000000000000000e  <span style="color:#ae81ff">0000000000000000</span>  WA       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
+  <span style="color:#f92672">[</span> <span style="color:#ae81ff">3</span><span style="color:#f92672">]</span> .stab             PROGBITS         <span style="color:#ae81ff">0000000000000000</span>  000000e8
+       <span style="color:#ae81ff">0000000000000084</span>  <span style="color:#ae81ff">0000000000000014</span>           <span style="color:#ae81ff">4</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
+  <span style="color:#f92672">[</span> <span style="color:#ae81ff">4</span><span style="color:#f92672">]</span> .stabstr          STRTAB           <span style="color:#ae81ff">0000000000000000</span>  0000016c
+       <span style="color:#ae81ff">0000000000000009</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">[</span> <span style="color:#ae81ff">5</span><span style="color:#f92672">]</span> .symtab           SYMTAB           <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000178</span>
+       <span style="color:#ae81ff">0000000000000108</span>  <span style="color:#ae81ff">0000000000000018</span>           <span style="color:#ae81ff">6</span>     <span style="color:#ae81ff">7</span>     <span style="color:#ae81ff">8</span>
+  <span style="color:#f92672">[</span> <span style="color:#ae81ff">6</span><span style="color:#f92672">]</span> .strtab           STRTAB           <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000280</span>
+       <span style="color:#ae81ff">0000000000000027</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">[</span> <span style="color:#ae81ff">7</span><span style="color:#f92672">]</span> .shstrtab         STRTAB           <span style="color:#ae81ff">0000000000000000</span>  000002a7
+       <span style="color:#ae81ff">0000000000000036</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
+Key to Flags:
+  W <span style="color:#f92672">(</span>write<span style="color:#f92672">)</span>, A <span style="color:#f92672">(</span>alloc<span style="color:#f92672">)</span>, X <span style="color:#f92672">(</span>execute<span style="color:#f92672">)</span>, M <span style="color:#f92672">(</span>merge<span style="color:#f92672">)</span>, S <span style="color:#f92672">(</span>strings<span style="color:#f92672">)</span>, I <span style="color:#f92672">(</span>info<span style="color:#f92672">)</span>,
+  L <span style="color:#f92672">(</span>link order<span style="color:#f92672">)</span>, O <span style="color:#f92672">(</span>extra OS processing required<span style="color:#f92672">)</span>, G <span style="color:#f92672">(</span>group<span style="color:#f92672">)</span>, T <span style="color:#f92672">(</span>TLS<span style="color:#f92672">)</span>,
+  C <span style="color:#f92672">(</span>compressed<span style="color:#f92672">)</span>, x <span style="color:#f92672">(</span>unknown<span style="color:#f92672">)</span>, o <span style="color:#f92672">(</span>OS specific<span style="color:#f92672">)</span>, E <span style="color:#f92672">(</span>exclude<span style="color:#f92672">)</span>,
+  l <span style="color:#f92672">(</span>large<span style="color:#f92672">)</span>, p <span style="color:#f92672">(</span>processor specific<span style="color:#f92672">)</span></code></pre></div>
 
-<p>它等于是一个蓝图，执行时按这个蓝图虚拟存储器去规划并映射它的地址空间。</p>
+<p>其中，<code>Address</code>表示这个section加载到进程中的虚拟内存地址，<code>Offset</code>表示这个section相对于文件头部的偏移量，有了<code>Offset</code>+<code>Size</code>进程才知道如何安排相应的虚拟地址即<code>Address</code>。<code>Flags</code>表示权限标志位，<code>A</code>表示这个section的内容需要在内存中载入，<code>X</code>表示可执行的权限，<code>W</code>表示可写入的权限。</p>
+
+<p><code>.text</code>用于存放二进制的执行代码(指令)。我们可以看到这个段的地址恰好是文件头中的Entry point address。</p>
+
+<p><code>.data</code>用于存放所有已经初始化过的全局变量的数据，<code>.bss</code>用于存放未初始化的全局变量数据，虽然他们在内存中都需要相应的起始地址和内存区域，但在可执行文件中没必要用一定区域去记下<code>.bss</code>中的零值。<code>.rodata</code>专门用于保存只读数据，例如字符串的字面量，在很多语言中它都是只读的。</p>
+
+<p><code>.symtab</code>表示符号表，源码中的字面量、全局变量、函数名、类型名、文件名等会作为符号记录在该表中，会记录它们的类型、作用域和内存地址。对于程序运行来讲，符号表没有什么用，CPU不管什么符号、类型，它只需要内存地址。符号就相当于是内存地址的助记符，主要是便于我们调试和反汇编使用的。</p>
+
+<h3 id="segment">Segment</h3>
+
+<p>执行的时候，我们需要告诉操作系统，有哪些section需要载入为内存中的segment，这个信息被链接器放在Program header table中，操作系统的载入器以此信息来安排程序在内存中的样子，我们可以这样查看:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -l hello
+Elf file type is EXEC <span style="color:#f92672">(</span>Executable file<span style="color:#f92672">)</span>
+Entry point 0x4000b0
+There are <span style="color:#ae81ff">2</span> program headers, starting at offset <span style="color:#ae81ff">64</span>
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
+                 0x00000000000000d5 0x00000000000000d5  R E    0x200000
+  LOAD           0x00000000000000d8 0x00000000006000d8 0x00000000006000d8
+                 0x000000000000000e 0x000000000000000e  RW     0x200000
+ Section to Segment mapping:
+  Segment Sections...
+   <span style="color:#ae81ff">00</span>     .text
+   <span style="color:#ae81ff">01</span>     .data</code></pre></div>
+
+<p>上面的section to segment mapping就表示把section中的<code>.text</code>段的内容放在内存中<code>00</code>号的segment上。在可执行文件中会把section分的很细，但在内存中可能会把一些section合并起来，忽略掉一些section，起到节约内存的目的。</p>
 </article>
 
       <div class="book-footer justify-between">
@@ -426,9 +415,9 @@ Section Headers:
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/680df681c4227558624a86353767ae5c9b20258c" title='Last modified by hjlarry | December 12, 2019' target="_blank">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/f8b0a0ee517ea9997b10393cb3ff6c0550d75328" title='Last modified by hjlarry | December 23, 2019' target="_blank">
       <img src="/svg/calendar.svg" alt="Calendar" />
-      <span>December 12, 2019</span>
+      <span>December 23, 2019</span>
     </a>
   </div>
   
@@ -473,7 +462,12 @@ Section Headers:
 <li><a href="#换入换出">换入换出</a></li>
 <li><a href="#性能相关">性能相关</a></li>
 </ul></li>
-<li><a href="#可执行文件">可执行文件</a></li>
+<li><a href="#可执行文件">可执行文件</a>
+<ul>
+<li><a href="#head">Head</a></li>
+<li><a href="#section">Section</a></li>
+<li><a href="#segment">Segment</a></li>
+</ul></li>
 </ul></li>
 </ul>
 </nav>

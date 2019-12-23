@@ -4,8 +4,8 @@ bookMenuLevels: 1
 ---
 
 - **计算机基础**
-  - [硬件部分]({{< relref "/docs/sicp/hardware" >}})
-  - [软件部分]({{< relref "/docs/sicp/software" >}})
+  - [硬件]({{< relref "/docs/sicp/hardware" >}})
+  - [软件]({{< relref "/docs/sicp/software" >}})
   - [汇编]({{< relref "/docs/sicp/asm" >}})
 - **GO语言**
   - [字典]({{< relref "/docs/go/map" >}})
