@@ -21,3 +21,25 @@
 第二是每个span还需要位图(bitmap)来标记哪些是可用的，我们所说的切分object也只是理解上的切分，实际上我们要找到一个可用的object，就是用这个span的起始地址加上位图中可用对象的偏移量乘以SizeClass的大小，即base+offset*size。
 
 第三，我们还需要一个反查表，它记录了每个span的起始地址，为什么需要这样一个表呢？假设某个span里面有100个object，我们只需要其中的10个object，我们就可用通过反查表把这个span一分为二，把剩余的90个object组成的span拿回来。拿回来之后还能通过反查表检查它左右相邻的span是不是闲置的，如果闲置则可把他们合并为一个大的块。所以span块大小可能不是固定的，根据需要可能会切分或合并。
+
+那么整个过程是这样的，首先堆Heap向操作系统申请64MB内存，操作系统是机会主义的分配，实际上拿到的64MB的期货，之后以页为单位写时分配物理内存。分配之后就有一大堆的span需要去管理，Heap采用了树堆结构去管理。树堆相当于树的数据结构，增加了一些堆的特性，排序按照地址来排序。使用树堆去分配给central，总是尽可能分配到一个大小合适而且地址靠前的span，因为地址靠前使得内存相对来说更紧凑。central拿到之后也只是做一些属性的设置，重置一下span的位图等。cache通常会和P绑定，M需要内存的时候就去找P拿，P再找cache，cache再找central。所以cache内会有一个数组，数组内容是以SizeClass为索引的span。P/M在cache上分配内存时是无锁的。例如用户若需要一个7字节大小的内存，计算得出对应的SizeClass是1#，就会通过P/M去cache[1]中看有没有span，没有就去central中拿，如果已经有了就去看这个span的位图中有没有空余的空间。而如果用户需要一个大于32KB的大对象，则central直接去堆上拿即可。
+
+小对象中有两种特殊的对象，一种是长度为0的对象，另一种是微小对象。对于长度为0的对象，比如空结构体，我们不应该为其分配内存，但得给它们一个合理合法的地址。Go专门有一个全局变量叫ZeroBase，不管是什么对象，只要它长度为0就会去指向这个全局变量的地址。
+
+{{< highlight go>}}
+// base address for all 0-byte allocations
+var zerobase uintptr
+
+func mallocgc(size uintptr, typ *_type, needzero bool) unsafe.Pointer {
+	if gcphase == _GCmarktermination {
+		throw("mallocgc called with gcphase == _GCmarktermination")
+	}
+
+	if size == 0 {
+		return unsafe.Pointer(&zerobase)
+	}
+    ...
+}
+{{< /highlight >}}
+
+微小对象属于分配中比较常见的，例如短字符串等。如果发现需要分配一批微小对象，会从一个2#的span中提取出一个object(16字节)，记录它并把多个微小对象都放进去，有助于节约内存。但是这些微小对象中不能有指针，因为它不能去引用其他地方，这样垃圾回收器才会把它当做一个整体去扫描。
