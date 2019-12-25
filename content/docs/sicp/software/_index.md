@@ -202,6 +202,55 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
 
 某种角度上，假设所有数据都交换到硬盘上，我们可以认为所有的数据保存在硬盘上，内存上只保存活跃数据，内存可以看成是硬盘的缓存或者说L4，虚拟存储器就可以看成硬盘上一个巨大的数组。
 
+寄存器
+-------
+由于寄存器数量很少，我们就给每个寄存器起了个名字，并分为:
+
+* 通用寄存器:AX,BX,CX,DX,SI,DI,SP,BP,R8-R15
+* 指令寄存器:IP，用于读取程序执行的下一条指令地址
+* 标志寄存器:FR，用于存放处理器的状态和运算结果
+
+我们在寄存器名称前加个R，表示64位的寄存器；加个E，表示32位的；不加表示16位的；同时AH表示AX的高位；AL表示AX的地位。可以通过gdb观察到这些寄存器的值。
+
+{{< highlight sh>}}
+(gdb) info registers
+rax            0x66	102
+rbx            0x0	0
+rcx            0x22	34
+rdx            0x33	51
+rsi            0x22	34
+rdi            0x11	17
+rbp            0x7fffffffe580	0x7fffffffe580
+rsp            0x7fffffffe550	0x7fffffffe550
+r8             0x7ffff7dd0d80	140737351847296
+r9             0x7ffff7dd0d80	140737351847296
+r10            0x0	0
+r11            0x0	0
+r12            0x555555554540	93824992232768
+r13            0x7fffffffe660	140737488348768
+r14            0x0	0
+r15            0x0	0
+rip            0x5555555546b2	0x5555555546b2 <main+68>
+eflags         0x206	[ PF IF ]
+cs             0x33	51
+ss             0x2b	43
+ds             0x0	0
+es             0x0	0
+fs             0x0	0
+gs             0x0	0
+(gdb) set $rbx=0x8070605040302010
+(gdb) p/x $ebx
+$1 = 0x40302010
+(gdb) p/x $bx
+$2 = 0x2010
+(gdb) p/x $bh
+$3 = 0x20
+(gdb) p/x $bl
+$4 = 0x10
+{{< /highlight >}}
+
+所以有了这些访问的手段，一个寄存器是可以分割为不同的部分，存储不同内容的。
+
 可执行文件
 -------
 

@@ -39,6 +39,7 @@ bookToc: false
 小对象中还有两种特殊的对象，一种是长度为0的对象，另一种是微小对象。对于长度为0的对象，比如空结构体，我们不应该为其分配内存，但得给它一个合法的地址。Go专门有一个全局变量叫ZeroBase，不管是什么对象，只要它长度为0就会去指向这个全局变量的地址。
 
 {{< highlight go>}}
+// src/runtime/malloc.go
 // base address for all 0-byte allocations
 var zerobase uintptr
 
