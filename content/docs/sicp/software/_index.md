@@ -215,6 +215,8 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
 * 指令寄存器:IP(也叫PC)，用于读取程序执行的下一条指令地址
 * 标志寄存器:FR，用于存放处理器的状态和运算结果
 
+### 通用寄存器
+
 我们在寄存器名称前加个R，表示64位的寄存器；加个E，表示32位的；不加表示16位的；同时AH表示AX的高位；AL表示AX的地位。可以通过gdb观察到这些寄存器的值。
 
 {{< highlight sh>}}
@@ -254,7 +256,90 @@ $3 = 0x20
 $4 = 0x10
 {{< /highlight >}}
 
-所以有了这些访问的手段，一个寄存器是可以分割为不同的部分，存储不同内容的。
+所以有了这些访问的手段，一个寄存器是可以分割为不同的部分，存储不同内容的。通用寄存器用来存什么都可以，只是由于C语言出现的早，它对各个寄存器的一些用法就成了约定俗成的惯例，例如si、di用来传参，ax保存返回值，bp、sp表示栈底、栈顶，cx用来做循环等都是惯例。
+
+但指令寄存器是在硬件层面上和其他寄存器有不同，专门用来放程序执行的下一条指令的。
+
+### 标志寄存器
+
+我们通过一个示例代码来观察标志寄存器的用途。
+
+{{< highlight asm>}}
+global _start
+
+section .data
+    hello   : db `hello,world!\n`
+
+section .text
+
+    _start:
+        mov     rax, 1
+        test    rax, rax ; 如果AX为0，则把ZF设为1，否则把ZF设为0
+        jne     .exit    ; 如果ZF为0，则跳转至.exit标签
+
+    .hello:
+        mov     rax, 1
+        mov     rdi, 1
+        mov     rsi, hello
+        mov     rdx, 14
+        syscall
+
+    .exit:
+        mov     rax, 60
+        xor     rdi, rdi
+        syscall
+{{< /highlight >}}
+
+标志寄存器有很多个位，ZF就是其中的一个位。哪个指令对哪个标志位有影响，都有手册可以查到，例如test指令可以通过[这里](https://baike.baidu.com/item/test/10804276#viewPageContent)查到，[jne](https://baike.baidu.com/item/jne)也是。
+
+接着，我们在gdb中观察:
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ nasm -g -F dwarf -f elf64 -o fr.o fr.s
+[ubuntu] ~/.mac/assem $ ld -o fr fr.o
+[ubuntu] ~/.mac/assem $ gdb fr
+...
+(gdb) b 9
+Breakpoint 1 at 0x4000b0: file fr.s, line 9.
+(gdb) r
+Starting program: /root/.mac/assem/fr
+
+Breakpoint 1, _start () at fr.s:9
+9	        mov     rax, 1
+(gdb) display $rax
+1: $rax = 0
+(gdb) display $eflags
+2: $eflags = [ IF ]
+(gdb) n
+10	        test    rax, rax ; ZF=1 if AX==0 else ZF=0
+1: $rax = 1
+2: $eflags = [ IF ]
+(gdb) n
+11	        jne     .exit    ; jmp if ZF==0
+1: $rax = 1
+2: $eflags = [ IF ]
+(gdb) n
+_start.exit () at fr.s:21
+21	        mov     rax, 60
+{{< /highlight >}}
+
+标志寄存器中若某位有值则会出现在eflags中，按当前代码逻辑，ZF为0会直接跳转到.exit部分。然后我们在gdb中修改$rax的值，会发现跳转至.hello部分。
+
+{{< highlight sh>}}
+(gdb) n
+10	        test    rax, rax ; ZF=1 if AX==0 else ZF=0
+1: $rax = 1
+2: $eflags = [ IF ]
+(gdb) set $rax=0
+(gdb) n
+11	        jne     .exit    ; jmp if ZF==0
+1: $rax = 0
+2: $eflags = [ PF ZF IF ]
+(gdb) n
+_start.hello () at fr.s:14
+14	        mov     rax, 1
+1: $rax = 0
+2: $eflags = [ PF ZF IF ]
+{{< /highlight >}}
 
 
 可执行文件
@@ -381,6 +466,8 @@ Program Headers:
 一般会把栈顶的地址放在SP寄存器，把栈底的地址放在BP寄存器。但是一个线程只有一套自己的寄存器，那么如果SP/BP用来存当前正在执行的B函数的栈帧，B执行完以后如何知道A的栈帧有多大呢？所以在两个栈帧之间还有一段空间用来存储A的BP/SP、IP，A在调用B的时候就把自己的BP/SP写进去，把自己调用完B之后下一条要执行什么指令写进IP，这叫保存现场。B执行完以后，通过这段空间恢复现场。
 
 理论上，SP或者BP使用一个就够了，每个语言都有自己的选择。Go早期只用SP，后来也引入了BP，因为很多的调试器、自动化检测工具需要使用BP确定栈底的位置。Go语言在调用CALL指令的时候会自动保存IP寄存器，调用RET指令的时候自动恢复IP寄存器。
+
+在C语言中，是优先通过寄存器传递参数和返回值，经常使用SI、DI寄存器传参，使用AX寄存器存储返回值，因为C是性能优先，寄存器肯定是最快的。Go是使用栈内存传参和返回值的，这和它本身Goroutine的运行方式有关。
 
 调用一个函数，在指令级别上还是有很大的开销的，所以有了内联(inline)的优化手段。
 
