@@ -70,8 +70,9 @@ section .text
         xor rdi, rdi
         syscall
 {{< /highlight >}}
+C语言、Go语言通过标准库进行系统调用，他们的标准库中的函数也只是在汇编之上的一种包装。在汇编语言中通过在不同寄存器中放参数，执行`syscall`这样一条指令就可以进行系统调用，`syscall`是64位操作系统改进的一条指令，x86下是`int 0x80`，这种改进效率上也更高一些。
 
-相比于call指令， int属于中断指令，需要栈切换并进行相关检查，开销更大一些。
+RAX寄存器代表系统调用的序号，相当于函数名称；RDI、RSI、RDX、R10、R8、R9，依次存放参数；再用RAX存返回值。这是系统调用的调用约定。可以通过[这里](http://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/)查看到系统调用函数有哪些，分别是如何传参的。
 
 
 进程
