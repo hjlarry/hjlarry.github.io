@@ -313,6 +313,26 @@ GNU通用的调试工具，也叫**gdb**。binutils属于静态的观察，而gd
 
 也可以使用一些带图形界面的类似工具，例如[gdbgui](https://www.gdbgui.com/)。还有些[cheatsheet](https://kapeli.com/cheat_sheets/GDB.docset/Contents/Resources/Documents/index)很好用。
 
+常用指令
+
+指令|作用
+---|---
+info r | 查看寄存器
+info f | 查看栈帧
+info files | 查看文件的各个段的起始地址
+info var | 查看全局变量
+info locals | 查看局部变量
+info breakpoints | 查看断点信息
+bt | 显示程序的栈
+set disassembly-flavor intel | 设置反汇编的风格为intel或att
+disass | 查看反汇编
+layout src | 显示源码窗口
+display [var] | 每次停下来时都会输出变量var的值，var可以设为寄存器
+l [n] | 查看第N行代码的上下五行
+c | 运行至下一断点或程序结束
+p/x $[var] | 以16进制输出变量var的值，也可输出表达式，不加`/x`为十进制
+x/10xb [addr]| 查看内存地址addr开始的10组数据，16进制的，单位是字节
+
 
 构建工具
 -------
