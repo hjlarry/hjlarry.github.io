@@ -215,3 +215,40 @@ Disassembly of section .text:
 * 基址变址，`lea rax, [rbx+rcx]`，把地址拿出来放到盒子里
 
 `mov rax, 0x100`表示给rax赋值为0x100，`mov rax, [0x100]`表示给rax赋值内存0x100位置的值，`lea rax, [0x100]`表示直接去找[0x100]的地址即0x100，赋值给rax。`mov`是对于内容的操作，`lea`是对于地址的操作。`mov`是不能直接在两块内存之间进行复制的。`[addr]`这种表达方式属于NASM编译器对内存操作必须这么做，即便是一个变量名称（代表一个内存地址），例如`x=100`，也得用`[x]`才取的到它的值100。
+
+### 变量
+可以在`.data`和`.bss`段中定义变量，定义示例:
+{{< highlight asm>}}
+section .data
+    x dq 0x8070605040302010    
+    y db 1,2,3
+    z times 3 dw 1,2                  
+    leny equ $-y                ;$为当前地址，所以减去y的地址，就是y的长度
+
+    s db "abcd", "e", "f"       ; db*6
+    lens equ $-s                ; equ定义的是常量，不会存储在.data中
+
+section .bss
+    xx resq 2 
+    yy times 2 resb 8
+{{< /highlight >}}
+`x`是变量名称，代表符号的地址，变量的起始地址；`dq`代表它的长度；`0x8070605040302010`代表它的初始化值。
+
+字符和它代表的长度如下表所示:
+
+.data中|长度(bytes)|.bss中
+---|---|---
+db|1|resb
+dw|2|resw
+dd|4|resd
+dq|8|resq
+dt|10|rest
+do|16|reso
+dy|32|resy
+dz|64|resz
+
+`y db 1,2,3`就表示从y这个内存地址开始，后面逗号分隔的有三块内存，每块内存都是db大小且值为对应的1、2、3。汇编语言中是没有字符串的，像`"abcd"`就是拿它的ASCII值把它当做字节序列。`s db "abcd", "e", "f"`中db放不下整个`"abcd"`，就用了4个db来放。通过`equ`定义的为整型常量，被编译器直接展开，不会存在`.data`中。另外，数字有大小端和进制的问题。
+
+在`.data`中是定义，而在`.bss`中是预留。`xx resq 2`就表示从`xx`开始，预留`resq`大小的空间，预留`2`组。
+
+`times`类似于语法糖，用于重复定义数据或指令。`yy times 2 resb 8`就表示`yy resb 8`重复两次。
