@@ -9,7 +9,7 @@ bookMenuLevels: 1
   - [汇编]({{< relref "/docs/sicp/asm" >}})
 - **GO语言**
   - [字典]({{< relref "/docs/go/map" >}})
-  - 闭包
+  - [闭包]({{< relref "/docs/go/closure" >}})
   - [延迟调用]({{< relref "/docs/go/defer" >}})
   - [垃圾回收]({{< relref "/docs/go/gc" >}})
   - [内存分配]({{< relref "/docs/go/alloc" >}})
