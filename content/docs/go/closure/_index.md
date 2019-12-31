@@ -72,3 +72,88 @@ return closure struct{
 在`test.func1`中，通过`MOVQ	8(DX), AX`从DX中存的地址偏移量+8也就是x的值100放在了AX寄存器中，接着放到栈上执行print。
 
 DX寄存器是整个闭包实现的核心，因为结构体是在堆上运行期动态分配的，它的地址在编译期不知道，闭包中的函数也是编译期就被编译为指令的，那么函数执行时如何知道它的本地变量的内存地址就是问题。DX寄存器是一个名字，编译期、运行期都一样，Go把动态的地址写进去，通过这个静态的名字加上偏移量来交互实现闭包。
+
+应用场景
+-------
+
+### 计数器
+每次调用返回一个自增的值，以前可能通过类或者全局变量，用函数实现会比较麻烦，有了闭包会比较简单:
+{{< highlight go>}}
+func getCounter() func() int {
+	x := 0
+	return func() int {
+		x++
+		return x
+	}
+}
+
+func main() {
+	c := getCounter()
+	println(c())
+	println(c())
+	println(c())
+}
+{{< /highlight >}}
+有点类似于C语言中的静态局部变量，可以把数据绑定到函数身上，也就有点像类了。
+
+### 封闭区间
+也可以把一份数据绑定到多个函数中去，如下例:
+{{< highlight go>}}
+func test() (func(), func(), func()) {
+	x := 100
+	fmt.Printf("%v\n", &x)
+	return func() {
+			fmt.Printf("f1.x:%v\n", &x)
+		}, func() {
+			fmt.Printf("f2.x:%v\n", &x)
+		}, func() {
+			fmt.Printf("f3.x:%v\n", &x)
+		}
+}
+func main() {
+	f1, f2, f3 := test()
+	f1()
+	f2()
+	f3()
+}
+{{< /highlight >}}
+x像是把全局变量的作用域缩小到test函数中，使得里面的三个不同逻辑共享它，构成了一个相对封闭的区间。
+
+### 绑定数据和逻辑
+有时候需要A把方法和不同数据都传给B，直接传看上去不优雅，把它们打包为一个闭包看上去就像只传了一个方法，B只是接收一套逻辑，这个逻辑具体是怎么运行B不需要知道。
+{{< highlight go>}}
+func hello(db Database) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, db.Url)
+	}
+}
+func main() {
+	db := NewDatabase("localhost:5432")
+	http.HandleFunc("/hello", hello(db))
+	http.ListenAndServe(":3000", nil)
+}
+{{< /highlight >}}
+
+### 改变函数签名
+例如把一个函数变成偏函数(partial)
+{{< highlight go>}}
+func test(x int) {
+	println(x)
+}
+
+func partial(f func(int), x int) func() {
+	return func() {
+		f(x)
+	}
+}
+
+func main() {
+	f := partial(test, 100)
+	f()
+}
+{{< /highlight >}}
+
+总结
+-------
+
+闭包虽然改善了一些代码上的设计，让代码看上去更干净整洁，可以实现一些设计模式。但它延长了变量的生命周期，必然会导致逃逸行为，其内部的一些交互过程也会使执行性能降低。所以对于闭包也不能滥用。
