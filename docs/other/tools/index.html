@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
 
 
-<script defer src="/cn.search.min.00812edc7a3d54429647a92bd716a9ba8d6c78b0ff4e2223f873b8dad55f3dd4.js" integrity="sha256-AIEu3Ho9VEKWR6kr1xapuo1seLD/TiIj&#43;HO42tVfPdQ="></script>
+<script defer src="/cn.search.min.32ca3e8d5c253b9ec6abae41ff75d6e66f8182c7f6602db96d16bd7941e925d6.js" integrity="sha256-Mso&#43;jVwlO57Gq65B/3XW5m&#43;Bgsf2YC25bRa9eUHpJdY="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/other/tools/index.xml" title="Home" />
 <!--
@@ -61,7 +61,7 @@ https://github.com/alex-shpak/hugo-book
 
 <ul>
 <li><a href="/docs/go/map/">字典</a></li>
-<li>闭包</li>
+<li><a href="/docs/go/closure/">闭包</a></li>
 <li><a href="/docs/go/defer/">延迟调用</a></li>
 <li><a href="/docs/go/gc/">垃圾回收</a></li>
 <li><a href="/docs/go/alloc/">内存分配</a></li>
@@ -403,6 +403,94 @@ String dump of section <span style="color:#e6db74">&#39;.abc&#39;</span>:
 
 <p>也可以使用一些带图形界面的类似工具，例如<a href="https://www.gdbgui.com/">gdbgui</a>。还有些<a href="https://kapeli.com/cheat_sheets/GDB.docset/Contents/Resources/Documents/index">cheatsheet</a>很好用。</p>
 
+<p>常用指令</p>
+
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>作用</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>info r</td>
+<td>查看寄存器</td>
+</tr>
+
+<tr>
+<td>info f</td>
+<td>查看栈帧</td>
+</tr>
+
+<tr>
+<td>info files</td>
+<td>查看文件的各个段的起始地址</td>
+</tr>
+
+<tr>
+<td>info var</td>
+<td>查看全局变量</td>
+</tr>
+
+<tr>
+<td>info locals</td>
+<td>查看局部变量</td>
+</tr>
+
+<tr>
+<td>info breakpoints</td>
+<td>查看断点信息</td>
+</tr>
+
+<tr>
+<td>bt</td>
+<td>显示程序的栈</td>
+</tr>
+
+<tr>
+<td>set disassembly-flavor intel</td>
+<td>设置反汇编的风格为intel或att</td>
+</tr>
+
+<tr>
+<td>disass</td>
+<td>查看反汇编</td>
+</tr>
+
+<tr>
+<td>layout src</td>
+<td>显示源码窗口</td>
+</tr>
+
+<tr>
+<td>display [var]</td>
+<td>每次停下来时都会输出变量var的值，var可以设为寄存器</td>
+</tr>
+
+<tr>
+<td>l [n]</td>
+<td>查看第N行代码的上下五行</td>
+</tr>
+
+<tr>
+<td>c</td>
+<td>运行至下一断点或程序结束</td>
+</tr>
+
+<tr>
+<td>p/x $[var]</td>
+<td>以16进制输出变量var的值，也可输出表达式，不加<code>/x</code>为十进制</td>
+</tr>
+
+<tr>
+<td>x/10xb [addr]</td>
+<td>查看内存地址addr开始的10组数据，16进制的，单位是字节</td>
+</tr>
+</tbody>
+</table>
+
 <h2 id="构建工具">构建工具</h2>
 
 <p>GNU的自动构建工具为<strong>make</strong>，有些像脚本语言，把一堆命令放一起批量执行。使用它做编译属于增量编译，即通过对比修改时间来判断是否需要重新执行。<a href="https://www.gnu.org/software/make/">官方网站</a></p>
@@ -428,9 +516,9 @@ String dump of section <span style="color:#e6db74">&#39;.abc&#39;</span>:
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/f8b0a0ee517ea9997b10393cb3ff6c0550d75328" title='Last modified by hjlarry | December 23, 2019' target="_blank">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/d8a896c2727803623fd3445d930c9c2ea6422925" title='Last modified by hjlarry | December 30, 2019' target="_blank">
       <img src="/svg/calendar.svg" alt="Calendar" />
-      <span>December 23, 2019</span>
+      <span>December 30, 2019</span>
     </a>
   </div>
   

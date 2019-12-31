@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
 
 
-<script defer src="/cn.search.min.00812edc7a3d54429647a92bd716a9ba8d6c78b0ff4e2223f873b8dad55f3dd4.js" integrity="sha256-AIEu3Ho9VEKWR6kr1xapuo1seLD/TiIj&#43;HO42tVfPdQ="></script>
+<script defer src="/cn.search.min.32ca3e8d5c253b9ec6abae41ff75d6e66f8182c7f6602db96d16bd7941e925d6.js" integrity="sha256-Mso&#43;jVwlO57Gq65B/3XW5m&#43;Bgsf2YC25bRa9eUHpJdY="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/sicp/software/index.xml" title="Home" />
 <!--
@@ -62,7 +62,7 @@ https://github.com/alex-shpak/hugo-book
 
 <ul>
 <li><a href="/docs/go/map/">字典</a></li>
-<li>闭包</li>
+<li><a href="/docs/go/closure/">闭包</a></li>
 <li><a href="/docs/go/defer/">延迟调用</a></li>
 <li><a href="/docs/go/gc/">垃圾回收</a></li>
 <li><a href="/docs/go/alloc/">内存分配</a></li>
@@ -179,9 +179,10 @@ https://github.com/alex-shpak/hugo-book
 </span><span style="color:#75715e"></span>        
         <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">60</span>     <span style="color:#75715e">; &#39;exit&#39; syscall number
 </span><span style="color:#75715e"></span>        <span style="color:#66d9ef">xor</span> <span style="color:#66d9ef">rdi</span>, <span style="color:#66d9ef">rdi</span>
-        <span style="color:#a6e22e">syscall</span></code></pre></div></p>
+        <span style="color:#a6e22e">syscall</span></code></pre></div>
+C语言、Go语言通过标准库进行系统调用，他们的标准库中的函数也只是在汇编之上的一种包装。在汇编语言中通过在不同寄存器中放参数，执行<code>syscall</code>这样一条指令就可以进行系统调用，<code>syscall</code>是64位操作系统改进的一条指令，x86下是<code>int 0x80</code>，这种改进效率上也更高一些。</p>
 
-<p>相比于call指令， int属于中断指令，需要栈切换并进行相关检查，开销更大一些。</p>
+<p>RAX寄存器代表系统调用的序号，相当于函数名称；RDI、RSI、RDX、R10、R8、R9，依次存放参数；再用RAX存返回值。这是系统调用的调用约定。可以通过<a href="http://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/">这里</a>查看到系统调用函数有哪些，分别是如何传参的。</p>
 
 <h2 id="进程">进程</h2>
 
@@ -314,6 +315,134 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
 
 <p>某种角度上，假设所有数据都交换到硬盘上，我们可以认为所有的数据保存在硬盘上，内存上只保存活跃数据，内存可以看成是硬盘的缓存或者说L4，虚拟存储器就可以看成硬盘上一个巨大的数组。</p>
 
+<h2 id="寄存器">寄存器</h2>
+
+<p>由于寄存器数量很少，我们就给每个寄存器起了个名字，并分为:</p>
+
+<ul>
+<li>通用寄存器:AX,BX,CX,DX,SI,DI,SP,BP,R8-R15</li>
+<li>指令寄存器:IP(也叫PC)，用于读取程序执行的下一条指令地址</li>
+<li>标志寄存器:FR，用于存放处理器的状态和运算结果</li>
+</ul>
+
+<h3 id="通用寄存器">通用寄存器</h3>
+
+<p>我们在寄存器名称前加个R，表示64位的寄存器；加个E，表示32位的；不加表示16位的；同时AH表示AX的高位；AL表示AX的地位。可以通过gdb观察到这些寄存器的值。</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> info registers
+rax            0x66	<span style="color:#ae81ff">102</span>
+rbx            0x0	<span style="color:#ae81ff">0</span>
+rcx            0x22	<span style="color:#ae81ff">34</span>
+rdx            0x33	<span style="color:#ae81ff">51</span>
+rsi            0x22	<span style="color:#ae81ff">34</span>
+rdi            0x11	<span style="color:#ae81ff">17</span>
+rbp            0x7fffffffe580	0x7fffffffe580
+rsp            0x7fffffffe550	0x7fffffffe550
+r8             0x7ffff7dd0d80	<span style="color:#ae81ff">140737351847296</span>
+r9             0x7ffff7dd0d80	<span style="color:#ae81ff">140737351847296</span>
+r10            0x0	<span style="color:#ae81ff">0</span>
+r11            0x0	<span style="color:#ae81ff">0</span>
+r12            0x555555554540	<span style="color:#ae81ff">93824992232768</span>
+r13            0x7fffffffe660	<span style="color:#ae81ff">140737488348768</span>
+r14            0x0	<span style="color:#ae81ff">0</span>
+r15            0x0	<span style="color:#ae81ff">0</span>
+rip            0x5555555546b2	0x5555555546b2 &lt;main+68&gt;
+eflags         0x206	<span style="color:#f92672">[</span> PF IF <span style="color:#f92672">]</span>
+cs             0x33	<span style="color:#ae81ff">51</span>
+ss             0x2b	<span style="color:#ae81ff">43</span>
+ds             0x0	<span style="color:#ae81ff">0</span>
+es             0x0	<span style="color:#ae81ff">0</span>
+fs             0x0	<span style="color:#ae81ff">0</span>
+gs             0x0	<span style="color:#ae81ff">0</span>
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> set $rbx<span style="color:#f92672">=</span>0x8070605040302010
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> p/x $ebx
+$1 <span style="color:#f92672">=</span> 0x40302010
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> p/x $bx
+$2 <span style="color:#f92672">=</span> 0x2010
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> p/x $bh
+$3 <span style="color:#f92672">=</span> 0x20
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> p/x $bl
+$4 <span style="color:#f92672">=</span> 0x10</code></pre></div>
+
+<p>所以有了这些访问的手段，一个寄存器是可以分割为不同的部分，存储不同内容的。通用寄存器用来存什么都可以，只是由于C语言出现的早，它对各个寄存器的一些用法就成了约定俗成的惯例，例如si、di用来传参，ax保存返回值，bp、sp表示栈底、栈顶，cx用来做循环等都是惯例。</p>
+
+<p>但指令寄存器是在硬件层面上和其他寄存器有不同，专门用来放程序执行的下一条指令的。</p>
+
+<h3 id="标志寄存器">标志寄存器</h3>
+
+<p>我们通过一个示例代码来观察标志寄存器的用途。</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">global</span> <span style="color:#66d9ef">_start</span>
+
+<span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.data</span>
+    <span style="color:#a6e22e">hello</span>   : <span style="color:#66d9ef">db</span> <span style="color:#960050;background-color:#1e0010">`</span><span style="color:#66d9ef">hello</span>,<span style="color:#66d9ef">world</span>!<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">n</span><span style="color:#960050;background-color:#1e0010">`</span>
+
+<span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.text</span>
+
+    _start:
+        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span>
+        <span style="color:#a6e22e">test</span>    <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">rax</span> <span style="color:#75715e">; 如果AX为0，则把ZF设为1，否则把ZF设为0
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">jne</span>     <span style="color:#66d9ef">.exit</span>    <span style="color:#75715e">; 如果ZF为0，则跳转至.exit标签
+</span><span style="color:#75715e"></span>
+    .hello:
+        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span>
+        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rdi</span>, <span style="color:#ae81ff">1</span>
+        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rsi</span>, <span style="color:#66d9ef">hello</span>
+        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rdx</span>, <span style="color:#ae81ff">14</span>
+        <span style="color:#a6e22e">syscall</span>
+
+    .exit:
+        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">60</span>
+        <span style="color:#a6e22e">xor</span>     <span style="color:#66d9ef">rdi</span>, <span style="color:#66d9ef">rdi</span>
+        <span style="color:#a6e22e">syscall</span></code></pre></div>
+
+<p>标志寄存器有很多个位，ZF就是其中的一个位。哪个指令对哪个标志位有影响，都有手册可以查到，例如test指令可以通过<a href="https://baike.baidu.com/item/test/10804276#viewPageContent">这里</a>查到，<a href="https://baike.baidu.com/item/jne">jne</a>也是。</p>
+
+<p>接着，我们在gdb中观察:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ nasm -g -F dwarf -f elf64 -o fr.o fr.s
+<span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ ld -o fr fr.o
+<span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ gdb fr
+...
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> b <span style="color:#ae81ff">9</span>
+Breakpoint <span style="color:#ae81ff">1</span> at 0x4000b0: file fr.s, line <span style="color:#ae81ff">9</span>.
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> r
+Starting program: /root/.mac/assem/fr
+
+Breakpoint <span style="color:#ae81ff">1</span>, _start <span style="color:#f92672">()</span> at fr.s:9
+<span style="color:#ae81ff">9</span>	        mov     rax, <span style="color:#ae81ff">1</span>
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> display $rax
+<span style="color:#ae81ff">1</span>: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> display $eflags
+<span style="color:#ae81ff">2</span>: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> IF <span style="color:#f92672">]</span>
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
+<span style="color:#ae81ff">10</span>	        test    rax, rax ; ZF<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> AX<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span> <span style="color:#66d9ef">else</span> ZF<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+<span style="color:#ae81ff">1</span>: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+<span style="color:#ae81ff">2</span>: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> IF <span style="color:#f92672">]</span>
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
+<span style="color:#ae81ff">11</span>	        jne     .exit    ; jmp <span style="color:#66d9ef">if</span> ZF<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span>
+<span style="color:#ae81ff">1</span>: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+<span style="color:#ae81ff">2</span>: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> IF <span style="color:#f92672">]</span>
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
+_start.exit <span style="color:#f92672">()</span> at fr.s:21
+<span style="color:#ae81ff">21</span>	        mov     rax, <span style="color:#ae81ff">60</span></code></pre></div></p>
+
+<p>标志寄存器中若某位有值则会出现在eflags中，按当前代码逻辑，ZF为0会直接跳转到.exit部分。然后我们在gdb中修改$rax的值，会发现跳转至.hello部分。</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
+<span style="color:#ae81ff">10</span>	        test    rax, rax ; ZF<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> AX<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span> <span style="color:#66d9ef">else</span> ZF<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+<span style="color:#ae81ff">1</span>: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+<span style="color:#ae81ff">2</span>: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> IF <span style="color:#f92672">]</span>
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> set $rax<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
+<span style="color:#ae81ff">11</span>	        jne     .exit    ; jmp <span style="color:#66d9ef">if</span> ZF<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span>
+<span style="color:#ae81ff">1</span>: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+<span style="color:#ae81ff">2</span>: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> PF ZF IF <span style="color:#f92672">]</span>
+<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
+_start.hello <span style="color:#f92672">()</span> at fr.s:14
+<span style="color:#ae81ff">14</span>	        mov     rax, <span style="color:#ae81ff">1</span>
+<span style="color:#ae81ff">1</span>: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+<span style="color:#ae81ff">2</span>: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> PF ZF IF <span style="color:#f92672">]</span></code></pre></div>
+
 <h2 id="可执行文件">可执行文件</h2>
 
 <p><img src="./images/elf.png" alt="ELF" /></p>
@@ -406,6 +535,38 @@ Program Headers:
    <span style="color:#ae81ff">01</span>     .data</code></pre></div>
 
 <p>上面的section to segment mapping就表示把section中的<code>.text</code>段的内容放在内存中<code>00</code>号的segment上。在可执行文件中会把section分的很细，但在内存中可能会把一些section合并起来，忽略掉一些section，起到节约内存的目的。</p>
+
+<h2 id="函数调用">函数调用</h2>
+
+<p>函数本身相当于一个图纸，出了设计院它就是只读的，放在<code>.text</code>段中，线程参考图纸来执行。线程通过IP/PC寄存器知道执行到图纸的哪里，下一条指令是什么，主线程通过可执行文件的入口地址找到第一条指令。</p>
+
+<h3 id="调用堆栈">调用堆栈</h3>
+
+<p>那么每个CPU核心只有一个IP寄存器，线程却有很多个怎么办？实际上在同一时刻，只有一个线程绑定了一个物理寄存器，若它的时间片用完了则由操作系统保存它对应的寄存器状态在某段内存中，下次轮到它执行时再恢复寄存器的状态。那么我们可以在抽象层面上理解为每个线程都有一套自己的寄存器。同时，这种切换线程需要消耗一定的资源，用于保存和恢复状态，用于内核态和用户态的切换。</p>
+
+<p>函数执行过程中需要在线程中保存参数、返回值、局部变量等，这块内存叫做<strong>栈</strong>(Stack)。那么如果是嵌套调用，如何保存各函数的状态呢？</p>
+
+<p><img src="./images/func.jpg" alt="" /></p>
+
+<p>如左图所示，A函数嵌套了B函数，A要等待B执行完成之后再接着执行自己的逻辑。所以我们一般把栈内存竖着画，由底部的高位向低位分配，函数执行结束则把其对应的内存区域销毁，如右图所示。我们把每一个函数所占的格子叫<strong>栈帧</strong>(Stack Frame)，把整个A、B、C的调用层次称为<strong>调用堆栈</strong>(Call Stack)。程序出错时候我们看到一级级的错误信息就是通过调用堆栈追溯到的。</p>
+
+<h3 id="调用约定">调用约定</h3>
+
+<p>接下来的问题是A调用B的时候，如何给B传递参数，如何接收B的返回值，要么A划定区域，要么B划定区域，要么用寄存器，要么用内存，我们把这种约定称为<strong>调用约定</strong>。以Go语言为例，若A调用B，则A会把自己的栈帧一分为二，下半部分存本地局部变量，上半部分存给B用的参数和B的返回值。若A调用B、C、D等多个函数，则上半部分占用多大空间按哪个函数的参数和返回值最大来算。如此一来，栈帧的大小是在编译期就能确定的，访问栈内某块内存只需根据相对位置，基于栈顶做加法或栈底做减法即可。</p>
+
+<p>一般会把栈顶的地址放在SP寄存器，把栈底的地址放在BP寄存器。但是一个线程只有一套自己的寄存器，那么如果SP/BP用来存当前正在执行的B函数的栈帧，B执行完以后如何知道A的栈帧有多大呢？所以在两个栈帧之间还有一段空间用来存储A的BP/SP、IP，A在调用B的时候就把自己的BP/SP写进去，把自己调用完B之后下一条要执行什么指令写进IP，这叫保存现场。B执行完以后，通过这段空间恢复现场。</p>
+
+<p>理论上，SP或者BP使用一个就够了，每个语言都有自己的选择。Go早期只用SP，后来也引入了BP，因为很多的调试器、自动化检测工具需要使用BP确定栈底的位置。Go语言在调用CALL指令的时候会自动保存IP寄存器，调用RET指令的时候自动恢复IP寄存器。</p>
+
+<p>在C语言中，是优先通过寄存器传递参数和返回值，经常使用SI、DI寄存器传参，使用AX寄存器存储返回值，因为C是性能优先，寄存器肯定是最快的。Go是使用栈内存传参和返回值的，这和它本身Goroutine的运行方式有关。</p>
+
+<p>调用一个函数，在指令级别上还是有很大的开销的，所以有了<strong>内联</strong>(inline)的优化手段。</p>
+
+<h3 id="栈和堆">栈和堆</h3>
+
+<p>堆、栈既是两种数据结构，也是函数执行单位，在不同的场景有不同的概念。</p>
+
+<p>对于栈内存来讲，它是整块的，不需要垃圾回收器参与，访问的时候只需要根据BP、SP按相对位置进行访问，所以它的效率是非常高的。而堆内存是和单个线程无关的，是共享的，就会涉及到很复杂的内存管理方式，分配的时候要找到大小和位置合适的块，释放的时候要尽可能的避免内存碎片化。所以说，编译器有责任尽可能把数据分配在栈上。但是，栈上内存是按栈帧整块释放的，某些情况下如果某个变量要在不同的栈帧中维持，它的生命周期发生了改变，这种情况这个变量的内存就要在堆上分配了，这种现象就叫<strong>逃逸</strong>。逃逸也会带来严重的性能问题。</p>
 </article>
 
       <div class="book-footer justify-between">
@@ -415,9 +576,9 @@ Program Headers:
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/f8b0a0ee517ea9997b10393cb3ff6c0550d75328" title='Last modified by hjlarry | December 23, 2019' target="_blank">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/51a34d4cc009ce563f87937d1d312ee728a6846d" title='Last modified by hjlarry | December 27, 2019' target="_blank">
       <img src="/svg/calendar.svg" alt="Calendar" />
-      <span>December 23, 2019</span>
+      <span>December 27, 2019</span>
     </a>
   </div>
   
@@ -462,11 +623,22 @@ Program Headers:
 <li><a href="#换入换出">换入换出</a></li>
 <li><a href="#性能相关">性能相关</a></li>
 </ul></li>
+<li><a href="#寄存器">寄存器</a>
+<ul>
+<li><a href="#通用寄存器">通用寄存器</a></li>
+<li><a href="#标志寄存器">标志寄存器</a></li>
+</ul></li>
 <li><a href="#可执行文件">可执行文件</a>
 <ul>
 <li><a href="#head">Head</a></li>
 <li><a href="#section">Section</a></li>
 <li><a href="#segment">Segment</a></li>
+</ul></li>
+<li><a href="#函数调用">函数调用</a>
+<ul>
+<li><a href="#调用堆栈">调用堆栈</a></li>
+<li><a href="#调用约定">调用约定</a></li>
+<li><a href="#栈和堆">栈和堆</a></li>
 </ul></li>
 </ul></li>
 </ul>

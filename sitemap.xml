@@ -9,7 +9,7 @@
   
   <url>
     <loc>https://hjlarry.github.io/docs/sicp/software/</loc>
-    <lastmod>2019-12-23T15:22:19+08:00</lastmod>
+    <lastmod>2019-12-27T16:09:13+08:00</lastmod>
   </url>
   
   <url>
@@ -42,7 +42,7 @@
   
   <url>
     <loc>https://hjlarry.github.io/docs/go/alloc/</loc>
-    <lastmod>2019-12-25T14:38:11+08:00</lastmod>
+    <lastmod>2019-12-25T15:28:33+08:00</lastmod>
   </url>
   
   <url>
@@ -72,6 +72,11 @@
   <url>
     <loc>https://hjlarry.github.io/docs/go/map/</loc>
     <lastmod>2019-12-23T15:22:19+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hjlarry.github.io/docs/go/closure/</loc>
+    <lastmod>2019-12-31T17:53:33+08:00</lastmod>
   </url>
   
 </urlset>
