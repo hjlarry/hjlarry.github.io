@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="cn">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Theory"><meta property="og:title" content="" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://hjlarry.github.io/docs/mysql/theory/" />
+
+<title>Theory | Home</title>
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
+
+
+<script defer src="/cn.search.min.0203c802fd9773ee1acafef13eb84602e358061c26258c5fa025f35753a29897.js" integrity="sha256-AgPIAv2Xc&#43;4ayv7xPrhGAuNYBhwmJYxfoCXzV1OimJc="></script>
+
+<link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/mysql/theory/index.xml" title="Home" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
+<h2 class="book-brand">
+  <a href="https://hjlarry.github.io/"><img src="/logo.png" alt="Logo" /><span>Home</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+    <ul>
+<li><strong>计算机基础</strong>
+
+<ul>
+<li><a href="/docs/sicp/hardware/">硬件</a></li>
+<li><a href="/docs/sicp/software/">软件</a></li>
+<li><a href="/docs/sicp/asm/">汇编</a></li>
+</ul></li>
+<li><strong>GO语言</strong>
+
+<ul>
+<li><a href="/docs/go/map/">字典</a></li>
+<li><a href="/docs/go/closure/">闭包</a></li>
+<li><a href="/docs/go/defer/">延迟调用</a></li>
+<li><a href="/docs/go/gc/">垃圾回收</a></li>
+<li><a href="/docs/go/alloc/">内存分配</a></li>
+<li><a href="/docs/go/goroutine/">并发调度</a></li>
+<li><a href="/docs/go/lock/">锁</a></li>
+</ul></li>
+<li><strong>Python语言</strong>
+
+<ul>
+<li>描述符</li>
+</ul></li>
+<li><strong>Mysql</strong>
+
+<ul>
+<li><a href="/docs/mysql/query/">查询</a></li>
+<li><a href="/docs/mysql/theory/"class=active>原理</a></li>
+</ul></li>
+<li><strong>其他</strong>
+
+<ul>
+<li><a href="/docs/other/tools/">基础系统工具</a></li>
+</ul></li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+    </aside>
+
+    <div class="book-page">
+      <header class="flex align-center justify-between book-header">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" alt="Menu" />
+  </label>
+  <strong>Theory</strong>
+</header>
+
+      
+<article class="markdown">
+
+<h1 id="mysql的原理">Mysql的原理</h1>
+
+<h2 id="查询执行过程">查询执行过程</h2>
+
+<p>一条SQL查询语句在Mysql中是如何执行的呢？我们可以通过它的基本结构图看到各个模块在执行过程中起到的作用:</p>
+
+<p><img src="./images/structure.jpg" alt="structure" /></p>
+
+<p>Server层包括连接器、查询缓存、分析器、优化器、执行器等，涵盖Mysql大多数核心服务功能，以及所有的内置函数、跨存储引擎的功能实现(如存储过程、触发器、视图等)。而存储引擎属于插件式架构，支持InnoDB、MyISAM、Memory等多个存储引擎，不同引擎共用一个Server层。</p>
+
+<h3 id="连接器">连接器</h3>
+
+<p>客户端一般通过TCP与服务端建立连接，用户名密码认证通过后，连接器先到权限列表中查出你拥有的权限，之后这个连接里的权限判断逻辑都依赖于此时读取到的，也就是说对这个权限的修改不会影响到已经正在连接的用户。</p>
+
+<p>正在连接的客户端可以这样查看到:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">show</span> processlist;
+<span style="color:#f92672">+----+------+-----------------+---------+---------+------+----------+------------------+</span>
+<span style="color:#f92672">|</span> Id <span style="color:#f92672">|</span> User <span style="color:#f92672">|</span> Host            <span style="color:#f92672">|</span> db      <span style="color:#f92672">|</span> Command <span style="color:#f92672">|</span> <span style="color:#66d9ef">Time</span> <span style="color:#f92672">|</span> State    <span style="color:#f92672">|</span> Info             <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----+------+-----------------+---------+---------+------+----------+------------------+</span>
+<span style="color:#f92672">|</span>  <span style="color:#ae81ff">4</span> <span style="color:#f92672">|</span> root <span style="color:#f92672">|</span> localhost       <span style="color:#f92672">|</span> awesome <span style="color:#f92672">|</span> Query   <span style="color:#f92672">|</span>    <span style="color:#ae81ff">0</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">starting</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">show</span> processlist <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>  <span style="color:#ae81ff">7</span> <span style="color:#f92672">|</span> root <span style="color:#f92672">|</span> localhost:<span style="color:#ae81ff">58134</span> <span style="color:#f92672">|</span> boss    <span style="color:#f92672">|</span> Sleep   <span style="color:#f92672">|</span>    <span style="color:#ae81ff">3</span> <span style="color:#f92672">|</span>          <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>             <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>  <span style="color:#ae81ff">8</span> <span style="color:#f92672">|</span> root <span style="color:#f92672">|</span> localhost:<span style="color:#ae81ff">58135</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>    <span style="color:#f92672">|</span> Sleep   <span style="color:#f92672">|</span>    <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span>          <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>             <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----+------+-----------------+---------+---------+------+----------+------------------+</span>
+<span style="color:#ae81ff">3</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div>
+Command列中显示为Sleep就表示该连接当前是空闲的，如果连接空闲太长时间就会被连接器自动断开，默认是8小时，可通过<code>wait_timeout</code>控制。</p>
+
+<h3 id="查询缓存">查询缓存</h3>
+
+<p>大多数情况下，我们往往不使用查询缓存，因为它是弊大于利的。它的失效非常的频繁，只要对一个表有更新，这个表上的所有查询缓存都会被清空。对于更新压力大的数据库来讲，查询缓存的命中效率很低。</p>
+
+<p>Mysql8.0以上版本直接将该功能删掉了，所以我们的结构图上也只是把它画成一条支线。</p>
+
+<h3 id="分析器">分析器</h3>
+
+<p>词法分析就是根据一些关键词判断出你要做什么，例如<code>select</code>表示这是一个查询语句。那么接下来就会把字符串<code>T</code>识别为表名<code>T</code>，字符串<code>ID</code>识别为列名<code>ID</code>。</p>
+
+<p>接着进行语法分析，就是判断输入的语句是否满足语法规则。语法错误的提示就是在这个阶段触发的，例如<code>You have an error in your SQL syntax</code>。</p>
+
+<h3 id="优化器">优化器</h3>
+
+<p>优化器是在表里有多个索引的时候决定使用哪个索引；或者有多表关联的时候决定各个表的连接顺序。例如<code>select * from t1 join t2 using(id) where t1.c=10 and t2.d=20</code>，就可以有两种处理方式:</p>
+
+<ul>
+<li>先从表t1中取出c=10的记录的id，根据id关联到表t2，判断t2中d的值是否为20</li>
+<li>先从表t2中取出d=20的记录的id，根据id关联到表t1，判断t1中c的值是否为10</li>
+</ul>
+
+<p>这两种方法执行的效率可能不同，优化器就是用来决定使用哪种方案更合理。</p>
+
+<h3 id="执行器">执行器</h3>
+
+<p>执行时，先去判断该用户有没有对这个表的要做的操作的权限，如果没有会返回相应的错误。有权限的话则打开表继续执行，执行器会根据表的引擎定义，使用过这个引擎提供的接口来执行。</p>
+
+<h2 id="innodb">InnoDB</h2>
+
+<p><code>InnoDB</code>是一个将表中的数据存储到磁盘上的存储引擎，真正处理数据的过程是发生在内存上的，所以需要把数据从磁盘加载到内存中，如果是处理写入或更新时，还需要把内存中的内容写回磁盘中。<code>InnoDB</code>将数据划分为若干个页，每页大小为16KB，<strong>以页做为硬盘和内存交互的基本单位</strong>，一般情况下，每次至少会读取或写回16KB的内容。</p>
+
+<h3 id="数据页">数据页</h3>
+
+<p>这些页有很多的种类，例如存放空间头部信息的页、存放日志信息的页等等。我们先来了解存放记录的页，也就是数据页，官方称为<strong>索引页</strong>。</p>
+
+<p>数据页被分为7个部分，有的部分占用固定大小的空间，有的不固定:</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">名称</th>
+<th align="center">中文名</th>
+<th align="center">占用空间</th>
+<th align="center">简单描述</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="center"><code>File Header</code></td>
+<td align="center">文件头部</td>
+<td align="center"><code>38</code>字节</td>
+<td align="center">页的一些通用信息</td>
+</tr>
+
+<tr>
+<td align="center"><code>Page Header</code></td>
+<td align="center">页面头部</td>
+<td align="center"><code>56</code>字节</td>
+<td align="center">数据页专有的一些信息</td>
+</tr>
+
+<tr>
+<td align="center"><code>Infimum + Supremum</code></td>
+<td align="center">最小和最大记录</td>
+<td align="center"><code>26</code>字节</td>
+<td align="center">两个虚拟的行记录</td>
+</tr>
+
+<tr>
+<td align="center"><code>User Records</code></td>
+<td align="center">用户记录</td>
+<td align="center">不确定</td>
+<td align="center">实际存储的行记录内容</td>
+</tr>
+
+<tr>
+<td align="center"><code>Free Space</code></td>
+<td align="center">空闲空间</td>
+<td align="center">不确定</td>
+<td align="center">页中尚未使用的空间</td>
+</tr>
+
+<tr>
+<td align="center"><code>Page Directory</code></td>
+<td align="center">页面目录</td>
+<td align="center">不确定</td>
+<td align="center">页中的某些记录的相对位置</td>
+</tr>
+
+<tr>
+<td align="center"><code>File Trailer</code></td>
+<td align="center">文件尾部</td>
+<td align="center"><code>8</code>字节</td>
+<td align="center">校验页是否完整</td>
+</tr>
+</tbody>
+</table>
+
+<p>在⻚的7个组成部分中，我们自己存储的记录会按照我们指定的行格式存储到User Records中。但在一开始生成⻚的时候，其实并没有User Records这个部分，每当我们插入一条记录，都会从Free Space中申请一个记录大小的空间划分到User Records，当Free Space的空间全部被替换掉后，也就意味着这个⻚使用完 了，如果还有新的记录插入的话，就需要去申请新的⻚了。</p>
+
+<p>每条记录的头信息中有一个<code>next_record</code>属性，从而使页中的数据串联成一个单链表，链表中的各个节点按主键的值由小到大连接起来。Innodb会把这些记录分成若干个不同的组，每组的最后一条记录的地址偏移量会存放在<code>Page Directory</code>中，这样通过主键在一个页中查找到一条记录就会非常的快，首先通过二分法查到它应该在哪个组中，接着遍历这个组找到相应的记录。</p>
+
+<p><code>File Header</code>主要存了上一页和下一页的编号，使得所有的数据页构成一个双向链表。而<code>File Trailer</code>会加入一些效验值，以保证从内存至硬盘同步数据的完整性。</p>
+
+<h3 id="行格式">行格式</h3>
+
+<p>每条用户记录在磁盘上的存放方式也被称为<strong>行格式</strong>或<strong>记录格式</strong>，行格式被分为四种，即<code>Compact</code>、<code>Redundant</code>、<code>Dynamic</code>和<code>Compressed</code>。它们原理上大体相同，所以我们以Compact格式为例来详细了解一下。</p>
+
+<p>如图所示，每条记录被分为两个部分，记录的真实数据和记录的额外信息。
+<img src="./images/record.jpg" alt="record" /></p>
+
+<p>Mysql支持一些变长的数据类型，如VARCHAR、各种TEXT、各种BLOB等类型，对于这类变长字段，除了存放它们真正的数据内容，还需要存它们占用了多大空间，在Compact中，会把它们占用多大空间按列的逆序存放在每条记录的头部。所以第一部分就是变长字段长度列表，它只存非NULL值的变长字段的列，如果表中没有变长字段，那就没有这一部分。但是如果当前表采用的字符集是变长字符集，那么对于CHAR类型的字段所占用的空间也会被加入到变长字段长度列表中。</p>
+
+<p>为了让NULL值不占用过多的空间，Compact把NULL值的列统一管理在一个地方。它首先会统计表中哪些列允许有NULL值，即忽略掉主键列和被<code>NOT NULL</code>修饰的列；其次将这些统计出来的列逆序的对应一个个二进制位，每位为1时就代表这列当前的值为NULL。同样的，若表中没有允许存储NULL的列，那么这部分也不存在。</p>
+
+<p>而记录的头信息都是一些二进制位，共计40位:</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">名称</th>
+<th align="center">大小(bit)</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="center"><code>预留位1</code></td>
+<td align="center"><code>1</code></td>
+<td align="center">没有使用</td>
+</tr>
+
+<tr>
+<td align="center"><code>预留位2</code></td>
+<td align="center"><code>1</code></td>
+<td align="center">没有使用</td>
+</tr>
+
+<tr>
+<td align="center"><code>delete_mask</code></td>
+<td align="center"><code>1</code></td>
+<td align="center">标记该记录是否被删除</td>
+</tr>
+
+<tr>
+<td align="center"><code>min_rec_mask</code></td>
+<td align="center"><code>1</code></td>
+<td align="center">B+树的每层非叶子节点中的最小记录都会添加该标记</td>
+</tr>
+
+<tr>
+<td align="center"><code>n_owned</code></td>
+<td align="center"><code>4</code></td>
+<td align="center">表示当前记录拥有的记录数</td>
+</tr>
+
+<tr>
+<td align="center"><code>heap_no</code></td>
+<td align="center"><code>13</code></td>
+<td align="center">表示当前记录在记录堆的位置信息</td>
+</tr>
+
+<tr>
+<td align="center"><code>record_type</code></td>
+<td align="center"><code>3</code></td>
+<td align="center">表示当前记录的类型</td>
+</tr>
+
+<tr>
+<td align="center"><code>next_record</code></td>
+<td align="center"><code>16</code></td>
+<td align="center">表示下一条记录的相对位置</td>
+</tr>
+</tbody>
+</table>
+
+<p>对于记录的真实数据部分，Mysql会为每条记录默认的添加一些列，也就是隐藏列，包括:</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">列名</th>
+<th align="center">是否必须</th>
+<th align="center">占用空间</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="center"><code>DB_ROW_ID</code></td>
+<td align="center">否</td>
+<td align="center"><code>6</code>字节</td>
+<td align="center">行ID，唯一标识一条记录</td>
+</tr>
+
+<tr>
+<td align="center"><code>DB_TRX_ID</code></td>
+<td align="center">是</td>
+<td align="center"><code>6</code>字节</td>
+<td align="center">事务ID</td>
+</tr>
+
+<tr>
+<td align="center"><code>DB_ROLL_PTR</code></td>
+<td align="center">是</td>
+<td align="center"><code>7</code>字节</td>
+<td align="center">回滚指针</td>
+</tr>
+</tbody>
+</table>
+
+<p>对于主键，优先使用用户定义的，如果未定义则选取一个<code>Unique</code>键作为主键，如果没有<code>Unique</code>键则会添加一个<code>DB_ROW_ID</code>的隐藏列作为主键，所以这个隐藏列可能不存在。</p>
+
+<p>之前提到一个数据页只有16KB，也就是16384字节，而VARCHAR、CHAR、TEXT、BLOB等字段都有可能大于它，这就造成了一个页存放不了一条记录的情况。我们把这种现象称为行溢出。对于这种情况，Compact会在记录的真实数据部分只存储这条记录的一部分，剩余的数据分散在其他的页中，然后真实数据部分还有20个字节指向这些页的地址。Dynamic、Compressed的行格式和Compact很像，只是在处理行溢出时有些不同罢了，它们只在记录的真实数据处存其他页面的地址，数据都在其他页面。Compressed采用压缩算法对页面进行压缩以节省空间。Mysql5.7默认的行格式就是Dynamic，Redundant属于Mysql5.0之前的快被淘汰的格式。</p>
+
+<h3 id="表空间">表空间</h3>
+
+<h3 id="数据目录">数据目录</h3>
+
+<h2 id="索引">索引</h2>
+
+<p>在没有索引的情况下，我们无法快速定位到数据所在的页，只能从第一个页沿着双向链表依次向下找每个页，在每个页中如果查找的不是主键，还得依次去比对每条记录。显然，这种查询效率是非常低的。</p>
+
+<h3 id="聚簇索引">聚簇索引</h3>
+
+<p>我们先来考虑一种简单的索引方式，先把页的结构简化来看。</p>
+
+<p><img src="./images/data_page.jpg" alt="data_page" /></p>
+
+<p>数据页中我们暂时认为每页存储三条记录就满了，每条记录我们只关注record_type，0表示普通记录，2表示最小记录，3表示最大记录，以及next_record表示下一条记录。</p>
+
+<p>接下来对于数据的增删改操作，我们必须通过一些诸如记录移动的操作来始终保证这个状态一直成立:<strong>下一个数据⻚中用户记录的主键值必须大于上一个⻚中用户记录的主键值</strong>。这个过程称为<strong>⻚分裂</strong>。有了这个状态的保证，我们可以给每个页建立一个目录项，每个目录项包括其对应的页号以及页中用户记录的最小的主键值，大概是这样的:</p>
+
+<p><img src="./images/simple_index.jpg" alt="simple_index" /></p>
+
+<p>这形成了一个简单的索引方案，我们把这些目录项放到一个数组中，当通过主键查找时就能通过这个数组找到对应的数据页，在根据数据页的Page Directory和二分法就可以迅速找到记录。</p>
+
+<p>这个方案的问题是我们需要一段连续的物理空间来放这个存储目录项的数组，但Mysql只能保证页的数据是连续的，即16KB的连续空间。随着表中的数据越来越多，多到16KB根本放不下这些目录项怎么办？另一个问题是如果我们删除数据记录使得某一页中没有内容，那么这页就没必要存在，那么这页对应的目录项也没必要存在，把目录项删除后其后的目录项都得向前移动一下，这显然不是好的设计。</p>
+
+<p>因此InnoDB复用了数据页来存储目录项，每条记录就是一个目录项，只不过这条记录的record_type是1，表示这是一条目录项记录，现在变成了这样:</p>
+
+<p><img src="./images/clustered_index.jpg" alt="clustered_index" /></p>
+
+<p>如果一个目录页放满了，就新增一个目录页，同时在其上再加一层目录页记录这两个目录页。这种数据组织方式就是<strong>B+树</strong>。</p>
+
+<p>这种组织方式有两个特点:</p>
+
+<p>1、使用记录主键值的大小进行记录和⻚的排序，这包括三个方面的含义:</p>
+
+<ul>
+<li>⻚内的记录是按照主键的大小顺序排成一个单向链表</li>
+<li>各个存放用户记录的⻚是根据⻚中用户记录的主键大小顺序排成一个双向链表</li>
+<li>存放目录项记录的⻚分为不同的层次，在同一层次中的⻚是根据⻚中目录项记录的主键大小顺序排成一个双向链表</li>
+</ul>
+
+<p>2、B+树的叶子节点存储的是完整的用户记录，即记录中包含了所有列的值。</p>
+
+<p>我们把符合这两个特点的B+树称为<strong>聚簇索引</strong>，InnoDB会自动为我们创建聚簇索引，而由于所有的记录都在叶子节点上，也就是所谓的<strong>索引即数据，数据即索引</strong>。</p>
+
+<h3 id="二级索引">二级索引</h3>
+
+<p>上面的聚簇索引只在搜索条件是主键是才起作用，如果以别的列为搜索条件又怎么办呢？我们可以多建几颗B+树。效果如图所示:</p>
+
+<p><img src="./images/secondary_index.jpg" alt="secondary_index" /></p>
+
+<p>这颗B+树假设我们以x列去建立索引，那么每个数据页内的记录就是按照x列的大小顺序排列的，和上面的类似，不同的是这条记录只有一个x列的值和其对应的主键的值。所以，当我们去按x=3这样的搜索条件查找数据时，就会先根据这颗新的B+树确定x=3时对应的主键是什么，在根据主键去聚簇索引中查找到完整的一条记录。这个过程也被称为<strong>回表</strong>。<code>二级索引(Secondary index)</code>这个名称也正是因为需要两颗B+树，操作两次。</p>
+
+<p>我们观察到上图中存储目录项的记录只包含了x的值和页号，实际上这在二级索引中会存在bug，有可能很多条记录中x的值都是相同的，此时再插入一条记录就不知道要插在哪个位置了。因此这颗B+树中叶子节点每条记录是x的值和主键的值，x相同则按主键大小顺序排列，目录项节点的每条记录是x的值、主键的值、页的号码，x相同时也可按主键排序。</p>
+
+<h3 id="联合索引">联合索引</h3>
+
+<p>联合索引就是同时以多个列作为排序规则，比如列x和列y的联合索引就是先以x为排序依据，x相等时以y作为排序依据。只需要根据二级索引的B+树稍作改造即可，每条记录存放x、y和主键的值即可。</p>
+
+<h3 id="索引使用">索引使用</h3>
+</article>
+
+      <div class="book-footer justify-between">
+  
+
+  
+  
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/6c9931ca1786202a8f64cac1069a76c8be5c8309" title='Last modified by hjlarry | January 3, 2020' target="_blank">
+      <img src="/svg/calendar.svg" alt="Calendar" />
+      <span>January 3, 2020</span>
+    </a>
+  </div>
+  
+  
+
+  
+  <div>
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/mysql/theory/_index.md" target="_blank">
+      <img src="/svg/edit.svg" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+  
+
+</div>
+
+      
+    </div>
+
+    
+  
+
+  <aside class="book-toc levels-3 fixed">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#mysql的原理">Mysql的原理</a>
+<ul>
+<li><a href="#查询执行过程">查询执行过程</a>
+<ul>
+<li><a href="#连接器">连接器</a></li>
+<li><a href="#查询缓存">查询缓存</a></li>
+<li><a href="#分析器">分析器</a></li>
+<li><a href="#优化器">优化器</a></li>
+<li><a href="#执行器">执行器</a></li>
+</ul></li>
+<li><a href="#innodb">InnoDB</a>
+<ul>
+<li><a href="#数据页">数据页</a></li>
+<li><a href="#行格式">行格式</a></li>
+<li><a href="#表空间">表空间</a></li>
+<li><a href="#数据目录">数据目录</a></li>
+</ul></li>
+<li><a href="#索引">索引</a>
+<ul>
+<li><a href="#聚簇索引">聚簇索引</a></li>
+<li><a href="#二级索引">二级索引</a></li>
+<li><a href="#联合索引">联合索引</a></li>
+<li><a href="#索引使用">索引使用</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </aside>
+
+
+
+  </main>
+
+  
+</body>
+
+</html>
