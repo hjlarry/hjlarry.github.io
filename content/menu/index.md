@@ -19,7 +19,6 @@ bookMenuLevels: 1
   - 描述符
 - **Mysql**
   - [查询]({{< relref "/docs/mysql/query" >}})
-  - 索引
   - [原理]({{< relref "/docs/mysql/theory" >}})
 - **其他**
   - [基础系统工具]({{< relref "/docs/other/tools" >}})
