@@ -162,7 +162,31 @@ Mysql支持一些变长的数据类型，如VARCHAR、各种TEXT、各种BLOB等
 ### 联合索引
 联合索引就是同时以多个列作为排序规则，比如列x和列y的联合索引就是先以x为排序依据，x相等时以y作为排序依据。只需要根据二级索引的B+树稍作改造即可，每条记录存放x、y和主键的值即可。
 
+### 索引的使用
+哪些情况能用到索引，哪些情况无法用到呢？我们通过一个例子来看:
+{{< highlight mysql>}}
+CREATE TABLE person_info(
+    id INT NOT NULL auto_increment,
+    name VARCHAR(100) NOT NULL,
+    birthday DATE NOT NULL,
+    phone_number CHAR(11) NOT NULL,
+    country varchar(100) NOT NULL,
+    PRIMARY KEY (id),
+    KEY idx_name_birthday_phone_number (name, birthday, phone_number) 
+);
+{{< /highlight >}}
+先建了一个表，其中有一个自动为主键id建立的聚簇索引，和一个二级索引idx_name_birthday_phone_number，它是由三个列组成的联合索引。如下情况可以使用到索引:
 
-### 索引使用
+**全值匹配**，当我们的搜索条件中的列和索引中的列一致时，如`SELECT * FROM person_info WHERE name = 'Ashburn' AND birthday = '1990-09-27' AND phone_number = '15123983239';`，若调换name、birthday、phone_number的顺序也是可以使用到索引的，因为Mysql的查询优化器会帮我们优化这种情况。
 
+**匹配左边的列**，在搜索语句中，也可以不包含全部索引的列，只匹配左边的部分列。如`SELECT * FROM person_info WHERE name = 'Ashburn';`是可以用到索引的，搜索条件中的列只要是从联合索引列的最左边开始的、连续的列就能匹配到。
 
+**匹配列前缀**，对于字符串而言，其排序的本质就是比较字符串的大小，一般的规则就是比较逐个字符的大小，也就是说只匹配字符串的前n个字符也是可以用到索引的，如`SELECT * FROM person_info WHERE name LIKE 'As%';`，但若没有从第一个字符开始匹配则用不到索引。有时候我们有匹配字符串后缀的需求，例如某一列是url，其前缀都是www，这种情况我们可以把表中的数据逆序存储，再使用匹配列前缀的方式就可以用到索引了。
+
+**匹配范围值**，当我们需要一个范围的值时也可以用到索引，因为所有记录都是按照索引列的值由小到大的顺序排列的。如`SELECT * FROM person_info WHERE name > 'Asa' AND name < 'Barlow' AND birthday > '1980-01-01';`可以用到name列的索引，但无法用到birthday的索引，因为name查出来的记录中可能并不是按birthday再排序过的。
+
+**精确匹配某一列并范围匹配另外一列**，对于同一个联合索引来说，虽然对多个列进行范围查找时只能用到最左边那个索引列，但如果左边的列是精确查找，则右边的列可以用范围查找，如`SELECT * FROM person_info WHERE name = 'Ashburn' AND birthday > '1980-01-01' AND birthday < '2000- 12-31' AND phone_number > '15100000000';`，name和birthday能用到索引，phone_number无法用到索引。
+
+**用于排序**。如果没有索引的话，我们会把所有的记录加载到内存中，然后通过一些排序算法例如快排等对这些记录排序，如果内存中放不下可能还会借助硬盘中的空间，最后排序完成后再返还给客户端。在Mysql中，把这种在内存中或硬盘中进行排序的方式称为**文件排序(filesort)**，是非常慢的。借助索引可以直接提取出数据，再进行回表拿到其他数据就可以了，例如`SELECT * FROM person_info ORDER BY name, birthday, phone_number LIMIT 10;`。但是，各个排序列的排序顺序要一致，某列asc、某列desc一起混用是无法索引的。另外，用于排序的多个列需要是同一个索引里的，索引列也不能是修饰过的形式，如`SELECT * FROM person_info ORDER BY UPPER(name) LIMIT 10;`。
+
+**用于分组**。其实和排序类似，如`SELECT name, birthday, phone_number, COUNT(*) FROM person_info GROUP BY name, birthday, phone_number`。
