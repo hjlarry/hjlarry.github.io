@@ -276,3 +276,13 @@ CREATE TABLE single_table (
 当我们可以直接通过主键列或唯一二级索引列来与常数的等值比较来定位到一条记录时，速度是非常快的，这种访问方法称为**const**。例如:`SELECT * FROM single_table WHERE id = 1438;`、`SELECT * FROM single_table WHERE key2 = 3841;`。主键列只需要一次定位，唯一索引列也只需要两次定位。
 
 对于唯一二级索引来说，查询该列为NULL值的情况比较特殊，因为唯一索引并不限制其列为NULL值的数量，所以使用`SELECT * FROM single_table WHERE key2 IS NULL;`查询时不会用const访问方法。
+
+### ref
+对于某个普通二级索引列和常数值的等值比较，比如`SELECT * FROM single_table WHERE key1 = 'abc';`，由于普通索引并不限制索引列值的唯一性，所以可能找到多条对应的记录，那么这种方式的代价取决于匹配到的二级索引记录的条数，如果匹配的记录较少，则回表代价较低。这种方法称为**ref**，它的效率比const差了一些。
+
+如果最左边的连续索引列是与常数的等值比较就可能采用ref的方法，如`SELECT * FROM single_table WHERE key_part1 ='god like'AND key_part2 = 'legendary';`，但如果不全是等值比较的话，它的访问方法就不会是ref了，如`SELECT * FROM single_table WHERE key_part1 ='god like'AND key_part2 > 'legendary';`
+
+普通二级索引或唯一二级索引使用`Key IS NULL`这样的方式作为搜索条件时，可能使用ref的访问方法。
+
+### ref_or_null
+当我们不仅想找出某个索引列的值等于某个常数的记录，还同时想找出该列为NULL的记录时，例如`SELECT * FROM single_demo WHERE key1 = 'abc' OR key1 ISNULL;`。这种查询使用的访问方法为**ref_or_null**。它的查询也会分为两个步骤，先分别定位key1=abc和key1是null的连续记录并找到这些记录对应的主键值，再从聚簇索引上根据主键找到完整的用户记录。
