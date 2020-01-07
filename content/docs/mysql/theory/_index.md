@@ -138,6 +138,7 @@ Mysql的视图是虚拟表，也会在对应的库文件夹下创建一个frm文
 
 索引
 -------
+
 在没有索引的情况下，我们无法快速定位到数据所在的页，只能从第一个页沿着双向链表依次向下找每个页，在每个页中如果查找的不是主键，还得依次去比对每条记录。显然，这种查询效率是非常低的。
 
 ### 聚簇索引
@@ -244,3 +245,34 @@ CREATE TABLE person_info(
 **让主键自增**。如果主键是自增(AUTO_INCREMENT)的，那我们每插满一个数据页就会去插下一个数据页。而如果插入的主键值忽大忽小，就可能会发生页分裂和记录移动，造成不必要的性能损耗。
 
 **避免冗余重复索引**，这往往发生在某个索引已经被联合索引包含到了，或者对某个列既建立了唯一索引和普通索引。
+
+
+访问方法
+-------
+
+我们平时所写的查询语句本质上只是一种声明式语法，只是告诉MySQL我们要获取的数据符合哪些规则，至于MySQL背地里是怎么把查询结果搞出来的那是MySQL自己的事儿。我们把MySQL执行查询语句的方式称之为访问方法或者访问类型。同一个查询语句可能可以使用多种不同的访问方法来执行，虽然最后的查询结果都是一样的，但是执行的时间可能差距很大。
+
+我们以此表格为例，看看不同的访问方法:
+{{< highlight mysql>}}
+CREATE TABLE single_table (
+    id INT NOT NULL AUTO_INCREMENT,
+    key1 VARCHAR(100),
+    key2 INT,
+    key3 VARCHAR(100),
+    key_part1 VARCHAR(100),
+    key_part2 VARCHAR(100),
+    key_part3 VARCHAR(100),
+    common_field VARCHAR(100),
+    PRIMARY KEY (id),
+    KEY idx_key1 (key1),
+    UNIQUE KEY idx_key2 (key2),
+    KEY idx_key3 (key3),
+    KEY idx_key_part(key_part1, key_part2, key_part3)
+) Engine=InnoDB CHARSET=utf8;
+{{< /highlight >}}
+它有主键id、唯一二级索引key2、普通二级索引key1和key3、联合索引。
+
+### const
+当我们可以直接通过主键列或唯一二级索引列来与常数的等值比较来定位到一条记录时，速度是非常快的，这种访问方法称为**const**。例如:`SELECT * FROM single_table WHERE id = 1438;`、`SELECT * FROM single_table WHERE key2 = 3841;`。主键列只需要一次定位，唯一索引列也只需要两次定位。
+
+对于唯一二级索引来说，查询该列为NULL值的情况比较特殊，因为唯一索引并不限制其列为NULL值的数量，所以使用`SELECT * FROM single_table WHERE key2 IS NULL;`查询时不会用const访问方法。
