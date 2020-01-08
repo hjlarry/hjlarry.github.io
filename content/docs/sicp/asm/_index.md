@@ -267,3 +267,14 @@ dz|64|resz
 整型常量通过`equ`定义，例如`leny equ $-y `，它常用来和`$`、`$$`配合计算长度，但不支持用它来定义浮点数。
 
 另一种常见的定义方式是使用`%assign name value`，它可以在任意位置定义，而且可以重复定义，使用时以最后一次的定义为准。这种定义方式属于使用宏，它是编译器在对代码预处理阶段就展开的。
+
+### 指令
+常用的指令其实很少，如下所示，如果遇到其他复杂的指令也只需要搜索一下即可。
+
+* 数据移动: mov, push, pop, lea
+* 算术: inc, dec, add, sub, imul, idev 
+* 二进制逻辑运算: not, and, xor, or
+* 位移: shl, shr
+* 字节数组或字符串: rep, movsb, cmpsb, scasb, stomb
+
+有时由于指令集的限制禁止一些操作，例如mov不能用于内存到内存的操作，这些都可以通过[x86手册](http://www.cs.virginia.edu/~evans/cs216/guides/x86.html)查看到。
