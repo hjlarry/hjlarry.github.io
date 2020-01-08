@@ -291,3 +291,11 @@ CREATE TABLE single_table (
 之前的方式都是和常数等值比较，但有时我们面对的搜索条件会更复杂，例如`SELECT * FROM single_table WHERE key2 IN (1438,6328) OR (key2 >= 38AND key2 <= 79);`，除了可能使用全表扫描的访问方法，也可能使用二级索引+回表的访问方法。如果采用回表的方式，索引列就需要匹配某个或某些范围的值，这种利用索引进行范围匹配的访问方法称为**range**。
 
 该例中，会分为三个范围，即key2=1438、key2=6328、key2∈[38,79]。范围一、范围二被称为单点区间，范围三称为连续范围空间。
+
+### index
+看这个查询`SELECT key_part1, key_part2, key_part3 FROMsingle_table WHERE key_part2 = 'abc';`，由于key_part2不是联合索引idx_key_part的最左索引列，所以我们无法使用ref的访问方法来执行这个语句。但这个语句有两个特点，一是它的查询列表只有三个列key_part1、key_part2、key_part3且都被联合索引包含，二是搜索条件只有key_part2列也被包含在联合索引中。
+
+也就是说我们可以直接遍历idx_key_part这颗B+树的叶子节点来得到结果，而不需要回表，因为这棵树比聚簇索引的树小的多，它的成本也要小很多，我们把这种访问方法称为**index**。
+
+### all
+最直接的查询执行方式就是全表扫描，对于InnoDB来说就是直接扫描聚簇索引，这种访问方法称为**all**。
