@@ -278,3 +278,27 @@ dz|64|resz
 * 字节数组或字符串: rep, movsb, cmpsb, scasb, stomb
 
 有时由于指令集的限制禁止一些操作，例如mov不能用于内存到内存的操作，这些都可以通过[x86手册](http://www.cs.virginia.edu/~evans/cs216/guides/x86.html)查看到。
+
+### 跳转
+跳转一般都是指跳转到某个label，分为三种，第一种`jmp`类似于goto，属于无条件跳转。
+
+第二种`test`则是针对其两个参数进行二进制AND逻辑操作，并根据结果设置标志寄存器的ZF标志位。之后配合`jz`(和je等价)、`jnz`(和jne等价)指令，它们会判断ZF标志位的值完成跳转。
+{{< highlight asm>}}
+    _start:
+        mov     rax, 1
+        test    rax, rax ; 如果AX为0，则把ZF设为1，否则把ZF设为0
+        jne     .exit    ; 如果ZF为0，则跳转至.exit标签
+{{< /highlight >}}
+
+第三种是使用`cmp`比较两个参数，比较的结果存到相应的状态寄存器中，根据状态寄存器的值再配合相关指令完成跳转:
+
+* je (==), jne (!=), jz (==0), jnz (!=0) 
+* jg (>), jge (>=), jl (<), jle (<=)
+
+{{< highlight asm>}}
+_start:
+    mov rax, 1 
+    mov rbx, 2 
+    cmp rax, rbx 
+    jne .exit
+{{< /highlight >}}
