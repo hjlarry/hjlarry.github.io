@@ -302,3 +302,17 @@ _start:
     cmp rax, rbx 
     jne .exit
 {{< /highlight >}}
+
+### 循环
+循环需要先将循环多少次放到`rcx`寄存器中，然后执行循环体逻辑，最后调用loop指令，该指令在rcx寄存器大于0时会减一并跳转到其参数的位置，等于0时则会接着向下执行。
+{{< highlight asm>}}
+_start:
+    xor rax, rax
+    mov rcx, 3
+.abc:
+    inc rax
+    loop .abc
+{{< /highlight >}}
+类似于do(sth...) until{rcx==0}。
+
+在汇编语言中，基本的控制流就是跳转和循环，其他的控制流也只是基于这两种的组合。高级语言里的控制流也只是看上去更方便，本质上在CPU眼里仍然是跳转和循环。
