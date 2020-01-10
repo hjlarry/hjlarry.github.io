@@ -4,19 +4,19 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Tools"><meta property="og:title" content="" />
+<meta name="description" content="常用工具整理"><meta property="og:title" content="常用工具整理" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://hjlarry.github.io/docs/other/tools/" />
 
-<title>Tools | Home</title>
+<title>常用工具整理 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 
 
 <link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
 
 
-<script defer src="/cn.search.min.0203c802fd9773ee1acafef13eb84602e358061c26258c5fa025f35753a29897.js" integrity="sha256-AgPIAv2Xc&#43;4ayv7xPrhGAuNYBhwmJYxfoCXzV1OimJc="></script>
+<script defer src="/cn.search.min.5db72b8b249767fee6bacfbdae02d1548ab68f0989b29a175889c8cb816cc0bb.js" integrity="sha256-XbcriySXZ/7mus&#43;9rgLRVIq2jwmJspoXWInIy4FswLs="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/other/tools/index.xml" title="Home" />
 <!--
@@ -110,7 +110,7 @@ https://github.com/alex-shpak/hugo-book
   <label for="menu-control">
     <img src="/svg/menu.svg" alt="Menu" />
   </label>
-  <strong>Tools</strong>
+  <strong>常用工具整理</strong>
 </header>
 
       
@@ -396,6 +396,34 @@ String dump of section <span style="color:#e6db74">&#39;.abc&#39;</span>:
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ objcopy --update-section .demo<span style="color:#f92672">=</span>makefile hello2
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ objcopy --remove-section .demo hello2</code></pre></div></p>
 
+<h3 id="objdump">objdump</h3>
+
+<p>主要用来查看反汇编代码，使用<code>objdump -d &lt;file&gt;</code>反汇编某文件<code>.text</code>段的内容，默认为att格式，可使用<code>-M</code>指定其他格式。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ objdump -M intel -d fr
+
+fr:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+00000000004000b0 &lt;_start&gt;:
+  4000b0:	b8 <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    eax,0x1
+  4000b5:	<span style="color:#ae81ff">48</span> <span style="color:#ae81ff">85</span> c0             	test   rax,rax
+  4000b8:	<span style="color:#ae81ff">75</span> 1b                	jne    4000d5 &lt;_start.exit&gt;
+
+00000000004000ba &lt;_start.hello&gt;:
+  4000ba:	b8 <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    eax,0x1
+  4000bf:	bf <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    edi,0x1
+  4000c4:	<span style="color:#ae81ff">48</span> be e0 <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">60</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> 	movabs rsi,0x6000e0
+  4000cb:	<span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>
+  4000ce:	ba 0e <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    edx,0xe
+  4000d3:	0f <span style="color:#ae81ff">05</span>                	syscall
+
+00000000004000d5 &lt;_start.exit&gt;:
+  4000d5:	b8 3c <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    eax,0x3c
+  4000da:	<span style="color:#ae81ff">48</span> <span style="color:#ae81ff">31</span> ff             	xor    rdi,rdi
+  4000dd:	0f <span style="color:#ae81ff">05</span>                	syscall</code></pre></div></p>
+
 <h2 id="调试工具">调试工具</h2>
 
 <p>GNU通用的调试工具，也叫<strong>gdb</strong>。binutils属于静态的观察，而gdb就可以动态的观察到每一个汇编指令的执行。<a href="https://www.gnu.org/software/gdb/">官方网站</a></p>
@@ -515,9 +543,9 @@ String dump of section <span style="color:#e6db74">&#39;.abc&#39;</span>:
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/d8a896c2727803623fd3445d930c9c2ea6422925" title='Last modified by hjlarry | December 30, 2019' target="_blank">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/17506a7fbb6cf8dccf49c67a41a1389f1240d616" title='Last modified by hjlarry | January 9, 2020' target="_blank">
       <img src="/svg/calendar.svg" alt="Calendar" />
-      <span>December 30, 2019</span>
+      <span>January 9, 2020</span>
     </a>
   </div>
   
@@ -557,6 +585,7 @@ String dump of section <span style="color:#e6db74">&#39;.abc&#39;</span>:
 <li><a href="#nm">nm</a></li>
 <li><a href="#strip">strip</a></li>
 <li><a href="#objcopy">objcopy</a></li>
+<li><a href="#objdump">objdump</a></li>
 </ul></li>
 <li><a href="#调试工具">调试工具</a></li>
 <li><a href="#构建工具">构建工具</a></li>

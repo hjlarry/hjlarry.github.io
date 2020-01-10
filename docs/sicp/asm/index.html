@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
 
 
-<script defer src="/cn.search.min.0203c802fd9773ee1acafef13eb84602e358061c26258c5fa025f35753a29897.js" integrity="sha256-AgPIAv2Xc&#43;4ayv7xPrhGAuNYBhwmJYxfoCXzV1OimJc="></script>
+<script defer src="/cn.search.min.5db72b8b249767fee6bacfbdae02d1548ab68f0989b29a175889c8cb816cc0bb.js" integrity="sha256-XbcriySXZ/7mus&#43;9rgLRVIq2jwmJspoXWInIy4FswLs="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/sicp/asm/index.xml" title="Home" />
 <!--
@@ -420,6 +420,98 @@ Disassembly of section .text:
 <p>整型常量通过<code>equ</code>定义，例如<code>leny equ $-y</code>，它常用来和<code>$</code>、<code>$$</code>配合计算长度，但不支持用它来定义浮点数。</p>
 
 <p>另一种常见的定义方式是使用<code>%assign name value</code>，它可以在任意位置定义，而且可以重复定义，使用时以最后一次的定义为准。这种定义方式属于使用宏，它是编译器在对代码预处理阶段就展开的。</p>
+
+<h3 id="指令">指令</h3>
+
+<p>常用的指令其实很少，如下所示，如果遇到其他复杂的指令也只需要搜索一下即可。</p>
+
+<ul>
+<li>数据移动: mov, push, pop, lea</li>
+<li>算术: inc, dec, add, sub, imul, idev</li>
+<li>二进制逻辑运算: not, and, xor, or</li>
+<li>位移: shl, shr</li>
+<li>字节数组或字符串: rep, movsb, cmpsb, scasb, stomb</li>
+</ul>
+
+<p>有时由于指令集的限制禁止一些操作，例如mov不能用于内存到内存的操作，这些都可以通过<a href="http://www.cs.virginia.edu/~evans/cs216/guides/x86.html">x86手册</a>查看到。</p>
+
+<h3 id="控制流">控制流</h3>
+
+<p>在汇编语言中，基本的控制流就是跳转和循环，其他的控制流也只是基于这两种的组合。高级语言里的控制流也只是看上去更方便，本质上在CPU眼里仍然是跳转和循环。</p>
+
+<h4 id="跳转">跳转</h4>
+
+<p>跳转一般都是指跳转到某个label，分为三种，第一种<code>jmp</code>类似于goto，属于无条件跳转。</p>
+
+<p>第二种<code>test</code>则是针对其两个参数进行二进制AND逻辑操作，并根据结果设置标志寄存器的ZF标志位。之后配合<code>jz</code>(和je等价)、<code>jnz</code>(和jne等价)指令，它们会判断ZF标志位的值完成跳转。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm">    _start:
+        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span>
+        <span style="color:#a6e22e">test</span>    <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">rax</span> <span style="color:#75715e">; 如果AX为0，则把ZF设为1，否则把ZF设为0
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">jne</span>     <span style="color:#66d9ef">.exit</span>    <span style="color:#960050;background-color:#1e0010">;</span> <span style="color:#960050;background-color:#1e0010">如果</span><span style="color:#66d9ef">ZF为0</span><span style="color:#960050;background-color:#1e0010">，则跳转至</span><span style="color:#66d9ef">.exit标签</span></code></pre></div></p>
+
+<p>第三种是使用<code>cmp</code>比较两个参数，比较的结果存到相应的状态寄存器中，根据状态寄存器的值再配合相关指令完成跳转:</p>
+
+<ul>
+<li>je (==), jne (!=), jz (==0), jnz (!=0)</li>
+<li>jg (&gt;), jge (&gt;=), jl (&lt;), jle (&lt;=)</li>
+</ul>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm">_start:
+    <span style="color:#a6e22e">mov</span> <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span> 
+    <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rbx</span>, <span style="color:#ae81ff">2</span> 
+    <span style="color:#66d9ef">cmp</span> <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">rbx</span> 
+    <span style="color:#66d9ef">jne</span> <span style="color:#66d9ef">.exit</span></code></pre></div>
+
+<h4 id="循环">循环</h4>
+
+<p>循环需要先将循环多少次放到<code>rcx</code>寄存器中，然后执行循环体逻辑，最后调用loop指令，该指令在rcx寄存器大于0时会减一并跳转到其参数的位置，等于0时则会接着向下执行。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm">_start:
+    <span style="color:#a6e22e">xor</span> <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">rax</span>
+    <span style="color:#a6e22e">mov</span> <span style="color:#66d9ef">rcx</span>, <span style="color:#ae81ff">3</span>
+.abc:
+    <span style="color:#a6e22e">inc</span> <span style="color:#66d9ef">rax</span>
+    <span style="color:#a6e22e">loop</span> <span style="color:#66d9ef">.abc</span></code></pre></div>
+类似于do(sth&hellip;) until{rcx==0}。</p>
+
+<h3 id="数据结构">数据结构</h3>
+
+<h4 id="字符串">字符串</h4>
+
+<p>汇编中会把字符串当做字节序列来处理，字节实际上是个整数，它的取值范围是0~255。当我们通过:</p>
+
+<pre><code>string db `\u6c49\xe5\xad\x97 \u263a \n` ; 汉字, ☺ -&gt; UTF-8
+</code></pre>
+
+<p>定义字符串时，实际上就是定义了一个字节序列，只是抽象层面上可以理解为字符串。而对于这种字节序列，CPU也提供了专门的指令适用于更高效的移动它们，即rep movs。</p>
+
+<p>编译器支持<code>\u</code>、<code>\x</code>以及utf-8等方式的编码。字符串可以放在<code>section .rodata</code>(只读)或<code>section .data</code>中。</p>
+
+<h4 id="数组">数组</h4>
+
+<p>数组实际上就是一个连续的存储空间，里面只有元素，没有别的东西。数组定义时得告诉编译器其长度，编译器才好安排地址。汇编里没有数组这种语法，我们的做法只是保留一段内存空间，本质上我们对数组的操作就是对其内存地址的操作。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.bss</span>
+    <span style="color:#960050;background-color:#1e0010">%</span><span style="color:#a6e22e">assign</span> <span style="color:#66d9ef">num</span> <span style="color:#ae81ff">10</span>
+    <span style="color:#960050;background-color:#1e0010">%</span><span style="color:#a6e22e">assign</span> <span style="color:#66d9ef">size</span> <span style="color:#ae81ff">8</span>
+    <span style="color:#a6e22e">array</span> <span style="color:#66d9ef">resq</span> <span style="color:#66d9ef">num</span> * <span style="color:#66d9ef">size</span></code></pre></div>
+通过<code>num*size</code>计算出数组的长度，array代表数组的起始地址，要拿到array[i]的地址就可以通过<code>array+size*i</code>。</p>
+
+<h4 id="结构体">结构体</h4>
+
+<p>结构体实际上也是一个连续的存储空间，只是其内部字段的长度不同，在汇编中还是按照起始地址加偏移量去数格子定位到不同的字段。那么它还是一个编译器的语法糖，通过反汇编是看不到的。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">struc</span> <span style="color:#66d9ef">User</span>
+    <span style="color:#a6e22e">.name</span> : <span style="color:#66d9ef">resb</span> <span style="color:#ae81ff">10</span>
+    <span style="color:#a6e22e">.age</span> : <span style="color:#66d9ef">resq</span> <span style="color:#ae81ff">1</span>
+<span style="color:#a6e22e">endstruc</span>
+
+<span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.data</span>
+    <span style="color:#a6e22e">u1</span> <span style="color:#66d9ef">istruc</span> <span style="color:#66d9ef">User</span>
+        <span style="color:#a6e22e">at</span> <span style="color:#66d9ef">User.name</span>, <span style="color:#66d9ef">db</span> <span style="color:#960050;background-color:#1e0010">&#34;</span><span style="color:#66d9ef">user1</span><span style="color:#960050;background-color:#1e0010">&#34;</span>
+        <span style="color:#a6e22e">at</span> <span style="color:#66d9ef">User.age</span>, <span style="color:#66d9ef">dq</span> <span style="color:#ae81ff">22</span>
+    <span style="color:#a6e22e">iend</span>
+
+<span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.bss</span>
+    <span style="color:#a6e22e">u2</span>  <span style="color:#66d9ef">resb</span> <span style="color:#66d9ef">User_size</span></code></pre></div>
+这段代码先定义的是一个内存布局，成员字段代表的是偏移量。接着使用<code>istruc</code>在data段中去初始化一个变量u1。又使用u2定义了一个未初始化值的User，<code>User_size</code>也是编译器语法糖，帮助编译器算出User结构体的长度。</p>
 </article>
 
       <div class="book-footer justify-between">
@@ -429,9 +521,9 @@ Disassembly of section .text:
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/33a23412208c5f0ffc5d3a610a924f7b3fe461fe" title='Last modified by hjlarry | December 30, 2019' target="_blank">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/09b3b8d8d767d5c1e7276617704cb8580ce42f40" title='Last modified by hjlarry | January 10, 2020' target="_blank">
       <img src="/svg/calendar.svg" alt="Calendar" />
-      <span>December 30, 2019</span>
+      <span>January 10, 2020</span>
     </a>
   </div>
   
@@ -477,6 +569,18 @@ Disassembly of section .text:
 <li><a href="#寻址方式">寻址方式</a></li>
 <li><a href="#变量">变量</a></li>
 <li><a href="#常量">常量</a></li>
+<li><a href="#指令">指令</a></li>
+<li><a href="#控制流">控制流</a>
+<ul>
+<li><a href="#跳转">跳转</a></li>
+<li><a href="#循环">循环</a></li>
+</ul></li>
+<li><a href="#数据结构">数据结构</a>
+<ul>
+<li><a href="#字符串">字符串</a></li>
+<li><a href="#数组">数组</a></li>
+<li><a href="#结构体">结构体</a></li>
+</ul></li>
 </ul></li>
 </ul></li>
 </ul>

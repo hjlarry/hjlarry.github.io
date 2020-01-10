@@ -4,19 +4,19 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Theory"><meta property="og:title" content="" />
+<meta name="description" content="Mysql原理"><meta property="og:title" content="Mysql原理" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://hjlarry.github.io/docs/mysql/theory/" />
 
-<title>Theory | Home</title>
+<title>Mysql原理 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 
 
 <link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
 
 
-<script defer src="/cn.search.min.0203c802fd9773ee1acafef13eb84602e358061c26258c5fa025f35753a29897.js" integrity="sha256-AgPIAv2Xc&#43;4ayv7xPrhGAuNYBhwmJYxfoCXzV1OimJc="></script>
+<script defer src="/cn.search.min.5db72b8b249767fee6bacfbdae02d1548ab68f0989b29a175889c8cb816cc0bb.js" integrity="sha256-XbcriySXZ/7mus&#43;9rgLRVIq2jwmJspoXWInIy4FswLs="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/mysql/theory/index.xml" title="Home" />
 <!--
@@ -110,7 +110,7 @@ https://github.com/alex-shpak/hugo-book
   <label for="menu-control">
     <img src="/svg/menu.svg" alt="Menu" />
   </label>
-  <strong>Theory</strong>
+  <strong>Mysql原理</strong>
 </header>
 
       
@@ -126,7 +126,7 @@ https://github.com/alex-shpak/hugo-book
 
 <p>Server层包括连接器、查询缓存、分析器、优化器、执行器等，涵盖Mysql大多数核心服务功能，以及所有的内置函数、跨存储引擎的功能实现(如存储过程、触发器、视图等)。而存储引擎属于插件式架构，支持InnoDB、MyISAM、Memory等多个存储引擎，不同引擎共用一个Server层。</p>
 
-<h3 id="连接器">连接器</h3>
+<h4 id="连接器">连接器</h4>
 
 <p>客户端一般通过TCP与服务端建立连接，用户名密码认证通过后，连接器先到权限列表中查出你拥有的权限，之后这个连接里的权限判断逻辑都依赖于此时读取到的，也就是说对这个权限的修改不会影响到已经正在连接的用户。</p>
 
@@ -142,19 +142,19 @@ https://github.com/alex-shpak/hugo-book
 <span style="color:#ae81ff">3</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div>
 Command列中显示为Sleep就表示该连接当前是空闲的，如果连接空闲太长时间就会被连接器自动断开，默认是8小时，可通过<code>wait_timeout</code>控制。</p>
 
-<h3 id="查询缓存">查询缓存</h3>
+<h4 id="查询缓存">查询缓存</h4>
 
 <p>大多数情况下，我们往往不使用查询缓存，因为它是弊大于利的。它的失效非常的频繁，只要对一个表有更新，这个表上的所有查询缓存都会被清空。对于更新压力大的数据库来讲，查询缓存的命中效率很低。</p>
 
 <p>Mysql8.0以上版本直接将该功能删掉了，所以我们的结构图上也只是把它画成一条支线。</p>
 
-<h3 id="分析器">分析器</h3>
+<h4 id="分析器">分析器</h4>
 
 <p>词法分析就是根据一些关键词判断出你要做什么，例如<code>select</code>表示这是一个查询语句。那么接下来就会把字符串<code>T</code>识别为表名<code>T</code>，字符串<code>ID</code>识别为列名<code>ID</code>。</p>
 
 <p>接着进行语法分析，就是判断输入的语句是否满足语法规则。语法错误的提示就是在这个阶段触发的，例如<code>You have an error in your SQL syntax</code>。</p>
 
-<h3 id="优化器">优化器</h3>
+<h4 id="优化器">优化器</h4>
 
 <p>优化器是在表里有多个索引的时候决定使用哪个索引；或者有多表关联的时候决定各个表的连接顺序。例如<code>select * from t1 join t2 using(id) where t1.c=10 and t2.d=20</code>，就可以有两种处理方式:</p>
 
@@ -165,7 +165,7 @@ Command列中显示为Sleep就表示该连接当前是空闲的，如果连接�
 
 <p>这两种方法执行的效率可能不同，优化器就是用来决定使用哪种方案更合理。</p>
 
-<h3 id="执行器">执行器</h3>
+<h4 id="执行器">执行器</h4>
 
 <p>执行时，先去判断该用户有没有对这个表的要做的操作的权限，如果没有会返回相应的错误。有权限的话则打开表继续执行，执行器会根据表的引擎定义，使用过这个引擎提供的接口来执行。</p>
 
@@ -360,9 +360,26 @@ Command列中显示为Sleep就表示该连接当前是空闲的，如果连接�
 
 <p>之前提到一个数据页只有16KB，也就是16384字节，而VARCHAR、CHAR、TEXT、BLOB等字段都有可能大于它，这就造成了一个页存放不了一条记录的情况。我们把这种现象称为行溢出。对于这种情况，Compact会在记录的真实数据部分只存储这条记录的一部分，剩余的数据分散在其他的页中，然后真实数据部分还有20个字节指向这些页的地址。Dynamic、Compressed的行格式和Compact很像，只是在处理行溢出时有些不同罢了，它们只在记录的真实数据处存其他页面的地址，数据都在其他页面。Compressed采用压缩算法对页面进行压缩以节省空间。Mysql5.7默认的行格式就是Dynamic，Redundant属于Mysql5.0之前的快被淘汰的格式。</p>
 
-<h3 id="表空间">表空间</h3>
-
 <h3 id="数据目录">数据目录</h3>
+
+<p>InnoDB、MyISAM这样的存储引擎会把数据存储在硬盘上的数据目录中，它不是安装目录，可通过如下命令查看:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">SHOW</span> VARIABLES <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;datadir&#39;</span>;
+<span style="color:#f92672">+---------------+-----------------------+</span>
+<span style="color:#f92672">|</span> Variable_name <span style="color:#f92672">|</span> Value                 <span style="color:#f92672">|</span>
+<span style="color:#f92672">+---------------+-----------------------+</span>
+<span style="color:#f92672">|</span> datadir       <span style="color:#f92672">|</span> <span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>local<span style="color:#f92672">/</span>var<span style="color:#f92672">/</span>mysql<span style="color:#f92672">/</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+---------------+-----------------------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
+
+<p>在这个目录中，我们每新建一个新的数据库，Mysql会帮我们创建一个同名的文件夹，并在该文件夹内创建一个<code>db.opt</code>的文件，它包含了这个数据库的属性，例如数据库的字符集和比较规则等。之后我们在某数据库创建一个表时，Mysql会为我们创建一个<code>表名.frm</code>的文件，它存储了表结构的定义；InnoDB会为我们创建一个<code>表名.ibd</code>的文件，它是一个独立的表空间文件，存储了一页页的数据。</p>
+
+<p>Mysql有四个系统库，但information_schema库被特殊对待，没有相应的文件夹，它保存着MySQL服务器维护的所有其他数据库的信息，比如有哪些表、哪些视图、哪些触发器、哪些列、哪些索引，都是一些元数据；mysql库存储了MySQL的用户账户和权限信息，一些存储过程、事件的定义信息，一些运行过程中产生的日志信息，一些帮助信息以及时区信息等；performance_schema库主要保存MySQL服务器运行过程中的一些状态信息，算是对MySQL服务器的一个性能监控，包括统计最近执行了哪些语句，在执行过程的每个阶段都话费了多⻓时间，内存的使用情况等；sys库主要是通过视图的形式把information_schema和performance_schema结合起来，让程序员可以更方便的了解MySQL服务器的一些性能信息。</p>
+
+<p>此外，默认情况下，InnoDB还会在该目录下创建<code>ibdata1</code>这样一个文件，表示系统表空间。MySQL5.5.7到MySQL5.6.6之间的各版本，表中的数据都会被默认存储到这个系统表空间。该目录下还包含服务器进程文件，服务器日志文件，自动生成的RSA、SSL证书和密钥文件等。</p>
+
+<p>Mysql的视图是虚拟表，也会在对应的库文件夹下创建一个frm文件存储。</p>
+
+<h3 id="表空间">表空间</h3>
 
 <h2 id="索引">索引</h2>
 
@@ -418,7 +435,286 @@ Command列中显示为Sleep就表示该连接当前是空闲的，如果连接�
 
 <p>联合索引就是同时以多个列作为排序规则，比如列x和列y的联合索引就是先以x为排序依据，x相等时以y作为排序依据。只需要根据二级索引的B+树稍作改造即可，每条记录存放x、y和主键的值即可。</p>
 
-<h3 id="索引使用">索引使用</h3>
+<h3 id="使用场景">使用场景</h3>
+
+<p>哪些情况能用到索引，哪些情况无法用到呢？我们通过一个例子来看:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#a6e22e">person_info</span>(
+    id <span style="color:#66d9ef">INT</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span> <span style="color:#66d9ef">auto_increment</span>,
+    name <span style="color:#66d9ef">VARCHAR</span>(<span style="color:#ae81ff">100</span>) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,
+    birthday <span style="color:#66d9ef">DATE</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,
+    phone_number <span style="color:#66d9ef">CHAR</span>(<span style="color:#ae81ff">11</span>) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,
+    country <span style="color:#66d9ef">varchar</span>(<span style="color:#ae81ff">100</span>) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,
+    <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span> (id),
+    <span style="color:#66d9ef">KEY</span> <span style="color:#a6e22e">idx_name_birthday_phone_number</span> (name, birthday, phone_number) 
+);</code></pre></div>
+先建了一个表，其中有一个自动为主键id建立的聚簇索引，和一个二级索引idx_name_birthday_phone_number，它是由三个列组成的联合索引。如下情况可以使用到索引:</p>
+
+<h4 id="全值匹配">全值匹配</h4>
+
+<p>当我们的搜索条件中的列和索引中的列一致时，如<code>SELECT * FROM person_info WHERE name = 'Ashburn' AND birthday = '1990-09-27' AND phone_number = '15123983239';</code>，若调换name、birthday、phone_number的顺序也是可以使用到索引的，因为Mysql的查询优化器会帮我们优化这种情况。</p>
+
+<h4 id="匹配左边的列">匹配左边的列</h4>
+
+<p>在搜索语句中，也可以不包含全部索引的列，只匹配左边的部分列。如<code>SELECT * FROM person_info WHERE name = 'Ashburn';</code>是可以用到索引的，搜索条件中的列只要是从联合索引列的最左边开始的、连续的列就能匹配到。</p>
+
+<h4 id="匹配列前缀">匹配列前缀</h4>
+
+<p>对于字符串而言，其排序的本质就是比较字符串的大小，一般的规则就是比较逐个字符的大小，也就是说只匹配字符串的前n个字符也是可以用到索引的，如<code>SELECT * FROM person_info WHERE name LIKE 'As%';</code>，但若没有从第一个字符开始匹配则用不到索引。有时候我们有匹配字符串后缀的需求，例如某一列是url，其前缀都是www，这种情况我们可以把表中的数据逆序存储，再使用匹配列前缀的方式就可以用到索引了。</p>
+
+<h4 id="匹配范围值">匹配范围值</h4>
+
+<p>当我们需要一个范围的值时也可以用到索引，因为所有记录都是按照索引列的值由小到大的顺序排列的。如<code>SELECT * FROM person_info WHERE name &gt; 'Asa' AND name &lt; 'Barlow' AND birthday &gt; '1980-01-01';</code>可以用到name列的索引，但无法用到birthday的索引，因为name查出来的记录中可能并不是按birthday再排序过的。</p>
+
+<h4 id="精确匹配某一列并范围匹配另外一列">精确匹配某一列并范围匹配另外一列</h4>
+
+<p>对于同一个联合索引来说，虽然对多个列进行范围查找时只能用到最左边那个索引列，但如果左边的列是精确查找，则右边的列可以用范围查找，如<code>SELECT * FROM person_info WHERE name = 'Ashburn' AND birthday &gt; '1980-01-01' AND birthday &lt; '2000- 12-31' AND phone_number &gt; '15100000000';</code>，name和birthday能用到索引，phone_number无法用到索引。</p>
+
+<h4 id="用于排序">用于排序</h4>
+
+<p>如果没有索引的话，我们会把所有的记录加载到内存中，然后通过一些排序算法例如快排等对这些记录排序，如果内存中放不下可能还会借助硬盘中的空间，最后排序完成后再返还给客户端。在Mysql中，把这种在内存中或硬盘中进行排序的方式称为<strong>文件排序(filesort)</strong>，是非常慢的。借助索引可以直接提取出数据，再进行回表拿到其他数据就可以了，例如<code>SELECT * FROM person_info ORDER BY name, birthday, phone_number LIMIT 10;</code>。但是，各个排序列的排序顺序要一致，某列asc、某列desc一起混用是无法索引的。另外，用于排序的多个列需要是同一个索引里的，索引列也不能是修饰过的形式，如<code>SELECT * FROM person_info ORDER BY UPPER(name) LIMIT 10;</code>。</p>
+
+<h4 id="用于分组">用于分组</h4>
+
+<p>其实和排序类似，如<code>SELECT name, birthday, phone_number, COUNT(*) FROM person_info GROUP BY name, birthday, phone_number</code>。</p>
+
+<h3 id="代价">代价</h3>
+
+<p>使用索引在空间和时间上都有代价，每建立一个索引都需要一颗B+树，大的B+树由很多数据页组成，算是不小的存储空间。每次对表进行增、删、改操作时，都可能要修改各个索引。B+树每层节点都是按照索引列的值按从小到大的顺序排序而组成了双向链表。不论是叶子节点的记录，还是内节点的记录都是按照索引列的值从小到大的顺序而形成了一个单向链表。而增、删、改操作可能会对节点和记录的排序造成破坏，所以存储引擎需要额外的时间进行一些记录移位，⻚面分裂、⻚面回收等操作来维护好节点和记录的排序。所以说，一个表上索引建的越多，就会占用越多的存储空间，在增删改记录的时候性能就越差。</p>
+
+<p>此外，回表也是有代价的。二级索引B+树记录在磁盘上的数据是相连的，集中分布在一个或几个数据页中，我们可以很快的把它们读出来，这种读取方式也叫<strong>顺序读取</strong>；读取到之后，其对应的主键并不相连，要读取到完整记录就需要在不同的数据页中去找，这种读取方式叫<strong>随机读取</strong>。需要回表的记录越多，使用二级索引的效率就越低，甚至让某些查询宁愿使用全表扫描也不使用二级索引。比如name值在Asa~Barlow之间的用户记录数量占全部记录数量90%以上，那么如果使用idx_name_birthday_phone_number索引的话，有90%多的id值需要回表，就还不如全表扫描。查询优化器会帮我们判断何时该用全表扫描代替二级索引回表。</p>
+
+<h3 id="优化策略">优化策略</h3>
+
+<h4 id="覆盖索引">覆盖索引</h4>
+
+<p>为了避免回表时的损耗，最好在查询列表里只包含索引，如<code>SELECT name, birthday, phone_number FROM person_info WHERE name &gt; 'Asa' AND name &lt; 'Barlow'</code>。不鼓励使用<code>*</code>号查询列表，最好把需要查询的列依次标明。</p>
+
+<h4 id="只为用于搜索-排序或分组的列创建索引">只为用于搜索、排序或分组的列创建索引</h4>
+
+<p>出现在查询列表中的列就没必要索引了。如<code>SELECT birthday, country FROM person_name WHERE name = 'Ashburn'</code>只需为name创建索引，birthday和country就不需要了。</p>
+
+<h4 id="为列的基数大的列创建索引">为列的基数大的列创建索引</h4>
+
+<p>列的基数是说该列中不重复的数的个数，比如性别这样的列，其基数也就2个，如果为其建立索引重复的值会特别的多，效果就不会好。</p>
+
+<h4 id="索引列的类型尽量小">索引列的类型尽量小</h4>
+
+<p>这里的类型指的是其表示的数据范围，例如整型分为TINYINT、MEDIUMINT、INT、BIGINT几种，在能表示出所需整数的前提下，能用INT就不要用BIGINT。因为数据类型越小，CPU做数字比较时就越快，同时索引占用的空间就越小，一个数据页中就能有更多的记录，缓存在内存中的数据也就越多。这点对于主键来说更是如此，因为二级索引也需要存储主键值。</p>
+
+<h4 id="索引字符串值的前缀">索引字符串值的前缀</h4>
+
+<p>也就是说在二级索引的记录中只保留字符串的前几个值，查找时虽不能精确的定位到记录的位置，但能定位到相应前缀的位置，在空间和时间上取得平衡。在字符串类型能存储的值较多的情况下，这种方式是非常鼓励的，如:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#a6e22e">person_info</span>(
+    name <span style="color:#66d9ef">VARCHAR</span>(<span style="color:#ae81ff">100</span>) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,
+    birthday <span style="color:#66d9ef">DATE</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,
+    phone_number <span style="color:#66d9ef">CHAR</span>(<span style="color:#ae81ff">11</span>) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,
+    <span style="color:#66d9ef">KEY</span> <span style="color:#a6e22e">idx_name_birthday_phone_number</span> (<span style="color:#a6e22e">name</span>(<span style="color:#ae81ff">10</span>), birthday) 
+);</code></pre></div>
+就表示用name的前10个字符来做为索引。但这种方式不能用name列来排序了，如<code>SELECT * FROM person_info ORDER BY name LIMIT 10;</code>则用不到索引。</p>
+
+<h4 id="让索引列在比较表达式中单独出现">让索引列在比较表达式中单独出现</h4>
+
+<p>例如<code>WHERE col * 2 &lt; 4</code>就用不到索引，但若写成<code>WHERE col &lt; 4/2</code>就能用到索引，所以如果索引列在比较表达式中不是以单独列的形式出现，而是以某个表达式，或者函数调用形式出现的话，是用不到索引的。</p>
+
+<h4 id="让主键自增">让主键自增</h4>
+
+<p>如果主键是自增(AUTO_INCREMENT)的，那我们每插满一个数据页就会去插下一个数据页。而如果插入的主键值忽大忽小，就可能会发生页分裂和记录移动，造成不必要的性能损耗。</p>
+
+<h4 id="避免冗余重复索引">避免冗余重复索引</h4>
+
+<p>这往往发生在某个索引已经被联合索引包含到了，或者对某个列既建立了唯一索引和普通索引。</p>
+
+<h3 id="访问方法">访问方法</h3>
+
+<p>我们平时所写的查询语句本质上只是一种声明式语法，只是告诉MySQL我们要获取的数据符合哪些规则，至于MySQL背地里是怎么把查询结果搞出来的那是MySQL自己的事儿。我们把MySQL执行查询语句的方式称之为访问方法或者访问类型。同一个查询语句可能可以使用多种不同的访问方法来执行，虽然最后的查询结果都是一样的，但是执行的时间可能差距很大。</p>
+
+<p>我们以此表格为例，看看不同的访问方法:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql"><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#a6e22e">single_table</span> (
+    id <span style="color:#66d9ef">INT</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span> <span style="color:#66d9ef">AUTO_INCREMENT</span>,
+    key1 <span style="color:#66d9ef">VARCHAR</span>(<span style="color:#ae81ff">100</span>),
+    key2 <span style="color:#66d9ef">INT</span>,
+    key3 <span style="color:#66d9ef">VARCHAR</span>(<span style="color:#ae81ff">100</span>),
+    key_part1 <span style="color:#66d9ef">VARCHAR</span>(<span style="color:#ae81ff">100</span>),
+    key_part2 <span style="color:#66d9ef">VARCHAR</span>(<span style="color:#ae81ff">100</span>),
+    key_part3 <span style="color:#66d9ef">VARCHAR</span>(<span style="color:#ae81ff">100</span>),
+    common_field <span style="color:#66d9ef">VARCHAR</span>(<span style="color:#ae81ff">100</span>),
+    <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span> (id),
+    <span style="color:#66d9ef">KEY</span> <span style="color:#a6e22e">idx_key1</span> (key1),
+    <span style="color:#66d9ef">UNIQUE</span> <span style="color:#66d9ef">KEY</span> <span style="color:#a6e22e">idx_key2</span> (key2),
+    <span style="color:#66d9ef">KEY</span> <span style="color:#a6e22e">idx_key3</span> (key3),
+    <span style="color:#66d9ef">KEY</span> <span style="color:#a6e22e">idx_key_part</span>(key_part1, key_part2, key_part3)
+) <span style="color:#66d9ef">Engine</span><span style="color:#f92672">=</span>InnoDB <span style="color:#66d9ef">CHARSET</span><span style="color:#f92672">=</span>utf8;</code></pre></div>
+它有主键id、唯一二级索引key2、普通二级索引key1和key3、联合索引。</p>
+
+<h4 id="const">const</h4>
+
+<p>当我们可以直接通过主键列或唯一二级索引列来与常数的等值比较来定位到一条记录时，速度是非常快的，这种访问方法称为<strong>const</strong>。例如:<code>SELECT * FROM single_table WHERE id = 1438;</code>、<code>SELECT * FROM single_table WHERE key2 = 3841;</code>。主键列只需要一次定位，唯一索引列也只需要两次定位。</p>
+
+<p>对于唯一二级索引来说，查询该列为NULL值的情况比较特殊，因为唯一索引并不限制其列为NULL值的数量，所以使用<code>SELECT * FROM single_table WHERE key2 IS NULL;</code>查询时不会用const访问方法。</p>
+
+<h4 id="ref">ref</h4>
+
+<p>对于某个普通二级索引列和常数值的等值比较，比如<code>SELECT * FROM single_table WHERE key1 = 'abc';</code>，由于普通索引并不限制索引列值的唯一性，所以可能找到多条对应的记录，那么这种方式的代价取决于匹配到的二级索引记录的条数，如果匹配的记录较少，则回表代价较低。这种方法称为<strong>ref</strong>，它的效率比const差了一些。</p>
+
+<p>如果最左边的连续索引列是与常数的等值比较就可能采用ref的方法，如<code>SELECT * FROM single_table WHERE key_part1 ='god like'AND key_part2 = 'legendary';</code>，但如果不全是等值比较的话，它的访问方法就不会是ref了，如<code>SELECT * FROM single_table WHERE key_part1 ='god like'AND key_part2 &gt; 'legendary';</code></p>
+
+<p>普通二级索引或唯一二级索引使用<code>Key IS NULL</code>这样的方式作为搜索条件时，可能使用ref的访问方法。</p>
+
+<h4 id="ref-or-null">ref_or_null</h4>
+
+<p>当我们不仅想找出某个索引列的值等于某个常数的记录，还同时想找出该列为NULL的记录时，例如<code>SELECT * FROM single_demo WHERE key1 = 'abc' OR key1 ISNULL;</code>。这种查询使用的访问方法为<strong>ref_or_null</strong>。它的查询也会分为两个步骤，先分别定位key1=abc和key1是null的连续记录并找到这些记录对应的主键值，再从聚簇索引上根据主键找到完整的用户记录。</p>
+
+<h4 id="range">range</h4>
+
+<p>之前的方式都是和常数等值比较，但有时我们面对的搜索条件会更复杂，例如<code>SELECT * FROM single_table WHERE key2 IN (1438,6328) OR (key2 &gt;= 38AND key2 &lt;= 79);</code>，除了可能使用全表扫描的访问方法，也可能使用二级索引+回表的访问方法。如果采用回表的方式，索引列就需要匹配某个或某些范围的值，这种利用索引进行范围匹配的访问方法称为<strong>range</strong>。</p>
+
+<p>该例中，会分为三个范围，即key2=1438、key2=6328、key2∈[38,79]。范围一、范围二被称为单点区间，范围三称为连续范围空间。</p>
+
+<h4 id="index">index</h4>
+
+<p>看这个查询<code>SELECT key_part1, key_part2, key_part3 FROMsingle_table WHERE key_part2 = 'abc';</code>，由于key_part2不是联合索引idx_key_part的最左索引列，所以我们无法使用ref的访问方法来执行这个语句。但这个语句有两个特点，一是它的查询列表只有三个列key_part1、key_part2、key_part3且都被联合索引包含，二是搜索条件只有key_part2列也被包含在联合索引中。</p>
+
+<p>也就是说我们可以直接遍历idx_key_part这颗B+树的叶子节点来得到结果，而不需要回表，因为这棵树比聚簇索引的树小的多，它的成本也要小很多，我们把这种访问方法称为<strong>index</strong>。</p>
+
+<h4 id="all">all</h4>
+
+<p>最直接的查询执行方式就是全表扫描，对于InnoDB来说就是直接扫描聚簇索引，这种访问方法称为<strong>all</strong>。</p>
+
+<h3 id="explain">EXPLAIN</h3>
+
+<p>一条查询语句在经过MySQL查询优化器的各种基于成本和规则的优化后会生成一个执行计划，这个执行计划展示了接下来具体执行查询的方式，比如多表连接的顺序是什么，对于每个表采用什么访问方法来具体执行查询等等。EXPLAIN能帮助我们查看到某个查询语句的具体执行计划。例如:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">explain</span> <span style="color:#66d9ef">select</span> <span style="color:#ae81ff">1</span>;
+<span style="color:#f92672">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+</span>
+<span style="color:#f92672">|</span> id <span style="color:#f92672">|</span> select_type <span style="color:#f92672">|</span> <span style="color:#66d9ef">table</span> <span style="color:#f92672">|</span> partitions <span style="color:#f92672">|</span> type <span style="color:#f92672">|</span> possible_keys <span style="color:#f92672">|</span> <span style="color:#66d9ef">key</span>  <span style="color:#f92672">|</span> key_len <span style="color:#f92672">|</span> ref  <span style="color:#f92672">|</span> rows <span style="color:#f92672">|</span> filtered <span style="color:#f92672">|</span> Extra          <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+</span>
+<span style="color:#f92672">|</span>  <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> SIMPLE      <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>  <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>       <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>          <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span>     <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> No <span style="color:#66d9ef">tables</span> used <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+</span>
+<span style="color:#ae81ff">1</span> row <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span>, <span style="color:#ae81ff">1</span> <span style="color:#a6e22e">warning</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
+
+<p>各列的详细解释如下:</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">列名</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="center"><code>id</code></td>
+<td align="left">在一个查询语句中每个<code>SELECT</code>关键字都对应一个唯一<code>id</code></td>
+</tr>
+
+<tr>
+<td align="center"><code>select_type</code></td>
+<td align="left"><code>SELECT</code>关键字对应的查询的类型</td>
+</tr>
+
+<tr>
+<td align="center"><code>table</code></td>
+<td align="left">表名</td>
+</tr>
+
+<tr>
+<td align="center"><code>partitions</code></td>
+<td align="left">匹配的分区信息</td>
+</tr>
+
+<tr>
+<td align="center"><code>type</code></td>
+<td align="left">针对单表的访问方法</td>
+</tr>
+
+<tr>
+<td align="center"><code>possible_keys</code></td>
+<td align="left">可能用到的索引</td>
+</tr>
+
+<tr>
+<td align="center"><code>key</code></td>
+<td align="left">实际上使用的索引</td>
+</tr>
+
+<tr>
+<td align="center"><code>key_len</code></td>
+<td align="left">实际使用到的索引长度</td>
+</tr>
+
+<tr>
+<td align="center"><code>ref</code></td>
+<td align="left">当使用索引列等值查询时，与索引列进行等值匹配的对象信息</td>
+</tr>
+
+<tr>
+<td align="center"><code>rows</code></td>
+<td align="left">预估的需要读取的记录条数</td>
+</tr>
+
+<tr>
+<td align="center"><code>filtered</code></td>
+<td align="left">某个表经过搜索条件过滤后剩余记录条数的百分比</td>
+</tr>
+
+<tr>
+<td align="center"><code>Extra</code></td>
+<td align="left">一些额外的信息</td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="table">table</h4>
+
+<p><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">explain</span> <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> s1, s2;
+<span style="color:#f92672">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+</span>
+<span style="color:#f92672">|</span> id <span style="color:#f92672">|</span> select_type <span style="color:#f92672">|</span> <span style="color:#66d9ef">table</span> <span style="color:#f92672">|</span> partitions <span style="color:#f92672">|</span> type <span style="color:#f92672">|</span> possible_keys <span style="color:#f92672">|</span> <span style="color:#66d9ef">key</span>  <span style="color:#f92672">|</span> key_len <span style="color:#f92672">|</span> ref  <span style="color:#f92672">|</span> rows <span style="color:#f92672">|</span> filtered <span style="color:#f92672">|</span> Extra                                 <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+</span>
+<span style="color:#f92672">|</span>  <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> SIMPLE      <span style="color:#f92672">|</span> s1    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>       <span style="color:#f92672">|</span> <span style="color:#66d9ef">ALL</span>  <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>          <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span>   <span style="color:#ae81ff">100</span>.<span style="color:#ae81ff">00</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>                                  <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>  <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> SIMPLE      <span style="color:#f92672">|</span> s2    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>       <span style="color:#f92672">|</span> <span style="color:#66d9ef">ALL</span>  <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>          <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span>   <span style="color:#ae81ff">100</span>.<span style="color:#ae81ff">00</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">Using</span> <span style="color:#66d9ef">join</span> <span style="color:#a6e22e">buffer</span> (Block Nested <span style="color:#66d9ef">Loop</span>) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span>, <span style="color:#ae81ff">1</span> <span style="color:#a6e22e">warning</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div>
+我们看到EXPLAIN语句输出的每条记录都对应着某个单表的访问方法，该条记录的table列代表了该表的表名。</p>
+
+<h4 id="id">id</h4>
+
+<p>查询语句一般以select关键字开头，简单的查询语句只有一个select，但有两种情况会出现多个select:</p>
+
+<ul>
+<li>查询语句包含子查询，如<code>SELECT * FROM s1 WHERE key1 IN (SELECT * FROM s2);</code></li>
+<li>查询语句包含UNION语句，如<code>SELECT * FROM s1 UNION SELECT * FROM s2;</code></li>
+</ul>
+
+<p>每多一个select关键字，就会给它分配一个唯一的id值。对于连接查询来说，这个id是相同的，出现在前面的就是驱动表，后面的是被驱动表。如:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">EXPLAIN</span> <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> s1 <span style="color:#66d9ef">WHERE</span> key1 <span style="color:#66d9ef">IN</span>(<span style="color:#66d9ef">SELECT</span> key1 <span style="color:#66d9ef">FROM</span> s2) <span style="color:#66d9ef">OR</span> key3 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;a&#39;</span>;
+<span style="color:#f92672">+----+--------------------+-------+------------+----------------+---------------+----------+---------+------+------+----------+-------------+</span>
+<span style="color:#f92672">|</span> id <span style="color:#f92672">|</span> select_type        <span style="color:#f92672">|</span> <span style="color:#66d9ef">table</span> <span style="color:#f92672">|</span> partitions <span style="color:#f92672">|</span> type           <span style="color:#f92672">|</span> possible_keys <span style="color:#f92672">|</span> <span style="color:#66d9ef">key</span>      <span style="color:#f92672">|</span> key_len <span style="color:#f92672">|</span> ref  <span style="color:#f92672">|</span> rows <span style="color:#f92672">|</span> filtered <span style="color:#f92672">|</span> Extra       <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----+--------------------+-------+------------+----------------+---------------+----------+---------+------+------+----------+-------------+</span>
+<span style="color:#f92672">|</span>  <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">PRIMARY</span>            <span style="color:#f92672">|</span> s1    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>       <span style="color:#f92672">|</span> <span style="color:#66d9ef">ALL</span>            <span style="color:#f92672">|</span> idx_key3      <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>     <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span>   <span style="color:#ae81ff">100</span>.<span style="color:#ae81ff">00</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">Using</span> <span style="color:#66d9ef">where</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>  <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> DEPENDENT SUBQUERY <span style="color:#f92672">|</span> s2    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>       <span style="color:#f92672">|</span> index_subquery <span style="color:#f92672">|</span> idx_key1      <span style="color:#f92672">|</span> idx_key1 <span style="color:#f92672">|</span> <span style="color:#ae81ff">303</span>     <span style="color:#f92672">|</span> func <span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span>   <span style="color:#ae81ff">100</span>.<span style="color:#ae81ff">00</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">Using</span> <span style="color:#66d9ef">index</span> <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----+--------------------+-------+------------+----------------+---------------+----------+---------+------+------+----------+-------------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span>, <span style="color:#ae81ff">1</span> <span style="color:#a6e22e">warning</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
+
+<p>但是查询优化器可能会将子查询转换为连接查询，所以会看到两个相同的id:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">EXPLAIN</span> <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> s1 <span style="color:#66d9ef">WHERE</span> key1 <span style="color:#66d9ef">IN</span>(<span style="color:#66d9ef">SELECT</span> key3 <span style="color:#66d9ef">FROM</span> s2 <span style="color:#66d9ef">WHERE</span> common_field <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;a&#39;</span>);
+<span style="color:#f92672">+----+-------------+-------+------------+------+---------------+----------+---------+-----------------+------+----------+-----------------------------+</span>
+<span style="color:#f92672">|</span> id <span style="color:#f92672">|</span> select_type <span style="color:#f92672">|</span> <span style="color:#66d9ef">table</span> <span style="color:#f92672">|</span> partitions <span style="color:#f92672">|</span> type <span style="color:#f92672">|</span> possible_keys <span style="color:#f92672">|</span> <span style="color:#66d9ef">key</span>      <span style="color:#f92672">|</span> key_len <span style="color:#f92672">|</span> ref             <span style="color:#f92672">|</span> rows <span style="color:#f92672">|</span> filtered <span style="color:#f92672">|</span> Extra                       <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----+-------------+-------+------------+------+---------------+----------+---------+-----------------+------+----------+-----------------------------+</span>
+<span style="color:#f92672">|</span>  <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> SIMPLE      <span style="color:#f92672">|</span> s1    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>       <span style="color:#f92672">|</span> <span style="color:#66d9ef">ALL</span>  <span style="color:#f92672">|</span> idx_key1      <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>     <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>            <span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span>   <span style="color:#ae81ff">100</span>.<span style="color:#ae81ff">00</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">Using</span> <span style="color:#66d9ef">where</span>                 <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>  <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> SIMPLE      <span style="color:#f92672">|</span> s2    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>       <span style="color:#f92672">|</span> ref  <span style="color:#f92672">|</span> idx_key3      <span style="color:#f92672">|</span> idx_key3 <span style="color:#f92672">|</span> <span style="color:#ae81ff">303</span>     <span style="color:#f92672">|</span> awesome.s1.key1 <span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span>   <span style="color:#ae81ff">100</span>.<span style="color:#ae81ff">00</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">Using</span> <span style="color:#66d9ef">where</span>; <span style="color:#a6e22e">FirstMatch</span>(s1) <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----+-------------+-------+------------+------+---------------+----------+---------+-----------------+------+----------+-----------------------------+</span>
+<span style="color:#ae81ff">2</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span>, <span style="color:#ae81ff">1</span> <span style="color:#a6e22e">warning</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
+
+<p>UNION子句会通过创建临时表把多个查询的结果合并起来进行去重，所以会有一条NULL的记录，UNION ALL不去重就不会有这条记录:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-mysql" data-lang="mysql">mysql<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">EXPLAIN</span> <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> s1  <span style="color:#66d9ef">UNION</span> <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">FROM</span> s2;
+<span style="color:#f92672">+----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+</span>
+<span style="color:#f92672">|</span> id <span style="color:#f92672">|</span> select_type  <span style="color:#f92672">|</span> <span style="color:#66d9ef">table</span>      <span style="color:#f92672">|</span> partitions <span style="color:#f92672">|</span> type <span style="color:#f92672">|</span> possible_keys <span style="color:#f92672">|</span> <span style="color:#66d9ef">key</span>  <span style="color:#f92672">|</span> key_len <span style="color:#f92672">|</span> ref  <span style="color:#f92672">|</span> rows <span style="color:#f92672">|</span> filtered <span style="color:#f92672">|</span> Extra           <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+</span>
+<span style="color:#f92672">|</span>  <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">PRIMARY</span>      <span style="color:#f92672">|</span> s1         <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>       <span style="color:#f92672">|</span> <span style="color:#66d9ef">ALL</span>  <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>          <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span>   <span style="color:#ae81ff">100</span>.<span style="color:#ae81ff">00</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>            <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span>  <span style="color:#ae81ff">2</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">UNION</span>        <span style="color:#f92672">|</span> s2         <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>       <span style="color:#f92672">|</span> <span style="color:#66d9ef">ALL</span>  <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>          <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span>    <span style="color:#ae81ff">1</span> <span style="color:#f92672">|</span>   <span style="color:#ae81ff">100</span>.<span style="color:#ae81ff">00</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>            <span style="color:#f92672">|</span>
+<span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">UNION</span> RESULT <span style="color:#f92672">|</span> <span style="color:#f92672">&lt;</span>union1,<span style="color:#ae81ff">2</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>       <span style="color:#f92672">|</span> <span style="color:#66d9ef">ALL</span>  <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>          <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span>    <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span>     <span style="color:#66d9ef">NULL</span> <span style="color:#f92672">|</span> <span style="color:#66d9ef">Using</span> temporary <span style="color:#f92672">|</span>
+<span style="color:#f92672">+----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+</span>
+<span style="color:#ae81ff">3</span> rows <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">set</span>, <span style="color:#ae81ff">1</span> <span style="color:#a6e22e">warning</span> (<span style="color:#ae81ff">0</span>.<span style="color:#ae81ff">00</span> sec)</code></pre></div></p>
 </article>
 
       <div class="book-footer justify-between">
@@ -428,9 +724,9 @@ Command列中显示为Sleep就表示该连接当前是空闲的，如果连接�
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/6c9931ca1786202a8f64cac1069a76c8be5c8309" title='Last modified by hjlarry | January 3, 2020' target="_blank">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/c300dd0ce98daa8ed2c474275cb7670065ae4c8f" title='Last modified by hjlarry | January 10, 2020' target="_blank">
       <img src="/svg/calendar.svg" alt="Calendar" />
-      <span>January 3, 2020</span>
+      <span>January 10, 2020</span>
     </a>
   </div>
   
@@ -460,25 +756,63 @@ Command列中显示为Sleep就表示该连接当前是空闲的，如果连接�
 <ul>
 <li><a href="#查询执行过程">查询执行过程</a>
 <ul>
+<li>
+<ul>
 <li><a href="#连接器">连接器</a></li>
 <li><a href="#查询缓存">查询缓存</a></li>
 <li><a href="#分析器">分析器</a></li>
 <li><a href="#优化器">优化器</a></li>
 <li><a href="#执行器">执行器</a></li>
 </ul></li>
+</ul></li>
 <li><a href="#innodb">InnoDB</a>
 <ul>
 <li><a href="#数据页">数据页</a></li>
 <li><a href="#行格式">行格式</a></li>
-<li><a href="#表空间">表空间</a></li>
 <li><a href="#数据目录">数据目录</a></li>
+<li><a href="#表空间">表空间</a></li>
 </ul></li>
 <li><a href="#索引">索引</a>
 <ul>
 <li><a href="#聚簇索引">聚簇索引</a></li>
 <li><a href="#二级索引">二级索引</a></li>
 <li><a href="#联合索引">联合索引</a></li>
-<li><a href="#索引使用">索引使用</a></li>
+<li><a href="#使用场景">使用场景</a>
+<ul>
+<li><a href="#全值匹配">全值匹配</a></li>
+<li><a href="#匹配左边的列">匹配左边的列</a></li>
+<li><a href="#匹配列前缀">匹配列前缀</a></li>
+<li><a href="#匹配范围值">匹配范围值</a></li>
+<li><a href="#精确匹配某一列并范围匹配另外一列">精确匹配某一列并范围匹配另外一列</a></li>
+<li><a href="#用于排序">用于排序</a></li>
+<li><a href="#用于分组">用于分组</a></li>
+</ul></li>
+<li><a href="#代价">代价</a></li>
+<li><a href="#优化策略">优化策略</a>
+<ul>
+<li><a href="#覆盖索引">覆盖索引</a></li>
+<li><a href="#只为用于搜索-排序或分组的列创建索引">只为用于搜索、排序或分组的列创建索引</a></li>
+<li><a href="#为列的基数大的列创建索引">为列的基数大的列创建索引</a></li>
+<li><a href="#索引列的类型尽量小">索引列的类型尽量小</a></li>
+<li><a href="#索引字符串值的前缀">索引字符串值的前缀</a></li>
+<li><a href="#让索引列在比较表达式中单独出现">让索引列在比较表达式中单独出现</a></li>
+<li><a href="#让主键自增">让主键自增</a></li>
+<li><a href="#避免冗余重复索引">避免冗余重复索引</a></li>
+</ul></li>
+<li><a href="#访问方法">访问方法</a>
+<ul>
+<li><a href="#const">const</a></li>
+<li><a href="#ref">ref</a></li>
+<li><a href="#ref-or-null">ref_or_null</a></li>
+<li><a href="#range">range</a></li>
+<li><a href="#index">index</a></li>
+<li><a href="#all">all</a></li>
+</ul></li>
+<li><a href="#explain">EXPLAIN</a>
+<ul>
+<li><a href="#table">table</a></li>
+<li><a href="#id">id</a></li>
+</ul></li>
 </ul></li>
 </ul></li>
 </ul>
