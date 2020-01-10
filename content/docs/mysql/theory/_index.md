@@ -311,3 +311,88 @@ CREATE TABLE single_table (
 
 #### all
 最直接的查询执行方式就是全表扫描，对于InnoDB来说就是直接扫描聚簇索引，这种访问方法称为**all**。
+
+### EXPLAIN
+一条查询语句在经过MySQL查询优化器的各种基于成本和规则的优化后会生成一个执行计划，这个执行计划展示了接下来具体执行查询的方式，比如多表连接的顺序是什么，对于每个表采用什么访问方法来具体执行查询等等。EXPLAIN能帮助我们查看到某个查询语句的具体执行计划。例如:
+{{< highlight mysql>}}
+mysql> explain select 1;
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+
+| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra          |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+
+|  1 | SIMPLE      | NULL  | NULL       | NULL | NULL          | NULL | NULL    | NULL | NULL |     NULL | No tables used |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+
+1 row in set, 1 warning (0.00 sec)
+{{< /highlight >}}
+
+各列的详细解释如下:
+
+|列名|描述|
+|:--:|:--|
+|`id`|在一个查询语句中每个`SELECT`关键字都对应一个唯一`id`|
+|`select_type`|`SELECT`关键字对应的查询的类型|
+|`table`|表名|
+|`partitions`|匹配的分区信息|
+|`type`|针对单表的访问方法|
+|`possible_keys`|可能用到的索引|
+|`key`|实际上使用的索引|
+|`key_len`|实际使用到的索引长度|
+|`ref`|当使用索引列等值查询时，与索引列进行等值匹配的对象信息|
+|`rows`|预估的需要读取的记录条数|
+|`filtered`|某个表经过搜索条件过滤后剩余记录条数的百分比|
+|`Extra`|一些额外的信息|
+
+#### table
+{{< highlight mysql>}}
+mysql> explain select * from s1, s2;
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+
+| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra                                 |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+
+|  1 | SIMPLE      | s1    | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    1 |   100.00 | NULL                                  |
+|  1 | SIMPLE      | s2    | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    1 |   100.00 | Using join buffer (Block Nested Loop) |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+
+2 rows in set, 1 warning (0.00 sec)
+{{< /highlight >}}
+我们看到EXPLAIN语句输出的每条记录都对应着某个单表的访问方法，该条记录的table列代表了该表的表名。
+
+#### id
+查询语句一般以select关键字开头，简单的查询语句只有一个select，但有两种情况会出现多个select:
+
+* 查询语句包含子查询，如`SELECT * FROM s1 WHERE key1 IN (SELECT * FROM s2);`
+* 查询语句包含UNION语句，如`SELECT * FROM s1 UNION SELECT * FROM s2;`
+
+每多一个select关键字，就会给它分配一个唯一的id值。对于连接查询来说，这个id是相同的，出现在前面的就是驱动表，后面的是被驱动表。如:
+{{< highlight mysql>}}
+mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN(SELECT key1 FROM s2) OR key3 = 'a';
++----+--------------------+-------+------------+----------------+---------------+----------+---------+------+------+----------+-------------+
+| id | select_type        | table | partitions | type           | possible_keys | key      | key_len | ref  | rows | filtered | Extra       |
++----+--------------------+-------+------------+----------------+---------------+----------+---------+------+------+----------+-------------+
+|  1 | PRIMARY            | s1    | NULL       | ALL            | idx_key3      | NULL     | NULL    | NULL |    1 |   100.00 | Using where |
+|  2 | DEPENDENT SUBQUERY | s2    | NULL       | index_subquery | idx_key1      | idx_key1 | 303     | func |    1 |   100.00 | Using index |
++----+--------------------+-------+------------+----------------+---------------+----------+---------+------+------+----------+-------------+
+2 rows in set, 1 warning (0.00 sec)
+{{< /highlight >}}
+
+但是查询优化器可能会将子查询转换为连接查询，所以会看到两个相同的id:
+{{< highlight mysql>}}
+mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN(SELECT key3 FROM s2 WHERE common_field = 'a');
++----+-------------+-------+------------+------+---------------+----------+---------+-----------------+------+----------+-----------------------------+
+| id | select_type | table | partitions | type | possible_keys | key      | key_len | ref             | rows | filtered | Extra                       |
++----+-------------+-------+------------+------+---------------+----------+---------+-----------------+------+----------+-----------------------------+
+|  1 | SIMPLE      | s1    | NULL       | ALL  | idx_key1      | NULL     | NULL    | NULL            |    1 |   100.00 | Using where                 |
+|  1 | SIMPLE      | s2    | NULL       | ref  | idx_key3      | idx_key3 | 303     | awesome.s1.key1 |    1 |   100.00 | Using where; FirstMatch(s1) |
++----+-------------+-------+------------+------+---------------+----------+---------+-----------------+------+----------+-----------------------------+
+2 rows in set, 1 warning (0.00 sec)
+{{< /highlight >}}
+
+UNION子句会通过创建临时表把多个查询的结果合并起来进行去重，所以会有一条NULL的记录，UNION ALL不去重就不会有这条记录:
+{{< highlight mysql>}}
+mysql> EXPLAIN SELECT * FROM s1  UNION SELECT *FROM s2;
++----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+
+| id | select_type  | table      | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra           |
++----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+
+|  1 | PRIMARY      | s1         | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    1 |   100.00 | NULL            |
+|  2 | UNION        | s2         | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    1 |   100.00 | NULL            |
+| NULL | UNION RESULT | <union1,2> | NULL       | ALL  | NULL          | NULL | NULL    | NULL | NULL |     NULL | Using temporary |
++----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+
+3 rows in set, 1 warning (0.00 sec)
+{{< /highlight >}}
