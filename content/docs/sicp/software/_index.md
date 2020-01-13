@@ -451,16 +451,106 @@ Program Headers:
 
 如左图所示，A函数嵌套了B函数，A要等待B执行完成之后再接着执行自己的逻辑。所以我们一般把栈内存竖着画，由底部的高位向低位分配，函数执行结束则把其对应的内存区域销毁，如右图所示。我们把每一个函数所占的格子叫**栈帧**(Stack Frame)，把整个A、B、C的调用层次称为**调用堆栈**(Call Stack)。程序出错时候我们看到一级级的错误信息就是通过调用堆栈追溯到的。
 
+调用一个函数，在指令级别上还是有很大的开销的，所以有了**内联**(inline)的优化手段。
+
 ### 调用约定
 接下来的问题是A调用B的时候，如何给B传递参数，如何接收B的返回值，要么A划定区域，要么B划定区域，要么用寄存器，要么用内存，我们把这种约定称为**调用约定**。以Go语言为例，若A调用B，则A会把自己的栈帧一分为二，下半部分存本地局部变量，上半部分存给B用的参数和B的返回值。若A调用B、C、D等多个函数，则上半部分占用多大空间按哪个函数的参数和返回值最大来算。如此一来，栈帧的大小是在编译期就能确定的，访问栈内某块内存只需根据相对位置，基于栈顶做加法或栈底做减法即可。
 
-一般会把栈顶的地址放在SP寄存器，把栈底的地址放在BP寄存器。但是一个线程只有一套自己的寄存器，那么如果SP/BP用来存当前正在执行的B函数的栈帧，B执行完以后如何知道A的栈帧有多大呢？所以在两个栈帧之间还有一段空间用来存储A的BP/SP、IP，A在调用B的时候就把自己的BP/SP写进去，把自己调用完B之后下一条要执行什么指令写进IP，这叫保存现场。B执行完以后，通过这段空间恢复现场。
+一般会把栈顶的地址放在SP寄存器，把栈底的地址放在BP寄存器。理论上，SP或者BP使用一个就够了，每个语言都有自己的选择。Go早期只用SP，后来也引入了BP，因为很多的调试器、自动化检测工具需要使用BP确定栈底的位置。
 
-理论上，SP或者BP使用一个就够了，每个语言都有自己的选择。Go早期只用SP，后来也引入了BP，因为很多的调试器、自动化检测工具需要使用BP确定栈底的位置。Go语言在调用CALL指令的时候会自动保存IP寄存器，调用RET指令的时候自动恢复IP寄存器。
+如果SP/BP用来存当前正在执行的B函数的栈帧，B执行完以后如何知道调用它的A函数的栈帧有多大呢？所以在两个栈帧之间还有一段空间用来存储A的BP/SP、IP，A在调用B的时候就把自己的BP/SP写进去，把自己调用完B之后下一条要执行什么指令写进IP，这叫保存现场。B执行完以后，通过这段空间恢复现场。接着，我们看看C语言和Go语言的保存现场和恢复现场分别是怎么做的。
 
-在C语言中，是优先通过寄存器传递参数和返回值，经常使用SI、DI寄存器传参，使用AX寄存器存储返回值，因为C是性能优先，寄存器肯定是最快的。Go是使用栈内存传参和返回值的，这和它本身Goroutine的运行方式有关。
+#### Go语言
+{{< highlight go>}}
+func add(x, y int) int {
+	z := x + y
+	return z
+}
 
-调用一个函数，在指令级别上还是有很大的开销的，所以有了**内联**(inline)的优化手段。
+func main() {
+	a, b := 0x11, 0x22
+	s := add(a, b)
+	println(s)
+}
+{{< /highlight >}}
+
+通过`go build -gcflags "-N -l" call.go`接着进行gdb调试:
+{{< highlight sh>}}
+(gdb) b 4
+Breakpoint 1 at 0x452347: file /root/.mac/gocode/call.go, line 4.
+(gdb) r
+Thread 1 "call" hit Breakpoint 1, main.add (x=17, y=34, ~r2=0) at /root/.mac/gocode/call.go:4
+4		z := x + y
+(gdb) disass
+Dump of assembler code for function main.add:
+   0x0000000000452330 <+0>:	sub    rsp,0x10
+   0x0000000000452334 <+4>:	mov    QWORD PTR [rsp+0x8],rbp
+   0x0000000000452339 <+9>:	lea    rbp,[rsp+0x8]
+   0x000000000045233e <+14>:	mov    QWORD PTR [rsp+0x28],0x0
+=> 0x0000000000452347 <+23>:	mov    rax,QWORD PTR [rsp+0x18]
+   0x000000000045234c <+28>:	add    rax,QWORD PTR [rsp+0x20]
+   0x0000000000452351 <+33>:	mov    QWORD PTR [rsp],rax
+   0x0000000000452355 <+37>:	mov    QWORD PTR [rsp+0x28],rax
+   0x000000000045235a <+42>:	mov    rbp,QWORD PTR [rsp+0x8]
+   0x000000000045235f <+47>:	add    rsp,0x10
+   0x0000000000452363 <+51>:	ret
+End of assembler dump.
+{{< /highlight >}}
+
+我们可以把它的栈帧变化情况画出来:
+
+![](./images/go_func.jpg)
+
+#### C语言
+{{< highlight c>}}
+int __attribute__((noinline, optimize("-O0"))) add(int x, int y)
+{
+    int z;
+    z = x + y;
+    return z;
+}
+
+int __attribute__((noinline)) main(int argc, char **argv)
+{
+    int x, y, a;
+    x = 0x11;
+    y = 0x22;
+    a = add(x, y);
+    printf("%d\n", a);
+}
+{{< /highlight >}}
+
+通过`gcc -g -O0 -o frame frame.c`接着进行gdb调试:
+{{< highlight sh>}}
+(gdb) b 5
+Breakpoint 1 at 0x654: file frame.c, line 5.
+(gdb) r
+Breakpoint 1, add (x=17, y=34) at frame.c:6
+6	    z = x + y;
+(gdb) disass
+Dump of assembler code for function add:
+   0x000055555555464a <+0>:	push   rbp
+   0x000055555555464b <+1>:	mov    rbp,rsp
+   0x000055555555464e <+4>:	mov    DWORD PTR [rbp-0x14],edi
+   0x0000555555554651 <+7>:	mov    DWORD PTR [rbp-0x18],esi
+=> 0x0000555555554654 <+10>:	mov    edx,DWORD PTR [rbp-0x14]
+   0x0000555555554657 <+13>:	mov    eax,DWORD PTR [rbp-0x18]
+   0x000055555555465a <+16>:	add    eax,edx
+   0x000055555555465c <+18>:	mov    DWORD PTR [rbp-0x4],eax
+   0x000055555555465f <+21>:	mov    eax,DWORD PTR [rbp-0x4]
+   0x0000555555554662 <+24>:	pop    rbp
+   0x0000555555554663 <+25>:	ret
+End of assembler dump.
+{{< /highlight >}}
+同样可以画出图来:
+![](./images/c_func.jpg)
+
+#### 比较
+相同点是在调用CALL指令的时候，先把main函数中执行完add函数的下一条指令(在IP寄存器中)存在栈里，在调用RET指令的时候，这条指令会被自动恢复入IP寄存器。
+
+不同点是C语言通过`push`和`pop`指令入栈、出栈，让栈顶SP自动随着变化。而Go语言采用了`sub`、`add`指令直接计算栈顶地址。
+
+此外，在C语言中，是优先通过寄存器传递参数和返回值，经常使用SI、DI寄存器传参，使用AX寄存器存储返回值，因为C是性能优先，寄存器肯定是最快的。Go是使用栈内存传参和返回值的，这和它本身Goroutine的运行方式有关。
 
 ### 栈和堆
 堆、栈既是两种数据结构，也是函数执行单位，在不同的场景有不同的概念。
