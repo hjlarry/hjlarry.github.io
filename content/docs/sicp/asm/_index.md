@@ -356,3 +356,31 @@ section .bss
     u2  resb User_size
 {{< /highlight >}}
 这段代码先定义的是一个内存布局，成员字段代表的是偏移量。接着使用`istruc`在data段中去初始化一个变量u1。又使用u2定义了一个未初始化值的User，`User_size`也是编译器语法糖，帮助编译器算出User结构体的长度。
+
+### 宏
+宏是在代码预处理阶段被展开的，相当于模板。
+
+#### %define
+单行宏定义，和`%assign`只支持常量不同，`%define`可以支持参数。属于汇编语言的一种功能，和汇编不是一回事，因为汇编是目标语言。
+{{< highlight asm>}}
+section .text
+    %define SYS_EXIT 60
+    %define DEMO(x)         mov rax, [rbx+x]
+
+    _start:
+        DEMO(100)
+
+    .exit:
+        mov     rax, SYS_EXIT
+        xor     rdi, rdi
+        syscall
+{{< /highlight >}}
+
+#### %macro
+有点像是定义函数，中间可以包含多行代码。
+```
+%macro <name> <args_count> 
+...
+%endmacro
+```
+使用这样的方式，可以先给宏定义个名字，之后跟参数，参数可以是多个。在内容中可以使用`%1`、`%2`这样的方式去调用第x个参数。还可使用`%%`这样的语法在宏内定义本地标签，在宏展开后这些本地标签会被自动重命名。
