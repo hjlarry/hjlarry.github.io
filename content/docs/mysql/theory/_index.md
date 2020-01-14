@@ -396,3 +396,38 @@ mysql> EXPLAIN SELECT * FROM s1  UNION SELECT *FROM s2;
 +----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+
 3 rows in set, 1 warning (0.00 sec)
 {{< /highlight >}}
+
+#### select_type
+每个select关键字都代表着一个小的查询语句，select_type就是描述这个小的查询语句在大的查询中扮演的角色，它的取值有这些可能:
+
+|名称|描述|
+|:--:|:--|
+|`SIMPLE`|不包含UNION或子查询的话都是该类型|
+|`PRIMARY`|对于大查询来说，最左边的小查询|
+|`UNION`|对于包含UNION的大查询，除最左边的小查询以外的小查询|
+|`UNION RESULT`|对于UNION会创建临时表，针对该临时表的查询|
+|`SUBQUERY`|子查询是相关子查询时，它的第一个SELECT代表的查询|
+|`DEPENDENT SUBQUERY`|子查询是不相关子查询时，它的第一个SELECT代表的查询|
+|`DEPENDENT UNION`|包含UNION或UNION ALL的大查询，如果各小查询依赖外层查询，除最左边的小查询之外的小查询|
+|`DERIVED`|对于采用物化方式执行的包含派生表的查询，对于派生表的子查询|
+|`MATERIALIZED`|若查询优化器选择将子查询物化之后与外层查询进行连接查询|
+|`UNCACHEABLE SUBQUERY`|不常用|
+|`UNCACHEABLE UNION`|不常用|
+
+#### partitions
+分区信息，一般该列值都为NULL。
+
+#### type
+代表Mysql对这个表执行查询时的访问方法，[之前](./#访问方法)已经提到过部分，这列可能的值有:
+
+* system，表中只有一条记录且该表使用的存储引擎的统计数据是精确的，比如MyISAM、Memory
+* const，对应[const](./#const)
+* ref，对应[ref](./#ref)
+* fulltext，全文索引
+* ref_or_null，对应[ref_or_null](./#ref-or-null)
+* index_merge，一般对某表的查询只能用一个索引，但某些场景可以使用Intersection、Union、Sort-Union这三种索引合并的方式
+* unique_subquery，在一些包含IN的子查询语句，若查询优化器决定将IN转换为EXISTS子查询且它可以用到主键进行等值匹配
+* index_subquery，和unique_subquery类似，只是访问子查询的表时使用的普通索引
+* range，对应[range](./#range)
+* index，对应[index](./#index)
+* ALL，对应[all](./#all)
