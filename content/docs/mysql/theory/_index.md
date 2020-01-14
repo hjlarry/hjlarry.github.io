@@ -422,6 +422,7 @@ mysql> EXPLAIN SELECT * FROM s1  UNION SELECT *FROM s2;
 
 * system，表中只有一条记录且该表使用的存储引擎的统计数据是精确的，比如MyISAM、Memory
 * const，对应[const](./#const)
+* eq_ref，连接查询时，若被驱动表是通过主键或者唯一二级索引列等值匹配的方式进行访问的
 * ref，对应[ref](./#ref)
 * fulltext，全文索引
 * ref_or_null，对应[ref_or_null](./#ref-or-null)
@@ -431,3 +432,46 @@ mysql> EXPLAIN SELECT * FROM s1  UNION SELECT *FROM s2;
 * range，对应[range](./#range)
 * index，对应[index](./#index)
 * ALL，对应[all](./#all)
+
+#### possible_keys和key
+possible_keys表示一开始的查询语句可能使用到的索引，而key表示经过了查询优化器计算使用不同的索引成本之后，实际上会使用到的索引。例如:
+{{< highlight mysql>}}
+mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z'AND key3 = 'a';
++----+-------------+-------+------------+------+-------------------+----------+---------+-------+------+----------+-------------+
+| id | select_type | table | partitions | type | possible_keys     | key      | key_len | ref   | rows | filtered | Extra       |
++----+-------------+-------+------------+------+-------------------+----------+---------+-------+------+----------+-------------+
+|  1 | SIMPLE      | s1    | NULL       | ref  | idx_key1,idx_key3 | idx_key3 | 303     | const |    1 |   100.00 | Using where |
++----+-------------+-------+------------+------+-------------------+----------+---------+-------+------+----------+-------------+
+1 row in set, 1 warning (0.01 sec)
+{{< /highlight >}}
+
+有个特例是当使用index为访问方法时，possible_keys列是空的。此外，possible_keys列中的值越多，可能用到的索引就越多，查询优化器计算查询成本时就得花费更多的时间去比较，如果可能的话，尽量删除用不到的索引。
+
+#### key_len
+表示当查询优化器决定使用某个索引执行查询时，该索引记录的最大长度，这个最大长度是这样计算的:
+
+* 对于使用固定长度类型的索引列来说，它实际占用的存储空间最大长度就是该固定值
+* 对于指定字符集的变长类型的索引来说，比如VARCHAR(100)-UTF8，那么就是100*3=300字节
+* 如果索引列可以存储NULL值，则key_len比不可以存储时多1个字节
+* 对于变长字段，都会有2个字节的空间来存储该变长列的实际长度
+
+#### ref
+当使用索引列等值匹配的条件去执行查询时，即const、eq_ref、ref、ref_or_null、unique_subquery之一，该列会展示出与索引列做等值匹配的是一个常数或者是某个列。例如:
+{{< highlight mysql>}}
+mysql> EXPLAIN SELECT * FROM s1 WHERE key1 = 'a';
++----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+
+| id | select_type | table | partitions | type | possible_keys | key      | key_len | ref   | rows | filtered | Extra |
++----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+
+|  1 | SIMPLE      | s1    | NULL       | ref  | idx_key1      | idx_key1 | 303     | const |    1 |   100.00 | NULL  |
++----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+
+1 row in set, 1 warning (0.00 sec)
+
+mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.id = s2.id;
++----+-------------+-------+------------+--------+---------------+---------+---------+---------------+------+----------+-------+
+| id | select_type | table | partitions | type   | possible_keys | key     | key_len | ref           | rows | filtered | Extra |
++----+-------------+-------+------------+--------+---------------+---------+---------+---------------+------+----------+-------+
+|  1 | SIMPLE      | s1    | NULL       | ALL    | PRIMARY       | NULL    | NULL    | NULL          |    1 |   100.00 | NULL  |
+|  1 | SIMPLE      | s2    | NULL       | eq_ref | PRIMARY       | PRIMARY | 4       | awesome.s1.id |    1 |   100.00 | NULL  |
++----+-------------+-------+------------+--------+---------------+---------+---------+---------------+------+----------+-------+
+2 rows in set, 1 warning (0.00 sec)
+{{< /highlight >}}
