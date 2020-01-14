@@ -16,9 +16,11 @@ bookMenuLevels: 1
   - [并发调度]({{< relref "/docs/go/goroutine" >}})
   - [锁]({{< relref "/docs/go/lock" >}})
 - **Python语言**
-  - 描述符
+  - [描述符]({{< relref "/docs/python/descriptor" >}})
 - **Mysql**
   - [查询]({{< relref "/docs/mysql/query" >}})
   - [原理]({{< relref "/docs/mysql/theory" >}})
 - **其他**
   - [基础系统工具]({{< relref "/docs/other/tools" >}})
+  - [git]({{< relref "/docs/other/git" >}})
+  - [docker]({{< relref "/docs/other/docker" >}})
