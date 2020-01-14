@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
 
 
-<script defer src="/cn.search.min.5db72b8b249767fee6bacfbdae02d1548ab68f0989b29a175889c8cb816cc0bb.js" integrity="sha256-XbcriySXZ/7mus&#43;9rgLRVIq2jwmJspoXWInIy4FswLs="></script>
+<script defer src="/cn.search.min.d6435a8341338af3206f281ee20daaedaa51bceaa6c1ae6716fb500f7dcbe081.js" integrity="sha256-1kNag0EzivMgbyge4g2q7apRvOqmwa5nFvtQD33L4IE="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/sicp/asm/index.xml" title="Home" />
 <!--
@@ -71,7 +71,7 @@ https://github.com/alex-shpak/hugo-book
 <li><strong>Python语言</strong>
 
 <ul>
-<li>描述符</li>
+<li><a href="/docs/python/descriptor/">描述符</a></li>
 </ul></li>
 <li><strong>Mysql</strong>
 
@@ -83,6 +83,8 @@ https://github.com/alex-shpak/hugo-book
 
 <ul>
 <li><a href="/docs/other/tools/">基础系统工具</a></li>
+<li><a href="/docs/other/git/">git</a></li>
+<li><a href="/docs/other/docker/">docker</a></li>
 </ul></li>
 </ul>
 
@@ -512,6 +514,71 @@ Disassembly of section .text:
 <span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.bss</span>
     <span style="color:#a6e22e">u2</span>  <span style="color:#66d9ef">resb</span> <span style="color:#66d9ef">User_size</span></code></pre></div>
 这段代码先定义的是一个内存布局，成员字段代表的是偏移量。接着使用<code>istruc</code>在data段中去初始化一个变量u1。又使用u2定义了一个未初始化值的User，<code>User_size</code>也是编译器语法糖，帮助编译器算出User结构体的长度。</p>
+
+<h3 id="宏">宏</h3>
+
+<p>宏是在代码预处理阶段被展开的，相当于模板。</p>
+
+<h4 id="define">%define</h4>
+
+<p>单行宏定义，和<code>%assign</code>只支持常量不同，<code>%define</code>可以支持参数。属于汇编语言的一种功能，和汇编不是一回事，因为汇编是目标语言。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.text</span>
+    <span style="color:#960050;background-color:#1e0010">%</span><span style="color:#a6e22e">define</span> <span style="color:#66d9ef">SYS_EXIT</span> <span style="color:#ae81ff">60</span>
+    <span style="color:#960050;background-color:#1e0010">%</span><span style="color:#a6e22e">define</span> <span style="color:#66d9ef">DEMO</span>(<span style="color:#66d9ef">x</span>)         <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rax</span>, [<span style="color:#66d9ef">rbx</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#66d9ef">x</span>]
+
+    _start:
+        <span style="color:#a6e22e">DEMO</span>(<span style="color:#ae81ff">100</span>)
+
+    .exit:
+        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">SYS_EXIT</span>
+        <span style="color:#a6e22e">xor</span>     <span style="color:#66d9ef">rdi</span>, <span style="color:#66d9ef">rdi</span>
+        <span style="color:#a6e22e">syscall</span></code></pre></div></p>
+
+<h4 id="macro">%macro</h4>
+
+<p>有点像是定义函数，中间可以包含多行代码。</p>
+
+<pre><code>%macro &lt;name&gt; &lt;args_count&gt; 
+...
+%endmacro
+</code></pre>
+
+<p>使用这样的方式，可以先给宏定义个名字，之后跟参数，参数可以是多个。在内容中可以使用<code>%1</code>、<code>%2</code>这样的方式去调用第x个参数。还可使用<code>%%</code>这样的语法在宏内定义本地标签，在宏展开后这些本地标签会被自动重命名。</p>
+
+<h2 id="调用libc">调用libc</h2>
+
+<p>汇编中虽然没有标准库，但可以通过混合编程调用C语言的标准库。</p>
+
+<p>这种方式需要使用main作为函数入口，并使用extern声明要用到的libc函数，然后用寄存器传参(依次为rdi,rsi,rdx,rcx,r8,r9)和接收返回值(rax)，且需要使用gcc作为链接器。</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">global</span> <span style="color:#66d9ef">main</span>
+<span style="color:#a6e22e">extern</span> <span style="color:#66d9ef">printf</span>
+
+<span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.data</span>
+    <span style="color:#a6e22e">s</span> <span style="color:#66d9ef">db</span>    <span style="color:#960050;background-color:#1e0010">`</span><span style="color:#66d9ef">hello</span> <span style="color:#66d9ef">world</span>!<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">n</span><span style="color:#960050;background-color:#1e0010">`</span>
+
+<span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.text</span>
+    main:
+        <span style="color:#a6e22e">push</span> <span style="color:#66d9ef">rbp</span>
+        <span style="color:#a6e22e">mov</span>  <span style="color:#66d9ef">rbp</span>, <span style="color:#66d9ef">rsp</span>   <span style="color:#75715e">;保存现场
+</span><span style="color:#75715e"></span>
+        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rdi</span>, <span style="color:#66d9ef">s</span>  <span style="color:#75715e">;传参
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">xor</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">rax</span> <span style="color:#75715e">;清空rax，用于接收返回值，虽然printf函数没有返回值
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">call</span>    <span style="color:#66d9ef">printf</span>
+
+        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">0</span>
+        <span style="color:#a6e22e">pop</span>     <span style="color:#66d9ef">rbx</span>     <span style="color:#75715e">;恢复现场
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">ret</span></code></pre></div>
+
+<p>可以这样编译运行它，并查看它的依赖:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ nasm -g -F dwarf -f elf64 -o libc.o libc.s
+<span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ gcc -no-pie -o libc libc.o
+<span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ ./libc
+hello world!
+<span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ ldd libc
+	linux-vdso.so.1 <span style="color:#f92672">(</span>0x00007ffc2f180000<span style="color:#f92672">)</span>
+	libc.so.6 <span style="color:#f92672">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span style="color:#f92672">(</span>0x00007fe329bdd000<span style="color:#f92672">)</span>
+	/lib64/ld-linux-x86-64.so.2 <span style="color:#f92672">(</span>0x00007fe329fce000<span style="color:#f92672">)</span></code></pre></div></p>
 </article>
 
       <div class="book-footer justify-between">
@@ -521,9 +588,9 @@ Disassembly of section .text:
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/09b3b8d8d767d5c1e7276617704cb8580ce42f40" title='Last modified by hjlarry | January 10, 2020' target="_blank">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/eb8f8dac192bbff448a4b7cd7df2af5cf1c3983f" title='Last modified by hjlarry | January 14, 2020' target="_blank">
       <img src="/svg/calendar.svg" alt="Calendar" />
-      <span>January 10, 2020</span>
+      <span>January 14, 2020</span>
     </a>
   </div>
   
@@ -581,7 +648,13 @@ Disassembly of section .text:
 <li><a href="#数组">数组</a></li>
 <li><a href="#结构体">结构体</a></li>
 </ul></li>
+<li><a href="#宏">宏</a>
+<ul>
+<li><a href="#define">%define</a></li>
+<li><a href="#macro">%macro</a></li>
 </ul></li>
+</ul></li>
+<li><a href="#调用libc">调用libc</a></li>
 </ul></li>
 </ul>
 </nav>

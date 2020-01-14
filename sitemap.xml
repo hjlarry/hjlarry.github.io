@@ -9,11 +9,21 @@
   
   <url>
     <loc>https://hjlarry.github.io/docs/sicp/software/</loc>
-    <lastmod>2019-12-27T16:09:13+08:00</lastmod>
+    <lastmod>2020-01-13T16:50:13+08:00</lastmod>
   </url>
   
   <url>
     <loc>https://hjlarry.github.io/docs/go/lock/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://hjlarry.github.io/docs/other/docker/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://hjlarry.github.io/docs/python/descriptor/</loc>
     <priority>0</priority>
   </url>
   
@@ -47,7 +57,7 @@
   
   <url>
     <loc>https://hjlarry.github.io/</loc>
-    <lastmod>2019-11-28T10:24:02+08:00</lastmod>
+    <lastmod>2020-01-14T10:44:26+08:00</lastmod>
   </url>
   
   <url>
@@ -72,6 +82,11 @@
   <url>
     <loc>https://hjlarry.github.io/docs/go/map/</loc>
     <lastmod>2019-12-23T15:22:19+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hjlarry.github.io/docs/other/git/</loc>
+    <lastmod>2020-01-14T10:44:26+08:00</lastmod>
   </url>
   
   <url>
