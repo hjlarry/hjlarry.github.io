@@ -384,3 +384,45 @@ section .text
 %endmacro
 ```
 使用这样的方式，可以先给宏定义个名字，之后跟参数，参数可以是多个。在内容中可以使用`%1`、`%2`这样的方式去调用第x个参数。还可使用`%%`这样的语法在宏内定义本地标签，在宏展开后这些本地标签会被自动重命名。
+
+
+示例
+-------
+
+### 调用libc
+汇编中虽然没有标准库，但可以通过混合编程调用C语言的标准库。
+
+这种方式需要使用main作为函数入口，并使用extern声明要用到的libc函数，然后用寄存器传参(依次为rdi,rsi,rdx,rcx,r8,r9)和接收返回值(rax)，且需要使用gcc作为链接器。
+
+{{< highlight asm>}}
+global main
+extern printf
+
+section .data
+    s db    `hello world!\n`
+
+section .text
+    main:
+        push rbp
+        mov  rbp, rsp   ;保存现场
+
+        mov     rdi, s  ;传参
+        xor     rax, rax ;清空rax，用于接收返回值，虽然printf函数没有返回值
+        call    printf
+
+        mov     rax, 0
+        pop     rbx     ;恢复现场
+        ret
+{{< /highlight >}}
+
+可以这样编译运行它，并查看它的依赖:
+{{< highlight sh>}}
+[ubuntu] ~/.mac/assem $ nasm -g -F dwarf -f elf64 -o libc.o libc.s
+[ubuntu] ~/.mac/assem $ gcc -no-pie -o libc libc.o
+[ubuntu] ~/.mac/assem $ ./libc
+hello world!
+[ubuntu] ~/.mac/assem $ ldd libc
+	linux-vdso.so.1 (0x00007ffc2f180000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fe329bdd000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fe329fce000)
+{{< /highlight >}}
