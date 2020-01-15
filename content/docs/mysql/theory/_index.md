@@ -496,3 +496,61 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
 2 rows in set, 1 warning (0.00 sec)
 {{< /highlight >}}
 我们可以看到驱动表s1表的执行计划的rows列为9688， filtered列为10.00，这意味着驱动表s1的扇出值就是`9688 × 10.00% = 968.8`，这说明还要对被驱动表执行大约968次查询。
+
+#### extra
+该列用来说明一些额外信息，有很多种，这里只列出比较常见的一些:
+
+**No tables used**，当查询语句中没有FROM子句时，也就是不去读表时。
+
+**Impossible WHERE**，当WHERE子句永远为FALSE时提示。
+
+**No matching min/max row**，查询列表处有MIN或MAX聚集函数，但是没有符合where子句中搜索条件的记录时，例如:
+{{< highlight mysql>}}
+mysql> EXPLAIN SELECT MIN(key1) FROM s1 WHERE key1 = 'abcdefg';
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------------------+
+| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra                   |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------------------+
+|  1 | SIMPLE      | NULL  | NULL       | NULL | NULL          | NULL | NULL    | NULL | NULL |     NULL | No matching min/max row |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------------------+
+1 row in set, 1 warning (0.00 sec)
+{{< /highlight >}}
+
+**Using index**，出现索引覆盖而无需回表时。
+
+**Using index condition**，当查询语句执行会用到索引下推时。例如:
+{{< highlight mysql>}}
+mysql> EXPLAIN SELECT * FROM s1 WHERE key1 >'z' AND key1 LIKE '%b';
++----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+-----------------------+
+| id | select_type | table | partitions | type  | possible_keys | key      | key_len | ref  | rows | filtered | Extra                 |
++----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+-----------------------+
+|  1 | SIMPLE      | s1    | NULL       | range | idx_key1      | idx_key1 | 303     | NULL |    1 |   100.00 | Using index condition |
++----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+-----------------------+
+1 row in set, 1 warning (0.00 sec)
+{{< /highlight >}}
+
+`key1 >'z'`能使用到索引，而`key1 LIKE '%b'`不能。它的执行过程是根据`key1 >'z'`这个条件，定位到二级索引idx_key1中对应的二级索引记录；对于这些记录先不去回表，而是先检测是否满足`key1 LIKE '%b'`这个条件；满足条件的才执行回表操作。这个过程就叫**索引下推**。
+
+**Using where**，当全表扫描且where子句有针对该表的搜索条件时，或索引访问但where子句有索引列之外的其他搜索条件时。例如:
+{{< highlight mysql>}}
+mysql> EXPLAIN SELECT * FROM s1 WHERE key1 ='a' AND common_field = 'a';
++----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------------+
+| id | select_type | table | partitions | type | possible_keys | key      | key_len | ref   | rows | filtered | Extra       |
++----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------------+
+|  1 | SIMPLE      | s1    | NULL       | ref  | idx_key1      | idx_key1 | 303     | const |    1 |   100.00 | Using where |
++----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------------+
+1 row in set, 1 warning (0.00 sec)
+{{< /highlight >}}
+
+**Using join buffer (Block Nested Loop)**，连接查询时，被驱动表不能有效利用索引加快访问速度时，join buffer可以减少访问被驱动表的次数。
+
+**Not exists**，使用外连接时，where子句要求被驱动表某列为NULL，但该列不允许存NULL值时。
+
+**Using intersect(...)、Using union(...)、Usingsort_union(...)**，索引合并时会出现。
+
+**Zero limit**，当我们的LIMIT子句的参数为0时，表示压根儿不打算从表中读出任何记录。
+
+**Using filesort**，当无法使用索引排序，只能使用内存或硬盘排序时。
+
+**Using temporary**，当查询执行可能借助临时表来完成一些功能，如去重、排序之类的时。
+
+**Start temporary, End temporary，LooseScan，FirstMatch(tbl_name)**，查询优化器会尝试将IN子查询转换成semi-join，当semi-join的执行策略为DuplicateWeedout时，驱动表显示Start temporary，被驱动表显示End temporary；当semi-join的执行策略是LooseScan时，就显示LooseScan；当semi-join的执行策略是FirstMatch时，就显示FirstMatch(tbl_name)。
