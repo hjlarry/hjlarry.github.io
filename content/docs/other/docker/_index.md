@@ -15,5 +15,22 @@ docker pull [选项] [镜像仓库的地址[:端口号]/]仓库名[:标签]
 ```
 镜像仓库的地址默认为Docker Hub的地址，对于Docker Hub，仓库名默认为library，所以我们往往可以简写为`docker pull ubuntu:18.04`。
 
+#### 列出镜像
+我们可以这样列出全部的镜像:
+{{< highlight sh>}}
+PS C:\Users\hejl> docker image ls
+REPOSITORY                                       TAG                 IMAGE ID            CREATED             SIZE
+hjlarry/cheers2019                               latest              f0c36061dc59        3 hours ago         4.01MB
+<none>                                           <none>              1487cd0b23aa        3 hours ago         356MB
+ubuntu                                           18.04               ccc6e87d482b        4 days ago          64.2MB
+ubuntu                                           latest              ccc6e87d482b        4 days ago          64.2MB
+golang                                           1.11-alpine         e116d2efa2ab        5 months ago        312MB
+gcr.azk8s.cn/google_containers/hyperkube-amd64   v1.9.2              583687acb4de        2 years ago         618MB
+{{< /highlight >}}
+我们可以看到镜像ID是镜像的唯一标识，但标签可以有多个，例如ubuntu的18.04和latest是同一个镜像。
 
+镜像的体积可能会比Docker Hub中显示的要大一些，因为Docker Hub进行了一定的压缩。实际这些镜像占用的总空间也不是把他们加起来就能算出来，因为共同的层可以复用。镜像占用的总大小可以通过`docker system df`看到。
 
+有一种特殊的镜像，镜像名和标签均为<none>，被称为虚悬镜像(dangling image)。它们没有什么用，可以通过`docker image prune`一键删除。
+
+还有一种镜像叫中间层镜像，用来加速构建、重复利用资源，有的中间层镜像也没有标签和名称，它们不能被删除。可以通过`docker image ls -a`观察到包含中间层镜像的所有镜像。
