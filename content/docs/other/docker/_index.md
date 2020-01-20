@@ -34,3 +34,10 @@ gcr.azk8s.cn/google_containers/hyperkube-amd64   v1.9.2              583687acb4d
 有一种特殊的镜像，镜像名和标签均为<none>，被称为虚悬镜像(dangling image)。它们没有什么用，可以通过`docker image prune`一键删除。
 
 还有一种镜像叫中间层镜像，用来加速构建、重复利用资源，有的中间层镜像也没有标签和名称，它们不能被删除。可以通过`docker image ls -a`观察到包含中间层镜像的所有镜像。
+
+#### 删除镜像
+使用`docker image rm <镜像1> [<镜像2> ...]`命令可删除镜像。这里既可以用镜像的名称，也就是`<仓库名>:<标签>`来表示镜像；也可以用镜像的ID，一般取前3位，足以区分出别的镜像即可。
+
+在删除镜像时，我们往往会看到删除信息中既有`Untagged`，也有`Deleted`。`Untagged`实际上是因为我们要删除的是某个tag标签下的镜像，需要去取消标签。
+
+可以使用多个命令配合来批量删除一些镜像，例如`docker image rm $(docker image ls -q redis)`可以删除所有仓库名为redis的镜像，`docker image rm $(docker image ls -q -f before=mongo:3.2)`可以删除所有mongo版本3.2之前的镜像。
