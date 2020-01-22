@@ -82,6 +82,18 @@ RUN buildDeps='gcc libc6-dev make wget' \
 {{< /highlight >}}
 所有的命令都是一个目的，即编译、安装redis可执行文件，没必要多层。此外，这组命令的最后添加了清理工作的命令，删除为了编译构建所需的文件，清理了所有下载、展开的文件，还清理了apt的缓存文件。镜像构建时，一定要确保每一层只添加真正需要添加的东西，任何无关的东西都应该清理掉。
 
+#### COPY
+该指令从构建上下文的目录中复制文件到镜像内的目标路径位置，源路径可以是多个，也可以用通配符，通配符规则是Go的[filepath.Match](https://golang.org/pkg/path/filepath/#Match)规则。还可以通过添加`--chown=<user>:<group>`选项来改变文件的所属用户和组。例如:
+```
+COPY hom* /mydir/
+COPY hom?.txt /mydir/
+COPY --chown=55:mygroup files* /mydir/
+COPY --chown=bin files* /mydir/
+```
+
+#### ADD
+该命令和COPY的格式和性质基本一致，按最佳实践，COPY的语义更加明确应尽可能的使用，尽在需要自动解压缩的场合使用ADD。
+
 ### 构建镜像
 使用`docker build [选项] <上下文路径/URL/->`命令可进行镜像构建。
 
