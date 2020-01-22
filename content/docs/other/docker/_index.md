@@ -81,3 +81,27 @@ RUN buildDeps='gcc libc6-dev make wget' \
     && apt-get purge -y --auto-remove $buildDeps
 {{< /highlight >}}
 所有的命令都是一个目的，即编译、安装redis可执行文件，没必要多层。此外，这组命令的最后添加了清理工作的命令，删除为了编译构建所需的文件，清理了所有下载、展开的文件，还清理了apt的缓存文件。镜像构建时，一定要确保每一层只添加真正需要添加的东西，任何无关的东西都应该清理掉。
+
+### 构建镜像
+使用`docker build [选项] <上下文路径/URL/->`命令可进行镜像构建。
+
+#### 上下文
+我们经常使用`docker build .`，往往会理解为`.`表示当前目录，下意识的认为这是dockerfile的所在路径，但这么理解是不准确的，实际上这是在指定上下文路径。
+
+那么什么是上下文呢？Docker在运行时分为服务端守护进程和客户端工具，我们输入docker相关命令都是客户端操作，通过[Docker Remote API](https://docs.docker.com/develop/sdk/)与服务端docker引擎交互。当我们进行镜像构建时，就是通过`docker build`在服务端进行构建，上下文路径中的内容会被发送过去，这个`.`就是在指定上下文路径，这样当在dockerfile中遇到文件复制这样的语句，例如`COPY ./package.json /app/`时并不是要复制dockerfile下的package.json，而是去复制上下文路径下的package.json。所以类似`COPY ../package.json /app/`或者`COPY /opt/*** /app`都超出了上下文路径而无效，如果需要它们的话就得把它们复制到上下文目录中去。
+
+dockerfile一般放在一个空目录或项目的根目录下，如果有东西不希望发送给docker引擎，可以使用`.dockerignore`剔除掉。默认情况下，会将上下文目录下的名为`Dockerfile`的文件作为Dockerfile，实际上可以通过如`-f ../Dockerfile.php`指定某个文件为Dockerfile。
+
+#### 其他构建方式
+还可以直接使用git repo的方式构建:
+{{< highlight sh>}}
+PS C:\Users\hejl>  docker build https://github.com/twang2218/gitlab-ce-zh.git#:11.1
+Sending build context to Docker daemon  6.144kB
+Step 1/23 : FROM gitlab/gitlab-ce:11.1.4-ce.0 as builder
+11.1.4-ce.0: Pulling from gitlab/gitlab-ce
+8ee29e426c26: Pull complete                                                                    6e83b260b73b: Pull complete                                                                    e26b65fd1143: Pull complete      
+...
+{{< /highlight >}}
+该命令指定了构建所需的git repo，指定了默认的master分支，构建目录为`/11.1/`，然后docker会自己去clone项目切换到指定分支，并进入指定目录进行构建。
+
+也可以通过tar压缩包构建，例如`docker build http://url/context.tar.gz`，会去下载tar压缩包并自动解压缩，以其为上下文，开始构建。
