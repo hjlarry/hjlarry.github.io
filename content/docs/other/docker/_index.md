@@ -94,6 +94,14 @@ COPY --chown=bin files* /mydir/
 #### ADD
 该命令和COPY的格式和性质基本一致，按最佳实践，COPY的语义更加明确应尽可能的使用，尽在需要自动解压缩的场合使用ADD。
 
+#### CMD
+因为容器是进程，那么在启动容器的时候，就需要指定所运行的程序及参数，CMD就用来指定默认的容器主进程的启动命令。比如，ubuntu镜像的CMD设置的是/bin/bash，所以我们运行容器`docker run -it ubuntu`会进入到bash，但当我们使用`docker run -it ubuntu cat /etc/os-release`运行容器时就用`cat /etc/os-release`替换掉了`/bin/bash`命令。
+
+该指令既支持shell格式，`CMD <命令>`，也支持exec格式，`CMD ["可执行文件", "参数1", "参数2"...]`。但是shell格式会被包装一个`sh -c`的参数。例如`CMD echo $HOME`在实际的执行时会被替换为`CMD [ "sh", "-c", "echo $HOME" ]`。
+
+另外，docker中的应用都是以前台执行的，而不是像虚拟机、物理机那样，可以用systemd去启动一个后台服务，容器内没有后台服务的概念。类似于`CMD service nginx start`会发现容器执行后就立即退出了，甚至`systemctl`命令结果却根本执行不了，因为容器就是为了主进程而存在的，主进程退出容器就没有存在的意义也会退出，这条命令会被翻译为`CMD [ "sh", "-c", "service nginx start"]`，sh是主进程，当`service nginx start`命令结束后，sh就结束了，主进程退出自然容器就会退出。正确的做法是直接执行nginx可执行文件并以前台形式运行，如`CMD ["nginx", "-g", "daemon off;"]`。
+
+
 ### 构建镜像
 使用`docker build [选项] <上下文路径/URL/->`命令可进行镜像构建。
 
