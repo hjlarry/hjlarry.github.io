@@ -101,6 +101,20 @@ COPY --chown=bin files* /mydir/
 
 另外，docker中的应用都是以前台执行的，而不是像虚拟机、物理机那样，可以用systemd去启动一个后台服务，容器内没有后台服务的概念。类似于`CMD service nginx start`会发现容器执行后就立即退出了，甚至`systemctl`命令结果却根本执行不了，因为容器就是为了主进程而存在的，主进程退出容器就没有存在的意义也会退出，这条命令会被翻译为`CMD [ "sh", "-c", "service nginx start"]`，sh是主进程，当`service nginx start`命令结束后，sh就结束了，主进程退出自然容器就会退出。正确的做法是直接执行nginx可执行文件并以前台形式运行，如`CMD ["nginx", "-g", "daemon off;"]`。
 
+#### ENV
+用来设置环境变量，设置后无论是之后的指令，还是运行时的应用都可以直接使用定义的环境变量。支持格式:
+
+* ENV <key> <value>
+* ENV <key1>=<value1> <key2>=<value2> ...
+
+例如:
+{{< highlight dockerfile>}}
+ENV VERSION=1.0 DEBUG=on NAME="Happy Feet"
+RUN curl -SLO "https://nodejs.org/dist/v$VERSION/node-v$NAME-linux-x64.tar.xz"
+{{< /highlight >}}
+
+#### ARG
+和ENV类似，也是设置环境变量，只是它在容器运行时不会存在这些环境变量。
 
 ### 构建镜像
 使用`docker build [选项] <上下文路径/URL/->`命令可进行镜像构建。
