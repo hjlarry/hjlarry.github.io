@@ -124,6 +124,20 @@ RUN curl -SLO "https://nodejs.org/dist/v$VERSION/node-v$NAME-linux-x64.tar.xz"
 #### EXPOSE
 只是一个声明，容器运行时提供的服务端口。容器不会因为这个声明就自动开启这个端口的服务，只是帮助镜像使用者理解，或是使用`docker run -P`做随机端口映射时可自动映射到该指令设置的端口。
 
+#### WORKDIR
+使用该指令可以指定当前目录(或者称为工作目录)，以后各层的当前目录就被设置为它，如该目录不存在则会自动创建该目录。
+
+比如我们可能会这样写:
+{{< highlight dockerfile>}}
+RUN cd /app
+RUN echo "hello" > world.txt
+{{< /highlight >}}
+
+这样构建运行后，会发现找不到/app/world.txt这个文件，因为两个RUN代表两层，它们的执行环境不同，运行到第二层时启动的是一个全新的容器。这个时候就应该用`WORKDIR`指令进行设置。
+
+#### USER
+使用该指令可以切换到指定的用户，其后的每一层执行RUN、CMD以及ENTRYPOINT之类命令都会是这个新的身份。这个用户必须是事先建立好的。
+
 ### 构建镜像
 使用`docker build [选项] <上下文路径/URL/->`命令可进行镜像构建。
 
