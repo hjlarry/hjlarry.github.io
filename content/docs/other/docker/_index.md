@@ -161,3 +161,48 @@ Step 1/23 : FROM gitlab/gitlab-ce:11.1.4-ce.0 as builder
 该命令指定了构建所需的git repo，指定了默认的master分支，构建目录为`/11.1/`，然后docker会自己去clone项目切换到指定分支，并进入指定目录进行构建。
 
 也可以通过tar压缩包构建，例如`docker build http://url/context.tar.gz`，会去下载tar压缩包并自动解压缩，以其为上下文，开始构建。
+
+
+容器
+-------
+镜像是静态的定义，而容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。
+
+容器的实质是进程，但与直接在宿主执行的进程是不同的，容器进程运行于属于自己独立的命名空间，有自己的root文件系统、网络配置、进程空间、用户ID空间等，也就是它是一个隔离的环境。
+
+每个容器运行时，是以镜像为基础层，在其上创建一个当前容器的存储层用于容器运行时读写，该存储层的生命周期和容器是一样的。容器存储层应保持无状态化，所有对文件的写入操作都应该使用数据卷或绑定宿主目录，在这些位置的读写就会跳过容器存储层，直接对宿主发生读写，其性能和稳定性更高。
+
+### 启动容器
+容器启动的方式分为两种，一种是基于镜像新建一个容器并启动，另一种是将终止状态的容器重新启动。
+
+#### 新建并启动
+主要使用`docker run`命令，例如:
+{{< highlight sh>}}
+PS C:\Users\hejl> docker run -i -t ubuntu:latest
+root@f8be09e399ae:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+{{< /highlight >}}
+
+`-t`选项让docker分配一个伪终端来绑定到容器的标准输入上，`-i`选项让容器的标准输入保持打开。
+
+当执行`docker run`时，Docker后台实际上运行了这些操作:
+
+1. 检查本地是否存在指定的镜像，不存在就从公有仓库下载
+2. 利用镜像创建并启动一个容器
+3. 分配一个文件系统，并在只读的镜像层外面挂载一层可读写层
+4. 从宿主主机配置的网桥接口中桥接一个虚拟接口到容器中去
+5. 从地址池配置一个ip地址给容器
+6. 执行用户指定的应用程序
+7. 执行完毕后容器被终止
+
+#### 启动终止的容器
+使用`docker container start <container_id>`可以将一个已终止的容器启动运行。
+{{< highlight sh>}}
+PS C:\Windows\system32> docker container start -i f8b
+root@f8be09e399ae:/# ps
+  PID TTY          TIME CMD
+    1 pts/0    00:00:00 bash
+   10 pts/0    00:00:00 ps
+root@f8be09e399ae:/# exit
+exit
+{{< /highlight >}}
+使用`ps`或`top`可以查看进程信息，说明容器中仅运行了默认的bash应用。
