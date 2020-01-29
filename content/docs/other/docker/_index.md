@@ -7,15 +7,14 @@
 
 Docker使用[Union FS](https://en.wikipedia.org/wiki/Union_mount)技术，将镜像设计为分层存储的架构。构建时，会一层层构建，前一层是后一层的基础，每层构建完就不会改变，后一层的任何改变只是发生在自己这一层。例如，删除前一层的文件并不是真正的删除，而只是在本层中标记上一层的文件是删除的。
 
-### 基本操作
-#### 获取镜像
+### 获取镜像
 使用如下命令可以从镜像仓库中拉取镜像:
 ```
 docker pull [选项] [镜像仓库的地址[:端口号]/]仓库名[:标签]
 ```
 镜像仓库的地址默认为Docker Hub的地址，对于Docker Hub，仓库名默认为library，所以我们往往可以简写为`docker pull ubuntu:18.04`。
 
-#### 列出镜像
+### 列出镜像
 我们可以这样列出全部的镜像:
 {{< highlight sh>}}
 PS C:\Users\hejl> docker image ls
@@ -35,7 +34,7 @@ gcr.azk8s.cn/google_containers/hyperkube-amd64   v1.9.2              583687acb4d
 
 还有一种镜像叫中间层镜像，用来加速构建、重复利用资源，有的中间层镜像也没有标签和名称，它们不能被删除。可以通过`docker image ls -a`观察到包含中间层镜像的所有镜像。
 
-#### 删除镜像
+### 删除镜像
 使用`docker image rm <镜像1> [<镜像2> ...]`命令可删除镜像。这里既可以用镜像的名称，也就是`<仓库名>:<标签>`来表示镜像；也可以用镜像的ID，一般取前3位，足以区分出别的镜像即可。
 
 在删除镜像时，我们往往会看到删除信息中既有`Untagged`，也有`Deleted`。`Untagged`实际上是因为我们要删除的是某个tag标签下的镜像，需要去取消标签。
@@ -230,7 +229,23 @@ hello world
 使用`docker logs`可以看到某后台运行的容器的输出信息。
 
 ### 查看所有容器
+使用`docker ps`可以看到正在运行的容器，`docker ps -a`会看到包括终止状态的容器，它和`docker container ls -a`等价。
 
 ### 进入容器
+对于后台运行的容器，有时需要进入容器进行操作，可以使用`docker exec`或`docker attach`命令，但attach进入后如果输入`exit`退出容器会导致容器状态停止，所以更推荐`exec`的方式。
+{{< highlight sh>}}
+PS C:\Users\hejl> docker exec -it 6f8 bash
+root@6f8a756d46fe:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@6f8a756d46fe:/# exit
+exit
+PS C:\Users\hejl> docker attach 6f8
+root@6f8a756d46fe:/#    
+{{< /highlight >}}
 
 ### 终止和删除
+使用`docker stop <container_id/container_name>`可停止运行中的容器。
+
+使用`docker rm <container_id/container_name>`可删除，添加`-f`参数会强制删除即使该容器正在运行。
+
+使用`docker container prune`可以清理掉所有处于终止状态的容器。
