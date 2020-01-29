@@ -171,11 +171,31 @@ Step 1/23 : FROM gitlab/gitlab-ce:11.1.4-ce.0 as builder
 
 每个容器运行时，是以镜像为基础层，在其上创建一个当前容器的存储层用于容器运行时读写，该存储层的生命周期和容器是一样的。容器存储层应保持无状态化，所有对文件的写入操作都应该使用数据卷或绑定宿主目录，在这些位置的读写就会跳过容器存储层，直接对宿主发生读写，其性能和稳定性更高。
 
-### 启动容器
-容器启动的方式分为两种，一种是基于镜像新建一个容器并启动，另一种是将终止状态的容器重新启动。
+### 创建容器
+使用`docker create <image>`可以基于镜像创建一个容器，创建后其处于停止状态，需要用启动命令启动。
+{{< highlight sh>}}
+PS C:\Windows\system32> docker create -it ubuntu:latest
+1179ee64f25b6ddbe95e916c4b888ff4d05878ebabd77c94658c9cbc8686b360
+PS C:\Windows\system32> docker start -i 117
+root@1179ee64f25b:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+{{< /highlight >}}
 
-#### 新建并启动
-主要使用`docker run`命令，例如:
+### 启动容器
+使用`docker start <container_id/container_name>`可以将一个终止状态的容器启动运行。
+{{< highlight sh>}}
+PS C:\Windows\system32> docker container start -i f8b
+root@f8be09e399ae:/# ps
+  PID TTY          TIME CMD
+    1 pts/0    00:00:00 bash
+   10 pts/0    00:00:00 ps
+root@f8be09e399ae:/# exit
+exit
+{{< /highlight >}}
+使用`ps`或`top`可以查看进程信息，说明容器中仅运行了默认的bash应用。
+
+### 新建并启动
+使用`docker run`命令，相当于`docker create`+`docker start`，例如:
 {{< highlight sh>}}
 PS C:\Users\hejl> docker run -i -t ubuntu:latest
 root@f8be09e399ae:/# ls
@@ -194,15 +214,23 @@ bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  s
 6. 执行用户指定的应用程序
 7. 执行完毕后容器被终止
 
-#### 启动终止的容器
-使用`docker container start <container_id>`可以将一个已终止的容器启动运行。
+### 后台运行
+很多时候，需要让Docker在后台运行而不是直接把执行命令的结果输出在当前宿主机上，此时可以通过添加`-d`参数来实现。`docker run`和`docker create`命令都可以使用该参数。
+
+但容器是否会长久运行，只取决于`docker run`到底跑了什么进程，和`-d`参数无关。如:
 {{< highlight sh>}}
-PS C:\Windows\system32> docker container start -i f8b
-root@f8be09e399ae:/# ps
-  PID TTY          TIME CMD
-    1 pts/0    00:00:00 bash
-   10 pts/0    00:00:00 ps
-root@f8be09e399ae:/# exit
-exit
+PS C:\Users\hejl> docker run -d ubuntu:18.04 /bin/sh -c "while true; do echo hello world; sleep 1; done"
+6ec4042f4d06f94a46aadebe8d05f33d9916985b19bae6d8d63ed867d89b3714
+PS C:\Users\hejl> docker logs 6ec
+hello world
+hello world
+hello world
+...
 {{< /highlight >}}
-使用`ps`或`top`可以查看进程信息，说明容器中仅运行了默认的bash应用。
+使用`docker logs`可以看到某后台运行的容器的输出信息。
+
+### 查看所有容器
+
+### 进入容器
+
+### 终止和删除
