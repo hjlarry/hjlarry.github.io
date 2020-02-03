@@ -299,6 +299,12 @@ Compose的定位是定义和运行多个Docker容器的应用，其中有两个�
 * --no-cache，构建镜像过程中不使用缓存
 * --pull，始终尝试通过pull来获取更新版本的镜像
 
+#### config
+验证`docker-compose.yml`文件中的格式是否正确，如果正确会显示配置，错误则显示错误原因。
+
+#### exec
+进入指定的容器，容器必须是运行状态的。例如`docker-compose exec web sh`
+
 #### run
 用于在指定服务上运行一个命令。
 
@@ -328,3 +334,64 @@ Compose的定位是定义和运行多个Docker容器的应用，其中有两个�
 * -t，停止容器时的超时
 
 ### 模板文件
+默认的文件名称为`docker-compose.yml`，下面主要介绍核心指令的含义。
+
+每个服务都必须通过image指令或build指令来自动构建生成镜像，如果使用build，Dockerfile中设置的选项(如CMD、EXPOSE、VOLUME、ENV)将会自动被获取，无需在模板文件中重复设置。
+
+#### build
+指定Dockerfile所在文件夹的路径，可以是绝对路径或是相对于`docker-compose.yml`文件的相对路径。如:
+{{< highlight yml>}}
+version: '3'
+services:
+
+  webapp:
+    build: ./dir
+{{< /highlight >}}
+
+也可以使用context指令指定Dockerfile所在的文件夹路径，使用dockerfile指令指定Dockerfile的文件名，使用arg指令指定构建镜像时的变量。如：
+{{< highlight yml>}}
+version: '3'
+services:
+
+  webapp:
+    build:
+      context: ./dir
+      dockerfile: Dockerfile-alternate
+      args:
+        buildno: 1
+{{< /highlight >}}
+
+#### command
+会覆盖掉容器启动后默认执行的命令。例如:
+{{< highlight yml>}}
+version: "3"
+services:
+
+  db:
+     image: mysql:8.0
+     command:
+      - --character-set-server=utf8mb4
+{{< /highlight >}}
+没有command时只启动`mysqld`，加上以后变为`mysqld --character-set-server=utf8mb4`
+
+#### depends_on
+解决容器之间的依赖、启动先后问题。
+
+#### environment
+设置环境变量，可以使用如下两种格式:
+{{< highlight yml>}}
+environment:
+  RACK_ENV: development
+  SESSION_SECRET:
+
+environment:
+  - RACK_ENV=development
+  - SESSION_SECRET
+{{< /highlight >}}
+在这里设置的环境变量，不能用于容器的构建过程中，只能在容器运行以后才能获取到。例如若dockerfie中有一层是`RUN flask db migrate`，则它无法获取到`docker-compose.yml`中设置的数据库连接的环境变量。正确的方法是dockerfile中没有这一层，而是通过`docker-compose run --rm web flask db migrate`来达到目的。
+
+#### expose
+暴漏端口，但不映射到宿主机，只有被连接的服务能通过该端口访问。
+
+#### image
+指定为镜像名称或镜像ID，如果镜像在本地不存在，将会尝试拉取这个镜像。
