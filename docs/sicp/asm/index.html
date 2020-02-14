@@ -13,10 +13,10 @@
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
+<link rel="stylesheet" href="/book.min.eddc90f1d1267cb826e7cffc53c434e50061c4bfe41146a43670842ce6cb3bf6.css" integrity="sha256-7dyQ8dEmfLgm58/8U8Q05QBhxL/kEUakNnCELObLO/Y=">
 
 
-<script defer src="/cn.search.min.d6435a8341338af3206f281ee20daaedaa51bceaa6c1ae6716fb500f7dcbe081.js" integrity="sha256-1kNag0EzivMgbyge4g2q7apRvOqmwa5nFvtQD33L4IE="></script>
+<script defer src="/cn.search.min.f501d9d3f7f729f2c56eb4a1001961a0b110046c470a021dbdafbe5027b2582b.js" integrity="sha256-9QHZ0/f3KfLFbrShABlhoLEQBGxHCgIdva&#43;&#43;UCeyWCs="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/sicp/asm/index.xml" title="Home" />
 <!--
@@ -51,14 +51,13 @@ https://github.com/alex-shpak/hugo-book
 
     <ul>
 <li><strong>计算机基础</strong>
-
 <ul>
 <li><a href="/docs/sicp/hardware/">硬件</a></li>
 <li><a href="/docs/sicp/software/">软件</a></li>
 <li><a href="/docs/sicp/asm/"class=active>汇编</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>GO语言</strong>
-
 <ul>
 <li><a href="/docs/go/map/">字典</a></li>
 <li><a href="/docs/go/closure/">闭包</a></li>
@@ -67,25 +66,26 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/docs/go/alloc/">内存分配</a></li>
 <li><a href="/docs/go/goroutine/">并发调度</a></li>
 <li><a href="/docs/go/lock/">锁</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>Python语言</strong>
-
 <ul>
 <li><a href="/docs/python/descriptor/">描述符</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>Mysql</strong>
-
 <ul>
 <li><a href="/docs/mysql/query/">查询</a></li>
 <li><a href="/docs/mysql/theory/">原理</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>其他</strong>
-
 <ul>
 <li><a href="/docs/other/tools/">基础系统工具</a></li>
 <li><a href="/docs/other/git/">git</a></li>
 <li><a href="/docs/other/docker/">docker</a></li>
-</ul></li>
+</ul>
+</li>
 </ul>
 
 
@@ -116,22 +116,13 @@ https://github.com/alex-shpak/hugo-book
 </header>
 
       
-<article class="markdown">
-
-<h1 id="汇编语言">汇编语言</h1>
-
+<article class="markdown"><h1 id="汇编语言">汇编语言</h1>
 <h2 id="基础知识">基础知识</h2>
-
 <p>编程语言是给人看的，CPU看不懂汇编语言，CPU能看懂的只有二进制指令。早期通过纸带打孔的方式输入指令，后来逐渐发展出了助记符，也就是例如跳转、循环之类的指令，再由编译器(汇编器)把这些助记符还原为二进制的指令。所以汇编语言可以理解为机器语言的一种方言，方便人类去记忆它，汇编语言和机器语言就存在着一定程度上的一一对应的关系。</p>
-
 <p>汇编是面向机器编程的语言，不同的硬件的指令可能是不同的，它能直接访问硬件的存储和端口，最大程度发挥出硬件的能力。它还有一些其他的使用场景，例如优化代码追求极致效率、直接调试和修改没有源码的程序、诊断恶意软件、进行逆向分析等。汇编的缺点也显而易见，对多数人而言，汇编代码难懂，不易维护，难于调试，不易移植，开发效率低。</p>
-
 <p>汇编语言的风格分为两种，Intel的和AT&amp;T的，相当于用不同的方言描述机器语言。AT&amp;T风格主要是GNU使用的，汇编器主要是GAS/as;Intel风格主要是windows使用的，汇编器有MASM、NASM、TASM、FASM。它们的主要区别在于AT&amp;T会在寄存器名字前加%，在立即操作数前加$前缀，且源和目标操作数的顺序和Intel相反。详细区别可参考<a href="https://zh.wikipedia.org/wiki/%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80#%E7%B5%84%E8%AD%AF%E9%A2%A8%E6%A0%BC">wiki</a>，以及<a href="https://developer.ibm.com/articles/l-gas-nasm/">这篇文章</a>。</p>
-
 <p>本文使用NASM汇编器，它采用Intel语法风格，支持很多种格式，包括ELF、COFF、Mach-O、Win32、Win64等，可使用<code>nasm -hf</code>查看其所有支持的格式。</p>
-
 <h2 id="处理过程">处理过程</h2>
-
 <p>Hello world示例程序:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">global</span> <span style="color:#66d9ef">_start</span> 
 
@@ -148,41 +139,34 @@ https://github.com/alex-shpak/hugo-book
         <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">60</span>     <span style="color:#75715e">; &#39;exit&#39; syscall number
 </span><span style="color:#75715e"></span>        <span style="color:#66d9ef">xor</span> <span style="color:#66d9ef">rdi</span>, <span style="color:#66d9ef">rdi</span>
         <span style="color:#a6e22e">syscall</span></code></pre></div></p>
-
 <h3 id="编译">编译</h3>
-
 <p>把每一个源码文件(可能是<code>.c</code>,<code>.s</code>,<code>.go</code>等格式)翻译为一个目标文件(可能是<code>.o</code>)，它和可执行文件很像，也是由一个个表构成，但问题是A文件若调用B文件的函数，A是不知道B在哪的，编译器就会把这个B的位置空下来，并把这个信息写在表中某个位置等待之后进行重定位。</p>
-
 <p>我们使用编译语句<code>nasm -g -F dwarf -f elf64 -o hello.o hello.s</code>来编译之前的helloworld程序。其中<code>-o hello.o</code>表示输出的目标文件名称为hello.o，<code>-f elf64</code>表示目标文件的格式采取elf64的，<code>-g</code>表示要生成调试信息，<code>-F dwarf</code>用来指定生成的调试信息的格式。此外可以通过<code>-O</code>指定不同的优化级别，可能有O0、O1、O2等，<code>-E</code>表示只做预处理。</p>
-
 <p>日常说编译的时候往往指的是编译和链接两个过程。</p>
-
 <h3 id="链接">链接</h3>
-
 <p>链接就是把编译后的目标文件合并在一起，通过起始地址就能计算出各个目标文件的偏移量，也就知道了编译时需要重定位的那些函数的地址，再把它填进去。</p>
-
 <p>我们使用GNU通用的链接器来链接，也可以对比出目标文件和链接后的可执行文件的区别:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ nasm -g -f elf64 -o hello.o hello.s
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ ld -o hello hello.o
 
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ file hello.o
-hello.o: ELF <span style="color:#ae81ff">64</span>-bit LSB relocatable, x86-64, version <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>SYSV<span style="color:#f92672">)</span>, not stripped
+hello.o: ELF 64-bit LSB relocatable, x86-64, version <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>SYSV<span style="color:#f92672">)</span>, not stripped
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ file hello
-hello: ELF <span style="color:#ae81ff">64</span>-bit LSB executable, x86-64, version <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>SYSV<span style="color:#f92672">)</span>, statically linked, not stripped
+hello: ELF 64-bit LSB executable, x86-64, version <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>SYSV<span style="color:#f92672">)</span>, statically linked, not stripped
 
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ objdump -d -M intel hello.o
 hello.o:     file format elf64-x86-64
 Disassembly of section .text:
 <span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#ae81ff">0000000000000000</span> &lt;_start&gt;:
-</span>   <span style="color:#ae81ff">0</span>:	b8 <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    eax,0x1
-   <span style="color:#ae81ff">5</span>:	bf <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    edi,0x1
+</span>   0:	b8 <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    eax,0x1
+   5:	bf <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    edi,0x1
 <span style="display:block;width:100%;background-color:#3c3d38">   a:	<span style="color:#ae81ff">48</span> be <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> 	movabs rsi,0x0
-</span>  <span style="color:#ae81ff">11</span>:	<span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>
-  <span style="color:#ae81ff">14</span>:	ba 0e <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    edx,0xe
-  <span style="color:#ae81ff">19</span>:	0f <span style="color:#ae81ff">05</span>                	syscall
+</span>  11:	<span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>
+  14:	ba 0e <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    edx,0xe
+  19:	0f <span style="color:#ae81ff">05</span>                	syscall
   1b:	b8 3c <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    eax,0x3c
-  <span style="color:#ae81ff">20</span>:	<span style="color:#ae81ff">48</span> <span style="color:#ae81ff">31</span> ff             	xor    rdi,rdi
-  <span style="color:#ae81ff">23</span>:	0f <span style="color:#ae81ff">05</span>                	syscall
+  20:	<span style="color:#ae81ff">48</span> <span style="color:#ae81ff">31</span> ff             	xor    rdi,rdi
+  23:	0f <span style="color:#ae81ff">05</span>                	syscall
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ objdump -d -M intel hello
 hello:     file format elf64-x86-64
 Disassembly of section .text:
@@ -196,9 +180,7 @@ Disassembly of section .text:
   4000cb:	b8 3c <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    eax,0x3c
   4000d0:	<span style="color:#ae81ff">48</span> <span style="color:#ae81ff">31</span> ff             	xor    rdi,rdi
   4000d3:	0f <span style="color:#ae81ff">05</span>                	syscall</code></pre></div></p>
-
 <p>通过反编译发现目标文件的起始地址_start是0，所以此时的<code>movabs rsi,0x0</code>也表示不知道hello的地址，而链接之后这些地址都有了。链接器也支持一些常见的参数，例如<code>-e</code>去指定一个非默认的入口标签，<code>-s</code>去移除所有的符号信息，<code>-S</code>仅移除调试信息。</p>
-
 <p>我们再来看看Go的编译和链接过程:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/gocode $ go build -x main.go
 WORK<span style="color:#f92672">=</span>/tmp/go-build182029561
@@ -208,7 +190,7 @@ cat &gt;$WORK/b001/importcfg <span style="color:#e6db74">&lt;&lt; &#39;EOF&#39; 
 </span><span style="color:#e6db74">packagefile runtime=/usr/local/go/pkg/linux_amd64/runtime.a
 </span><span style="color:#e6db74">EOF</span>
 cd /root/.mac/gocode
-<span style="display:block;width:100%;background-color:#3c3d38">/usr/local/go/pkg/tool/linux_amd64/compile -o $WORK/b001/_pkg_.a -trimpath <span style="color:#e6db74">&#34;</span>$WORK<span style="color:#e6db74">/b001=&gt;&#34;</span> -p main -complete -buildid dR1ZsbI6brd59SPrnOhX/dR1ZsbI6brd59SPrnOhX -goversion go1.13 -D _/root/.mac/gocode -importcfg $WORK/b001/importcfg -pack -c<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> ./main.go
+<span style="display:block;width:100%;background-color:#3c3d38">/usr/local/go/pkg/tool/linux_amd64/compile -o $WORK/b001/_pkg_.a -trimpath <span style="color:#e6db74">&#34;</span>$WORK<span style="color:#e6db74">/b001=&gt;</span><span style="color:#e6db74">&#34;</span> -p main -complete -buildid dR1ZsbI6brd59SPrnOhX/dR1ZsbI6brd59SPrnOhX -goversion go1.13 -D _/root/.mac/gocode -importcfg $WORK/b001/importcfg -pack -c<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> ./main.go
 </span>/usr/local/go/pkg/tool/linux_amd64/buildid -w $WORK/b001/_pkg_.a <span style="color:#75715e"># internal</span>
 cp $WORK/b001/_pkg_.a /root/.cache/go-build/dd/ddfadd34424d01a7a08b5c1cad7d09610caf9d21c8372338aed2d3331c8802cd-d <span style="color:#75715e"># internal</span>
 cat &gt;$WORK/b001/importcfg.link <span style="color:#e6db74">&lt;&lt; &#39;EOF&#39; # internal
@@ -226,15 +208,10 @@ cd .
 </span>/usr/local/go/pkg/tool/linux_amd64/buildid -w $WORK/b001/exe/a.out <span style="color:#75715e"># internal</span>
 cp $WORK/b001/exe/a.out main
 rm -r $WORK/b001/</code></pre></div></p>
-
 <p>它也有自己的编译器和链接器，只是它的目标文件通过<code>-pack</code>参数进行了打包，打包为一个个<code>.a</code>格式再进行链接。</p>
-
 <h2 id="源码结构">源码结构</h2>
-
 <p>汇编语言都是对内存的处理，其本身没有函数的概念，为了便于维护和写跳转之类的语句，就有了标签代表相应的内存地址，放在不同的section中。</p>
-
 <h3 id="标签">标签</h3>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">global</span> <span style="color:#66d9ef">_start</span> 
 
 <span style="color:#66d9ef">section</span> <span style="color:#66d9ef">.text</span> 
@@ -244,13 +221,9 @@ rm -r $WORK/b001/</code></pre></div></p>
         <span style="color:#a6e22e">syscall</span>
     _start:
         <span style="color:#a6e22e">jmp</span> <span style="color:#66d9ef">main</span> </code></pre></div>
-
 <p>上述源码中<code>main</code>与<code>_start</code>称为标签，可以使用<code>jmp</code>跳转至某个标签，或者<code>call</code>调用某个标签的内容。</p>
-
 <p>标签会被编译器翻译为内存地址，我们通过符号表也能看到它。使用global可以把这个标签声明为全局的标签。</p>
-
 <h3 id="本地标签">本地标签</h3>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.text</span> 
     <span style="color:#66d9ef">main</span>:
         <span style="color:#a6e22e">jmp</span> <span style="color:#66d9ef">.hello</span>
@@ -258,15 +231,10 @@ rm -r $WORK/b001/</code></pre></div></p>
         <span style="color:#a6e22e">mov</span> <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">60</span>
         <span style="color:#a6e22e">xor</span> <span style="color:#66d9ef">rdi</span>, <span style="color:#66d9ef">rdi</span>
         <span style="color:#a6e22e">syscall</span></code></pre></div>
-
 <p>以<code>.</code>开头的称为本地标签，例如上面的<code>.hello</code>，编译器会把它翻译为其前一个标签+本地标签，即<code>main.hello</code>，这样就形成了一种类似于名字空间的效果。让大段的逻辑分成多个片段，不需要担心命名上的冲突，属于汇编这门语言提供的一个功能。它和本地符号无关，<code>main.hello</code>也可以是一个全局的符号，代表的一种身份，而<code>.hello</code>依然是一个本地标签，相当于一个称谓。</p>
-
 <h3 id="入口标签">入口标签</h3>
-
 <p>GNU的链接器默认使用一个特殊符号<code>_start</code>当做程序的入口，如果我们没定义这样的名字或者把它改为一个其他名字，那么链接器链接的时候就会用一个默认的地址，这个地址可能是程序<code>.text</code>段的第一行，同时链接器会提示:<code>ld: warning: cannot find entry symbol _start; defaulting to 00000000004000b0</code>。链接器允许使用<code>ld -e</code>自行指定一个入口标签，当然这个标签必须是全局的。</p>
-
 <h3 id="段标签与内存地址">段标签与内存地址</h3>
-
 <p>可以使用<code>$</code>表示当前这行指令的内存地址，<code>$$</code>表示当前section的起始地址，同时我们也可以通过反汇编观察到跳转时标签和内存地址一一对应的关系:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">global</span> <span style="color:#66d9ef">_start</span> 
 <span style="color:#66d9ef">section</span> <span style="color:#66d9ef">.text</span> 
@@ -281,18 +249,17 @@ rm -r $WORK/b001/</code></pre></div></p>
         <span style="color:#a6e22e">syscall</span>
     _start:
         <span style="color:#a6e22e">jmp</span> <span style="color:#66d9ef">main</span></code></pre></div></p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ nasm -g -F dwarf -f elf64 -o hello.o hello.s
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ ld -o hello hello.o
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ objdump -d -M intel hello
 hello:     file format elf64-x86-64
 Disassembly of section .text:
 <span style="color:#ae81ff">0000000000400080</span> &lt;main&gt;:
-  <span style="color:#ae81ff">400080</span>:	<span style="color:#ae81ff">48</span> b8 <span style="color:#ae81ff">80</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">40</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> 	movabs rax,0x400080
-  <span style="color:#ae81ff">400087</span>:	<span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>
+  400080:	<span style="color:#ae81ff">48</span> b8 <span style="color:#ae81ff">80</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">40</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> 	movabs rax,0x400080
+  400087:	<span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>
   40008a:	<span style="color:#ae81ff">48</span> bb a8 <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">40</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> 	movabs rbx,0x4000a8
-  <span style="color:#ae81ff">400091</span>:	<span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>
-  <span style="color:#ae81ff">400094</span>:	<span style="color:#ae81ff">48</span> b9 <span style="color:#ae81ff">94</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">40</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> 	movabs rcx,0x400094
+  400091:	<span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>
+  400094:	<span style="color:#ae81ff">48</span> b9 <span style="color:#ae81ff">94</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">40</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> 	movabs rcx,0x400094
   40009b:	<span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>
   40009e:	<span style="color:#ae81ff">48</span> ba <span style="color:#ae81ff">80</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">40</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> 	movabs rdx,0x400080
   4000a5:	<span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>
@@ -302,13 +269,9 @@ Disassembly of section .text:
   4000b0:	0f <span style="color:#ae81ff">05</span>                	syscall
 00000000004000b2 &lt;_start&gt;:
   4000b2:	eb cc                	jmp    <span style="color:#ae81ff">400080</span> &lt;main&gt;</code></pre></div>
-
 <h2 id="语言规范">语言规范</h2>
-
 <h3 id="寻址方式">寻址方式</h3>
-
 <p>寻址方式就是通过什么方式确定目标所在的地址。我们把寄存器当成一个个的盒子，有以下几种寻址方式:</p>
-
 <ul>
 <li>立即寻址，<code>mov rax, 0x100</code>，直接把值0x100放在一个盒子中</li>
 <li>寄存器寻址，<code>mov rax, rbx</code>，把一个盒子中的值放在另一个盒子中</li>
@@ -317,11 +280,8 @@ Disassembly of section .text:
 <li>寄存器相对寻址，<code>mov rax,[8+rbx]</code>，先算出rbx+8，得到一个内存地址而已</li>
 <li>基址变址，<code>lea rax, [rbx+rcx]</code>，把地址拿出来放到盒子里</li>
 </ul>
-
 <p><code>mov rax, 0x100</code>表示给rax赋值为0x100，<code>mov rax, [0x100]</code>表示给rax赋值内存0x100位置的值，<code>lea rax, [0x100]</code>表示直接去找[0x100]的地址即0x100，赋值给rax。<code>mov</code>是对于内容的操作，<code>lea</code>是对于地址的操作。<code>mov</code>是不能直接在两块内存之间进行复制的。<code>[addr]</code>这种表达方式属于NASM编译器对内存操作必须这么做，即便是一个变量名称（代表一个内存地址），例如<code>x=100</code>，也得用<code>[x]</code>才取的到它的值100。</p>
-
 <h3 id="变量">变量</h3>
-
 <p>可以在<code>.data</code>和<code>.bss</code>段中定义变量，定义示例:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.data</span>
     <span style="color:#a6e22e">x</span> <span style="color:#66d9ef">dq</span> <span style="color:#ae81ff">0x8070605040302010</span>    
@@ -336,9 +296,7 @@ Disassembly of section .text:
     <span style="color:#a6e22e">xx</span> <span style="color:#66d9ef">resq</span> <span style="color:#ae81ff">2</span> 
     <span style="color:#66d9ef">yy</span> <span style="color:#66d9ef">times</span> <span style="color:#ae81ff">2</span> <span style="color:#66d9ef">resb</span> <span style="color:#ae81ff">8</span></code></pre></div>
 <code>x</code>是变量名称，代表符号的地址，变量的起始地址；<code>dq</code>代表它的长度；<code>0x8070605040302010</code>代表它的初始化值。</p>
-
 <p>字符和它代表的长度如下表所示:</p>
-
 <table>
 <thead>
 <tr>
@@ -347,50 +305,42 @@ Disassembly of section .text:
 <th>.bss中</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>db</td>
 <td>1</td>
 <td>resb</td>
 </tr>
-
 <tr>
 <td>dw</td>
 <td>2</td>
 <td>resw</td>
 </tr>
-
 <tr>
 <td>dd</td>
 <td>4</td>
 <td>resd</td>
 </tr>
-
 <tr>
 <td>dq</td>
 <td>8</td>
 <td>resq</td>
 </tr>
-
 <tr>
 <td>dt</td>
 <td>10</td>
 <td>rest</td>
 </tr>
-
 <tr>
 <td>do</td>
 <td>16</td>
 <td>reso</td>
 </tr>
-
 <tr>
 <td>dy</td>
 <td>32</td>
 <td>resy</td>
 </tr>
-
 <tr>
 <td>dz</td>
 <td>64</td>
@@ -398,35 +348,22 @@ Disassembly of section .text:
 </tr>
 </tbody>
 </table>
-
 <p><code>y db 1,2,3</code>就表示从y这个内存地址开始，后面逗号分隔的有三块内存，每块内存都是db大小且值为对应的1、2、3。汇编语言中是没有字符串的，像<code>&quot;abcd&quot;</code>就是拿它的ASCII值把它当做字节序列。<code>s db &quot;abcd&quot;, &quot;e&quot;, &quot;f&quot;</code>中db放不下整个<code>&quot;abcd&quot;</code>，就用了4个db来放。<code>equ</code>是定义常量的方式，见后文描述。另外，数字有大小端和进制的问题。</p>
-
 <p>在<code>.data</code>中是定义，而在<code>.bss</code>中是预留。<code>xx resq 2</code>就表示从<code>xx</code>开始，预留<code>resq</code>大小的空间，预留<code>2</code>组。</p>
-
 <p><code>times</code>类似于语法糖，用于重复定义数据或指令。<code>yy times 2 resb 8</code>就表示<code>yy resb 8</code>重复两次。</p>
-
 <h3 id="常量">常量</h3>
-
 <p>常量是不会存在<code>.data</code>段中的，尽管我们在那里定义，但它会被编译器展开，变为指令的一部分，保存在<code>.text</code>段中。</p>
-
 <p>汇编语言中常量有四种，即整数、浮点数、字符、字符串。整数常量的值有不同的写法:</p>
-
 <ul>
 <li>十进制的，100, 0100, 100d, 0100d, 0d100</li>
 <li>十六进制的，0h64, 0x64, $064, 64h</li>
 <li>二进制的，0b101, 101b</li>
 </ul>
-
 <p>字符代表的是其ASCII的常量值，支持转义，支持单双和反引号。字符串会被解析为ASCII的序列，从左依次排列。</p>
-
-<p>整型常量通过<code>equ</code>定义，例如<code>leny equ $-y</code>，它常用来和<code>$</code>、<code>$$</code>配合计算长度，但不支持用它来定义浮点数。</p>
-
+<p>整型常量通过<code>equ</code>定义，例如<code>leny equ $-y </code>，它常用来和<code>$</code>、<code>$$</code>配合计算长度，但不支持用它来定义浮点数。</p>
 <p>另一种常见的定义方式是使用<code>%assign name value</code>，它可以在任意位置定义，而且可以重复定义，使用时以最后一次的定义为准。这种定义方式属于使用宏，它是编译器在对代码预处理阶段就展开的。</p>
-
 <h3 id="指令">指令</h3>
-
 <p>常用的指令其实很少，如下所示，如果遇到其他复杂的指令也只需要搜索一下即可。</p>
-
 <ul>
 <li>数据移动: mov, push, pop, lea</li>
 <li>算术: inc, dec, add, sub, imul, idev</li>
@@ -434,38 +371,27 @@ Disassembly of section .text:
 <li>位移: shl, shr</li>
 <li>字节数组或字符串: rep, movsb, cmpsb, scasb, stomb</li>
 </ul>
-
 <p>有时由于指令集的限制禁止一些操作，例如mov不能用于内存到内存的操作，这些都可以通过<a href="http://www.cs.virginia.edu/~evans/cs216/guides/x86.html">x86手册</a>查看到。</p>
-
 <h3 id="控制流">控制流</h3>
-
 <p>在汇编语言中，基本的控制流就是跳转和循环，其他的控制流也只是基于这两种的组合。高级语言里的控制流也只是看上去更方便，本质上在CPU眼里仍然是跳转和循环。</p>
-
 <h4 id="跳转">跳转</h4>
-
 <p>跳转一般都是指跳转到某个label，分为三种，第一种<code>jmp</code>类似于goto，属于无条件跳转。</p>
-
 <p>第二种<code>test</code>则是针对其两个参数进行二进制AND逻辑操作，并根据结果设置标志寄存器的ZF标志位。之后配合<code>jz</code>(和je等价)、<code>jnz</code>(和jne等价)指令，它们会判断ZF标志位的值完成跳转。
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm">    _start:
         <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span>
         <span style="color:#a6e22e">test</span>    <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">rax</span> <span style="color:#75715e">; 如果AX为0，则把ZF设为1，否则把ZF设为0
-</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">jne</span>     <span style="color:#66d9ef">.exit</span>    <span style="color:#960050;background-color:#1e0010">;</span> <span style="color:#960050;background-color:#1e0010">如果</span><span style="color:#66d9ef">ZF为0</span><span style="color:#960050;background-color:#1e0010">，则跳转至</span><span style="color:#66d9ef">.exit标签</span></code></pre></div></p>
-
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">jne</span>     <span style="color:#66d9ef">.exit</span>    <span style="color:#960050;background-color:#1e0010">;</span> <span style="color:#960050;background-color:#1e0010">如</span><span style="color:#960050;background-color:#1e0010">果</span><span style="color:#66d9ef">ZF为0</span><span style="color:#960050;background-color:#1e0010">，</span><span style="color:#960050;background-color:#1e0010">则</span><span style="color:#960050;background-color:#1e0010">跳</span><span style="color:#960050;background-color:#1e0010">转</span><span style="color:#960050;background-color:#1e0010">至</span><span style="color:#66d9ef">.exit标签</span></code></pre></div></p>
 <p>第三种是使用<code>cmp</code>比较两个参数，比较的结果存到相应的状态寄存器中，根据状态寄存器的值再配合相关指令完成跳转:</p>
-
 <ul>
 <li>je (==), jne (!=), jz (==0), jnz (!=0)</li>
 <li>jg (&gt;), jge (&gt;=), jl (&lt;), jle (&lt;=)</li>
 </ul>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm">_start:
     <span style="color:#a6e22e">mov</span> <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span> 
     <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rbx</span>, <span style="color:#ae81ff">2</span> 
     <span style="color:#66d9ef">cmp</span> <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">rbx</span> 
     <span style="color:#66d9ef">jne</span> <span style="color:#66d9ef">.exit</span></code></pre></div>
-
 <h4 id="循环">循环</h4>
-
 <p>循环需要先将循环多少次放到<code>rcx</code>寄存器中，然后执行循环体逻辑，最后调用loop指令，该指令在rcx寄存器大于0时会减一并跳转到其参数的位置，等于0时则会接着向下执行。
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm">_start:
     <span style="color:#a6e22e">xor</span> <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">rax</span>
@@ -474,31 +400,20 @@ Disassembly of section .text:
     <span style="color:#a6e22e">inc</span> <span style="color:#66d9ef">rax</span>
     <span style="color:#a6e22e">loop</span> <span style="color:#66d9ef">.abc</span></code></pre></div>
 类似于do(sth&hellip;) until{rcx==0}。</p>
-
 <h3 id="数据结构">数据结构</h3>
-
 <h4 id="字符串">字符串</h4>
-
 <p>汇编中会把字符串当做字节序列来处理，字节实际上是个整数，它的取值范围是0~255。当我们通过:</p>
-
 <pre><code>string db `\u6c49\xe5\xad\x97 \u263a \n` ; 汉字, ☺ -&gt; UTF-8
-</code></pre>
-
-<p>定义字符串时，实际上就是定义了一个字节序列，只是抽象层面上可以理解为字符串。而对于这种字节序列，CPU也提供了专门的指令适用于更高效的移动它们，即rep movs。</p>
-
+</code></pre><p>定义字符串时，实际上就是定义了一个字节序列，只是抽象层面上可以理解为字符串。而对于这种字节序列，CPU也提供了专门的指令适用于更高效的移动它们，即rep movs。</p>
 <p>编译器支持<code>\u</code>、<code>\x</code>以及utf-8等方式的编码。字符串可以放在<code>section .rodata</code>(只读)或<code>section .data</code>中。</p>
-
 <h4 id="数组">数组</h4>
-
 <p>数组实际上就是一个连续的存储空间，里面只有元素，没有别的东西。数组定义时得告诉编译器其长度，编译器才好安排地址。汇编里没有数组这种语法，我们的做法只是保留一段内存空间，本质上我们对数组的操作就是对其内存地址的操作。
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.bss</span>
     <span style="color:#960050;background-color:#1e0010">%</span><span style="color:#a6e22e">assign</span> <span style="color:#66d9ef">num</span> <span style="color:#ae81ff">10</span>
     <span style="color:#960050;background-color:#1e0010">%</span><span style="color:#a6e22e">assign</span> <span style="color:#66d9ef">size</span> <span style="color:#ae81ff">8</span>
     <span style="color:#a6e22e">array</span> <span style="color:#66d9ef">resq</span> <span style="color:#66d9ef">num</span> * <span style="color:#66d9ef">size</span></code></pre></div>
 通过<code>num*size</code>计算出数组的长度，array代表数组的起始地址，要拿到array[i]的地址就可以通过<code>array+size*i</code>。</p>
-
 <h4 id="结构体">结构体</h4>
-
 <p>结构体实际上也是一个连续的存储空间，只是其内部字段的长度不同，在汇编中还是按照起始地址加偏移量去数格子定位到不同的字段。那么它还是一个编译器的语法糖，通过反汇编是看不到的。
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">struc</span> <span style="color:#66d9ef">User</span>
     <span style="color:#a6e22e">.name</span> : <span style="color:#66d9ef">resb</span> <span style="color:#ae81ff">10</span>
@@ -514,13 +429,9 @@ Disassembly of section .text:
 <span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.bss</span>
     <span style="color:#a6e22e">u2</span>  <span style="color:#66d9ef">resb</span> <span style="color:#66d9ef">User_size</span></code></pre></div>
 这段代码先定义的是一个内存布局，成员字段代表的是偏移量。接着使用<code>istruc</code>在data段中去初始化一个变量u1。又使用u2定义了一个未初始化值的User，<code>User_size</code>也是编译器语法糖，帮助编译器算出User结构体的长度。</p>
-
 <h3 id="宏">宏</h3>
-
 <p>宏是在代码预处理阶段被展开的，相当于模板。</p>
-
 <h4 id="define">%define</h4>
-
 <p>单行宏定义，和<code>%assign</code>只支持常量不同，<code>%define</code>可以支持参数。属于汇编语言的一种功能，和汇编不是一回事，因为汇编是目标语言。
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.text</span>
     <span style="color:#960050;background-color:#1e0010">%</span><span style="color:#a6e22e">define</span> <span style="color:#66d9ef">SYS_EXIT</span> <span style="color:#ae81ff">60</span>
@@ -533,24 +444,15 @@ Disassembly of section .text:
         <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">SYS_EXIT</span>
         <span style="color:#a6e22e">xor</span>     <span style="color:#66d9ef">rdi</span>, <span style="color:#66d9ef">rdi</span>
         <span style="color:#a6e22e">syscall</span></code></pre></div></p>
-
 <h4 id="macro">%macro</h4>
-
 <p>有点像是定义函数，中间可以包含多行代码。</p>
-
 <pre><code>%macro &lt;name&gt; &lt;args_count&gt; 
 ...
 %endmacro
-</code></pre>
-
-<p>使用这样的方式，可以先给宏定义个名字，之后跟参数，参数可以是多个。在内容中可以使用<code>%1</code>、<code>%2</code>这样的方式去调用第x个参数。还可使用<code>%%</code>这样的语法在宏内定义本地标签，在宏展开后这些本地标签会被自动重命名。</p>
-
+</code></pre><p>使用这样的方式，可以先给宏定义个名字，之后跟参数，参数可以是多个。在内容中可以使用<code>%1</code>、<code>%2</code>这样的方式去调用第x个参数。还可使用<code>%%</code>这样的语法在宏内定义本地标签，在宏展开后这些本地标签会被自动重命名。</p>
 <h2 id="调用libc">调用libc</h2>
-
 <p>汇编中虽然没有标准库，但可以通过混合编程调用C语言的标准库。</p>
-
 <p>这种方式需要使用main作为函数入口，并使用extern声明要用到的libc函数，然后用寄存器传参(依次为rdi,rsi,rdx,rcx,r8,r9)和接收返回值(rax)，且需要使用gcc作为链接器。</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">global</span> <span style="color:#66d9ef">main</span>
 <span style="color:#a6e22e">extern</span> <span style="color:#66d9ef">printf</span>
 
@@ -569,7 +471,6 @@ Disassembly of section .text:
         <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">0</span>
         <span style="color:#a6e22e">pop</span>     <span style="color:#66d9ef">rbx</span>     <span style="color:#75715e">;恢复现场
 </span><span style="color:#75715e"></span>        <span style="color:#66d9ef">ret</span></code></pre></div>
-
 <p>可以这样编译运行它，并查看它的依赖:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ nasm -g -F dwarf -f elf64 -o libc.o libc.s
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ gcc -no-pie -o libc libc.o
@@ -588,7 +489,7 @@ hello world!
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/eb8f8dac192bbff448a4b7cd7df2af5cf1c3983f" title='Last modified by hjlarry | January 14, 2020' target="_blank">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/d803d0e16359e70019145365604fba908cc36c30" title='Last modified by hjlarry | January 14, 2020' target="_blank">
       <img src="/svg/calendar.svg" alt="Calendar" />
       <span>January 14, 2020</span>
     </a>
@@ -615,48 +516,35 @@ hello world!
 
   <aside class="book-toc levels-3 fixed">
     <nav id="TableOfContents">
-<ul>
-<li><a href="#汇编语言">汇编语言</a>
-<ul>
-<li><a href="#基础知识">基础知识</a></li>
-<li><a href="#处理过程">处理过程</a>
-<ul>
-<li><a href="#编译">编译</a></li>
-<li><a href="#链接">链接</a></li>
-</ul></li>
-<li><a href="#源码结构">源码结构</a>
-<ul>
-<li><a href="#标签">标签</a></li>
-<li><a href="#本地标签">本地标签</a></li>
-<li><a href="#入口标签">入口标签</a></li>
-<li><a href="#段标签与内存地址">段标签与内存地址</a></li>
-</ul></li>
-<li><a href="#语言规范">语言规范</a>
-<ul>
-<li><a href="#寻址方式">寻址方式</a></li>
-<li><a href="#变量">变量</a></li>
-<li><a href="#常量">常量</a></li>
-<li><a href="#指令">指令</a></li>
-<li><a href="#控制流">控制流</a>
-<ul>
-<li><a href="#跳转">跳转</a></li>
-<li><a href="#循环">循环</a></li>
-</ul></li>
-<li><a href="#数据结构">数据结构</a>
-<ul>
-<li><a href="#字符串">字符串</a></li>
-<li><a href="#数组">数组</a></li>
-<li><a href="#结构体">结构体</a></li>
-</ul></li>
-<li><a href="#宏">宏</a>
-<ul>
-<li><a href="#define">%define</a></li>
-<li><a href="#macro">%macro</a></li>
-</ul></li>
-</ul></li>
-<li><a href="#调用libc">调用libc</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#基础知识">基础知识</a></li>
+    <li><a href="#处理过程">处理过程</a>
+      <ul>
+        <li><a href="#编译">编译</a></li>
+        <li><a href="#链接">链接</a></li>
+      </ul>
+    </li>
+    <li><a href="#源码结构">源码结构</a>
+      <ul>
+        <li><a href="#标签">标签</a></li>
+        <li><a href="#本地标签">本地标签</a></li>
+        <li><a href="#入口标签">入口标签</a></li>
+        <li><a href="#段标签与内存地址">段标签与内存地址</a></li>
+      </ul>
+    </li>
+    <li><a href="#语言规范">语言规范</a>
+      <ul>
+        <li><a href="#寻址方式">寻址方式</a></li>
+        <li><a href="#变量">变量</a></li>
+        <li><a href="#常量">常量</a></li>
+        <li><a href="#指令">指令</a></li>
+        <li><a href="#控制流">控制流</a></li>
+        <li><a href="#数据结构">数据结构</a></li>
+        <li><a href="#宏">宏</a></li>
+      </ul>
+    </li>
+    <li><a href="#调用libc">调用libc</a></li>
+  </ul>
 </nav>
   </aside>
 

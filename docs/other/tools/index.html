@@ -13,10 +13,10 @@
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
+<link rel="stylesheet" href="/book.min.eddc90f1d1267cb826e7cffc53c434e50061c4bfe41146a43670842ce6cb3bf6.css" integrity="sha256-7dyQ8dEmfLgm58/8U8Q05QBhxL/kEUakNnCELObLO/Y=">
 
 
-<script defer src="/cn.search.min.d6435a8341338af3206f281ee20daaedaa51bceaa6c1ae6716fb500f7dcbe081.js" integrity="sha256-1kNag0EzivMgbyge4g2q7apRvOqmwa5nFvtQD33L4IE="></script>
+<script defer src="/cn.search.min.f501d9d3f7f729f2c56eb4a1001961a0b110046c470a021dbdafbe5027b2582b.js" integrity="sha256-9QHZ0/f3KfLFbrShABlhoLEQBGxHCgIdva&#43;&#43;UCeyWCs="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/other/tools/index.xml" title="Home" />
 <!--
@@ -51,14 +51,13 @@ https://github.com/alex-shpak/hugo-book
 
     <ul>
 <li><strong>计算机基础</strong>
-
 <ul>
 <li><a href="/docs/sicp/hardware/">硬件</a></li>
 <li><a href="/docs/sicp/software/">软件</a></li>
 <li><a href="/docs/sicp/asm/">汇编</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>GO语言</strong>
-
 <ul>
 <li><a href="/docs/go/map/">字典</a></li>
 <li><a href="/docs/go/closure/">闭包</a></li>
@@ -67,25 +66,26 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/docs/go/alloc/">内存分配</a></li>
 <li><a href="/docs/go/goroutine/">并发调度</a></li>
 <li><a href="/docs/go/lock/">锁</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>Python语言</strong>
-
 <ul>
 <li><a href="/docs/python/descriptor/">描述符</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>Mysql</strong>
-
 <ul>
 <li><a href="/docs/mysql/query/">查询</a></li>
 <li><a href="/docs/mysql/theory/">原理</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>其他</strong>
-
 <ul>
 <li><a href="/docs/other/tools/"class=active>基础系统工具</a></li>
 <li><a href="/docs/other/git/">git</a></li>
 <li><a href="/docs/other/docker/">docker</a></li>
-</ul></li>
+</ul>
+</li>
 </ul>
 
 
@@ -116,20 +116,12 @@ https://github.com/alex-shpak/hugo-book
 </header>
 
       
-<article class="markdown">
-
-<h1 id="常用工具整理">常用工具整理</h1>
-
+<article class="markdown"><h1 id="常用工具整理">常用工具整理</h1>
 <h2 id="体检工具">体检工具</h2>
-
 <p>生产环境不同于开发环境，生产环境往往是一个很干净的、只保留了相关依赖的环境，而且需要运行很长的时间。而开发环境属于实验室性质的，类库比较齐全，只跑个单元测试或者benchmark之类的，运行时间很短。所以开发环境中很小的问题比如内存泄漏几KB，在生产环境随着时间的累积或者成千上万的访问，可能会把垃圾回收器搞崩溃。这种情况如果我们不擅于使用工具可能找不到任何问题。</p>
-
 <p>另外，开发环境我们可以使用100%的资源，但生产环境一定要预留一些资源用来做调度、预警之类的。</p>
-
 <h3 id="dstat">dstat</h3>
-
 <p>它能实时查看一些基本信息，默认情况下它会包括:</p>
-
 <ul>
 <li>CPU基本信息(用户使用时间、系统使用时间、空闲时间等)</li>
 <li>磁盘基本信息(读、写)</li>
@@ -137,97 +129,83 @@ https://github.com/alex-shpak/hugo-book
 <li>换入换出信息</li>
 <li>系统基本信息(中断的次数、上下文切换的次数)</li>
 </ul>
-
 <p>如下所示:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ dstat
 You did not <span style="color:#66d9ef">select</span> any stats, using -cdngy by default.
 --total-cpu-usage-- -dsk/total- -net/total- ---paging-- ---system--
 usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
-  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span>|2797B  597B|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |  <span style="color:#ae81ff">90</span>   <span style="color:#ae81ff">236</span>
-  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span>|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">140</span>   <span style="color:#ae81ff">323</span>
-  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span>|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">163</span>   <span style="color:#ae81ff">376</span>
-  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">1</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span>|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">169</span>   <span style="color:#ae81ff">391</span></code></pre></div></p>
-
+  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   0|2797B  597B|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |  <span style="color:#ae81ff">90</span>   <span style="color:#ae81ff">236</span>
+  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   0|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">140</span>   <span style="color:#ae81ff">323</span>
+  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   0|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">163</span>   <span style="color:#ae81ff">376</span>
+  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">1</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   0|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">169</span>   <span style="color:#ae81ff">391</span></code></pre></div></p>
 <p>生产环境下我们程序出错的时候，应该先从大的方面入手定位到具体是哪个方面的问题，看看当前的系统环境有没有问题，是不是我们的程序在当前的系统环境下水土不服。比如程序是IO密集型的，系统中有另一个程序在和它抢磁盘资源等。可以通过<code>dstat --list</code>查看它能对哪些细分项目查看其情况。<a href="http://dag.wiee.rs/home-made/dstat/">查看更多使用示例</a></p>
-
 <h3 id="sysstat">sysstat</h3>
-
 <p>通过定位了系统中哪个方面的问题之后，接着我们应该去定位我们自己程序哪个方面有问题。sysstat可以根据单个进程去检查它的各个方面，比如说我们定位到是内存方面的问题，接着去看自己程序中内存的问题:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ pidstat -r -p <span style="color:#e6db74">`</span>pidof tmux<span style="color:#e6db74">`</span> <span style="color:#ae81ff">2</span>
-Linux <span style="color:#ae81ff">4</span>.9.184-linuxkit <span style="color:#f92672">(</span>cabd4e519687<span style="color:#f92672">)</span> 	<span style="color:#ae81ff">12</span>/09/19 	_x86_64_	<span style="color:#f92672">(</span><span style="color:#ae81ff">2</span> CPU<span style="color:#f92672">)</span>
+Linux 4.9.184-linuxkit <span style="color:#f92672">(</span>cabd4e519687<span style="color:#f92672">)</span> 	12/09/19 	_x86_64_	<span style="color:#f92672">(</span><span style="color:#ae81ff">2</span> CPU<span style="color:#f92672">)</span>
 
-<span style="color:#ae81ff">10</span>:02:38      UID       PID  minflt/s  majflt/s     VSZ     RSS   %MEM  Command
-<span style="color:#ae81ff">10</span>:02:40        <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">35</span>      <span style="color:#ae81ff">0</span>.00      <span style="color:#ae81ff">0</span>.00   <span style="color:#ae81ff">27424</span>    <span style="color:#ae81ff">4000</span>   <span style="color:#ae81ff">0</span>.20  tmux: server
-<span style="color:#ae81ff">10</span>:02:42        <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">35</span>      <span style="color:#ae81ff">0</span>.00      <span style="color:#ae81ff">0</span>.00   <span style="color:#ae81ff">27424</span>    <span style="color:#ae81ff">4000</span>   <span style="color:#ae81ff">0</span>.20  tmux: server
-<span style="color:#ae81ff">10</span>:02:44        <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">35</span>      <span style="color:#ae81ff">0</span>.00      <span style="color:#ae81ff">0</span>.00   <span style="color:#ae81ff">27424</span>    <span style="color:#ae81ff">4000</span>   <span style="color:#ae81ff">0</span>.20  tmux: server
-<span style="color:#ae81ff">10</span>:02:46        <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">35</span>      <span style="color:#ae81ff">0</span>.00      <span style="color:#ae81ff">0</span>.00   <span style="color:#ae81ff">27424</span>    <span style="color:#ae81ff">4000</span>   <span style="color:#ae81ff">0</span>.20  tmux: server</code></pre></div>
+10:02:38      UID       PID  minflt/s  majflt/s     VSZ     RSS   %MEM  Command
+10:02:40        <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">35</span>      0.00      0.00   <span style="color:#ae81ff">27424</span>    <span style="color:#ae81ff">4000</span>   0.20  tmux: server
+10:02:42        <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">35</span>      0.00      0.00   <span style="color:#ae81ff">27424</span>    <span style="color:#ae81ff">4000</span>   0.20  tmux: server
+10:02:44        <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">35</span>      0.00      0.00   <span style="color:#ae81ff">27424</span>    <span style="color:#ae81ff">4000</span>   0.20  tmux: server
+10:02:46        <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">35</span>      0.00      0.00   <span style="color:#ae81ff">27424</span>    <span style="color:#ae81ff">4000</span>   0.20  tmux: server</code></pre></div>
 我们把tmux当做是自己写的某个程序，每2秒输出一次信息。minflt/s就代表一些小范围的缺页异常，可能是一些数据不需要了只要补上相应的物理内存即可。而majflt/s代表了需要从硬盘换入内存，这可能就意味着我们程序是不是有的任务优先级太低被操作系统换出到硬盘上了，我们可能需要通过系统调用告诉操作系统把某段内存锁死。</p>
-
 <p>更详细的使用方法，请参考<a href="http://sebastien.godard.pagesperso-orange.fr/documentation.html">官方文档</a>。</p>
-
 <h3 id="strace">strace</h3>
-
 <p>接着我们可以深入到自己程序的逻辑中去，比如使用strace检查我们程序的系统调用。可能只是一个简单的程序:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 
 <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 	println(<span style="color:#e6db74">&#34;hello world!&#34;</span>)
 }</code></pre></div></p>
-
 <p>却涉及到大量的系统调用:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ go build test.go
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ strace ~/.mac/test
 execve<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/root/.mac/test&#34;</span>, <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/root/.mac/test&#34;</span><span style="color:#f92672">]</span>, 0x7ffec1a0b740 /* <span style="color:#ae81ff">14</span> vars */<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
 arch_prctl<span style="color:#f92672">(</span>ARCH_SET_FS, 0x4c5650<span style="color:#f92672">)</span>       <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
-sched_getaffinity<span style="color:#f92672">(</span><span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">8192</span>, <span style="color:#f92672">[</span><span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span><span style="color:#f92672">])</span>      <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span>
+sched_getaffinity<span style="color:#f92672">(</span>0, 8192, <span style="color:#f92672">[</span>0, 1<span style="color:#f92672">]</span><span style="color:#f92672">)</span>      <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span>
 openat<span style="color:#f92672">(</span>AT_FDCWD, <span style="color:#e6db74">&#34;/sys/kernel/mm/transparent_hugepage/hpage_pmd_size&#34;</span>, O_RDONLY<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> -1 ENOENT <span style="color:#f92672">(</span>No such file or directory<span style="color:#f92672">)</span>
-mmap<span style="color:#f92672">(</span>NULL, <span style="color:#ae81ff">262144</span>, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd246a01000
-mmap<span style="color:#f92672">(</span>0xc000000000, <span style="color:#ae81ff">67108864</span>, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0xc000000000
-mmap<span style="color:#f92672">(</span>0xc000000000, <span style="color:#ae81ff">67108864</span>, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0xc000000000
-mmap<span style="color:#f92672">(</span>NULL, <span style="color:#ae81ff">33554432</span>, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd244a01000
-mmap<span style="color:#f92672">(</span>NULL, <span style="color:#ae81ff">2164736</span>, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd2447f0000
-mmap<span style="color:#f92672">(</span>NULL, <span style="color:#ae81ff">65536</span>, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd2447e0000
-mmap<span style="color:#f92672">(</span>NULL, <span style="color:#ae81ff">65536</span>, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd2447d0000
-rt_sigprocmask<span style="color:#f92672">(</span>SIG_SETMASK, NULL, <span style="color:#f92672">[]</span>, <span style="color:#ae81ff">8</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
-sigaltstack<span style="color:#f92672">(</span>NULL, <span style="color:#f92672">{</span>ss_sp<span style="color:#f92672">=</span>NULL, ss_flags<span style="color:#f92672">=</span>SS_DISABLE, ss_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#f92672">})</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
-sigaltstack<span style="color:#f92672">({</span>ss_sp<span style="color:#f92672">=</span>0xc000002000, ss_flags<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, ss_size<span style="color:#f92672">=</span><span style="color:#ae81ff">32768</span><span style="color:#f92672">}</span>, NULL<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
-rt_sigprocmask<span style="color:#f92672">(</span>SIG_SETMASK, <span style="color:#f92672">[]</span>, NULL, <span style="color:#ae81ff">8</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
-gettid<span style="color:#f92672">()</span>                                <span style="color:#f92672">=</span> <span style="color:#ae81ff">394</span>
-rt_sigaction<span style="color:#f92672">(</span>SIGHUP, NULL, <span style="color:#f92672">{</span>sa_handler<span style="color:#f92672">=</span>SIG_DFL, sa_mask<span style="color:#f92672">=[]</span>, sa_flags<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#f92672">}</span>, <span style="color:#ae81ff">8</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
-rt_sigaction<span style="color:#f92672">(</span>SIGHUP, <span style="color:#f92672">{</span>sa_handler<span style="color:#f92672">=</span>0x44d8f0, sa_mask<span style="color:#f92672">=</span>~<span style="color:#f92672">[]</span>, sa_flags<span style="color:#f92672">=</span>SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer<span style="color:#f92672">=</span>0x44da20<span style="color:#f92672">}</span>, NULL, <span style="color:#ae81ff">8</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
-rt_sigaction<span style="color:#f92672">(</span>SIGINT, NULL, <span style="color:#f92672">{</span>sa_handler<span style="color:#f92672">=</span>SIG_DFL, sa_mask<span style="color:#f92672">=[]</span>, sa_flags<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#f92672">}</span>, <span style="color:#ae81ff">8</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
-rt_sigaction<span style="color:#f92672">(</span>SIGINT, <span style="color:#f92672">{</span>sa_handler<span style="color:#f92672">=</span>0x44d8f0, sa_mask<span style="color:#f92672">=</span>~<span style="color:#f92672">[]</span>, sa_flags<span style="color:#f92672">=</span>SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer<span style="color:#f92672">=</span>0x44da20<span style="color:#f92672">}</span>, NULL, <span style="color:#ae81ff">8</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+mmap<span style="color:#f92672">(</span>NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd246a01000
+mmap<span style="color:#f92672">(</span>0xc000000000, 67108864, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0xc000000000
+mmap<span style="color:#f92672">(</span>0xc000000000, 67108864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0xc000000000
+mmap<span style="color:#f92672">(</span>NULL, 33554432, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd244a01000
+mmap<span style="color:#f92672">(</span>NULL, 2164736, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd2447f0000
+mmap<span style="color:#f92672">(</span>NULL, 65536, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd2447e0000
+mmap<span style="color:#f92672">(</span>NULL, 65536, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 0x7fd2447d0000
+rt_sigprocmask<span style="color:#f92672">(</span>SIG_SETMASK, NULL, <span style="color:#f92672">[</span><span style="color:#f92672">]</span>, 8<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+sigaltstack<span style="color:#f92672">(</span>NULL, <span style="color:#f92672">{</span>ss_sp<span style="color:#f92672">=</span>NULL, ss_flags<span style="color:#f92672">=</span>SS_DISABLE, ss_size<span style="color:#f92672">=</span>0<span style="color:#f92672">}</span><span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+sigaltstack<span style="color:#f92672">(</span><span style="color:#f92672">{</span>ss_sp<span style="color:#f92672">=</span>0xc000002000, ss_flags<span style="color:#f92672">=</span>0, ss_size<span style="color:#f92672">=</span>32768<span style="color:#f92672">}</span>, NULL<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+rt_sigprocmask<span style="color:#f92672">(</span>SIG_SETMASK, <span style="color:#f92672">[</span><span style="color:#f92672">]</span>, NULL, 8<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+gettid<span style="color:#f92672">(</span><span style="color:#f92672">)</span>                                <span style="color:#f92672">=</span> <span style="color:#ae81ff">394</span>
+rt_sigaction<span style="color:#f92672">(</span>SIGHUP, NULL, <span style="color:#f92672">{</span>sa_handler<span style="color:#f92672">=</span>SIG_DFL, sa_mask<span style="color:#f92672">=</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span>, sa_flags<span style="color:#f92672">=</span>0<span style="color:#f92672">}</span>, 8<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+rt_sigaction<span style="color:#f92672">(</span>SIGHUP, <span style="color:#f92672">{</span>sa_handler<span style="color:#f92672">=</span>0x44d8f0, sa_mask<span style="color:#f92672">=</span>~<span style="color:#f92672">[</span><span style="color:#f92672">]</span>, sa_flags<span style="color:#f92672">=</span>SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer<span style="color:#f92672">=</span>0x44da20<span style="color:#f92672">}</span>, NULL, 8<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+rt_sigaction<span style="color:#f92672">(</span>SIGINT, NULL, <span style="color:#f92672">{</span>sa_handler<span style="color:#f92672">=</span>SIG_DFL, sa_mask<span style="color:#f92672">=</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span>, sa_flags<span style="color:#f92672">=</span>0<span style="color:#f92672">}</span>, 8<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+rt_sigaction<span style="color:#f92672">(</span>SIGINT, <span style="color:#f92672">{</span>sa_handler<span style="color:#f92672">=</span>0x44d8f0, sa_mask<span style="color:#f92672">=</span>~<span style="color:#f92672">[</span><span style="color:#f92672">]</span>, sa_flags<span style="color:#f92672">=</span>SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer<span style="color:#f92672">=</span>0x44da20<span style="color:#f92672">}</span>, NULL, 8<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
 
 ......</code></pre></div></p>
-
 <p>打印输入输出必然会涉及系统调用，但如果我们使用一些第三方库时发现系统调用仍然很多，就可以去查找有没有优化替代的方案。</p>
-
 <p>一般，我们查看一些摘要信息即可:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ strace -c ~/.mac/test
 hello world!
 % time     seconds  usecs/call     calls    errors syscall
 ------ ----------- ----------- --------- --------- ----------------
-  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           write
-  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">7</span>           mmap
-  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">114</span>           rt_sigaction
-  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">6</span>           rt_sigprocmask
-  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">2</span>           clone
-  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           execve
-  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">2</span>           sigaltstack
-  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           arch_prctl
-  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           gettid
-  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">3</span>           futex
-  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           sched_getaffinity
-  <span style="color:#ae81ff">0</span>.00    <span style="color:#ae81ff">0</span>.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">1</span> openat
+  0.00    0.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           write
+  0.00    0.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">7</span>           mmap
+  0.00    0.000000           <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">114</span>           rt_sigaction
+  0.00    0.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">6</span>           rt_sigprocmask
+  0.00    0.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">2</span>           clone
+  0.00    0.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           execve
+  0.00    0.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">2</span>           sigaltstack
+  0.00    0.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           arch_prctl
+  0.00    0.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           gettid
+  0.00    0.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">3</span>           futex
+  0.00    0.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>           sched_getaffinity
+  0.00    0.000000           <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">1</span> openat
 ------ ----------- ----------- --------- --------- ----------------
-<span style="color:#ae81ff">100</span>.00    <span style="color:#ae81ff">0</span>.000000                   <span style="color:#ae81ff">140</span>         <span style="color:#ae81ff">1</span> total</code></pre></div></p>
-
+100.00    0.000000                   <span style="color:#ae81ff">140</span>         <span style="color:#ae81ff">1</span> total</code></pre></div></p>
 <h2 id="开发工具">开发工具</h2>
-
 <p>GNU通用的开发工具，也叫<strong>binutils</strong>，是一个标准，属于随身带的瑞士军刀，任何语言编写的程序都适用，但可能与语言自带的工具链细节上有些出入。<a href="https://www.gnu.org/software/binutils/">官方网站</a></p>
-
 <p>它主要包括:</p>
-
 <ul>
 <li>readelf : 查看ELF文件信息。</li>
 <li>objdump : 查看⽬标文件 (ELF/COFF) 信息。</li>
@@ -238,17 +216,14 @@ hello world!
 <li>strings : 输出字符串。</li>
 <li>size : 查看各段⼤小。</li>
 </ul>
-
 <p>当我们不熟悉一门语言写的程序时，我们可以把它翻译成汇编语言，在把汇编语言翻译成C语言，也许这个C语言无法运行，但方便了我们阅读和理解程序的思路。</p>
-
 <h3 id="readelf">readelf</h3>
-
 <p>查看elf文件的头部信息:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -h hello
 ELF Header:
   Magic:   7f <span style="color:#ae81ff">45</span> 4c <span style="color:#ae81ff">46</span> <span style="color:#ae81ff">02</span> <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>      // 魔法数，可以快速读取出来用于预判整个文件是不是一个合法的内容
   Class:                             ELF64          // ELF文件的格式
-  Data:                              <span style="color:#ae81ff">2</span><span style="color:#960050;background-color:#1e0010">&#39;</span>s complement, little endian  // 大小端情况
+  Data:                              2<span style="color:#960050;background-color:#1e0010">&#39;</span>s complement, little endian  // 大小端情况
   Version:                           <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>current<span style="color:#f92672">)</span>
   OS/ABI:                            UNIX - System V    // 哪个平台使用
   ABI Version:                       <span style="color:#ae81ff">0</span>
@@ -265,7 +240,6 @@ ELF Header:
   Size of section headers:           <span style="color:#ae81ff">64</span> <span style="color:#f92672">(</span>bytes<span style="color:#f92672">)</span>
   Number of section headers:         <span style="color:#ae81ff">8</span>
   Section header string table index: <span style="color:#ae81ff">7</span></code></pre></div></p>
-
 <p>查看其执行时需要向内存(进程)中载入哪些信息:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -l hello
 Elf file type is EXEC <span style="color:#f92672">(</span>Executable file<span style="color:#f92672">)</span>
@@ -282,124 +256,109 @@ Program Headers:
   Segment Sections...
    <span style="color:#ae81ff">00</span>     .text
    <span style="color:#ae81ff">01</span>     .data</code></pre></div></p>
-
 <p>查看其本身的section信息:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -S hello
 There are <span style="color:#ae81ff">8</span> section headers, starting at offset 0x2e0:
 Section Headers:
   <span style="color:#f92672">[</span>Nr<span style="color:#f92672">]</span> Name              Type             Address           Offset
        Size              EntSize          Flags  Link  Info  Align
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>                   NULL             <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000000</span>
+  <span style="color:#f92672">[</span> 0<span style="color:#f92672">]</span>                   NULL             <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000000</span>
        <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">]</span> .text             PROGBITS         00000000004000b0  000000b0
+  <span style="color:#f92672">[</span> 1<span style="color:#f92672">]</span> .text             PROGBITS         00000000004000b0  000000b0
        <span style="color:#ae81ff">0000000000000025</span>  <span style="color:#ae81ff">0000000000000000</span>  AX       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">16</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">]</span> .data             PROGBITS         00000000006000d8  000000d8
+  <span style="color:#f92672">[</span> 2<span style="color:#f92672">]</span> .data             PROGBITS         00000000006000d8  000000d8
        000000000000000e  <span style="color:#ae81ff">0000000000000000</span>  WA       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">3</span><span style="color:#f92672">]</span> .stab             PROGBITS         <span style="color:#ae81ff">0000000000000000</span>  000000e8
+  <span style="color:#f92672">[</span> 3<span style="color:#f92672">]</span> .stab             PROGBITS         <span style="color:#ae81ff">0000000000000000</span>  000000e8
        <span style="color:#ae81ff">0000000000000084</span>  <span style="color:#ae81ff">0000000000000014</span>           <span style="color:#ae81ff">4</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">4</span><span style="color:#f92672">]</span> .stabstr          STRTAB           <span style="color:#ae81ff">0000000000000000</span>  0000016c
+  <span style="color:#f92672">[</span> 4<span style="color:#f92672">]</span> .stabstr          STRTAB           <span style="color:#ae81ff">0000000000000000</span>  0000016c
        <span style="color:#ae81ff">0000000000000009</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">5</span><span style="color:#f92672">]</span> .symtab           SYMTAB           <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000178</span>
+  <span style="color:#f92672">[</span> 5<span style="color:#f92672">]</span> .symtab           SYMTAB           <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000178</span>
        <span style="color:#ae81ff">0000000000000108</span>  <span style="color:#ae81ff">0000000000000018</span>           <span style="color:#ae81ff">6</span>     <span style="color:#ae81ff">7</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">6</span><span style="color:#f92672">]</span> .strtab           STRTAB           <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000280</span>
+  <span style="color:#f92672">[</span> 6<span style="color:#f92672">]</span> .strtab           STRTAB           <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000280</span>
        <span style="color:#ae81ff">0000000000000027</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">7</span><span style="color:#f92672">]</span> .shstrtab         STRTAB           <span style="color:#ae81ff">0000000000000000</span>  000002a7
+  <span style="color:#f92672">[</span> 7<span style="color:#f92672">]</span> .shstrtab         STRTAB           <span style="color:#ae81ff">0000000000000000</span>  000002a7
        <span style="color:#ae81ff">0000000000000036</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
 Key to Flags:
   W <span style="color:#f92672">(</span>write<span style="color:#f92672">)</span>, A <span style="color:#f92672">(</span>alloc<span style="color:#f92672">)</span>, X <span style="color:#f92672">(</span>execute<span style="color:#f92672">)</span>, M <span style="color:#f92672">(</span>merge<span style="color:#f92672">)</span>, S <span style="color:#f92672">(</span>strings<span style="color:#f92672">)</span>, I <span style="color:#f92672">(</span>info<span style="color:#f92672">)</span>,
   L <span style="color:#f92672">(</span>link order<span style="color:#f92672">)</span>, O <span style="color:#f92672">(</span>extra OS processing required<span style="color:#f92672">)</span>, G <span style="color:#f92672">(</span>group<span style="color:#f92672">)</span>, T <span style="color:#f92672">(</span>TLS<span style="color:#f92672">)</span>,
   C <span style="color:#f92672">(</span>compressed<span style="color:#f92672">)</span>, x <span style="color:#f92672">(</span>unknown<span style="color:#f92672">)</span>, o <span style="color:#f92672">(</span>OS specific<span style="color:#f92672">)</span>, E <span style="color:#f92672">(</span>exclude<span style="color:#f92672">)</span>,
   l <span style="color:#f92672">(</span>large<span style="color:#f92672">)</span>, p <span style="color:#f92672">(</span>processor specific<span style="color:#f92672">)</span></code></pre></div></p>
-
 <p>查看其section的内容，例如我们想看其<code>.data</code>段的，它是第2个段，可以使用16进制和字符串的方式:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -x <span style="color:#ae81ff">2</span> hello
 Hex dump of section <span style="color:#e6db74">&#39;.data&#39;</span>:
   0x006000d8 68656c6c 6f2c2077 6f726c64 210a     hello, world!.
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -p <span style="color:#ae81ff">2</span> hello
 String dump of section <span style="color:#e6db74">&#39;.data&#39;</span>:
-  <span style="color:#f92672">[</span>     <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>  hello, world!</code></pre></div></p>
-
+  <span style="color:#f92672">[</span>     0<span style="color:#f92672">]</span>  hello, world!</code></pre></div></p>
 <p>查看其符号表信息:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -s hello
 Symbol table <span style="color:#e6db74">&#39;.symtab&#39;</span> contains <span style="color:#ae81ff">11</span> entries:
    Num:    Value          Size Type    Bind   Vis      Ndx Name
-     <span style="color:#ae81ff">0</span>: <span style="color:#ae81ff">0000000000000000</span>     <span style="color:#ae81ff">0</span> NOTYPE  LOCAL  DEFAULT  UND
-     <span style="color:#ae81ff">1</span>: 00000000004000b0     <span style="color:#ae81ff">0</span> SECTION LOCAL  DEFAULT    <span style="color:#ae81ff">1</span>
-     <span style="color:#ae81ff">2</span>: 00000000006000d8     <span style="color:#ae81ff">0</span> SECTION LOCAL  DEFAULT    <span style="color:#ae81ff">2</span>
-     <span style="color:#ae81ff">3</span>: <span style="color:#ae81ff">0000000000000000</span>     <span style="color:#ae81ff">0</span> SECTION LOCAL  DEFAULT    <span style="color:#ae81ff">3</span>
-     <span style="color:#ae81ff">4</span>: <span style="color:#ae81ff">0000000000000000</span>     <span style="color:#ae81ff">0</span> SECTION LOCAL  DEFAULT    <span style="color:#ae81ff">4</span>
-     <span style="color:#ae81ff">5</span>: <span style="color:#ae81ff">0000000000000000</span>     <span style="color:#ae81ff">0</span> FILE    LOCAL  DEFAULT  ABS hello.s
-     <span style="color:#ae81ff">6</span>: 00000000006000d8     <span style="color:#ae81ff">1</span> OBJECT  LOCAL  DEFAULT    <span style="color:#ae81ff">2</span> hello
-     <span style="color:#ae81ff">7</span>: 00000000004000b0     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">1</span> _start
-     <span style="color:#ae81ff">8</span>: 00000000006000e6     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">2</span> __bss_start
-     <span style="color:#ae81ff">9</span>: 00000000006000e6     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">2</span> _edata
-    <span style="color:#ae81ff">10</span>: 00000000006000e8     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">2</span> _end</code></pre></div>
+     0: <span style="color:#ae81ff">0000000000000000</span>     <span style="color:#ae81ff">0</span> NOTYPE  LOCAL  DEFAULT  UND
+     1: 00000000004000b0     <span style="color:#ae81ff">0</span> SECTION LOCAL  DEFAULT    <span style="color:#ae81ff">1</span>
+     2: 00000000006000d8     <span style="color:#ae81ff">0</span> SECTION LOCAL  DEFAULT    <span style="color:#ae81ff">2</span>
+     3: <span style="color:#ae81ff">0000000000000000</span>     <span style="color:#ae81ff">0</span> SECTION LOCAL  DEFAULT    <span style="color:#ae81ff">3</span>
+     4: <span style="color:#ae81ff">0000000000000000</span>     <span style="color:#ae81ff">0</span> SECTION LOCAL  DEFAULT    <span style="color:#ae81ff">4</span>
+     5: <span style="color:#ae81ff">0000000000000000</span>     <span style="color:#ae81ff">0</span> FILE    LOCAL  DEFAULT  ABS hello.s
+     6: 00000000006000d8     <span style="color:#ae81ff">1</span> OBJECT  LOCAL  DEFAULT    <span style="color:#ae81ff">2</span> hello
+     7: 00000000004000b0     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">1</span> _start
+     8: 00000000006000e6     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">2</span> __bss_start
+     9: 00000000006000e6     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">2</span> _edata
+    10: 00000000006000e8     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">2</span> _end</code></pre></div>
 此外，<code>-e</code>代表同时加上<code>-h -l -S</code>三个参数。</p>
-
 <h3 id="nm">nm</h3>
-
 <p>使用nm也可查看其符号表信息:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ nm hello
 00000000006000e6 D __bss_start
 00000000006000e6 D _edata
 00000000006000e8 D _end
 00000000004000b0 T _start
 00000000006000d8 d hello</code></pre></div>
-
 <p>其中，<code>00000000006000e6</code>表示链接器安排给这个符号的虚拟内存地址；<code>D</code>表示它的类型，大写是全局的、可以跨文件访问到的，小写表示本地的。</p>
-
 <h3 id="strip">strip</h3>
-
 <p>使用strip可以剔除其符号表，减少文件本身的大小。默认为<code>-s</code>剔除的符号，也可以<code>-S</code>仅剔除掉调试用的符号。
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ strip -S hello
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -s hello
 Symbol table <span style="color:#e6db74">&#39;.symtab&#39;</span> contains <span style="color:#ae81ff">8</span> entries:
    Num:    Value          Size Type    Bind   Vis      Ndx Name
-     <span style="color:#ae81ff">0</span>: <span style="color:#ae81ff">0000000000000000</span>     <span style="color:#ae81ff">0</span> NOTYPE  LOCAL  DEFAULT  UND
-     <span style="color:#ae81ff">1</span>: 00000000006000d8     <span style="color:#ae81ff">1</span> OBJECT  LOCAL  DEFAULT    <span style="color:#ae81ff">2</span> hello
-     <span style="color:#ae81ff">2</span>: 00000000004000b0     <span style="color:#ae81ff">0</span> SECTION LOCAL  DEFAULT    <span style="color:#ae81ff">1</span>
-     <span style="color:#ae81ff">3</span>: 00000000006000d8     <span style="color:#ae81ff">0</span> SECTION LOCAL  DEFAULT    <span style="color:#ae81ff">2</span>
-     <span style="color:#ae81ff">4</span>: 00000000004000b0     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">1</span> _start
-     <span style="color:#ae81ff">5</span>: 00000000006000e6     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">2</span> __bss_start
-     <span style="color:#ae81ff">6</span>: 00000000006000e6     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">2</span> _edata
-     <span style="color:#ae81ff">7</span>: 00000000006000e8     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">2</span> _end
+     0: <span style="color:#ae81ff">0000000000000000</span>     <span style="color:#ae81ff">0</span> NOTYPE  LOCAL  DEFAULT  UND
+     1: 00000000006000d8     <span style="color:#ae81ff">1</span> OBJECT  LOCAL  DEFAULT    <span style="color:#ae81ff">2</span> hello
+     2: 00000000004000b0     <span style="color:#ae81ff">0</span> SECTION LOCAL  DEFAULT    <span style="color:#ae81ff">1</span>
+     3: 00000000006000d8     <span style="color:#ae81ff">0</span> SECTION LOCAL  DEFAULT    <span style="color:#ae81ff">2</span>
+     4: 00000000004000b0     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">1</span> _start
+     5: 00000000006000e6     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">2</span> __bss_start
+     6: 00000000006000e6     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">2</span> _edata
+     7: 00000000006000e8     <span style="color:#ae81ff">0</span> NOTYPE  GLOBAL DEFAULT    <span style="color:#ae81ff">2</span> _end
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ strip -s hello
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -s hello
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ nm hello
 nm: hello: no symbols</code></pre></div></p>
-
 <h3 id="objcopy">objcopy</h3>
-
 <p>可以在可执行文件中自己创建section，藏一些东西，比如背景mp3文件等。我们就可以用到objcopy工具:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ objcopy --add-section .abc<span style="color:#f92672">=</span>addr.c --set-section-flags .abc<span style="color:#f92672">=</span>noload,readonly hello hello2
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -S hello2
 There are <span style="color:#ae81ff">5</span> section headers, starting at offset 0x190:
 Section Headers:
   <span style="color:#f92672">[</span>Nr<span style="color:#f92672">]</span> Name              Type             Address           Offset
        Size              EntSize          Flags  Link  Info  Align
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>                   NULL             <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000000</span>
+  <span style="color:#f92672">[</span> 0<span style="color:#f92672">]</span>                   NULL             <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000000</span>
        <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">]</span> .text             PROGBITS         00000000004000b0  000000b0
+  <span style="color:#f92672">[</span> 1<span style="color:#f92672">]</span> .text             PROGBITS         00000000004000b0  000000b0
        <span style="color:#ae81ff">0000000000000025</span>  <span style="color:#ae81ff">0000000000000000</span>  AX       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">16</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">]</span> .data             PROGBITS         00000000006000d8  000000d8
+  <span style="color:#f92672">[</span> 2<span style="color:#f92672">]</span> .data             PROGBITS         00000000006000d8  000000d8
        000000000000000e  <span style="color:#ae81ff">0000000000000000</span>  WA       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">3</span><span style="color:#f92672">]</span> .abc              PROGBITS         <span style="color:#ae81ff">0000000000000000</span>  000000e6
+  <span style="color:#f92672">[</span> 3<span style="color:#f92672">]</span> .abc              PROGBITS         <span style="color:#ae81ff">0000000000000000</span>  000000e6
        <span style="color:#ae81ff">0000000000000088</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span> <span style="color:#ae81ff">4</span><span style="color:#f92672">]</span> .shstrtab         STRTAB           <span style="color:#ae81ff">0000000000000000</span>  0000016e
+  <span style="color:#f92672">[</span> 4<span style="color:#f92672">]</span> .shstrtab         STRTAB           <span style="color:#ae81ff">0000000000000000</span>  0000016e
        000000000000001c  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -p .abc hello2
 String dump of section <span style="color:#e6db74">&#39;.abc&#39;</span>:
-  <span style="color:#f92672">[</span>     <span style="color:#ae81ff">0</span><span style="color:#f92672">]</span>  // 查看基址变址的寻址方式^J#include &lt;stdio.h&gt;^J^Jint main<span style="color:#f92672">(){</span>^J    int x<span style="color:#f92672">[</span><span style="color:#ae81ff">3</span><span style="color:#f92672">]</span>;^J    <span style="color:#66d9ef">for</span><span style="color:#f92672">(</span>int i<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>;i&lt;<span style="color:#ae81ff">3</span>;i++<span style="color:#f92672">){</span>^J        x<span style="color:#f92672">[</span>i<span style="color:#f92672">]=</span> 0x22;^J</code></pre></div>
-
+  <span style="color:#f92672">[</span>     0<span style="color:#f92672">]</span>  // 查看基址变址的寻址方式^J#include &lt;stdio.h&gt;^J^Jint main<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">{</span>^J    int x<span style="color:#f92672">[</span>3<span style="color:#f92672">]</span>;^J    <span style="color:#66d9ef">for</span><span style="color:#f92672">(</span>int i<span style="color:#f92672">=</span>0;i&lt;3;i++<span style="color:#f92672">)</span><span style="color:#f92672">{</span>^J        x<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span><span style="color:#f92672">=</span> 0x22;^J</code></pre></div>
 <p>我们为可执行文件hello新增了一个<code>.abc</code>的段，它的内容读取自<code>addr.c</code>文件，它的权限是只读的且无需载入的，并且把它另存为了hello2。此外，我们也可以使用别的文件的内容来更新某个section，或者对section进行重命名、删除等操作:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ objcopy --rename-section .abc<span style="color:#f92672">=</span>.demo hello2
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ objcopy --update-section .demo<span style="color:#f92672">=</span>makefile hello2
 <span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ objcopy --remove-section .demo hello2</code></pre></div></p>
-
 <h3 id="objdump">objdump</h3>
-
 <p>主要用来查看反汇编代码，使用<code>objdump -d &lt;file&gt;</code>反汇编某文件<code>.text</code>段的内容，默认为att格式，可使用<code>-M</code>指定其他格式。
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ objdump -M intel -d fr
 
@@ -425,15 +384,10 @@ Disassembly of section .text:
   4000d5:	b8 3c <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    eax,0x3c
   4000da:	<span style="color:#ae81ff">48</span> <span style="color:#ae81ff">31</span> ff             	xor    rdi,rdi
   4000dd:	0f <span style="color:#ae81ff">05</span>                	syscall</code></pre></div></p>
-
 <h2 id="调试工具">调试工具</h2>
-
 <p>GNU通用的调试工具，也叫<strong>gdb</strong>。binutils属于静态的观察，而gdb就可以动态的观察到每一个汇编指令的执行。<a href="https://www.gnu.org/software/gdb/">官方网站</a></p>
-
 <p>也可以使用一些带图形界面的类似工具，例如<a href="https://www.gdbgui.com/">gdbgui</a>。还有些<a href="https://kapeli.com/cheat_sheets/GDB.docset/Contents/Resources/Documents/index">cheatsheet</a>很好用。</p>
-
 <p>常用指令</p>
-
 <table>
 <thead>
 <tr>
@@ -441,89 +395,71 @@ Disassembly of section .text:
 <th>作用</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>info r</td>
 <td>查看寄存器</td>
 </tr>
-
 <tr>
 <td>info f</td>
 <td>查看栈帧</td>
 </tr>
-
 <tr>
 <td>info files</td>
 <td>查看文件的各个段的起始地址</td>
 </tr>
-
 <tr>
 <td>info var</td>
 <td>查看全局变量</td>
 </tr>
-
 <tr>
 <td>info locals</td>
 <td>查看局部变量</td>
 </tr>
-
 <tr>
 <td>info breakpoints</td>
 <td>查看断点信息</td>
 </tr>
-
 <tr>
 <td>bt</td>
 <td>显示程序的栈</td>
 </tr>
-
 <tr>
 <td>set disassembly-flavor intel</td>
 <td>设置反汇编的风格为intel或att</td>
 </tr>
-
 <tr>
 <td>disass</td>
 <td>查看反汇编</td>
 </tr>
-
 <tr>
 <td>layout src</td>
 <td>显示源码窗口</td>
 </tr>
-
 <tr>
 <td>display [var]</td>
 <td>每次停下来时都会输出变量var的值，var可以设为寄存器</td>
 </tr>
-
 <tr>
 <td>l [n]</td>
 <td>查看第N行代码的上下五行</td>
 </tr>
-
 <tr>
 <td>c</td>
 <td>运行至下一断点或程序结束</td>
 </tr>
-
 <tr>
 <td>p/x $[var]</td>
 <td>以16进制输出变量var的值，也可输出表达式，不加<code>/x</code>为十进制</td>
 </tr>
-
 <tr>
 <td>x/10xb [addr]</td>
 <td>查看内存地址addr开始的10组数据，16进制的，单位是字节</td>
 </tr>
 </tbody>
 </table>
-
 <h2 id="构建工具">构建工具</h2>
-
 <p>GNU的自动构建工具为<strong>make</strong>，有些像脚本语言，把一堆命令放一起批量执行。使用它做编译属于增量编译，即通过对比修改时间来判断是否需要重新执行。<a href="https://www.gnu.org/software/make/">官方网站</a></p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-make" data-lang="make"><span style="color:#a6e22e">hello</span><span style="color:#f92672">:</span> hello.s
     nasm -g -f elf64 -o hello.o hello.s
     ld -o $@ hello.o
@@ -534,7 +470,6 @@ Disassembly of section .text:
     
 <span style="color:#a6e22e">.PHONY</span><span style="color:#f92672">:</span> clean
 </code></pre></div>
-
 <p>对于这段构建代码，<code>hello:</code>后的部分就是告诉它要去检查哪些文件的修改时间；<code>$@</code>就表示当前这段的目标<code>hello</code>，<code>$&lt;</code>表示这段的第一个依赖项，<code>$^</code>表示这段的所有依赖项；命令前加<code>-</code>表示该命令如有错误则忽略；<code>PHONY</code>表示没有目标，没有依赖，总是执行规则，在该例中，若恰好文件夹内有一个名为<code>clean</code>的文件，没有<code>PHONY</code>时则<code>make clean</code>不会执行；另外，由于历史原因makefile只能使用tab来缩进，不能使用空格。</p>
 </article>
 
@@ -572,27 +507,26 @@ Disassembly of section .text:
 
   <aside class="book-toc levels-3 fixed">
     <nav id="TableOfContents">
-<ul>
-<li><a href="#常用工具整理">常用工具整理</a>
-<ul>
-<li><a href="#体检工具">体检工具</a>
-<ul>
-<li><a href="#dstat">dstat</a></li>
-<li><a href="#sysstat">sysstat</a></li>
-<li><a href="#strace">strace</a></li>
-</ul></li>
-<li><a href="#开发工具">开发工具</a>
-<ul>
-<li><a href="#readelf">readelf</a></li>
-<li><a href="#nm">nm</a></li>
-<li><a href="#strip">strip</a></li>
-<li><a href="#objcopy">objcopy</a></li>
-<li><a href="#objdump">objdump</a></li>
-</ul></li>
-<li><a href="#调试工具">调试工具</a></li>
-<li><a href="#构建工具">构建工具</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#体检工具">体检工具</a>
+      <ul>
+        <li><a href="#dstat">dstat</a></li>
+        <li><a href="#sysstat">sysstat</a></li>
+        <li><a href="#strace">strace</a></li>
+      </ul>
+    </li>
+    <li><a href="#开发工具">开发工具</a>
+      <ul>
+        <li><a href="#readelf">readelf</a></li>
+        <li><a href="#nm">nm</a></li>
+        <li><a href="#strip">strip</a></li>
+        <li><a href="#objcopy">objcopy</a></li>
+        <li><a href="#objdump">objdump</a></li>
+      </ul>
+    </li>
+    <li><a href="#调试工具">调试工具</a></li>
+    <li><a href="#构建工具">构建工具</a></li>
+  </ul>
 </nav>
   </aside>
 

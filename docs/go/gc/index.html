@@ -13,10 +13,10 @@
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
+<link rel="stylesheet" href="/book.min.eddc90f1d1267cb826e7cffc53c434e50061c4bfe41146a43670842ce6cb3bf6.css" integrity="sha256-7dyQ8dEmfLgm58/8U8Q05QBhxL/kEUakNnCELObLO/Y=">
 
 
-<script defer src="/cn.search.min.d6435a8341338af3206f281ee20daaedaa51bceaa6c1ae6716fb500f7dcbe081.js" integrity="sha256-1kNag0EzivMgbyge4g2q7apRvOqmwa5nFvtQD33L4IE="></script>
+<script defer src="/cn.search.min.f501d9d3f7f729f2c56eb4a1001961a0b110046c470a021dbdafbe5027b2582b.js" integrity="sha256-9QHZ0/f3KfLFbrShABlhoLEQBGxHCgIdva&#43;&#43;UCeyWCs="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/go/gc/index.xml" title="Home" />
 <!--
@@ -51,14 +51,13 @@ https://github.com/alex-shpak/hugo-book
 
     <ul>
 <li><strong>计算机基础</strong>
-
 <ul>
 <li><a href="/docs/sicp/hardware/">硬件</a></li>
 <li><a href="/docs/sicp/software/">软件</a></li>
 <li><a href="/docs/sicp/asm/">汇编</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>GO语言</strong>
-
 <ul>
 <li><a href="/docs/go/map/">字典</a></li>
 <li><a href="/docs/go/closure/">闭包</a></li>
@@ -67,25 +66,26 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/docs/go/alloc/">内存分配</a></li>
 <li><a href="/docs/go/goroutine/">并发调度</a></li>
 <li><a href="/docs/go/lock/">锁</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>Python语言</strong>
-
 <ul>
 <li><a href="/docs/python/descriptor/">描述符</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>Mysql</strong>
-
 <ul>
 <li><a href="/docs/mysql/query/">查询</a></li>
 <li><a href="/docs/mysql/theory/">原理</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>其他</strong>
-
 <ul>
 <li><a href="/docs/other/tools/">基础系统工具</a></li>
 <li><a href="/docs/other/git/">git</a></li>
 <li><a href="/docs/other/docker/">docker</a></li>
-</ul></li>
+</ul>
+</li>
 </ul>
 
 
@@ -116,79 +116,46 @@ https://github.com/alex-shpak/hugo-book
 </header>
 
       
-<article class="markdown">
-
-<h1 id="垃圾回收器的设计">垃圾回收器的设计</h1>
-
+<article class="markdown"><h1 id="垃圾回收器的设计">垃圾回收器的设计</h1>
 <h2 id="背景知识">背景知识</h2>
-
 <p>垃圾回收器的首要任务就是节约内存，尽可能的节约内存也意味着要尽可能的增加执行频率，这样就会影响性能。如果不想影响用户代码的性能，就得尽量隔久一些执行一次垃圾回收，这就可能导致大量内存无法回收，空间浪费严重。所以垃圾回收器的设计难点就是在这两者间取得平衡，很难做到完美。</p>
-
 <p>我们说垃圾回收通常是针对堆上的垃圾，堆内存都是要释放的，区别只是有的语言需要手动释放，有的语言由垃圾回收器来释放，不释放就是内存泄漏了。而栈内存是绑定在线程上，在Go中也就是M(G0)以及G，默认的2KB会当做一个对象来处理，垃圾回收器通常不会介入。</p>
-
 <p>Go中的垃圾回收属于很传统的策略，基于标记清理，标记出死了的对象然后清理掉，但它不会压缩内存，有的语言会压缩好处在于可以空出大量的连续内存空间，但Go由于支持指针不会这样做。</p>
-
 <p>另外，由于Go需要支持垃圾回收和用户逻辑的并发，也让垃圾回收这件事复杂了很多。就像我们要打扫一条街，那把街两头堵住打扫完了再打开是最方便的，但现在要在打扫的同时不能影响游客游览，这就可能这条街永远打扫不干净。</p>
-
 <p>即便是并发，也会有一个短暂的暂停行为，被称为STW(stop the world)。需要在这个时间内去通知所有的P，我要开始垃圾回收了，并做一些相关的状态设置，用户代码被冻结。所以有时候用户程序对垃圾回收器不友好是可能造成卡顿的，比如说在极短的时间内大量创建了微小对象，逼的垃圾回收器执行频率升高，卡顿就会明显，这种情况就要考虑用对象池等方式来优化。</p>
-
 <p>垃圾回收的过程主要涉及怎么触发、怎么启动、怎么标记、怎么清理这些问题，我们下面来详细了解这些问题。</p>
-
 <h2 id="触发">触发</h2>
-
 <p>有三种情况会触发垃圾回收，通过自动触发，手工触发，系统监控程序来触发。</p>
-
 <p>自动触发是有一个阈值(nextGC)，默认可能是4MB或者8MB，当在堆上分配的内存超过该阈值，则自动启动回收，每次启动后调整下次阈值翻倍。</p>
-
 <p>手工强制使用<code>runtime.GC</code>这样的代码来执行垃圾回收，这种方式不会去检查阈值，往往用来模拟和测试。</p>
-
 <p>为什么还需要系统监控程序触发呢？假设某段时间有个热点，内存突然使用了100MB，那么自动触发的阈值就会被推高到200MB，这时候热点消失内存只使用了50MB时，可能在50~200之间一直没法触发自动回收而产生大量垃圾。系统监控程序会检查上次垃圾回收若已经超过2分钟，则强制执行一次垃圾回收，这种方式也不会检查阈值。</p>
-
 <p>那么自动触发时如何检查阈值是否达到呢？正常想法可能是每次执行<code>malloc(size)</code>函数的时候累加其size并检查一次，这种效率会很低，每次分配都去检查，且这个函数被所有的P/M共享就涉及到需要加锁。Go中采用的优化策略是不在<code>malloc(size)</code>时检查，只有在大对象分配的时候才检查，因为内存分配只有两种情况，要么从操作系统拿回一大块内存来分配给某个大对象，要么拿回一大块内存切成N多小块复用。</p>
-
 <h2 id="启动">启动</h2>
-
 <p>启动的第一步就是开启STW，让所有的P/M进入到一种特殊的状态。其实开启STW之前还要做一件事情，上一个垃圾回收周期的清理工作。然后垃圾回收的相关指令和函数会被打包为一个个worker，进而作为G对象交给调度器执行，垃圾回收代码和用户代码都是G对象从而实现了并发。</p>
-
 <h3 id="worker">worker</h3>
-
 <p>worker分为三种，第一种属于正式工，专门做垃圾回收；第二种属于小时工，执行一段时间垃圾回收就释放P/M执行用户逻辑；第三种是临时工，没有用户G的时候，P/M会闲置，就可能有临时工来执行一段时间。如果没有正式工，小时工和临时工随时都可能因为抢占式调度去执行用户代码，可能导致垃圾回收无法结束；如果都是正式工也不行，正式工不会被抢占，用户逻辑可能被饿死；所以有了小时工和临时工，小时工算是辅助正式工来加快垃圾回收的效率，而临时工更不靠谱，只有在P/M闲置时才可能来帮忙。</p>
-
 <p>这种种措施就是要保证:</p>
-
 <ul>
 <li>垃圾回收一定能够完成</li>
 <li>垃圾回收尽可能快的完成</li>
 <li>垃圾回收不能影响用户代码的执行</li>
 </ul>
-
 <h3 id="controller">controller</h3>
-
 <p>在一个垃圾回收的周期内，会有一个controller来收集信息，它会收集完成这个周期花了多少物理时间，花了多少CPU时间，开始和结束的时候堆的大小，使用的正式工、临时工、小时工的数量。通过这些信息，controller就会去推算下一个周期垃圾回收的阈值应升高还是降低，比如nextGC当前是4MB，下一次就应该是8MB，通过controller推算出应该降低10%，那最终触发的阈值就是7.2MB；另外，controller也会去推算多少正式工、临时工、小时工参与是合理的。这些推算都是概率问题，属于局部性原则的一种应用，本次垃圾回收的压力大，那么下次垃圾回收压力大的概率就高一些。这种简单的策略为垃圾回收增加了一些灵活性，比僵化的阈值设定要好一些。</p>
-
 <h2 id="标记">标记</h2>
-
 <h3 id="三色标记">三色标记</h3>
-
 <p>启动之后就要开始执行标记操作，标记有一个基本的规则叫三色标记原则。</p>
-
 <p>我们把任一段代码编译之后，会发现编译器插入一些例如<code>PCDATA</code>这样的指令，它属于伪指令，是为了在编译时记录对象的相关信息以及一些元数据信息，这些信息可以用来给内存分配器提供参考:当在堆上分配一个对象的时候，除了去分配相应的内存(比如起始位置0x100100)，还会在一个位图中查找到索引0x100100的位置，按照元数据中的类型信息标记出该对象的第几个位置是指针。</p>
-
 <p>而一个对象要么是从全局变量引用下来，要么是从栈上引用下来，自然就会有根对象，这个根对象就是位图中的指针。垃圾回收的时候就是先去查看位图有没有指针，根据指针一路追踪扫描下去。</p>
-
 <p>在一次扫描开始时，会认为所有的对象是白色的。根对象一定是活的，那么被它引用的对象也一定是活的，就把它标记为灰色的，并把它的引用放在一个队列中去。接着把这个队列的灰色对象依次拿出来，比如先拿出了灰色的A，看A引用的对象是什么，把A引用的对象重新加到队列中去，并把A标记为黑色。重复执行这个过程，那么最终就只会剩下两种对象，黑色的和白色的，黑色的是活着的，白色的是死掉的。</p>
-
 <h3 id="写屏障">写屏障</h3>
-
 <p>但还有个问题没有解决，标记的同时用户代码也在执行，如果已经标记为黑色的对象又引用了一个白色对象C怎么办，因为不会对黑色对象进行二次扫描，在最终清理时就会把这个C也误杀掉。为了解决这个问题，在编译期编译器就会对指针写操作的语句插入一段<strong>写屏障</strong>代码，这段代码会判断如果当前正在垃圾回收，指针的写操作不会立即执行，而是先执行写屏障逻辑。写屏障逻辑会判断这个指针若是黑色的，就把它重新变成灰色的加入队列进行二次扫描。</p>
-
 <p>具体如何加入写屏障的，我们可以看如下示例:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">x</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">int</span>
 <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>(){
     <span style="color:#a6e22e">x</span> = new(<span style="color:#66d9ef">int</span>)
     println(<span style="color:#a6e22e">x</span>)
 }</code></pre></div></p>
-
 <p>然后我们编译并反汇编:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ go tool objdump -s <span style="color:#e6db74">&#34;main\.main&#34;</span> test
 TEXT main.main<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span> /root/.mac/test.go
@@ -199,15 +166,15 @@ TEXT main.main<span style="color:#f92672">(</span>SB<span style="color:#f92672">
   test.go:5		0x452343		48896c2410		MOVQ BP, 0x10<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
   test.go:5		0x452348		488d6c2410		LEAQ 0x10<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>, BP
   test.go:6		0x45234d		488d052cbc0000		LEAQ 0xbc2c<span style="color:#f92672">(</span>IP<span style="color:#f92672">)</span>, AX
-  test.go:6		0x452354		<span style="color:#ae81ff">48890424</span>		MOVQ AX, <span style="color:#ae81ff">0</span><span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
+  test.go:6		0x452354		48890424		MOVQ AX, 0<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
 <span style="display:block;width:100%;background-color:#3c3d38">  test.go:6		0x452358		e8038afbff		CALL runtime.newobject<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
 </span><span style="display:block;width:100%;background-color:#3c3d38">  test.go:6		0x45235d		488b442408		MOVQ 0x8<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>, AX
 </span><span style="display:block;width:100%;background-color:#3c3d38">  test.go:6		0x452362		833d37dd080000		CMPL $0x0, runtime.writeBarrier<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
-</span><span style="display:block;width:100%;background-color:#3c3d38">  test.go:6		0x452369		<span style="color:#ae81ff">7530</span>			JNE 0x45239b
+</span><span style="display:block;width:100%;background-color:#3c3d38">  test.go:6		0x452369		7530			JNE 0x45239b
 </span>  test.go:6		0x45236b		4889058e270700		MOVQ AX, main.x<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
   test.go:7		0x452372		e83931fdff		CALL runtime.printlock<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
   test.go:7		0x452377		488b0582270700		MOVQ main.x<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>, AX
-  test.go:7		0x45237e		<span style="color:#ae81ff">48890424</span>		MOVQ AX, <span style="color:#ae81ff">0</span><span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
+  test.go:7		0x45237e		48890424		MOVQ AX, 0<span style="color:#f92672">(</span>SP<span style="color:#f92672">)</span>
   test.go:7		0x452382		e8293afdff		CALL runtime.printpointer<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
   test.go:7		0x452387		e8b433fdff		CALL runtime.printnl<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
   test.go:7		0x45238c		e89f31fdff		CALL runtime.printunlock<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
@@ -219,9 +186,7 @@ TEXT main.main<span style="color:#f92672">(</span>SB<span style="color:#f92672">
 </span><span style="display:block;width:100%;background-color:#3c3d38">  test.go:6		0x4523a7		ebc9			JMP 0x452372
 </span>  test.go:5		0x4523a9		e8f27affff		CALL runtime.morestack_noctxt<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>
   test.go:5		0x4523ae		eb80			JMP main.main<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span></code></pre></div></p>
-
 <p>我们看到<code>new(int)</code>对应<code>CALL runtime.newobject(SB)</code>，之后通过<code>CMPL $0x0, runtime.writeBarrier(SB)</code>进行比较，比较结果为真则跳转至下面的<code>CALL runtime.gcWriteBarrier(SB)</code>，执行完了再跳转回去继续赋值。</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// src/runtime/mgc.go 
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">writeBarrier</span> <span style="color:#66d9ef">struct</span> {
 	<span style="color:#a6e22e">enabled</span> <span style="color:#66d9ef">bool</span>    <span style="color:#75715e">// compiler emits a check of this before calling write barrier
@@ -230,25 +195,15 @@ TEXT main.main<span style="color:#f92672">(</span>SB<span style="color:#f92672">
 </span><span style="color:#75715e"></span>	<span style="color:#a6e22e">cgo</span>     <span style="color:#66d9ef">bool</span>    <span style="color:#75715e">// whether we need a write barrier for a cgo check
 </span><span style="color:#75715e"></span>	<span style="color:#a6e22e">alignme</span> <span style="color:#66d9ef">uint64</span>  <span style="color:#75715e">// guarantee alignment so that compiler can use a 32 or 64-bit load
 </span><span style="color:#75715e"></span>}</code></pre></div>
-
 <p>我们通过写屏障的定义也就知道了<code>$0x0</code>是和这里的enabled进行比较的，这种简单的比较对性能的影响是非常小的。</p>
-
 <h3 id="挣工分">挣工分</h3>
-
 <p>还有一个问题，用户代码中分配对象的速度远大于回收的速度，造成垃圾回收无法结束。这种情况如何处理呢？</p>
-
 <p>每次分配对象的时候，会去检查若当前正在垃圾回收，则每个G对象都会有一个信用值，分配一个size大小的对象，就把这个信用值减去size，直到这个信用值为负数，则把这个执行一半的G暂停并保存上下文丢回给调度器，其绑定的P/M来帮助进行垃圾回收挣工分，工分挣到一定程度比如3倍的信用值则接着去执行用户代码(这个可能就不会接着之前暂停的G、可能是任意G)。</p>
-
 <p>但是仅这种挣工分来还债再接着执行用户代码的方式效率可能会很低，因为本身垃圾回收器就有worker，这些worker可能突然执行效率很高，导致来协助挣工分的P/M挣不到，于是就有了一个公用的信用值来存储垃圾回收器中workder挣的工分。所以当公用的信用值还有额度的时候，说明垃圾回收的压力还不大，用户G会先去尝试扣减这个公用信用值，如果不够扣才会去帮助垃圾回收。</p>
-
 <h2 id="清理">清理</h2>
-
 <p>标记完之后如何清理呢？内存是分块的，每个大块下又分了很多小块，每个小块可能代表一个对象。它还有一份元数据，是一个位图，位图和这些内存块一一对应。所谓的回收清理只是标记出在这个位图中哪些块是死了的，告诉内存分配器哪些块是可以合并的等，以便于下一次能直接复用。</p>
-
 <p>清理操作也是和用户代码并发的，但要清理的这些对象和用户逻辑之间没有任何干扰，互相不影响，相对比较容易。</p>
-
 <h2 id="总结">总结</h2>
-
 <p>在研究垃圾回收器的设计过程中，我们发现整个处理过程是比较复杂的。垃圾回收器的设计中有大量的细节处理是在找平衡，在执行效率和空间占用中找到平衡。</p>
 </article>
 
@@ -286,26 +241,25 @@ TEXT main.main<span style="color:#f92672">(</span>SB<span style="color:#f92672">
 
   <aside class="book-toc levels-3 fixed">
     <nav id="TableOfContents">
-<ul>
-<li><a href="#垃圾回收器的设计">垃圾回收器的设计</a>
-<ul>
-<li><a href="#背景知识">背景知识</a></li>
-<li><a href="#触发">触发</a></li>
-<li><a href="#启动">启动</a>
-<ul>
-<li><a href="#worker">worker</a></li>
-<li><a href="#controller">controller</a></li>
-</ul></li>
-<li><a href="#标记">标记</a>
-<ul>
-<li><a href="#三色标记">三色标记</a></li>
-<li><a href="#写屏障">写屏障</a></li>
-<li><a href="#挣工分">挣工分</a></li>
-</ul></li>
-<li><a href="#清理">清理</a></li>
-<li><a href="#总结">总结</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#背景知识">背景知识</a></li>
+    <li><a href="#触发">触发</a></li>
+    <li><a href="#启动">启动</a>
+      <ul>
+        <li><a href="#worker">worker</a></li>
+        <li><a href="#controller">controller</a></li>
+      </ul>
+    </li>
+    <li><a href="#标记">标记</a>
+      <ul>
+        <li><a href="#三色标记">三色标记</a></li>
+        <li><a href="#写屏障">写屏障</a></li>
+        <li><a href="#挣工分">挣工分</a></li>
+      </ul>
+    </li>
+    <li><a href="#清理">清理</a></li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
 </nav>
   </aside>
 

@@ -13,10 +13,10 @@
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/book.min.0379377fb17315c9a560efd4d406aea4535c095a461b220fd9e3d2e9c05550e6.css" integrity="sha256-A3k3f7FzFcmlYO/U1AaupFNcCVpGGyIP2ePS6cBVUOY=">
+<link rel="stylesheet" href="/book.min.eddc90f1d1267cb826e7cffc53c434e50061c4bfe41146a43670842ce6cb3bf6.css" integrity="sha256-7dyQ8dEmfLgm58/8U8Q05QBhxL/kEUakNnCELObLO/Y=">
 
 
-<script defer src="/cn.search.min.d6435a8341338af3206f281ee20daaedaa51bceaa6c1ae6716fb500f7dcbe081.js" integrity="sha256-1kNag0EzivMgbyge4g2q7apRvOqmwa5nFvtQD33L4IE="></script>
+<script defer src="/cn.search.min.f501d9d3f7f729f2c56eb4a1001961a0b110046c470a021dbdafbe5027b2582b.js" integrity="sha256-9QHZ0/f3KfLFbrShABlhoLEQBGxHCgIdva&#43;&#43;UCeyWCs="></script>
 
 <link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/go/lock/index.xml" title="Home" />
 <!--
@@ -51,14 +51,13 @@ https://github.com/alex-shpak/hugo-book
 
     <ul>
 <li><strong>计算机基础</strong>
-
 <ul>
 <li><a href="/docs/sicp/hardware/">硬件</a></li>
 <li><a href="/docs/sicp/software/">软件</a></li>
 <li><a href="/docs/sicp/asm/">汇编</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>GO语言</strong>
-
 <ul>
 <li><a href="/docs/go/map/">字典</a></li>
 <li><a href="/docs/go/closure/">闭包</a></li>
@@ -67,25 +66,26 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/docs/go/alloc/">内存分配</a></li>
 <li><a href="/docs/go/goroutine/">并发调度</a></li>
 <li><a href="/docs/go/lock/"class=active>锁</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>Python语言</strong>
-
 <ul>
 <li><a href="/docs/python/descriptor/">描述符</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>Mysql</strong>
-
 <ul>
 <li><a href="/docs/mysql/query/">查询</a></li>
 <li><a href="/docs/mysql/theory/">原理</a></li>
-</ul></li>
+</ul>
+</li>
 <li><strong>其他</strong>
-
 <ul>
 <li><a href="/docs/other/tools/">基础系统工具</a></li>
 <li><a href="/docs/other/git/">git</a></li>
 <li><a href="/docs/other/docker/">docker</a></li>
-</ul></li>
+</ul>
+</li>
 </ul>
 
 
@@ -116,24 +116,15 @@ https://github.com/alex-shpak/hugo-book
 </header>
 
       
-<article class="markdown">
-
-<h1 id="锁的原理">锁的原理</h1>
-
+<article class="markdown"><h1 id="锁的原理">锁的原理</h1>
 <p>锁是怎么实现的？怎么做到独占的？实际上得从原子操作说起。</p>
-
 <h2 id="原子操作">原子操作</h2>
-
 <p>原子操作不是说一定要只能一个动作，而是说把它包装成一条指令或者一个函数的时候，它可以保证不会被侵入。在单核CPU上，一条指令肯定是原子的，但不见得一条指令就只做了一个操作，可能是两个操作，比如<code>CAS</code>(Compare&amp;Set或Compare&amp;Swap，X86下对应的是CMPXCHG汇编指令)是比较并交换操作数，这在单核上没有问题，但在多核上如何保证不被打断呢？这就需要硬件来支持了。</p>
-
 <p>我们在<a href="https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-instruction-set-reference-manual-325383.pdf">intel IA-64手册</a>中，可以翻到这样一条指令前缀:
-<img src="images/lock.jpg" alt="" /></p>
-
+<img src="images/lock.jpg" alt=""></p>
 <p>按文档描述，把这条前缀加到某些指令前时，它可以实现一个原子操作。在x86体系中，CPU里专门有一条引线叫HLOCK pin，当遇到有LOCK前缀的指令就拉低该引线电位，从而锁住了总线。那么在同一总线上的其他Core就无法通过总线访问内存了。所以原子操作的本质仍然是锁，只是这个锁是硬件层面的。也不存在软件层面上真正意义的无锁操作，底层仍然是锁。</p>
-
 <p>我们在Go的源码中也能看到大量这样的代码:</p>
-
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#960050;background-color:#1e0010">//</span> <span style="color:#a6e22e">src</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">runtime</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">internal</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">atomic</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">asm_amd64.s</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#960050;background-color:#1e0010">/</span> <span style="color:#a6e22e">src</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">runtime</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">internal</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">atomic</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">asm_amd64.s</span>
 <span style="color:#a6e22e">TEXT</span> <span style="color:#66d9ef">runtime</span><span style="color:#960050;background-color:#1e0010">∕</span><span style="color:#66d9ef">internal</span><span style="color:#960050;background-color:#1e0010">∕</span><span style="color:#66d9ef">atomic</span><span style="color:#960050;background-color:#1e0010">·</span><span style="color:#66d9ef">Cas</span>(<span style="color:#66d9ef">SB</span>),<span style="color:#66d9ef">NOSPLIT</span>,<span style="color:#66d9ef">$0-17</span>
 	<span style="color:#a6e22e">MOVQ</span>	<span style="color:#66d9ef">ptr</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">0</span>(<span style="color:#66d9ef">FP</span>), <span style="color:#66d9ef">BX</span>
 	<span style="color:#a6e22e">MOVL</span>	<span style="color:#66d9ef">old</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">8</span>(<span style="color:#66d9ef">FP</span>), <span style="color:#66d9ef">AX</span>
@@ -142,15 +133,10 @@ https://github.com/alex-shpak/hugo-book
 	<span style="color:#a6e22e">CMPXCHGL</span>	<span style="color:#66d9ef">CX</span>, <span style="color:#ae81ff">0</span>(<span style="color:#66d9ef">BX</span>)
 	<span style="color:#a6e22e">SETEQ</span>	<span style="color:#66d9ef">ret</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">16</span>(<span style="color:#66d9ef">FP</span>)
 	<span style="color:#a6e22e">RET</span></code></pre></div>
-
 <p>随着现在CPU核数逐步增多，这种LOCK前缀锁总线的方式带来的性能问题就凸显了出来，所以现在的体系遇到LOCK前缀时，不是去锁整个总线，而是先检查一下要锁的内容是不是在cache中，如果在的话只锁那一行cacheline，只有同时访问这一个cacheline的其他core才会被锁住，就像数据库的表锁和行锁。这样一来，性能的影响没那么大了，但是原子操作还是会带来性能影响的，只是硬件层面的东西我们作为程序员改变不了什么也就很少去提。</p>
-
 <p>那么原子操作和我们平时所说的互斥锁有什么区别呢？我们谈原子操作是只针对一个操作，而锁是往往是要包含一段逻辑、一个block的。</p>
-
 <h2 id="无锁结构">无锁结构</h2>
-
 <p>也就是Lock Free，它的做法用伪码来表达是这样的:</p>
-
 <pre><code>for {
     old = atomic.Load()
 
@@ -167,44 +153,30 @@ func compareAndSwap(addr int, old int, new int) bool{
     *addr = new
     return True
 }
-</code></pre>
-
-<p>当old通过原子操作读出以后，如果有其他CPU操作修改了这个值，那么<code>atomic.CAS</code>就会发现old变了则修改失败重新循环，反之修改成功退出循环，这就是无锁结构。运气好的话一次就执行完了，运气不好一直被打断的话循环多少次是未知的。它的实际使用场景比如说是一个无锁结构的链表队列，当需要向队列尾部插入元素时，插入不成功则说明有其他线程刚刚插入过，队列尾部的地址已经变了，则需重试。</p>
-
+</code></pre><p>当old通过原子操作读出以后，如果有其他CPU操作修改了这个值，那么<code>atomic.CAS</code>就会发现old变了则修改失败重新循环，反之修改成功退出循环，这就是无锁结构。运气好的话一次就执行完了，运气不好一直被打断的话循环多少次是未知的。它的实际使用场景比如说是一个无锁结构的链表队列，当需要向队列尾部插入元素时，插入不成功则说明有其他线程刚刚插入过，队列尾部的地址已经变了，则需重试。</p>
 <p>这种结构也有个问题，就是ABA的问题。试想一下<code>atomic.Load</code>读出来是A，然后被人修改为了B再修改回A，<code>atomic.CAS</code>就发现不了接着执行自己的逻辑。这样粗看好像也没有什么问题，但CAS只是检查的一个地址，实际情况往往会有其他的逻辑，有人做了一个比喻:你拿着一个装满钱的手提箱在飞机场，此时过来了一个火辣性感的美女，然后她很暖昧地挑逗着你，并趁你不注意的时候，把用一个一模一样的手提箱和你那装满钱的箱子调了个包，然后就离开了，你看到你的手提箱还在那，于是就提着手提箱去赶飞机去了。</p>
-
 <p>怎么解决ABA的问题呢？可以采用数据库乐观锁的办法，每次进行修改的时候添加一个时间戳或者流水号，上例就是<code>atomic.Load</code>读出来以后就是A20191222，修改为B就变为了B20191223，再进行一次修改就是A20191224了。</p>
-
 <h2 id="缓存一致性">缓存一致性</h2>
-
 <p>CPU是不会和内存直接交互的，它和内存之间的读写都是通过L1、L2、L3缓存来做中转。那么如果内存上有个X=1，CPU1和CPU2都把这个X读到自己的缓存上，CPU1这时候对X做了修改让X=3，CPU2又如何知道呢？这就是缓存一致性的问题，需要确保的是任一时刻，缓存的内容是相同的。</p>
-
 <p>缓存是以行为单位的，也就是cacheline，每行中除了缓存的数据外还包括内存地址和状态。而状态又分为四种，即M、E、S、I。M即modify，表示当前CPU修改过数据，需要以此为准回写到主存中去；E即exclusive，独占，当前的CPU独占了这个数据，和主存中是一致的，其他CPU没有的；S即shared，共享，各个CPU都有这行数据，且是和主存一致的；I即invalid，表示失效的，CPU发现是这个状态就意味着需要从主存里重新去拿一下。</p>
-
 <p>当CPU2要去写某一行数据的时候，它就会向总线发出一个请求: CPU2要独占某一段地址。CPU1、CPU3、CPU4一直都在嗅探总线去接收总线的通知，然后去检查自己的缓存中有没有这行数据，如果CPU3有且这行状态是共享的，那就把CPU3的这行变为失效状态；但如果CPU1那行已经是独占的，这个CPU2就得等，等到CPU1修改完数据回写到主存当中会解除CPU1的独占状态，CPU2重新从主存刷新自己的缓存再把它修改为独占状态。修改了数据就需要改为modify，因为需要一批数据一同刷入主存。</p>
-
 <p>这种通过四种状态保证缓存一致性的方式和我们日常见到的锁的原理差不多，数据库修改某行的时候也是加行锁，其他人要修改该行就得排队，要修改其他行就不受影响。</p>
-
 <h2 id="go语言中的锁">Go语言中的锁</h2>
-
 <h3 id="futex">Futex</h3>
-
 <p>锁的本质是通过某种操作实现休眠、唤醒等操作，那它就一定要由操作系统来实现，由OS实现才能避免对于休眠的单位不去分配时间片。那么锁就需要进行系统调用，它的效率就会非常低？Linux在很早期的版本就提供了一种锁<a href="https://zh.wikipedia.org/wiki/Futex">Futex</a>，虽然是由操作系统提供的，但它是在用户空间实现的，是一种特殊的系统调用，大部分情况下不需要进入内核空间，避免了通常的系统调用所需的用户态内核态之间的切换。Futex其实就是一块内存空间，通常是一个整型变量，大家通过原子操作对它做修改，要么就修改成功执行逻辑，要么就修改失败等待它。</p>
-
 <p>Linux手册中提供了这种锁的<a href="http://man7.org/linux/man-pages/man2/futex.2.html">调用方式</a>，包括锁定、等待、唤醒等参数。Go中调用其API:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// src/runtime/os_linux.go
 </span><span style="color:#75715e"></span>
 <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">futex</span>(<span style="color:#a6e22e">addr</span> <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>, <span style="color:#a6e22e">op</span> <span style="color:#66d9ef">int32</span>, <span style="color:#a6e22e">val</span> <span style="color:#66d9ef">uint32</span>, <span style="color:#a6e22e">ts</span>, <span style="color:#a6e22e">addr2</span> <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>, <span style="color:#a6e22e">val3</span> <span style="color:#66d9ef">uint32</span>) <span style="color:#66d9ef">int32</span>
 
 <span style="color:#75715e">// Linux futex.
-</span><span style="color:#75715e">//
-</span><span style="color:#75715e">//	futexsleep(uint32 *addr, uint32 val)
-</span><span style="color:#75715e">//	futexwakeup(uint32 *addr)
-</span><span style="color:#75715e">//
-</span><span style="color:#75715e">// Futexsleep atomically checks if *addr == val and if so, sleeps on addr.
-</span><span style="color:#75715e">// Futexwakeup wakes up threads sleeping on addr.
-</span><span style="color:#75715e">// Futexsleep is allowed to wake up spuriously.
+</span><span style="color:#75715e"></span><span style="color:#75715e">//
+</span><span style="color:#75715e"></span><span style="color:#75715e">//	futexsleep(uint32 *addr, uint32 val)
+</span><span style="color:#75715e"></span><span style="color:#75715e">//	futexwakeup(uint32 *addr)
+</span><span style="color:#75715e"></span><span style="color:#75715e">//
+</span><span style="color:#75715e"></span><span style="color:#75715e">// Futexsleep atomically checks if *addr == val and if so, sleeps on addr.
+</span><span style="color:#75715e"></span><span style="color:#75715e">// Futexwakeup wakes up threads sleeping on addr.
+</span><span style="color:#75715e"></span><span style="color:#75715e">// Futexsleep is allowed to wake up spuriously.
 </span><span style="color:#75715e"></span>
 
 <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">futexsleep</span>(<span style="color:#a6e22e">addr</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">uint32</span>, <span style="color:#a6e22e">val</span> <span style="color:#66d9ef">uint32</span>, <span style="color:#a6e22e">ns</span> <span style="color:#66d9ef">int64</span>) {
@@ -230,9 +202,7 @@ func compareAndSwap(addr int, old int, new int) bool{
 
 	<span style="color:#f92672">*</span>(<span style="color:#f92672">*</span><span style="color:#66d9ef">int32</span>)(<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>(uintptr(<span style="color:#ae81ff">0x1006</span>))) = <span style="color:#ae81ff">0x1006</span>
 }</code></pre></div>
-
 <p>有了API，并不能直接用，还要对其进行包装:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// src/runtime/lock_futex.go
 </span><span style="color:#75715e"></span>
 <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">lock</span>(<span style="color:#a6e22e">l</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">mutex</span>) {
@@ -305,15 +275,10 @@ func compareAndSwap(addr int, old int, new int) bool{
 		<span style="color:#a6e22e">gp</span>.<span style="color:#a6e22e">stackguard0</span> = <span style="color:#a6e22e">stackPreempt</span>
 	}
 }</code></pre></div>
-
 <p>其一开始尝试拿锁属于投机，先以最乐观的情况考虑，如果没人竞争就能直接拿到锁，这种概率并不低，我们自己做性能设计时也可以参考它先设计乐观的情况。尝试失败则进入自旋状态，自旋状态打个比方，就是你在火车上上厕所，发现厕所有人，你在外面焦急的转圈等待；它是次一级的理想状态，因为厕所的人出来你马上就能进去，若是回到座位上可能被人插队；<code>procyield(active_spin_cnt)</code>背后会调用一个专门的CPU指令<a href="http://c9x.me/x86/html/file_module_x86_id_232.html">PAUSE</a>，它可以降低自旋状态时CPU的功耗并进入一个短暂的等待。自旋时没拿到锁则进入另一个状态，相当于回到座位上但是盯着厕所的门，这个状态下执行的<code>osyield()</code>是操作系统提供的等待，这种等待的时长就比CPU指令长很多，同时涉及到状态切换开销也会大很多。这种积极的尝试如果仍然失败，则进入睡眠状态，等待厕所里面的人出来唤醒它，唤醒后重新进入这个循环。</p>
-
 <p>尽管做了这样的包装，这种锁仍然属于较低层次的，一般不会给用户直接用。</p>
-
 <h3 id="sema">Sema</h3>
-
 <p>信号量，可以控制同时执行的数量，如果数量是1就相当于互斥锁，如果都在执行了再进来人就得排队。</p>
-
 <p>首先，它的结构是这样的:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// src/runtime/sema.go
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">semaRoot</span> <span style="color:#66d9ef">struct</span> {
@@ -321,9 +286,7 @@ func compareAndSwap(addr int, old int, new int) bool{
 	<span style="color:#a6e22e">treap</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">sudog</span> <span style="color:#75715e">// root of balanced tree of unique waiters.
 </span><span style="color:#75715e"></span>	<span style="color:#a6e22e">nwait</span> <span style="color:#66d9ef">uint32</span> <span style="color:#75715e">// Number of waiters. Read w/o the lock.
 </span><span style="color:#75715e"></span>}</code></pre></div></p>
-
 <p><code>lock</code> 就是之前设计的那种锁，在这之上提供了一个<code>treap</code>这样的平衡树结构，它是等待人(G对象)的列表，还有<code>nwait</code>计数器存储等待人的数量。</p>
-
 <p>它的核心获取锁的逻辑:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">semacquire1</span>(<span style="color:#a6e22e">addr</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">uint32</span>, <span style="color:#a6e22e">lifo</span> <span style="color:#66d9ef">bool</span>, <span style="color:#a6e22e">profile</span> <span style="color:#a6e22e">semaProfileFlags</span>, <span style="color:#a6e22e">skipframes</span> <span style="color:#66d9ef">int</span>) {
     <span style="color:#75715e">//简单的情况，即直接成功获取锁
@@ -368,7 +331,6 @@ func compareAndSwap(addr int, old int, new int) bool{
 	}
 }</code></pre></div>
 首先尝试去锁定，并给等待者的数量加上1，然后通过<code>cansemacquire</code>检查一下能不能获得这把锁，能获得则减1退出循环。不能获得则加入到队列中，<code>goparkunlock</code>休眠。信号量归根结底是用原子操作来维护某个地址上的信号量加减，用一个锁来维护一个等待者计数器，这里的<code>&amp;root.lock</code>是为了保护对计数器的操作和入队的操作。</p>
-
 <p>接着我们看看释放:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">semrelease1</span>(<span style="color:#a6e22e">addr</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">uint32</span>, <span style="color:#a6e22e">handoff</span> <span style="color:#66d9ef">bool</span>, <span style="color:#a6e22e">skipframes</span> <span style="color:#66d9ef">int</span>) {
 	<span style="color:#a6e22e">root</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">semroot</span>(<span style="color:#a6e22e">addr</span>)
@@ -407,13 +369,9 @@ func compareAndSwap(addr int, old int, new int) bool{
 		}
 	}
 }</code></pre></div></p>
-
 <p>首先，释放必然使地址上的信号量加1。其次，去查看是否有人等，没人等则直接退出；如果有人等，则从队列中dequeue一个等待者、计数器减一，等待者可能是按地址排序的，但这属于其内部实现，我们没法确定弹出的是谁。最后如果传入的<code>handoff</code>为true表示要进行权限转移，会给这个弹出的等待者发一张票，之前<code>semacquire1</code>的for循环中<code>goparkunlock</code>休眠后被唤醒的第一件事就是检查有没有拿到票，拿到了则可以短路出去，没必要再走一次for循环和别人竞争抢锁<code>&amp;root.lock</code>。</p>
-
 <p>信号量结合了它的特征，在一些短路的设计上值得我们学习。它仍然是runtime层面的，还不是交给用户去使用的。</p>
-
 <h3 id="mutex">Mutex</h3>
-
 <p>给用户使用的锁在标准库中，我们来看看它的实现:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// src/sync/mutex.go 
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Mutex</span> <span style="color:#66d9ef">struct</span> {
@@ -426,9 +384,7 @@ func compareAndSwap(addr int, old int, new int) bool{
 	<span style="color:#a6e22e">mutexStarving</span>
 	<span style="color:#a6e22e">mutexWaiterShift</span> = <span style="color:#66d9ef">iota</span>
 )</code></pre></div></p>
-
 <p>Mutex结构包括一个状态和一个计数，这个状态分为四种，即锁定、唤醒(这里可以理解为自旋)、饥饿、等待者转移。怎样会出现饥饿状态呢？比如A、B竞争一把锁的时候，A拿到了，B经过不断尝试最终进入了睡眠状态，A释放锁的时候又有C去竞争锁，C此时可能处于自旋状态，同理C后面可能还有D、E，B就一直拿不到锁处于饥饿状态。这种状态在并发编程中并不少见。</p>
-
 <p>接着我们看看其锁定的过程:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">m</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Mutex</span>) <span style="color:#a6e22e">Lock</span>() {
 	<span style="color:#75715e">// 进入快速路径，乐观状态，没有竞争
@@ -516,9 +472,7 @@ func compareAndSwap(addr int, old int, new int) bool{
 		<span style="color:#a6e22e">race</span>.<span style="color:#a6e22e">Acquire</span>(<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>(<span style="color:#a6e22e">m</span>))
 	}
 }</code></pre></div></p>
-
 <h2 id="总结">总结</h2>
-
 <p>我们从原子操作到Mutex，经历了四个层次的包装，每层包装面向不同的目的去解决不同的问题。在做发动机的时候，我们考虑的是动力、性能、省油，但拿它做飞机引擎还是做汽车引擎就要做不同的包装。我们平时做设计的时候往往也需要层进式的考虑问题，不要总是想着一步到位。</p>
 </article>
 
@@ -556,21 +510,19 @@ func compareAndSwap(addr int, old int, new int) bool{
 
   <aside class="book-toc levels-3 fixed">
     <nav id="TableOfContents">
-<ul>
-<li><a href="#锁的原理">锁的原理</a>
-<ul>
-<li><a href="#原子操作">原子操作</a></li>
-<li><a href="#无锁结构">无锁结构</a></li>
-<li><a href="#缓存一致性">缓存一致性</a></li>
-<li><a href="#go语言中的锁">Go语言中的锁</a>
-<ul>
-<li><a href="#futex">Futex</a></li>
-<li><a href="#sema">Sema</a></li>
-<li><a href="#mutex">Mutex</a></li>
-</ul></li>
-<li><a href="#总结">总结</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#原子操作">原子操作</a></li>
+    <li><a href="#无锁结构">无锁结构</a></li>
+    <li><a href="#缓存一致性">缓存一致性</a></li>
+    <li><a href="#go语言中的锁">Go语言中的锁</a>
+      <ul>
+        <li><a href="#futex">Futex</a></li>
+        <li><a href="#sema">Sema</a></li>
+        <li><a href="#mutex">Mutex</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
 </nav>
   </aside>
 
