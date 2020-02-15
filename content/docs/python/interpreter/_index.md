@@ -399,3 +399,78 @@ PyObject* _Py_HOT_FUNCTION _PyEval_EvalFrameDefault(PyFrameObject *f, int throwf
 {{< /highlight >}}
 
 ### 终止
+执行完之后，结束之前还要进行一系列的清理操作。
+{{< highlight c>}}
+<!-- cpython/Python/pylifecycle.c -->
+int Py_FinalizeEx(void)
+{
+    // 等待前台线程结束
+    wait_for_thread_shutdown();
+
+    /* Get current thread state and interpreter pointer */
+    tstate = PyThreadState_GET();
+    interp = tstate->interp;
+
+    // 调用 atexit 注册的退出函数
+    call_py_exitfuncs(interp);
+
+    /* Flush sys.stdout and sys.stderr */
+    if (flush_std_files() < 0) {
+        status = -1;
+    }
+
+    /* Disable signal handling */
+    PyOS_FiniInterrupts();
+
+    // 垃圾回收，执行析构方法
+    _PyGC_CollectIfEnabled();
+
+    // 释放导入的模块
+    PyImport_Cleanup();
+
+    // 执行相关结束函数
+    _PyTraceMalloc_Fini();
+    _PyImport_Fini();
+    _PyType_Fini();
+    _PyFaulthandler_Fini();
+    _PyExc_Fini();
+
+    // 执行内置类型的结束函数
+    PyMethod_Fini();
+    PyFrame_Fini();
+    PyCFunction_Fini();
+    PyTuple_Fini();
+    PyList_Fini();
+    PySet_Fini();
+    PyBytes_Fini();
+    PyByteArray_Fini();
+    PyLong_Fini();
+    PyFloat_Fini();
+    PyDict_Fini();
+    PySlice_Fini();
+    _PyGC_Fini();
+    _Py_HashRandomization_Fini();
+    _PyArg_Fini();
+    PyAsyncGen_Fini();
+    _PyContext_Fini();
+
+    /* Cleanup Unicode implementation */
+    _PyUnicode_Fini();
+
+    PyGrammar_RemoveAccelerators(&_PyParser_Grammar);
+
+    /* Cleanup auto-thread-state */
+    _PyGILState_Fini();
+
+    /* Delete current thread. After this, many C API calls become crashy. */
+    PyThreadState_Swap(NULL);
+    // 清理解释器和主线程状态
+    PyInterpreterState_Delete(interp);
+
+    call_ll_exitfuncs();
+
+    _PyRuntime_Finalize();
+
+    return status;
+}
+{{< /highlight >}}
