@@ -4,7 +4,7 @@
 -------
 Python中的字节码并不能被CPU执行，而是由栈式虚拟机执行，每条指令的背后都对应了一大堆C实现的机器指令。
 
-字节码被存储在代码对象的__code__.co_code中，以一个函数为例:
+字节码被存储在代码对象(即`__code__`)的`co_code`中，以一个函数为例:
 {{< highlight python>}}
 >>> def add(x, y):                                                                                          
 ...     z = x + y
@@ -33,4 +33,46 @@ Python中的字节码并不能被CPU执行，而是由栈式虚拟机执行，�
   3           8 LOAD_FAST                2 (z)
              10 RETURN_VALUE
 {{< /highlight >}}
-指令所对应的源码行这个信息其实保存在__code__的两个相关属性中，co_firstlineno用来存储该段代码起始的行号，co_lnotab由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。
+指令所对应的源码行这个信息其实保存在代码对象的两个相关属性中，`co_firstlineno`用来存储该段代码起始的行号，`co_lnotab`由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。每条字节码指令代表的意义可通过官方文档[此处](https://docs.python.org/3/library/dis.html)查询到。
+
+
+GIL
+-------
+全局解释器锁机制使得解释器在同一时刻仅有一个线程可以被调度执行，某个线程若想要执行，就先要拿到GIL，但在每个Python进程中，只有一个GIL。它的存在使得解释器本身的实现更简单一些，更容易实现对象的安全访问，便于进行内存管理和编写扩展。但在多核环境下无法实现并行，对于以多线程为基础的并发应用就是一个灾难。
+
+对于IO密集型任务，线程是在发生阻塞时主动释放GIL的，让其他线程得以执行。而对于CPU密集型任务，采取超时策略。
+
+当GIL被其他线程占用时，等待线程会阻塞一段时间。如果超时（默认为0.005秒）后，依然无法获取锁，则发出请求。这种请求设计的很轻巧，就是一个全局条件变量设置。正在执行的线程在解释循环内会检查该标记，然后释放锁，切换线程执行，其自身进入等待状态。属于典型的协作机制。相关源码:
+{{< highlight c>}}
+<!-- cpython/Python/ceval.c -->
+main_loop:
+    for (;;) {
+        <!-- ... -->
+        if (_Py_atomic_load_relaxed(eval_breaker)) {
+            opcode = _Py_OPCODE(*next_instr);
+            if (_Py_atomic_load_relaxed(&ceval->gil_drop_request)) {
+                /* Give another thread a chance */
+                drop_gil(ceval, tstate);
+
+                /* Other threads may run now */
+                take_gil(ceval, tstate);
+
+                /* Check if we should make a quick exit. */
+                exit_thread_if_finalizing(tstate);
+
+                if (_PyThreadState_Swap(&runtime->gilstate, tstate) != NULL) {
+                    Py_FatalError("ceval: orphan tstate");
+                }
+            }
+        }
+        <!-- ... -->
+        switch (opcode) {
+          case TARGET(NOP):
+          case TARGET(LOAD_FAST):
+          <!-- ... -->
+        }
+    }
+{{< /highlight >}}
+CPython使用系统线程，且没有实现线程调度。所以，具体哪个等待线程被切换执行，由操作系统决定。甚至，发出请求和被切换执行的未必就是同一个线程。
+
+对于CPU密集型任务，除了使用多进程架构绕开，也可以使用C来编写多线程的扩展也能绕开GIL限制。
