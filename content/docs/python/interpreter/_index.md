@@ -47,7 +47,6 @@ GIL
 <!-- cpython/Python/ceval.c -->
 main_loop:
     for (;;) {
-        <!-- ... -->
         if (_Py_atomic_load_relaxed(eval_breaker)) {
             opcode = _Py_OPCODE(*next_instr);
             if (_Py_atomic_load_relaxed(&ceval->gil_drop_request)) {
@@ -65,11 +64,10 @@ main_loop:
                 }
             }
         }
-        <!-- ... -->
         switch (opcode) {
           case TARGET(NOP):
           case TARGET(LOAD_FAST):
-          <!-- ... -->
+          ...
         }
     }
 {{< /highlight >}}
@@ -84,8 +82,7 @@ CPython使用系统线程，且没有实现线程调度。所以，具体哪个�
 ### 入口
 {{< highlight c>}}
 <!-- cpython/Programs/python.c -->
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     // unix平台是_Py_UnixMain，windows平台是Py_Main
     return _Py_UnixMain(argc, argv);
@@ -95,15 +92,13 @@ main(int argc, char **argv)
 然后是选择执行模式:
 {{< highlight c>}}
 <!-- cpython/Modules/main.c -->
-int
-_Py_UnixMain(int argc, char **argv)
+int _Py_UnixMain(int argc, char **argv)
 {
     return pymain_main(&pymain);
 }
-static int
-pymain_main(_PyMain *pymain)
+
+static int pymain_main(_PyMain *pymain)
 {
-    
     pymain_init(pymain);
 
     int res = pymain_cmdline(pymain);
@@ -131,8 +126,8 @@ done:
 
     return pymain->status;
 }
-static void
-pymain_run_python(_PyMain *pymain)
+
+static void pymain_run_python(_PyMain *pymain)
 {
     PyCompilerFlags cf = {.cf_flags = 0};
 
@@ -161,8 +156,7 @@ pymain_run_python(_PyMain *pymain)
 主要是初始化内置类型，以及创建buildins、sys模块，并初始化sys.modules，sys.path等运行所需的环境配置。
 {{< highlight c>}}
 <!-- cpython/Python/pylifecycle.c -->
-_PyInitError
-_Py_InitializeCore(const _PyCoreConfig *core_config)
+_PyInitError _Py_InitializeCore(const _PyCoreConfig *core_config)
 {
     // 创建解释器状态实例
     interp = PyInterpreterState_New();
@@ -230,5 +224,178 @@ _Py_InitializeCore(const _PyCoreConfig *core_config)
 {{< /highlight >}}
 
 ### 执行
+完成初始化之后，就进入执行流程，这里以文件模式的执行为例:
+{{< highlight c>}}
+<!-- cpython/Modules/main.c -->
+static int pymain_run_file(FILE *fp, const wchar_t *filename, PyCompilerFlags *p_cf)
+{
+    run = PyRun_AnyFileExFlags(fp, filename_str, filename != NULL, p_cf);
+    return run != 0;
+}
+{{< /highlight >}}
+
+{{< highlight c>}}
+<!-- cpython/Python/pythonrun.c -->
+/* Parse input from a file and execute it */
+int PyRun_AnyFileExFlags(FILE *fp, const char *filename, int closeit, ...)
+{
+    return PyRun_SimpleFileExFlags(fp, filename, closeit, flags);
+}
+
+int PyRun_SimpleFileExFlags(FILE *fp, const char *filename, int closeit, ...)
+{
+    // 获取__main__.__dict__，添加__file__ 信息
+    m = PyImport_AddModule("__main__");
+    d = PyModule_GetDict(m);
+    if (PyDict_GetItemString(d, "__file__") == NULL) {
+        PyObject *f;
+        f = PyUnicode_DecodeFSDefault(filename);
+        if (f == NULL)
+            goto done;
+        if (PyDict_SetItemString(d, "__file__", f) < 0) {
+            Py_DECREF(f);
+            goto done;
+        }
+        if (PyDict_SetItemString(d, "__cached__", Py_None) < 0) {
+            Py_DECREF(f);
+            goto done;
+        }
+    }
+
+    // 运行入口文件（检查pyc缓存），将__main__.__dict__做为名字空间传入
+    if (maybe_pyc_file(fp, filename, ext, closeit)) {
+        // 运行缓存文件
+        v = run_pyc_file(pyc_fp, filename, d, d, flags);
+        fclose(pyc_fp);
+    } else {
+        // 运行py文件
+        v = PyRun_FileExFlags(fp, filename, Py_file_input, d, d,
+                              closeit, flags);
+    }
+  done:
+    if (set_file_name && PyDict_DelItemString(d, "__file__"))
+        PyErr_Clear();
+    Py_DECREF(m);
+    return ret;
+}
+
+// 编译源文件，随后进入字节码执行流程
+PyObject * PyRun_FileExFlags(FILE *fp, const char *filename_str, int start, ...)
+{
+    filename = PyUnicode_DecodeFSDefault(filename_str);
+    arena = PyArena_New();
+
+    // 编译源文件
+    mod = PyParser_ASTFromFileObject(fp, filename, NULL, start, 0, 0,
+                                     flags, NULL, arena);
+    // 字节码执行流程
+    ret = run_mod(mod, filename, globals, locals, flags, arena);
+    return ret;
+}
+
+static PyObject * run_mod(mod_ty mod, PyObject *filename, ...)
+{
+    co = PyAST_CompileObject(mod, filename, flags, -1, arena);
+    v = PyEval_EvalCode((PyObject*)co, globals, locals);
+}
+{{< /highlight >}}
+
+之后创建执行所需的栈帧对象，并准备好参数等待执行数据。
+{{< highlight c>}}
+<!-- cpython/Python/ceval.c -->
+PyObject * PyEval_EvalCode(PyObject *co, PyObject *globals, PyObject *locals)
+{
+    return PyEval_EvalCodeEx(co, globals, locals, ...);
+}
+PyObject * PyEval_EvalCodeEx(PyObject *_co, PyObject *globals, PyObject *locals, ...)
+{
+    return _PyEval_EvalCodeWithName(_co, globals, locals, ...);
+}
+PyObject * _PyEval_EvalCodeWithName(PyObject *_co, PyObject *globals, PyObject *locals, ...)
+{
+
+    // 创建栈帧
+    tstate = PyThreadState_GET();
+    f = _PyFrame_New_NoTrack(tstate, co, globals, locals);
+
+    // 填充参数、自由变量（闭包）等数据
+    retval = PyEval_EvalFrameEx(f,0);
+}
+PyObject * PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
+{
+    PyThreadState *tstate = PyThreadState_GET();
+    return tstate->interp->eval_frame(f, throwflag);
+}
+PyObject* _Py_HOT_FUNCTION _PyEval_EvalFrameDefault(PyFrameObject *f, int throwflag)
+{
+    // 指令参数所需的相关名字列表
+    co = f->f_code;
+    names = co->co_names;
+    consts = co->co_consts;
+    fastlocals = f->f_localsplus;
+    freevars = f->f_localsplus + co->co_nlocals;
+
+    // 类似于SP、PC寄存器，下一条指令及栈帧顶位置
+    first_instr = (_Py_CODEUNIT *) PyBytes_AS_STRING(co->co_code);
+    next_instr = first_instr;
+    stack_pointer = f->f_stacktop;
+
+    // 解释循环
+    main_loop:
+    for (;;) {
+        // 检查并处理GIL
+        if (_Py_atomic_load_relaxed(&_PyRuntime.ceval.eval_breaker)) {
+        }
+
+    fast_next_opcode:
+        // 下一条指令和参数
+        NEXTOPARG();
+    dispatch_opcode:
+
+        // 指令执行，每条指令由C实现具体过程
+        switch (opcode) {
+
+        TARGET(NOP)
+            FAST_DISPATCH();
+
+        TARGET(LOAD_FAST) {
+            PyObject *value = GETLOCAL(oparg);
+            Py_INCREF(value);
+            PUSH(value);
+            FAST_DISPATCH();
+        }
+     }
+     exit_eval_frame:
+        Py_LeaveRecursiveCall();
+        f->f_executing = 0;
+        tstate->frame = f->f_back;
+    return _Py_CheckFunctionResult(NULL, retval, "PyEval_EvalFrameEx");
+}
+{{< /highlight >}}
+
+用户栈内存按地址从低向高分配，每次执行时会递增指令计数器。
+{{< highlight c>}}
+<!-- cpython/Python/ceval.c -->
+#define NEXTOPARG()  do { \
+        _Py_CODEUNIT word = *next_instr; \
+        opcode = _Py_OPCODE(word); \
+        oparg = _Py_OPARG(word); \
+        next_instr++; \
+    } while (0)
+#define EMPTY()           (STACK_LEVEL() == 0)
+#define TOP()             (stack_pointer[-1])
+#define SECOND()          (stack_pointer[-2])
+#define THIRD()           (stack_pointer[-3])
+#define FOURTH()          (stack_pointer[-4])
+#define PEEK(n)           (stack_pointer[-(n)])
+#define SET_TOP(v)        (stack_pointer[-1] = (v))
+#define SET_SECOND(v)     (stack_pointer[-2] = (v))
+#define SET_THIRD(v)      (stack_pointer[-3] = (v))
+#define SET_FOURTH(v)     (stack_pointer[-4] = (v))
+#define SET_VALUE(n, v)   (stack_pointer[-(n)] = (v))
+#define BASIC_STACKADJ(n) (stack_pointer += n)
+#define BASIC_PUSH(v)     (*stack_pointer++ = (v)) // 地址从低向高进行
+#define BASIC_POP()       (*--stack_pointer)
+{{< /highlight >}}
 
 ### 终止
