@@ -76,3 +76,159 @@ main_loop:
 CPython使用系统线程，且没有实现线程调度。所以，具体哪个等待线程被切换执行，由操作系统决定。甚至，发出请求和被切换执行的未必就是同一个线程。
 
 对于CPU密集型任务，除了使用多进程架构绕开，也可以使用C来编写多线程的扩展也能绕开GIL限制。
+
+
+执行过程
+-------
+
+### 入口
+{{< highlight c>}}
+<!-- cpython/Programs/python.c -->
+int
+main(int argc, char **argv)
+{
+    // unix平台是_Py_UnixMain，windows平台是Py_Main
+    return _Py_UnixMain(argc, argv);
+}
+{{< /highlight >}}
+
+然后是选择执行模式:
+{{< highlight c>}}
+<!-- cpython/Modules/main.c -->
+int
+_Py_UnixMain(int argc, char **argv)
+{
+    return pymain_main(&pymain);
+}
+static int
+pymain_main(_PyMain *pymain)
+{
+    
+    pymain_init(pymain);
+
+    int res = pymain_cmdline(pymain);
+    if (res < 0) {
+        _Py_FatalInitError(pymain->err);
+    }
+    if (res == 1) {
+        goto done;
+    }
+
+    pymain_init_stdio(pymain);
+    // 初始化
+    pymain->err = _Py_InitializeCore(&pymain->config);
+
+    // 执行逻辑
+    pymain_run_python(pymain);
+
+    if (Py_FinalizeEx() < 0) {
+        pymain->status = 120;
+    }
+
+done:
+    // 退出清理
+    pymain_free(pymain);
+
+    return pymain->status;
+}
+static void
+pymain_run_python(_PyMain *pymain)
+{
+    PyCompilerFlags cf = {.cf_flags = 0};
+
+    pymain_header(pymain);
+    pymain_import_readline(pymain);
+
+    // 执行模式选择
+    if (pymain->command) {
+        // 命令行模式 -c
+        pymain->status = pymain_run_command(pymain->command, &cf);
+    }
+    else if (pymain->module) {
+        // 模块模式 -m
+        pymain->status = (pymain_run_module(pymain->module, 1) != 0);
+    }
+    else {
+        // 入口文件模式
+        pymain_run_filename(pymain, &cf);
+    }
+
+    pymain_repl(pymain, &cf);
+}
+{{< /highlight >}}
+
+### 初始化
+主要是初始化内置类型，以及创建buildins、sys模块，并初始化sys.modules，sys.path等运行所需的环境配置。
+{{< highlight c>}}
+<!-- cpython/Python/pylifecycle.c -->
+_PyInitError
+_Py_InitializeCore(const _PyCoreConfig *core_config)
+{
+    // 创建解释器状态实例
+    interp = PyInterpreterState_New();
+
+    // 创建主线程状态实例
+    tstate = PyThreadState_New(interp);
+    (void) PyThreadState_Swap(tstate);
+
+    /* Auto-thread-state API */
+    _PyGILState_Init(interp, tstate);
+
+    /* Create the GIL */
+    PyEval_InitThreads();
+
+    // 创建并初始化内置类型
+    _Py_ReadyTypes();
+
+    // 初始化带有对象缓存的内置类型
+    if (!_PyLong_Init())
+        return _Py_INIT_ERR("can't init longs");
+
+    if (!PyByteArray_Init())
+        return _Py_INIT_ERR("can't init bytearray");
+
+    if (!_PyFloat_Init())
+        return _Py_INIT_ERR("can't init float");
+
+    PyObject *modules = PyDict_New();
+
+    // 创建sys.modules,存储运行期被导入的模块
+    interp->modules = modules;
+
+    // 初始化sys模块
+    err = _PySys_BeginInit(&sysmod);
+    interp->sysdict = PyModule_GetDict(sysmod);
+    Py_INCREF(interp->sysdict);
+    PyDict_SetItemString(interp->sysdict, "modules", modules);
+    _PyImport_FixupBuiltin(sysmod, "sys", modules);
+
+    // 初始化 __buildin__ 模块
+    bimod = _PyBuiltin_Init();
+    _PyImport_FixupBuiltin(bimod, "builtins", modules);
+    interp->builtins = PyModule_GetDict(bimod);
+    Py_INCREF(interp->builtins);
+
+    // 初始化内置异常类型
+    _PyExc_Init(bimod);
+
+    // 初始化导入机制
+    err = _PyImport_Init(interp);
+    err = _PyImportHooks_Init();
+
+    /* Initialize _warnings. */
+    if (_PyWarnings_Init() == NULL) {
+        return _Py_INIT_ERR("can't initialize warnings");
+    }
+
+    if (!_PyContext_Init())
+        return _Py_INIT_ERR("can't init context");
+
+    /* Only when we get here is the runtime core fully initialized */
+    _PyRuntime.core_initialized = 1;
+    return _Py_INIT_OK();
+}
+{{< /highlight >}}
+
+### 执行
+
+### 终止
