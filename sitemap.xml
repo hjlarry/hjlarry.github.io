@@ -28,6 +28,11 @@
   </url>
   
   <url>
+    <loc>https://hjlarry.github.io/docs/python/interpreter/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://hjlarry.github.io/docs/sicp/asm/</loc>
     <priority>0</priority>
   </url>

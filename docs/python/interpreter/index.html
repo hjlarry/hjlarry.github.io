@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="cn">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interpreter"><meta property="og:title" content="" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://hjlarry.github.io/docs/python/interpreter/" />
+
+<title>Interpreter | Home</title>
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/book.min.eddc90f1d1267cb826e7cffc53c434e50061c4bfe41146a43670842ce6cb3bf6.css" integrity="sha256-7dyQ8dEmfLgm58/8U8Q05QBhxL/kEUakNnCELObLO/Y=">
+
+
+<script defer src="/cn.search.min.117fcb9935f4f72849245c6f2f7adc28ee2cde39ad96557343beb26db98e32c7.js" integrity="sha256-EX/LmTX09yhJJFxvL3rcKO4s3jmtllVzQ76ybbmOMsc="></script>
+
+<link rel="alternate" type="application/rss+xml" href="https://hjlarry.github.io/docs/python/interpreter/index.xml" title="Home" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
+<h2 class="book-brand">
+  <a href="https://hjlarry.github.io/"><img src="/logo.png" alt="Logo" /><span>Home</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+    <ul>
+<li><strong>计算机基础</strong>
+<ul>
+<li><a href="/docs/sicp/hardware/">硬件</a></li>
+<li><a href="/docs/sicp/software/">软件</a></li>
+<li><a href="/docs/sicp/asm/">汇编</a></li>
+</ul>
+</li>
+<li><strong>GO语言</strong>
+<ul>
+<li><a href="/docs/go/map/">字典</a></li>
+<li><a href="/docs/go/closure/">闭包</a></li>
+<li><a href="/docs/go/defer/">延迟调用</a></li>
+<li><a href="/docs/go/gc/">垃圾回收</a></li>
+<li><a href="/docs/go/alloc/">内存分配</a></li>
+<li><a href="/docs/go/goroutine/">并发调度</a></li>
+<li><a href="/docs/go/lock/">锁</a></li>
+</ul>
+</li>
+<li><strong>Python语言</strong>
+<ul>
+<li><a href="/docs/python/descriptor/">描述符</a></li>
+<li><a href="/docs/python/interpreter/"class=active>解释器</a></li>
+</ul>
+</li>
+<li><strong>Mysql</strong>
+<ul>
+<li><a href="/docs/mysql/query/">查询</a></li>
+<li><a href="/docs/mysql/theory/">原理</a></li>
+</ul>
+</li>
+<li><strong>其他</strong>
+<ul>
+<li><a href="/docs/other/tools/">基础系统工具</a></li>
+<li><a href="/docs/other/git/">git</a></li>
+<li><a href="/docs/other/docker/">docker</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+    </aside>
+
+    <div class="book-page">
+      <header class="flex align-center justify-between book-header">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" alt="Menu" />
+  </label>
+  <strong>Interpreter</strong>
+</header>
+
+      
+<article class="markdown"><h1 id="cpython解释器">CPython解释器</h1>
+<h2 id="字节码">字节码</h2>
+<p>Python中的字节码并不能被CPU执行，而是由栈式虚拟机执行，每条指令的背后都对应了一大堆C实现的机器指令。</p>
+<p>字节码被存储在代码对象(即<code>__code__</code>)的<code>co_code</code>中，以一个函数为例:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;</span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">add</span>(x, y):                                                                                          
+<span style="color:#f92672">.</span><span style="color:#f92672">.</span><span style="color:#f92672">.</span>     z <span style="color:#f92672">=</span> x <span style="color:#f92672">+</span> y
+<span style="color:#f92672">.</span><span style="color:#f92672">.</span><span style="color:#f92672">.</span>     <span style="color:#66d9ef">return</span> z
+
+<span style="color:#f92672">&gt;&gt;</span><span style="color:#f92672">&gt;</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74"> </span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>join(str(b) <span style="color:#66d9ef">for</span> b <span style="color:#f92672">in</span> add<span style="color:#f92672">.</span>__code__<span style="color:#f92672">.</span>co_code)
+<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">124 0 124 1 23 0 125 2 124 2 83 0</span><span style="color:#e6db74">&#39;</span></code></pre></div>
+字节码中每两个数字为一组，第一个为指令，第二个为参数，指令对应的二进制数可以在CPython源码中找到:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;</span><span style="color:#f92672">!</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span> cpython<span style="color:#f92672">/</span>Include<span style="color:#f92672">/</span>opcode.h <span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>
+<span style="color:#75715e">#</span><span style="color:#75715e">define BINARY_ADD               23</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define RETURN_VALUE             83</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define LOAD_FAST               124</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define STORE_FAST              125</span></code></pre></div>
+这就可以和dis的输出结果对应起来:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;</span><span style="color:#f92672">&gt;</span> dis<span style="color:#f92672">.</span>dis(add)
+<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">!</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span> <span style="color:#960050;background-color:#1e0010">源</span><span style="color:#960050;background-color:#1e0010">码</span><span style="color:#960050;background-color:#1e0010">行</span>    <span style="color:#960050;background-color:#1e0010">偏</span><span style="color:#960050;background-color:#1e0010">移</span><span style="color:#960050;background-color:#1e0010">量</span> <span style="color:#960050;background-color:#1e0010">指</span><span style="color:#960050;background-color:#1e0010">令</span>           <span style="color:#960050;background-color:#1e0010">参</span><span style="color:#960050;background-color:#1e0010">数</span>(<span style="color:#960050;background-color:#1e0010">目</span><span style="color:#960050;background-color:#1e0010">标</span><span style="color:#960050;background-color:#1e0010">对</span><span style="color:#960050;background-color:#1e0010">象</span>)  <span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>
+  <span style="color:#ae81ff">2</span>           <span style="color:#ae81ff">0</span> LOAD_FAST                <span style="color:#ae81ff">0</span> (x)
+              <span style="color:#ae81ff">2</span> LOAD_FAST                <span style="color:#ae81ff">1</span> (y)
+              <span style="color:#ae81ff">4</span> BINARY_ADD
+              <span style="color:#ae81ff">6</span> STORE_FAST               <span style="color:#ae81ff">2</span> (z)
+
+  <span style="color:#ae81ff">3</span>           <span style="color:#ae81ff">8</span> LOAD_FAST                <span style="color:#ae81ff">2</span> (z)
+             <span style="color:#ae81ff">10</span> RETURN_VALUE</code></pre></div>
+指令所对应的源码行这个信息其实保存在代码对象的两个相关属性中，<code>co_firstlineno</code>用来存储该段代码起始的行号，<code>co_lnotab</code>由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。每条字节码指令代表的意义可通过官方文档<a href="https://docs.python.org/3/library/dis.html">此处</a>查询到。</p>
+<h2 id="gil">GIL</h2>
+<p>全局解释器锁机制使得解释器在同一时刻仅有一个线程可以被调度执行，某个线程若想要执行，就先要拿到GIL，但在每个Python进程中，只有一个GIL。它的存在使得解释器本身的实现更简单一些，更容易实现对象的安全访问，便于进行内存管理和编写扩展。但在多核环境下无法实现并行，对于以多线程为基础的并发应用就是一个灾难。</p>
+<p>对于IO密集型任务，线程是在发生阻塞时主动释放GIL的，让其他线程得以执行。而对于CPU密集型任务，采取超时策略。</p>
+<p>当GIL被其他线程占用时，等待线程会阻塞一段时间。如果超时（默认为0.005秒）后，依然无法获取锁，则发出请求。这种请求设计的很轻巧，就是一个全局条件变量设置。正在执行的线程在解释循环内会检查该标记，然后释放锁，切换线程执行，其自身进入等待状态。属于典型的协作机制。相关源码:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;</span><span style="color:#f92672">!</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>ceval.c <span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>
+main_loop:
+    <span style="color:#66d9ef">for</span> (;;) {
+        <span style="color:#66d9ef">if</span> (_Py_atomic_load_relaxed(eval_breaker)) {
+            opcode <span style="color:#f92672">=</span> _Py_OPCODE(<span style="color:#f92672">*</span>next_instr);
+            <span style="color:#66d9ef">if</span> (_Py_atomic_load_relaxed(<span style="color:#f92672">&amp;</span>ceval<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>gil_drop_request)) {
+                <span style="color:#75715e">/* Give another thread a chance */</span>
+                drop_gil(ceval, tstate);
+
+                <span style="color:#75715e">/* Other threads may run now */</span>
+                take_gil(ceval, tstate);
+
+                <span style="color:#75715e">/* Check if we should make a quick exit. */</span>
+                exit_thread_if_finalizing(tstate);
+
+                <span style="color:#66d9ef">if</span> (_PyThreadState_Swap(<span style="color:#f92672">&amp;</span>runtime<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>gilstate, tstate) <span style="color:#f92672">!</span><span style="color:#f92672">=</span> NULL) {
+                    Py_FatalError(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">ceval: orphan tstate</span><span style="color:#e6db74">&#34;</span>);
+                }
+            }
+        }
+        <span style="color:#66d9ef">switch</span> (opcode) {
+          <span style="color:#66d9ef">case</span> TARGET(NOP)<span style="color:#f92672">:</span>
+          <span style="color:#66d9ef">case</span> TARGET(LOAD_FAST)<span style="color:#f92672">:</span>
+          ...
+        }
+    }</code></pre></div>
+CPython使用系统线程，且没有实现线程调度。所以，具体哪个等待线程被切换执行，由操作系统决定。甚至，发出请求和被切换执行的未必就是同一个线程。</p>
+<p>对于CPU密集型任务，除了使用多进程架构绕开，也可以使用C来编写多线程的扩展也能绕开GIL限制。</p>
+<h2 id="执行过程">执行过程</h2>
+<h3 id="入口">入口</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;</span><span style="color:#f92672">!</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span> cpython<span style="color:#f92672">/</span>Programs<span style="color:#f92672">/</span>python.c <span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>
+<span style="color:#66d9ef">int</span> main(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span><span style="color:#f92672">*</span>argv)
+{
+    <span style="color:#75715e">// unix平台是_Py_UnixMain，windows平台是Py_Main
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> _Py_UnixMain(argc, argv);
+}</code></pre></div>
+<p>然后是选择执行模式:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;</span><span style="color:#f92672">!</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span> cpython<span style="color:#f92672">/</span>Modules<span style="color:#f92672">/</span>main.c <span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>
+<span style="color:#66d9ef">int</span> _Py_UnixMain(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span><span style="color:#f92672">*</span>argv)
+{
+    <span style="color:#66d9ef">return</span> pymain_main(<span style="color:#f92672">&amp;</span>pymain);
+}
+
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> pymain_main(_PyMain <span style="color:#f92672">*</span>pymain)
+{
+    pymain_init(pymain);
+
+    <span style="color:#66d9ef">int</span> res <span style="color:#f92672">=</span> pymain_cmdline(pymain);
+    <span style="color:#66d9ef">if</span> (res <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+        _Py_FatalInitError(pymain<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>err);
+    }
+    <span style="color:#66d9ef">if</span> (res <span style="color:#f92672">=</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) {
+        <span style="color:#66d9ef">goto</span> done;
+    }
+
+    pymain_init_stdio(pymain);
+    <span style="color:#75715e">// 初始化
+</span><span style="color:#75715e"></span>    pymain<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>err <span style="color:#f92672">=</span> _Py_InitializeCore(<span style="color:#f92672">&amp;</span>pymain<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>config);
+
+    <span style="color:#75715e">// 执行逻辑
+</span><span style="color:#75715e"></span>    pymain_run_python(pymain);
+
+    <span style="color:#66d9ef">if</span> (Py_FinalizeEx() <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+        pymain<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>status <span style="color:#f92672">=</span> <span style="color:#ae81ff">120</span>;
+    }
+
+done:
+    <span style="color:#75715e">// 退出清理
+</span><span style="color:#75715e"></span>    pymain_free(pymain);
+
+    <span style="color:#66d9ef">return</span> pymain<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>status;
+}
+
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> pymain_run_python(_PyMain <span style="color:#f92672">*</span>pymain)
+{
+    PyCompilerFlags cf <span style="color:#f92672">=</span> {.cf_flags <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>};
+
+    pymain_header(pymain);
+    pymain_import_readline(pymain);
+
+    <span style="color:#75715e">// 执行模式选择
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (pymain<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>command) {
+        <span style="color:#75715e">// 命令行模式 -c
+</span><span style="color:#75715e"></span>        pymain<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>status <span style="color:#f92672">=</span> pymain_run_command(pymain<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>command, <span style="color:#f92672">&amp;</span>cf);
+    }
+    <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (pymain<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>module) {
+        <span style="color:#75715e">// 模块模式 -m
+</span><span style="color:#75715e"></span>        pymain<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>status <span style="color:#f92672">=</span> (pymain_run_module(pymain<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>module, <span style="color:#ae81ff">1</span>) <span style="color:#f92672">!</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>);
+    }
+    <span style="color:#66d9ef">else</span> {
+        <span style="color:#75715e">// 入口文件模式
+</span><span style="color:#75715e"></span>        pymain_run_filename(pymain, <span style="color:#f92672">&amp;</span>cf);
+    }
+
+    pymain_repl(pymain, <span style="color:#f92672">&amp;</span>cf);
+}</code></pre></div></p>
+<h3 id="初始化">初始化</h3>
+<p>主要是初始化内置类型，以及创建buildins、sys模块，并初始化sys.modules，sys.path等运行所需的环境配置。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;</span><span style="color:#f92672">!</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>pylifecycle.c <span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>
+_PyInitError _Py_InitializeCore(<span style="color:#66d9ef">const</span> _PyCoreConfig <span style="color:#f92672">*</span>core_config)
+{
+    <span style="color:#75715e">// 创建解释器状态实例
+</span><span style="color:#75715e"></span>    interp <span style="color:#f92672">=</span> PyInterpreterState_New();
+
+    <span style="color:#75715e">// 创建主线程状态实例
+</span><span style="color:#75715e"></span>    tstate <span style="color:#f92672">=</span> PyThreadState_New(interp);
+    (<span style="color:#66d9ef">void</span>) PyThreadState_Swap(tstate);
+
+    <span style="color:#75715e">/* Auto-thread-state API */</span>
+    _PyGILState_Init(interp, tstate);
+
+    <span style="color:#75715e">/* Create the GIL */</span>
+    PyEval_InitThreads();
+
+    <span style="color:#75715e">// 创建并初始化内置类型
+</span><span style="color:#75715e"></span>    _Py_ReadyTypes();
+
+    <span style="color:#75715e">// 初始化带有对象缓存的内置类型
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>_PyLong_Init())
+        <span style="color:#66d9ef">return</span> _Py_INIT_ERR(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">can&#39;t init longs</span><span style="color:#e6db74">&#34;</span>);
+
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>PyByteArray_Init())
+        <span style="color:#66d9ef">return</span> _Py_INIT_ERR(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">can&#39;t init bytearray</span><span style="color:#e6db74">&#34;</span>);
+
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>_PyFloat_Init())
+        <span style="color:#66d9ef">return</span> _Py_INIT_ERR(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">can&#39;t init float</span><span style="color:#e6db74">&#34;</span>);
+
+    PyObject <span style="color:#f92672">*</span>modules <span style="color:#f92672">=</span> PyDict_New();
+
+    <span style="color:#75715e">// 创建sys.modules,存储运行期被导入的模块
+</span><span style="color:#75715e"></span>    interp<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>modules <span style="color:#f92672">=</span> modules;
+
+    <span style="color:#75715e">// 初始化sys模块
+</span><span style="color:#75715e"></span>    err <span style="color:#f92672">=</span> _PySys_BeginInit(<span style="color:#f92672">&amp;</span>sysmod);
+    interp<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>sysdict <span style="color:#f92672">=</span> PyModule_GetDict(sysmod);
+    Py_INCREF(interp<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>sysdict);
+    PyDict_SetItemString(interp<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>sysdict, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">modules</span><span style="color:#e6db74">&#34;</span>, modules);
+    _PyImport_FixupBuiltin(sysmod, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">sys</span><span style="color:#e6db74">&#34;</span>, modules);
+
+    <span style="color:#75715e">// 初始化 __buildin__ 模块
+</span><span style="color:#75715e"></span>    bimod <span style="color:#f92672">=</span> _PyBuiltin_Init();
+    _PyImport_FixupBuiltin(bimod, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">builtins</span><span style="color:#e6db74">&#34;</span>, modules);
+    interp<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>builtins <span style="color:#f92672">=</span> PyModule_GetDict(bimod);
+    Py_INCREF(interp<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>builtins);
+
+    <span style="color:#75715e">// 初始化内置异常类型
+</span><span style="color:#75715e"></span>    _PyExc_Init(bimod);
+
+    <span style="color:#75715e">// 初始化导入机制
+</span><span style="color:#75715e"></span>    err <span style="color:#f92672">=</span> _PyImport_Init(interp);
+    err <span style="color:#f92672">=</span> _PyImportHooks_Init();
+
+    <span style="color:#75715e">/* Initialize _warnings. */</span>
+    <span style="color:#66d9ef">if</span> (_PyWarnings_Init() <span style="color:#f92672">=</span><span style="color:#f92672">=</span> NULL) {
+        <span style="color:#66d9ef">return</span> _Py_INIT_ERR(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">can&#39;t initialize warnings</span><span style="color:#e6db74">&#34;</span>);
+    }
+
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>_PyContext_Init())
+        <span style="color:#66d9ef">return</span> _Py_INIT_ERR(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">can&#39;t init context</span><span style="color:#e6db74">&#34;</span>);
+
+    <span style="color:#75715e">/* Only when we get here is the runtime core fully initialized */</span>
+    _PyRuntime.core_initialized <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">_Py_INIT_OK</span>();
+}</code></pre></div></p>
+<h3 id="执行">执行</h3>
+<p>完成初始化之后，就进入执行流程，这里以文件模式的执行为例:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;</span><span style="color:#f92672">!</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span> cpython<span style="color:#f92672">/</span>Modules<span style="color:#f92672">/</span>main.c <span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> pymain_run_file(FILE <span style="color:#f92672">*</span>fp, <span style="color:#66d9ef">const</span> wchar_t <span style="color:#f92672">*</span>filename, PyCompilerFlags <span style="color:#f92672">*</span>p_cf)
+{
+    run <span style="color:#f92672">=</span> PyRun_AnyFileExFlags(fp, filename_str, filename <span style="color:#f92672">!</span><span style="color:#f92672">=</span> NULL, p_cf);
+    <span style="color:#66d9ef">return</span> run <span style="color:#f92672">!</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+}</code></pre></div></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;</span><span style="color:#f92672">!</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>pythonrun.c <span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>
+<span style="color:#75715e">/* Parse input from a file and execute it */</span>
+<span style="color:#66d9ef">int</span> PyRun_AnyFileExFlags(FILE <span style="color:#f92672">*</span>fp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>filename, <span style="color:#66d9ef">int</span> closeit, ...)
+{
+    <span style="color:#66d9ef">return</span> PyRun_SimpleFileExFlags(fp, filename, closeit, flags);
+}
+
+<span style="color:#66d9ef">int</span> PyRun_SimpleFileExFlags(FILE <span style="color:#f92672">*</span>fp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>filename, <span style="color:#66d9ef">int</span> closeit, ...)
+{
+    <span style="color:#75715e">// 获取__main__.__dict__，添加__file__ 信息
+</span><span style="color:#75715e"></span>    m <span style="color:#f92672">=</span> PyImport_AddModule(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">__main__</span><span style="color:#e6db74">&#34;</span>);
+    d <span style="color:#f92672">=</span> PyModule_GetDict(m);
+    <span style="color:#66d9ef">if</span> (PyDict_GetItemString(d, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">__file__</span><span style="color:#e6db74">&#34;</span>) <span style="color:#f92672">=</span><span style="color:#f92672">=</span> NULL) {
+        PyObject <span style="color:#f92672">*</span>f;
+        f <span style="color:#f92672">=</span> PyUnicode_DecodeFSDefault(filename);
+        <span style="color:#66d9ef">if</span> (f <span style="color:#f92672">=</span><span style="color:#f92672">=</span> NULL)
+            <span style="color:#66d9ef">goto</span> done;
+        <span style="color:#66d9ef">if</span> (PyDict_SetItemString(d, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">__file__</span><span style="color:#e6db74">&#34;</span>, f) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+            Py_DECREF(f);
+            <span style="color:#66d9ef">goto</span> done;
+        }
+        <span style="color:#66d9ef">if</span> (PyDict_SetItemString(d, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">__cached__</span><span style="color:#e6db74">&#34;</span>, Py_None) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+            Py_DECREF(f);
+            <span style="color:#66d9ef">goto</span> done;
+        }
+    }
+
+    <span style="color:#75715e">// 运行入口文件（检查pyc缓存），将__main__.__dict__做为名字空间传入
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (maybe_pyc_file(fp, filename, ext, closeit)) {
+        <span style="color:#75715e">// 运行缓存文件
+</span><span style="color:#75715e"></span>        v <span style="color:#f92672">=</span> run_pyc_file(pyc_fp, filename, d, d, flags);
+        fclose(pyc_fp);
+    } <span style="color:#66d9ef">else</span> {
+        <span style="color:#75715e">// 运行py文件
+</span><span style="color:#75715e"></span>        v <span style="color:#f92672">=</span> PyRun_FileExFlags(fp, filename, Py_file_input, d, d,
+                              closeit, flags);
+    }
+  done:
+    <span style="color:#66d9ef">if</span> (set_file_name <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> PyDict_DelItemString(d, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">__file__</span><span style="color:#e6db74">&#34;</span>))
+        PyErr_Clear();
+    Py_DECREF(m);
+    <span style="color:#66d9ef">return</span> ret;
+}
+
+<span style="color:#75715e">// 编译源文件，随后进入字节码执行流程
+</span><span style="color:#75715e"></span>PyObject <span style="color:#f92672">*</span> PyRun_FileExFlags(FILE <span style="color:#f92672">*</span>fp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>filename_str, <span style="color:#66d9ef">int</span> start, ...)
+{
+    filename <span style="color:#f92672">=</span> PyUnicode_DecodeFSDefault(filename_str);
+    arena <span style="color:#f92672">=</span> PyArena_New();
+
+    <span style="color:#75715e">// 编译源文件
+</span><span style="color:#75715e"></span>    mod <span style="color:#f92672">=</span> PyParser_ASTFromFileObject(fp, filename, NULL, start, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>,
+                                     flags, NULL, arena);
+    <span style="color:#75715e">// 字节码执行流程
+</span><span style="color:#75715e"></span>    ret <span style="color:#f92672">=</span> run_mod(mod, filename, globals, locals, flags, arena);
+    <span style="color:#66d9ef">return</span> ret;
+}
+
+<span style="color:#66d9ef">static</span> PyObject <span style="color:#f92672">*</span> run_mod(mod_ty mod, PyObject <span style="color:#f92672">*</span>filename, ...)
+{
+    co <span style="color:#f92672">=</span> PyAST_CompileObject(mod, filename, flags, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, arena);
+    v <span style="color:#f92672">=</span> PyEval_EvalCode((PyObject<span style="color:#f92672">*</span>)co, globals, locals);
+}</code></pre></div>
+<p>之后创建执行所需的栈帧对象，并准备好参数等待执行数据。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;</span><span style="color:#f92672">!</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>ceval.c <span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>
+PyObject <span style="color:#f92672">*</span> PyEval_EvalCode(PyObject <span style="color:#f92672">*</span>co, PyObject <span style="color:#f92672">*</span>globals, PyObject <span style="color:#f92672">*</span>locals)
+{
+    <span style="color:#66d9ef">return</span> PyEval_EvalCodeEx(co, globals, locals, ...);
+}
+PyObject <span style="color:#f92672">*</span> PyEval_EvalCodeEx(PyObject <span style="color:#f92672">*</span>_co, PyObject <span style="color:#f92672">*</span>globals, PyObject <span style="color:#f92672">*</span>locals, ...)
+{
+    <span style="color:#66d9ef">return</span> _PyEval_EvalCodeWithName(_co, globals, locals, ...);
+}
+PyObject <span style="color:#f92672">*</span> _PyEval_EvalCodeWithName(PyObject <span style="color:#f92672">*</span>_co, PyObject <span style="color:#f92672">*</span>globals, PyObject <span style="color:#f92672">*</span>locals, ...)
+{
+
+    <span style="color:#75715e">// 创建栈帧
+</span><span style="color:#75715e"></span>    tstate <span style="color:#f92672">=</span> PyThreadState_GET();
+    f <span style="color:#f92672">=</span> _PyFrame_New_NoTrack(tstate, co, globals, locals);
+
+    <span style="color:#75715e">// 填充参数、自由变量（闭包）等数据
+</span><span style="color:#75715e"></span>    retval <span style="color:#f92672">=</span> PyEval_EvalFrameEx(f,<span style="color:#ae81ff">0</span>);
+}
+PyObject <span style="color:#f92672">*</span> PyEval_EvalFrameEx(PyFrameObject <span style="color:#f92672">*</span>f, <span style="color:#66d9ef">int</span> throwflag)
+{
+    PyThreadState <span style="color:#f92672">*</span>tstate <span style="color:#f92672">=</span> PyThreadState_GET();
+    <span style="color:#66d9ef">return</span> tstate<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>interp<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>eval_frame(f, throwflag);
+}
+PyObject<span style="color:#f92672">*</span> _Py_HOT_FUNCTION _PyEval_EvalFrameDefault(PyFrameObject <span style="color:#f92672">*</span>f, <span style="color:#66d9ef">int</span> throwflag)
+{
+    <span style="color:#75715e">// 指令参数所需的相关名字列表
+</span><span style="color:#75715e"></span>    co <span style="color:#f92672">=</span> f<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>f_code;
+    names <span style="color:#f92672">=</span> co<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>co_names;
+    consts <span style="color:#f92672">=</span> co<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>co_consts;
+    fastlocals <span style="color:#f92672">=</span> f<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>f_localsplus;
+    freevars <span style="color:#f92672">=</span> f<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>f_localsplus <span style="color:#f92672">+</span> co<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>co_nlocals;
+
+    <span style="color:#75715e">// 类似于SP、PC寄存器，下一条指令及栈帧顶位置
+</span><span style="color:#75715e"></span>    first_instr <span style="color:#f92672">=</span> (_Py_CODEUNIT <span style="color:#f92672">*</span>) PyBytes_AS_STRING(co<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>co_code);
+    next_instr <span style="color:#f92672">=</span> first_instr;
+    stack_pointer <span style="color:#f92672">=</span> f<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>f_stacktop;
+
+    <span style="color:#75715e">// 解释循环
+</span><span style="color:#75715e"></span>    main_loop:
+    <span style="color:#66d9ef">for</span> (;;) {
+        <span style="color:#75715e">// 检查并处理GIL
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (_Py_atomic_load_relaxed(<span style="color:#f92672">&amp;</span>_PyRuntime.ceval.eval_breaker)) {
+        }
+
+    fast_next_opcode:
+        <span style="color:#75715e">// 下一条指令和参数
+</span><span style="color:#75715e"></span>        NEXTOPARG();
+    dispatch_opcode:
+
+        <span style="color:#75715e">// 指令执行，每条指令由C实现具体过程
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">switch</span> (opcode) {
+
+        TARGET(NOP)
+            FAST_DISPATCH();
+
+        TARGET(LOAD_FAST) {
+            PyObject <span style="color:#f92672">*</span>value <span style="color:#f92672">=</span> GETLOCAL(oparg);
+            Py_INCREF(value);
+            PUSH(value);
+            FAST_DISPATCH();
+        }
+     }
+     exit_eval_frame:
+        Py_LeaveRecursiveCall();
+        f<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>f_executing <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+        tstate<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>frame <span style="color:#f92672">=</span> f<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>f_back;
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">_Py_CheckFunctionResult</span>(NULL, retval, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">PyEval_EvalFrameEx</span><span style="color:#e6db74">&#34;</span>);
+}</code></pre></div></p>
+<p>用户栈内存按地址从低向高分配，每次执行时会递增指令计数器。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;</span><span style="color:#f92672">!</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>ceval.c <span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>
+<span style="color:#75715e">#</span><span style="color:#75715e">define NEXTOPARG()  do { \</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">        _Py_CODEUNIT word = *next_instr; \</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">        opcode = _Py_OPCODE(word); \</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">        oparg = _Py_OPARG(word); \</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">        next_instr++; \</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">    } while (0)</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define EMPTY()           (STACK_LEVEL() == 0)</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define TOP()             (stack_pointer[-1])</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define SECOND()          (stack_pointer[-2])</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define THIRD()           (stack_pointer[-3])</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define FOURTH()          (stack_pointer[-4])</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define PEEK(n)           (stack_pointer[-(n)])</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define SET_TOP(v)        (stack_pointer[-1] = (v))</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define SET_SECOND(v)     (stack_pointer[-2] = (v))</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define SET_THIRD(v)      (stack_pointer[-3] = (v))</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define SET_FOURTH(v)     (stack_pointer[-4] = (v))</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define SET_VALUE(n, v)   (stack_pointer[-(n)] = (v))</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define BASIC_STACKADJ(n) (stack_pointer += n)</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define BASIC_PUSH(v)     (*stack_pointer++ = (v)) </span><span style="color:#75715e">// 地址从低向高进行
+</span><span style="color:#75715e"></span><span style="color:#75715e">#</span><span style="color:#75715e">define BASIC_POP()       (*--stack_pointer)</span></code></pre></div></p>
+<h3 id="终止">终止</h3>
+<p>执行完之后，结束之前还要进行一系列的清理操作。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;</span><span style="color:#f92672">!</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>pylifecycle.c <span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>
+<span style="color:#66d9ef">int</span> Py_FinalizeEx(<span style="color:#66d9ef">void</span>)
+{
+    <span style="color:#75715e">// 等待前台线程结束
+</span><span style="color:#75715e"></span>    wait_for_thread_shutdown();
+
+    <span style="color:#75715e">/* Get current thread state and interpreter pointer */</span>
+    tstate <span style="color:#f92672">=</span> PyThreadState_GET();
+    interp <span style="color:#f92672">=</span> tstate<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>interp;
+
+    <span style="color:#75715e">// 调用 atexit 注册的退出函数
+</span><span style="color:#75715e"></span>    call_py_exitfuncs(interp);
+
+    <span style="color:#75715e">/* Flush sys.stdout and sys.stderr */</span>
+    <span style="color:#66d9ef">if</span> (flush_std_files() <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+        status <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+    }
+
+    <span style="color:#75715e">/* Disable signal handling */</span>
+    PyOS_FiniInterrupts();
+
+    <span style="color:#75715e">// 垃圾回收，执行析构方法
+</span><span style="color:#75715e"></span>    _PyGC_CollectIfEnabled();
+
+    <span style="color:#75715e">// 释放导入的模块
+</span><span style="color:#75715e"></span>    PyImport_Cleanup();
+
+    <span style="color:#75715e">// 执行相关结束函数
+</span><span style="color:#75715e"></span>    _PyTraceMalloc_Fini();
+    _PyImport_Fini();
+    _PyType_Fini();
+    _PyFaulthandler_Fini();
+    _PyExc_Fini();
+
+    <span style="color:#75715e">// 执行内置类型的结束函数
+</span><span style="color:#75715e"></span>    PyMethod_Fini();
+    PyFrame_Fini();
+    PyCFunction_Fini();
+    PyTuple_Fini();
+    PyList_Fini();
+    PySet_Fini();
+    PyBytes_Fini();
+    PyByteArray_Fini();
+    PyLong_Fini();
+    PyFloat_Fini();
+    PyDict_Fini();
+    PySlice_Fini();
+    _PyGC_Fini();
+    _Py_HashRandomization_Fini();
+    _PyArg_Fini();
+    PyAsyncGen_Fini();
+    _PyContext_Fini();
+
+    <span style="color:#75715e">/* Cleanup Unicode implementation */</span>
+    _PyUnicode_Fini();
+
+    PyGrammar_RemoveAccelerators(<span style="color:#f92672">&amp;</span>_PyParser_Grammar);
+
+    <span style="color:#75715e">/* Cleanup auto-thread-state */</span>
+    _PyGILState_Fini();
+
+    <span style="color:#75715e">/* Delete current thread. After this, many C API calls become crashy. */</span>
+    PyThreadState_Swap(NULL);
+    <span style="color:#75715e">// 清理解释器和主线程状态
+</span><span style="color:#75715e"></span>    PyInterpreterState_Delete(interp);
+
+    call_ll_exitfuncs();
+
+    _PyRuntime_Finalize();
+
+    <span style="color:#66d9ef">return</span> status;
+}</code></pre></div></p>
+</article>
+
+      <div class="book-footer justify-between">
+  
+
+  
+  
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/5a7893a09b3fe8e9d358ca0818caaef2deb6021f" title='Last modified by hjlarry | February 15, 2020' target="_blank">
+      <img src="/svg/calendar.svg" alt="Calendar" />
+      <span>February 15, 2020</span>
+    </a>
+  </div>
+  
+  
+
+  
+  <div>
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/python/interpreter/_index.md" target="_blank">
+      <img src="/svg/edit.svg" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+  
+
+</div>
+
+      
+    </div>
+
+    
+  
+
+  <aside class="book-toc levels-3 fixed">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#字节码">字节码</a></li>
+    <li><a href="#gil">GIL</a></li>
+    <li><a href="#执行过程">执行过程</a>
+      <ul>
+        <li><a href="#入口">入口</a></li>
+        <li><a href="#初始化">初始化</a></li>
+        <li><a href="#执行">执行</a></li>
+        <li><a href="#终止">终止</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </aside>
+
+
+
+  </main>
+
+  
+</body>
+
+</html>
