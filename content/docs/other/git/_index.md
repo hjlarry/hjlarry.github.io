@@ -125,3 +125,13 @@ git中还有一种对象类型就是tag，它通常和commit差不多。
 
 FAQ
 -------
+
+相关链接
+-------
+
+* [图解git](https://marklodato.github.io/visual-git-guide/index-zh-cn.html)
+* [git可视化](http://onlywei.github.io/explain-git-with-d3/#commit)
+* [Pro git V2](https://git-scm.com/book/zh/v2)
+* [Write yourself a Git!](https://wyag.thb.lt/)
+* [Dulwich---Pure-Python Git implementation](https://github.com/dulwich/dulwich)
+* [Oh Shit, Git!?!](https://ohshitgit.com/)
