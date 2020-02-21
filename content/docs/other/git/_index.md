@@ -15,7 +15,7 @@ Git本质上是一个内容寻址(content-addressable)文件系统，并在此�
 
 在这里目录中，有一个隐藏目录`.git`就是git的版本库(Repository)。
 
-版本库中存了很多东西，其中还有一片区域，我们称为stage(或index)暂存区。
+版本库中存了很多东西，其中还有一片区域，一般为`.git/index`文件，我们称为stage(或index)暂存区。
 
 再加上远程仓库，例如github上的repo，我们平时做的大量操作都是把文件在这四个区域之间相互移动。
 ![area](./images/area.jpg)
@@ -112,13 +112,86 @@ tree表示本次提交产生的另一个tree类型git对象的路径地址。aut
 {{< /highlight >}}
 它会把当前的目录结构打一个快照，相当于以表格的形式记录该目录下每一个目标的权限、类型(通常是文件blob，或者是文件夹变成一个新的tree对象)、哈希值(也就相当于文件路径)、文件名。
 
-暂存区有一个index，当我们通过`git add *`时会把工作区文件的文件内容生成一个blob object，把文件名和blob的sha1等其他信息更新到这个index中；当我们通过`git commit -m`时，git会根据暂存区的index信息生成一个tree object，并创建一个新的commit object关联到这个tree。commit object的parent指向了上一个commit，当前分支的指针也会移动到新的commit结点。
+也就是说，当我们通过`git add *`时会把工作区文件的文件内容生成一个blob object，并把文件名和blob的sha1等其他信息更新到暂存区的index文件中；当我们通过`git commit -m`时，git会根据index信息生成一个tree object，并创建一个新的commit object关联到这个tree。commit object的parent指向了上一个commit，当前分支的指针也会移动到新的commit结点。
 
 #### tag
-git中还有一种对象类型就是tag，它通常和commit差不多。
+git中还有一种对象类型就是tag，它通常和commit差不多。见下文[标签引用](#标签引用)。
 
 ### 引用
+引用本质上就是指向某个commit的指针，它被放在`.gits/refs`目录中。
+{{< highlight sh>}}
+➜  testgit git:(master) tree .git/refs/
+.git/refs/
+├── heads
+│   └── master
+└── tags
 
+2 directories, 1 file
+➜  testgit git:(master) cat .git/refs/heads/master
+79380b0625150b1b71940cfac0b2a501793eac0c
+{{< /highlight >}}
+
+#### 分支引用
+当我们新建一个分支时，就会在`.git/refs/heads`文件夹下多一个名称为分支名称的文件，内容就是一个commit的sha。当我们提交一次commit时，当前分支的引用的commit就会自动发生改变。
+{{< highlight sh>}}
+➜  testgit git:(6c27f42) git branch testbranch
+➜  testgit git:(testbranch) cat .git/refs/heads/testbranch
+6c27f425aae198e6c1e5098c13d352b3f27edfca
+{{< /highlight >}}
+
+#### HEAD引用
+它是一个符号引用，指向当前所在的分支。它位于`.git/HEAD`文件。
+{{< highlight sh>}}
+➜  testgit git:(master) cat .git/HEAD
+ref: refs/heads/master
+➜  testgit git:(master) git checkout 6c27
+Note: checking out '6c27'.
+You are in 'detached HEAD' state.
+➜  testgit git:(6c27f42) cat .git/HEAD
+6c27f425aae198e6c1e5098c13d352b3f27edfca
+{{< /highlight >}}
+当我们checkout某个commit时，HEAD会指向commit，这时候称为Detached HEAD状态。
+
+#### 标签引用
+我们通常创建的都是轻量级标签，它只是一个引用，位于`.gits/refs/tags`文件夹下。但还可以创建另一种附注标签，它会额外创建一个tag object。
+{{< highlight sh>}}
+➜  testgit git:(testbranch) git tag testmytag
+➜  testgit git:(testbranch) cat .git/refs/tags/testmytag
+6c27f425aae198e6c1e5098c13d352b3f27edfca
+➜  testgit git:(testbranch) git tag -a v1.0 -m "test my tag"
+➜  testgit git:(testbranch) cat .git/refs/tags/v1.0
+0ee17848727b21f3086760c6bbc38cc9a12b5e08
+➜  testgit git:(testbranch) git cat-file -t 0ee1
+tag
+➜  testgit git:(testbranch) git cat-file -p 0ee1
+object 6c27f425aae198e6c1e5098c13d352b3f27edfca
+type commit
+tag v1.0
+tagger hjlarry <hjlarry@163.com> 1582267013 +0800
+
+test my tag
+{{< /highlight >}}
+标签和分支的主要区别是:
+
+* 标签可以指向任意object，而分支只能指向commit object。
+* 分支在每次提交更新时会自动更新，而标签不会。
+
+#### 远程引用
+当我们添加一个远程仓库，或者是从远程库clone过来时，就会有远程引用，它位于`.git/refs/remotes`文件夹下。
+{{< highlight sh>}}
+➜  testgit git:(testbranch) tree ~/my_git/.git/refs/remotes
+/home/hejl/my_git/.git/refs/remotes
+└── origin
+    ├── HEAD
+    └── master
+
+1 directory, 2 files
+➜  testgit git:(testbranch) cat ~/my_git/.git/refs/remotes/origin/HEAD
+ref: refs/remotes/origin/master
+➜  testgit git:(testbranch) cat ~/my_git/.git/refs/remotes/origin/master
+94985c6535a5493d493ce89631c7e417f5e7ecaa
+{{< /highlight >}}
+远程引用和分支之间最主要的区别在于远程引用是只读的。虽然可以checkout到某个远程引用，但是Git并不会将HEAD引用指向该远程引用，这种情况仍然是Detached HEAD状态。 
 
 常用指令
 -------
