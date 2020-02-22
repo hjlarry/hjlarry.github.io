@@ -1,5 +1,5 @@
 ---
-title: "Git"
+title: "Git原理和技巧"
 draft: false
 ---
 
@@ -87,7 +87,7 @@ committer hjlarry <hjlarry@163.com> 1582182460 +0800
 
 first commit
 {{< /highlight >}}
-tree表示本次提交产生的另一个tree类型git对象的路径地址。author和committer大多数情况相同，但早期一些项目通过电子邮件来进行git，author和committer可以是不同的人，包含了它们的username、email(所以刚使用git时要求在gitconfig中设置用户名和邮箱)、时间戳。紧跟着是提交的message。
+tree表示本次提交产生的另一个tree类型git对象的路径地址。author和committer大多数情况相同，但有时比如说我们把别人分支的一个commit通过`cherry-pick`加入我们的分支，这时committer是我们自己，author仍然是别人。这里author需要包含username、email(所以刚使用git时要求在gitconfig中设置用户名和邮箱)、时间戳。紧跟着是提交的message。
 
 实际上完整的commit对象的内容正是邮件的一种简单的格式，源于[RFC2822](https://www.ietf.org/rfc/rfc2822.txt)。还包括一个parent，指向本次提交的父commit对象的路径地址，因为现在是第一次提交，没有parent。以及一个gpgsig，通过PGP签名了一下这个对象，通过`cat-file`看不到。
 
@@ -150,7 +150,7 @@ You are in 'detached HEAD' state.
 ➜  testgit git:(6c27f42) cat .git/HEAD
 6c27f425aae198e6c1e5098c13d352b3f27edfca
 {{< /highlight >}}
-当我们checkout某个commit时，HEAD会指向commit，这时候称为Detached HEAD状态。
+当我们checkout某个commit时，HEAD会指向commit，这时候称为分离头指针(Detached HEAD)状态。
 
 #### 标签引用
 我们通常创建的都是轻量级标签，它只是一个引用，位于`.gits/refs/tags`文件夹下。但还可以创建另一种附注标签，它会额外创建一个tag object。
@@ -191,13 +191,22 @@ ref: refs/remotes/origin/master
 ➜  testgit git:(testbranch) cat ~/my_git/.git/refs/remotes/origin/master
 94985c6535a5493d493ce89631c7e417f5e7ecaa
 {{< /highlight >}}
-远程引用和分支之间最主要的区别在于远程引用是只读的。虽然可以checkout到某个远程引用，但是Git并不会将HEAD引用指向该远程引用，这种情况仍然是Detached HEAD状态。 
+远程引用和分支之间最主要的区别在于远程引用是只读的。虽然可以checkout到某个远程引用，但是Git并不会将HEAD引用指向该远程引用，这种情况仍然是分离头指针状态。 
 
 常用指令
 -------
 
 FAQ
 -------
+#### 每次commit，Git储存的是全新的文件快照还是储存文件的变更部分？
+Git储存的是全新的文件快照，即使你只修改了文件的一行，也会产生一个新的blob对象。这种储存方式存储的对象格式被称为松散(loose)格式。
+
+这样势必会造成大量的空间浪费。但是，Git会时不时的把这些松散格式的文件打包成一个称为包文件(packfile)的二进制文件以节省空间和提升效率。手动执行`git gc`也可以达到这种效果。这也是`./git/objects/info`和`./git/objects/pack`两个文件夹的用途。
+
+#### 为什么要有暂存区的概念，不能直接存储么？
+因为提交是需要原子性的，即一次提交下的文件，要么全部成功，要么全部失败。
+
+但在Git的命令行下，我们很难像SVN那样有一个图形界面，勾选要提交的文件，填入提交信息，点个按钮就能完成提交。需要`git add`这个命令帮助我们选择要提交的文件。
 
 相关链接
 -------
