@@ -196,6 +196,50 @@ ref: refs/remotes/origin/master
 常用指令
 -------
 
+### 变基
+
+#### 交互式变基
+通过`git rebase -i <commit_id>`就能进入一个交互式界面:
+{{< highlight sh>}}
+pick 2c70e0b second commit a
+pick c351a72 third commit
+
+# Rebase 37b766f..c351a72 onto 37b766f (2 commands)
+#
+# Commands:
+# p, pick = use commit
+# r, reword = use commit, but edit the commit message
+# e, edit = use commit, but stop for amending
+# s, squash = use commit, but meld into previous commit
+# f, fixup = like "squash", but discard this commit's log message
+# x, exec = run command (the rest of the line) using shell
+# d, drop = remove commit
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+# Note that empty commits are commented out
+{{< /highlight >}}
+它会列出这个`commit_id`(可以用commit的hash或者`HEAD~3`这样的形式)的child一直到当前分支的最后一个commit，我们可以在这个界面中编辑想对每一个commit做的操作：
+
+* p，对这条commit不做任何变更
+* r，使用这条commit，但修改它的commit message
+* e，先暂停rebase，把这条commit修改编辑以后再继续，继续时使用`git rebase --continue`即可
+* s，使用这条commit，但把它合并入前一条commit
+* f, 和s相同，但丢弃掉它的commit message
+* x, 在rebase过程中执行一些命令，例如`npm test`之类确保修改不会产生破坏性内容
+* d, 移除这条commit
+
+我们在一些场景，例如修改老旧commit的msg、把连续或间隔的多个commit整理为1个等使用交互式变基都会比较方便。
+
+这种方式看起来没有办法修改最祖先的那条commit，实际上有这种场景时我们可以直接把祖先commit添加到头部即可。在交互式界面中也可以手动调整commit的顺序。有些操作例如修改commit msg，就会产生一个新的commit object，当然也会影响到它的所有child object，因为sha值变了，就得一层层的修改下去。
+
+
+### 合并
+
 FAQ
 -------
 #### 每次commit，Git储存的是全新的文件快照还是储存文件的变更部分？
