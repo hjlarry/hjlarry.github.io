@@ -193,7 +193,7 @@ ref: refs/remotes/origin/master
 {{< /highlight >}}
 远程引用和分支之间最主要的区别在于远程引用是只读的。虽然可以checkout到某个远程引用，但是Git并不会将HEAD引用指向该远程引用，这种情况仍然是分离头指针状态。 
 
-常用指令
+常用操作
 -------
 
 ### 变基
@@ -239,6 +239,26 @@ pick c351a72 third commit
 
 
 ### 合并
+
+### 常用命令
+
+命令|意义
+---|---
+`git diff` | 比较工作区和暂存区所含文件的差异
+`git diff HEAD` | 比较工作区和HEAD所含文件的差异
+`git diff --cached` | 比较暂存区和HEAD所含文件的差异
+`git diff -- <file>` | 比较工作区和HEAD某个文件的差异
+`git reset HEAD` | 暂存区的所有文件恢复的和HEAD一样
+`git reset HEAD <file>` | 暂存区某个文件恢复为HEAD那个文件
+`git checkout -- <file>` | 工作区某个文件恢复为暂存区那个文件
+`git reset --hard <commit>` | 工作区恢复为该commit，回滚和未来均可
+`git stash` | 暂存工作现场
+`git stash apply` | 恢复工作现场
+`git stash apply <index>` | 恢复到某个工作现场
+`git branch -av` | 查看所有本地和远程的分支及其对应的commit
+`git checkout -b <name> <commit>` | 创建一个分支并切换过去，commit可省略
+`git branch --set-upstream A origin/A` | 将本地A分支和远程A分支关联
+
 
 FAQ
 -------
