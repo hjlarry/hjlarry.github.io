@@ -196,6 +196,90 @@ ref: refs/remotes/origin/master
 常用操作
 -------
 
+### 合并
+
+#### FAST-FORWARD
+当试图合并两个分支时，如果顺着一个分支一路走下去能到达另一个分支，那么Git的合并只是把指针往前推进，所以叫快进模式(即Fast-forward)。
+{{< highlight sh>}}
+➜  testgit git:(master) ✗ git checkout -b fixbug
+Switched to a new branch 'fixbug'
+➜  testgit git:(fixbug) ✗ echo '123' > test.txt
+➜  testgit git:(fixbug) ✗ git add .
+➜  testgit git:(fixbug) ✗ git commit -m "9th commit"
+[fixbug 22a449d] 9th commit
+ 1 file changed, 1 insertion(+)
+➜  testgit git:(fixbug) git checkout master
+Switched to branch 'master'
+➜  testgit git:(master) git merge fixbug
+Updating c658c0b..22a449d
+Fast-forward
+ test.txt | 1 +
+ 1 file changed, 1 insertion(+)
+{{< /highlight >}}
+合并时，会提示Fast-forward。
+
+另外，我们往往会把远程仓库的更新`git pull`下来，这背后实际上执行了两条指令，先`git fetch`再`git merge`，这种情况一般也属于Fast-forward合并。
+
+#### 三方合并
+非FAST-FORWARD情况时，就是一次三方合并。三方指的是当前分支节点、要合并的分支的节点以及它们的共同祖父节点。这种情况会把它们的内容合并起来，如果没有冲突的话会自动形成一个新的commit。
+{{< highlight sh>}}
+➜  testgit git:(master) git checkout -b newfeature HEAD~2
+Switched to a new branch 'newfeature'
+➜  testgit git:(newfeature) echo 'newfeature' > newfeature.txt
+➜  testgit git:(newfeature) ✗ git add .
+➜  testgit git:(newfeature) ✗ git commit -m "add new feature"
+[newfeature 68212fe] add new feature
+ 1 file changed, 1 insertion(+)
+ create mode 100644 newfeature.txt
+➜  testgit git:(newfeature) git checkout master
+Switched to branch 'master'
+➜  testgit git:(master) git merge newfeature
+Merge made by the 'recursive' strategy.
+ newfeature.txt | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 newfeature.txt
+{{< /highlight >}}
+通过`git log --graph`可以看到实际的情况:
+{{< highlight sh>}}
+*   commit 979309d67d62bd2fb3beeb009c20f750d362e93a (HEAD -> master)
+|\  Merge: 22a449d 68212fe
+| | Author: hjlarry <hjlarry@163.com>
+| | Date:   Sun Feb 23 21:46:55 2020 +0800
+| |
+| |     Merge branch 'newfeature'
+| |
+| * commit 68212fef9f5e17091bcd14b4d9be713bfc2c763b (newfeature)
+| | Author: hjlarry <hjlarry@163.com>
+| | Date:   Sun Feb 23 21:46:34 2020 +0800
+| |
+| |     add new feature
+| |
+* | commit 22a449d52fe269ed7c969c179c1788f89013ac2d 
+| | Author: hjlarry <hjlarry@163.com>
+| | Date:   Sun Feb 23 21:39:01 2020 +0800
+| |
+| |     9th commit
+| |
+* | commit c658c0b8070ec1ab7dfe53351b64da79ae939e6d
+|/  Author: hjlarry <hjlarry@163.com>
+|   Date:   Sun Feb 23 16:57:12 2020 +0800
+|
+|       8th commit
+{{< /highlight >}}
+我们观察merge时的那个commit object会发现它是有两个parent的:
+{{< highlight sh>}}
+➜  testgit git:(master) git cat-file -p 9793
+tree 88cab0838dc7d8ae476592dbd60b4bda86dafbd8
+parent 22a449d52fe269ed7c969c179c1788f89013ac2d
+parent 68212fef9f5e17091bcd14b4d9be713bfc2c763b
+author hjlarry <hjlarry@163.com> 1582465615 +0800
+committer hjlarry <hjlarry@163.com> 1582465615 +0800
+
+Merge branch 'newfeature'
+{{< /highlight >}}
+
+三方合并时，也经常会遇到发生冲突的情况。这时候git会暂停合并，给出提示，并在冲突的地方做出标记。我们需要手工处理，选择某个分支或者自行再做修改都可以，然后再自行`git add`和`git commit`即可。
+
 ### 变基
 
 #### 交互式变基
@@ -237,9 +321,6 @@ pick c351a72 third commit
 
 这种方式看起来没有办法修改最祖先的那条commit，实际上有这种场景时我们可以直接把祖先commit添加到头部即可。在交互式界面中也可以手动调整commit的顺序。有些操作例如修改commit msg，就会产生一个新的commit object，当然也会影响到它的所有child object，因为sha值变了，就得一层层的修改下去。
 
-
-### 合并
-
 ### 常用命令
 
 命令|意义
@@ -257,7 +338,7 @@ pick c351a72 third commit
 `git stash apply <index>` | 恢复到某个工作现场
 `git branch -av` | 查看所有本地和远程的分支及其对应的commit
 `git checkout -b <name> <commit>` | 创建一个分支并切换过去，commit可省略
-`git branch --set-upstream A origin/A` | 将本地A分支和远程A分支关联
+`git branch --set-upstream-to=origin/A` | 将本地当前分支和远程A分支关联
 
 
 FAQ
