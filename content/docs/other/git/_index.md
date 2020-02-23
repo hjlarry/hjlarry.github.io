@@ -239,7 +239,7 @@ Merge made by the 'recursive' strategy.
  1 file changed, 1 insertion(+)
  create mode 100644 newfeature.txt
 {{< /highlight >}}
-通过`git log --graph`可以看到实际的情况:
+通过`git log --graph`可以观察到日志:
 {{< highlight sh>}}
 *   commit 979309d67d62bd2fb3beeb009c20f750d362e93a (HEAD -> master)
 |\  Merge: 22a449d 68212fe
@@ -281,6 +281,52 @@ Merge branch 'newfeature'
 三方合并时，也经常会遇到发生冲突的情况。这时候git会暂停合并，给出提示，并在冲突的地方做出标记。我们需要手工处理，选择某个分支或者自行再做修改都可以，然后再自行`git add`和`git commit`即可。
 
 ### 变基
+
+基于之前三方合并的示例，还有一种合并分支的方法就是变基。它会在当前分支上重演一遍目标分支的历史，最后形成一个线性的提交历史。
+{{< highlight sh>}}
+➜  testgit git:(master) git checkout -b testrebase HEAD~
+Switched to a new branch 'testrebase'
+➜  testgit git:(testrebase) echo 'testrebase'>test.txt
+➜  testgit git:(testrebase) ✗ git add .
+➜  testgit git:(testrebase) ✗ git commit -m "test rebase"
+[testrebase 7f4088a] test rebase
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+➜  testgit git:(testrebase) git checkout master
+Switched to branch 'master'
+➜  testgit git:(master) git log --graph
+➜  testgit git:(master) git rebase testrebase
+First, rewinding head to replay your work on top of it...
+Applying: add new feature
+{{< /highlight >}}
+依然观察日志:
+{{< highlight sh>}}
+* commit cd2c246f0cfcd2d98717af0a405ac17fd23636bc (HEAD -> master)
+| Author: hjlarry <hjlarry@163.com>
+| Date:   Sun Feb 23 21:46:34 2020 +0800
+|
+|     add new feature
+|
+* commit 7f4088a0254081c4349a253c2d3a74dd7a7f1234 (testrebase)
+| Author: hjlarry <hjlarry@163.com>
+| Date:   Sun Feb 23 22:47:17 2020 +0800
+|
+|     test rebase
+|
+* commit 22a449d52fe269ed7c969c179c1788f89013ac2d (fixbug)
+| Author: hjlarry <hjlarry@163.com>
+| Date:   Sun Feb 23 21:39:01 2020 +0800
+|
+|     9th commit
+|
+* commit c658c0b8070ec1ab7dfe53351b64da79ae939e6d
+| Author: hjlarry <hjlarry@163.com>
+| Date:   Sun Feb 23 16:57:12 2020 +0800
+|
+|     8th commit
+{{< /highlight >}}
+
+它典型的使用场景，例如团队其他人维护的项目，我们在自己的分支上为其提供feature，然后把我们的分支变基到origin/master上，这样其他人只需要去FAST-FORWARD而无需人工整合。
+
 
 #### 交互式变基
 通过`git rebase -i <commit_id>`就能进入一个交互式界面:
