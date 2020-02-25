@@ -390,10 +390,34 @@ pick c351a72 third commit
 ### 其他技巧
 
 #### cherry-pick
+cherry-pick类似于一个定制化的merge，它可以把其它分支上的commit一个个摘下来，合并到当前分支。
 
-#### submodule
+它的使用方法是`git cherry-pick <commid_id1> <commid_id2> ...`，就会把每个挑选的commit提交一次生成一个新的commit id。也可以通过`git cherry-pick -n <commid_id1> <commid_id2>`挑选出相应的commit至暂存区而不提交，后续自己可以再手动提交。
 
 #### reflog
+引用日志记录了用户在本地更改的完整历史记录，通过`git reflog`可以查看到类似这样的信息
+{{< highlight sh>}}
+e1b4a61 (HEAD) HEAD@{0}: revert: Revert "8th commit"
+979309d HEAD@{1}: checkout: moving from master to HEAD@{11}
+c658c0b (master) HEAD@{2}: reset: moving to c658
+5665150 HEAD@{3}: reset: moving to 5665
+...
+{{< /highlight >}}
+翻译过来就是:
+```
+HEAD@{0} 撤销操作: 撤销的消息
+HEAD@{1} 切换操作: 从master切换至HEAD@{11}
+HEAD@{2} 重置操作: 重置至c658
+HEAD@{3} 重置操作: 重置至5665
+```
+接着我们就可以使用`git checkout HEAD@{1}`这样的操作恢复到切换操作时的场景。
+
+#### submodule
+使用场景，例如开发过程中有一些通用的部分希望抽出作为一个公共的库来维护，或者hugo中的某些皮肤也使用了submodule。
+
+包含子模块的项目，在clone主项目的时候需要带参数`git clone <url> --recurse-submodules`或者使用`git submodule init && git submodule update`。
+
+如果子模块的内容我们做了变更，在主模块中使用`git add/commit`是无效的。如果子模块的远程仓库有更新，我们也需要进入子模块文件夹才能获取到更新。
 
 FAQ
 -------
