@@ -282,7 +282,7 @@ Merge branch 'newfeature'
 
 ### 变基
 
-基于之前三方合并的示例，还有一种合并分支的方法就是变基。它会在当前分支上重演一遍目标分支的历史，最后形成一个线性的提交历史。
+基于之前三方合并的示例，还有一种合并分支的方法就是变基。它会在当前分支上重演一遍目标分支的历史，最后形成一个线性的提交历史。当前分支的commit object由于变更了其parent就会发生改变，而目标分支的commit object往往不会改变。
 {{< highlight sh>}}
 ➜  testgit git:(master) git checkout -b testrebase HEAD~
 Switched to a new branch 'testrebase'
@@ -384,8 +384,16 @@ pick c351a72 third commit
 `git stash apply <index>` | 恢复到某个工作现场
 `git branch -av` | 查看所有本地和远程的分支及其对应的commit
 `git checkout -b <name> <commit>` | 创建一个分支并切换过去，commit可省略
-`git branch --set-upstream-to=origin/A` | 将本地当前分支和远程A分支关联
+`git branch -f <name> <commit>` | 强制把某个分支移动到commit处去
+`git branch -u origin/A` | 将本地当前分支和远程A分支关联
 
+### 其他技巧
+
+#### cherry-pick
+
+#### submodule
+
+#### reflog
 
 FAQ
 -------
@@ -399,12 +407,38 @@ Git储存的是全新的文件快照，即使你只修改了文件的一行，�
 
 但在Git的命令行下，我们很难像SVN那样有一个图形界面，勾选要提交的文件，填入提交信息，点个按钮就能完成提交。需要`git add`这个命令帮助我们选择要提交的文件。
 
+#### 使用merge还是rebase合并分支？
+`git merge`和`git rebase`都被设计来将一个分支的更改并入另一个分支，但它们的方式却不太一样。
+
+merge是一个安全的操作，现有的分支不会被更改。但另一方面，每次合并一个feature分支时都会引入一个外来的合并提交，当同时进行的feature过多时会使得整个树看起来非常杂乱，增加了开发者了解项目历史的成本。
+
+rebase最大的好处就是使项目的历史非常的整洁、线性，可以从项目的起点开始浏览到终点不需要任何的分叉。但是不合理的rebase会给团队其他人协同开发带来很大的困扰。此外，rebase不能在合并提交时附带message，也就不能像merge那样看到feature分支的并入带来了哪些更改。
+
+所在，绝不能在公共的分支使用变基，也不能使用`git push -f`强制推送去修改远程仓库的历史。合理的使用场景应该像下面描述的这样:
+
+基于上游分支master拉出来一个dev的分支，自行在dev上开发完成后可能master已经有了其他人开发的新的内容，这时应该在dev分支上使用`git rebase master`把master分支的内容先同步过来，然后在master分支上使用`git merge dev`把dev分支的内容放回去。
+
+此外，一般有远程仓库，那么相应的可能是通过`git pull --rebase`把远程的变更内容拿回来，然后通过PR的方式由远程仓库的管理者决定如何并入远程分支。
+
+#### 使用revert、reset还是checkout回滚代码？
+代码的回滚可以分为回滚某次提交，或者回滚某些文件两个层面。
+
+对于回滚提交，应该使用reset和revert。
+
+reset的本质是把HEAD移动到某个commit的位置，那么该分支从新HEAD到末端的这部分就处于悬挂状态，如果上面没有什么tag或branch引用的话，再下次git进行垃圾回收的时候就会被删除。reset本身有参数，`--mixed`为默认选项，表示暂存区和将要reset的提交同步，而工作区不受影响；使用`--hard`表示暂存区和工作区都和将要reset的提交同步；使用`--soft`表示暂存区和工作区都不做改变。
+
+而revert是不会改变提交的历史的，它会创建一个新的提交，而这个提交的内容是撤回的部分。所以revert往往用于公共的分支上。
+
+对于文件提交，应该使用reset和checkout。区别在于checkout用于把工作区中的某个文件恢复为某个commit中的该文件，而reset用于把暂存区中的某个文件恢复至某个commit的该文件，`--mixed`、`--soft`、`--hard`对于恢复文件的场景是无效的参数。
+
+
 相关链接
 -------
 
 * [图解git](https://marklodato.github.io/visual-git-guide/index-zh-cn.html)
-* [git可视化](http://onlywei.github.io/explain-git-with-d3/#commit)
 * [Pro git V2](https://git-scm.com/book/zh/v2)
 * [Write yourself a Git!](https://wyag.thb.lt/)
 * [Dulwich---Pure-Python Git implementation](https://github.com/dulwich/dulwich)
 * [Oh Shit, Git!?!](https://ohshitgit.com/)
+* [git可视化](http://onlywei.github.io/explain-git-with-d3/#commit)
+* [LearnGitBranching](https://learngitbranching.js.org/)
