@@ -22,6 +22,7 @@ bookMenuLevels: 1
   - [查询]({{< relref "/docs/mysql/query" >}})
   - [原理]({{< relref "/docs/mysql/theory" >}})
 - **其他**
-  - [基础系统工具]({{< relref "/docs/other/tools" >}})
   - [git]({{< relref "/docs/other/git" >}})
   - [docker]({{< relref "/docs/other/docker" >}})
+  - [网络协议]({{< relref "/docs/other/protocol" >}})
+  - [基础系统工具]({{< relref "/docs/other/tools" >}})
