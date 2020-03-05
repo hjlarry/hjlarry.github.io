@@ -54,3 +54,5 @@ TCP关闭连接的过程可以用状态时序图表示为:
 但此时A进入TIME_WAIT状态，因为它没法知道ACK是否到达B。它等的结果无非是两种，要么B没有收到ACK，那么B就一定会为它的FIN消息进行超时重传，A就需要收到FIN之后再次发送ACK；要么B收到ACK了，那么A就可以关闭了，等待时间至少是B的timeout+FIN的传输时间，为保证可靠，采用了更加保守的等待时间2MSL(Maximum Segment Life)。
 
 ### 状态机
+将建立连接和关闭连接的两个时序图合起来就是著名的TCP状态机：
+![status](./images/tcp_status_machine.png)
