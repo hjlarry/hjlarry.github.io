@@ -86,3 +86,28 @@ TCP是有状态的，UDP是无状态的。
 1. 需要资源少，在网络情况较好的内网或者对于丢包不敏感的应用
 2. 无需一对一沟通，建立连接，而是可以广播的应用
 3. 需要处理速度快，时延低，可以容忍少数丢包，但要求即便拥塞也一往无前的时候
+
+Socket
+-------
+Socket在Linux中以文件的形式存在，它是一种特殊的文件，是对`打开open –> 读写write/read –> 关闭close`模式的一个实现。
+
+在服务端和客户端通信之前，双方都要建立一个Socket，指定是IPv4还是IPv6，是基于数据流SOCK_STREAM的(TCP)还是基于数据报SOCK_DGRAM的(UDP)。
+
+### 基于TCP
+基于TCP协议的Socket程序函数的调用过程如下图所示:
+
+![tcp](./images/tcp_socket.png)
+
+服务端先调用bind函数为该socket赋予一个IP地址和端口，有了它就可以调用listen函数进入监听状态，客户端就可以发起连接。
+
+服务端内核为每个Socket维护了两个队列。一个队列是已经建立了连接的，三次握手已完成，处于ESTABLISHED状态；另一个是还没有完全建立连接的，处于SYN_RCVD状态。
+
+接着，服务端调用accept函数时，会拿出一个已完成的连接进行处理。如果没有已完成的连接，就要等着。服务端等待的时候，客户端可以通过connect函数发起连接，socket函数中声明要连接的IP地址和端口号，然后发起三次握手，一旦握手成功，服务端的accept函数会返回另一个socket。
+
+所以，服务端监听用的socket和真正用来传输数据的socket是两个，分别叫做监听Socket和已连接Socket。连接建立成功后，双方开始通过read和write函数读写数据。
+
+内核中既然socket是一个文件，那就有对应的文件描述符。每个进程中有个task_struct数组，里面指向该进程打开的所有文件，文件描述符可以理解为数组的index。每个文件又会有一个inode，socket对应的inode不像普通文件放在硬盘上，而是在内存中，这个inode指向了socket在内核中的Socket结构:
+
+![socket](./images/socket_queue.png)
+
+这个Socket结构主要是两个队列，发送队列和接收队列，队列里面保存的是缓存sk_buff，每个sk_buff就能看到完整的包的结构。
