@@ -111,3 +111,8 @@ Socket在Linux中以文件的形式存在，它是一种特殊的文件，是对
 ![socket](./images/socket_queue.png)
 
 这个Socket结构主要是两个队列，发送队列和接收队列，队列里面保存的是缓存sk_buff，每个sk_buff就能看到完整的包的结构。
+
+### 基于UDP
+由于UDP的过程非常简单，没有建立连接，没有三次握手，只需要绑定IP和端口号。而且无需维护连接状态，服务端也就不需为每对连接建立一组socket，只需要一个socket就能和多个客户端通信，而且每次通信的时候通过调用sendto和recvfrom还能再传入IP地址和端口。
+
+![udp](./images/udp_socket.png)
