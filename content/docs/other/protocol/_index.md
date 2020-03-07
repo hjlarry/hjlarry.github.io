@@ -116,3 +116,41 @@ Socket在Linux中以文件的形式存在，它是一种特殊的文件，是对
 由于UDP的过程非常简单，没有建立连接，没有三次握手，只需要绑定IP和端口号。而且无需维护连接状态，服务端也就不需为每对连接建立一组socket，只需要一个socket就能和多个客户端通信，而且每次通信的时候通过调用sendto和recvfrom还能再传入IP地址和端口。
 
 ![udp](./images/udp_socket.png)
+
+### 并发处理
+通过之前的基于TCP或UDP的socket函数建立连接之后，需要一个while循环，客户端和服务端不断的接收数据，就构成了一个基本的网络交互程序。但这个程序是一对一的，如何让服务端能服务更多的客户端呢？
+
+#### 多进程
+当建立连接之后，就会有一个已连接的socket，这时候可以fork出一个子进程，把接下来的数据接收的事情交给子进程来做。在Linux内核，子进程会复制文件描述符的列表，以及内存空间，还有当前执行到程序的哪一条语句。之前父进程accept之后创建的已连接socket也是一个文件描述符，就会被子进程获得。子进程通信完毕后，就需要退出，需要父进程通过子进程PID来查看它是否需要退出。
+
+#### 多线程
+每次和一个客户端连接就创建一个进程是很奢侈的事情，相对而言，创建一个线程就要轻量级很多。这些线程共享文件描述符列表、进程空间，也可以通过已连接的socket来处理客户端请求。
+
+但是一台机器无法创建过多的进程或线程，著名的[C10K](https://en.wikipedia.org/wiki/C10k_problem)问题就是指单机操作系统无法维护过多的进程或线程，在早期成为一个瓶颈。为了解决这个问题，就发明了IO多路复用的方式。
+
+#### IO多路复用，select
+select的方式是有一个线程专门去监控所有的socket，因为socket是文件描述符，所有的socket都可以放在一个叫做fd_set的集合中，然后select函数来监听这个集合是否有变化。一旦有变化，就依次查看每个文件描述符，那些发生变化的文件描述符在fd_set中对应的位会设为1，表示socket可读或可写，从而可以进行读写操作。接着再次调用select函数，进入下一轮变化的监听。
+
+但是select仍然有个问题，就是当连接过多的时候，每次都通过轮询查看一遍fd_set效率不高。它虽然比多线程效率高很多，但仍然没有完全解决C10K的问题，于是有了epoll的方案。
+
+[示例程序](https://github.com/hjlarry/practise-py/blob/master/standard_library/Concurrency/Select/select_echo_server.py)
+
+#### IO多路复用，epoll
+epoll通过注册callback函数，当某个文件描述符发生变化的时候，就会主动通知。
+
+epoll_create会创建一个epoll对象，它也是一个文件，对应一个文件描述符，它里面有一个红黑树，这个红黑树中就保存着要监听的所有socket。当epoll_ctl添加一个socket时，就是把它加入这个红黑树，同时红黑树中的节点指向一个结构，并将这个结构挂在被监听的socket事件列表中。当一个socket发生一个事件的时候，可以从这个列表中得到epoll对象，并调用callback通知它。
+
+epoll并非在所有情况都比select高效，例如在少于1024个文件描述符监听，且大多数socket都是处于活跃繁忙状态的时候，select会比epoll更高效，因为epoll会有更多次的系统调用，内核态和用户态的切换更为频繁。
+
+[示例程序](https://github.com/hjlarry/practise-py/blob/master/standard_library/Concurrency/Select/select_poll_echo_server.py)
+
+Http
+-------
+
+
+Https
+-------
+
+
+RPC
+-------
