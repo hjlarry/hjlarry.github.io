@@ -144,11 +144,37 @@ epoll并非在所有情况都比select高效，例如在少于1024个文件描�
 
 [示例程序](https://github.com/hjlarry/practise-py/blob/master/standard_library/Concurrency/Select/select_poll_echo_server.py)
 
-Http
+HTTP
 -------
 
+### 请求准备
+当我们输入一个域名，按下回车键时，浏览器会将它发送给DNS服务器，让它解析为IP地址。接着就可以通过三次握手建立TCP连接了。如果是HTTP1.1的协议，它开启了Keep-Alive，这样建立的TCP连接会在多次请求中复用，从而减少了不断建立连接和断开连接的消耗。
 
-Https
+### 请求构建
+连接建立以后，就开始构建这样格式的请求:
+
+![request](./images/http_request.png)
+
+#### 请求行
+方法常用的有GET、POST、PUT、DELETE、HEAD、OPTIONS等。HEAD和GET请求同一个URL时服务端返回的响应头信息应该相同，只是对于HEAD服务端响应时不返回消息体，常用于测试该URL的有效性、是否有更新等。OPTIONS属于预检请求，常用于确认服务端该资源是否支持跨域以及支持哪些请求方法等。GET和HEAD属于安全的方法，GET、PUT、DELETE、HEAD、OPTIONS都是幂等的。
+
+URL一般是相对路径。版本一般是`HTTP/1.1`。
+
+#### 请求头
+请求头都是一行行key-value的字段，比较重要的有：
+
+* Host，HTTP/1.1中的必需字段，服务器的域名和端口号(80可忽略)
+* User-Agent，浏览器身份标识字符串
+* Content-Type，请求体的多媒体类型(POST和PUT请求中)
+* Authorization，认证信息
+
+### 请求发送
+
+### 返回构建
+
+### HTTP 2.0
+
+HTTPS
 -------
 
 
