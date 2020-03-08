@@ -165,7 +165,7 @@ URL一般是相对路径。版本一般是`HTTP/1.1`。
 
 * Host，HTTP/1.1中的必需字段，服务器的域名和端口号(80可忽略)
 * User-Agent，浏览器身份标识字符串
-* Content-Type，请求体的多媒体类型(POST和PUT请求中)
+* Content-Type，请求体的MIME类型(POST和PUT请求中)
 * Authorization，认证信息
 
 ### 请求发送
@@ -178,6 +178,32 @@ TCP层发送每个报文时都会加上自己的地址和目标的地址，把�
 服务器发现MAC地址符合，根据IP头中的协议项知道是TCP协议，然后解析TCP头，根据里面的序号确定是要回ACK还是丢弃掉。TCP头里面有端口号，HTTP进程正在监听，于是服务器最终把包交给这个进程去处理。
 
 ### 返回构建
+返回也有自己的格式:
+
+![response](./images/http_response.png)
+
+状态码有五种可能的取值:
+
+* 1**，指示信息，表示请求已接收，需请求者继续处理
+* 2**，成功，操作被重新接收并处理
+* 3**，重定向，要完成请求必须进行更进一步的操作
+* 4**，客户端错误，请求语法错误或请求无法实现
+* 5**，服务端错误，服务器处理请求过程中发生了错误
+
+响应头重要的字段有:
+
+* Content-Type，响应体的MIME类型
+* Content-Length，响应体的长度
+* Access-Control-Allow-Origin，指定哪些网站可参与到跨资源共享过程中
+* Allow，对于该资源有效的动作(HTTP方法)
+* Cache-Control，向从服务器直到客户端在内的所有缓存机制告知，它们是否可以缓存这个对象。如`Cache-Control: max-age=3600`
+* Expires，超过该时间则认为此回应已过期
+* Last-Modified，所请求的对象最后修改日期
+* Location，用于重定向
+* Refresh，设定可定时的重定向，例如`Refresh: 5; url=http://a.com`设定了5秒后跳转至a.com
+* Set-Cookie，设置Cookie
+
+响应构建好之后，也只是把请求发送的过程逆向来发送回去。
 
 ### HTTP 2.0
 
