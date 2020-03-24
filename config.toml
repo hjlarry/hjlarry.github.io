@@ -1,4 +1,4 @@
-baseURL = "https://hjlarry.github.io/"
+baseURL = "/"
 languageCode = "zh-cn"
 title = "Home"
 theme = "hugo-book"

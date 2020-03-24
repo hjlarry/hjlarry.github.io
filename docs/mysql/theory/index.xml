@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Mysql原理 on Home</title>
-    <link>https://hjlarry.github.io/docs/mysql/theory/</link>
+    <link>/docs/mysql/theory/</link>
     <description>Recent content in Mysql原理 on Home</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     
-	<atom:link href="https://hjlarry.github.io/docs/mysql/theory/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/docs/mysql/theory/index.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>

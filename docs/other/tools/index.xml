@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>常用工具整理 on Home</title>
-    <link>https://hjlarry.github.io/docs/other/tools/</link>
+    <link>/docs/other/tools/</link>
     <description>Recent content in 常用工具整理 on Home</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     
-	<atom:link href="https://hjlarry.github.io/docs/other/tools/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/docs/other/tools/index.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>
