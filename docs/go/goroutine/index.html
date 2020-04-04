@@ -4,20 +4,31 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Go并发机制"><meta property="og:title" content="Go并发机制" />
+<meta name="description" content="Go并发调度 背景知识 GO和其他语言不同的就是我们很少在GO中听到多线程的概念，其提供的API中也没有创建线程这种东西。因为这门语言从用户写的第一行代码开始就是并发状态的。
+并发与并行 并发是指多个逻辑可以同时执行，把CPU时间分成不同的时间片段，这些时间片段分配给不同的逻辑，构成一个完整的CPU执行时间序列。 而并行是一种特殊的并发，不同逻辑由于CPU的多核，分配在不同的核上可以在物理时间上同时执行。这种状态其实很难实现，因为往往任一操作系统，它本身跑的程序非常多，远大于CPU核数。
+线程与协程 线程是执行单位，相当于工厂里的生产线。操作系统是按线程分配时间片，所以程序的线程越多获得的执行时间也就越长。线程是在系统空间实现的，而协程是在用户空间实现的，操作系统根本不知道协程。
+比如某个线程上有A、B两个任务，若A有死循环或者A等待网络响应等就会发生B被饿死的情况，为了避免这种情况，A就会主动让给B或者调度器去执行。这就是协程的工作方式，任务之间相互协商，属于协作式多任务系统，通常是在用户空间实现一个框架。而多线程是抢占式调度，不管某个程序会不会主动让出，当前时间片执行完就会被操作系统强迫分给其他线程。
+程序等于算法加数据，算法相当于一个解决问题的过程，数据又分为系统数据和用户数据。用户数据保存在用户堆栈上。操作系统为每个线程分配一个栈，大多用来保存局部变量，通常编译期就能确定，运行期通过寄存器访问，无需垃圾回收。而堆内存属于进程，进程内的线程共享，需要运行期动态分配以及垃圾回收。
+运行时 现代的编程语言创建一个线程往往是使用一个标准库或者第三方库提供API的，分配内存也往往会向操作系统提前申请一大块内存，通过这样一层抽象来减少用户态和内核态的切换来提升效率，我们把这层抽象叫做runtime(运行时)。它就像一个弱化版的操作系统，可以针对用户空间内的代码，结合当前语言的特性做大量的优化。
+Go运行时第一个抽象出的概念就是P(Processor)，相当于处理器。物理上有多少个CPU、有多少个核，runtime并不关心，它是在OS上的一层抽象，os才是在硬件的上一层抽象。runtime认为在当前的环境内只有一个程序，所以我们可以通过P来设定并发的数量，同时能执行这个程序内的多少个并发任务。
+第二个抽象是M(Machine)，对应了一个系统线程，是对线程的包装，也就是说P控制了同时有多少个M在执行。它是实际执行体，和P绑定，以调度循环方式不断执行G并发任务。
+第三个抽象就是G(Goroutine)，实际上就是任务载体，或者说资源包，包括了函数地址，需要的参数，所需的内存。当我们使用go func(){}()时，实际上就是创建了一个G对象。
+为什么G需要内存，按说M相当于线程也就应该有了栈内存？实际上它们都有自己的内存，G中的内存为G.stack(默认大小2KB)，M中的内存为G0。G在M上运行，就像是列车在线路上运行，线路本身也需要去投入资源维护。而把两块内存分开，是因为M所需的内存比较连续、相对固定、逻辑完整，G却会因为各种各样的原因或者异常可能会调度到别的M上去。
+G、M、P共同构成了多任务并发执行的基本模式，P用来控制同时有多少个并发任务执行，M对应到某个线程，G代表了go func语句翻译的一个任务包，最终还得有个调度器统合起来，把G放到合适的M上去执行。
+任务平衡 正向分析 当我们在一个for循环中创建了成千上万个并发任务时，它们并不是立即执行的，而是打包成一个个G对象保存在两个队列中(P本地队列和G全局队列)。
+假设当前只有4个P，在main函数执行的时候就需要一个P1/M1绑定体，main中创建的其他go func就会打包成G对象放在P1.queue中。也就是说任一M内创建的G都会保存在当前这个P的本地队列中，为什么不能放在P2、P3、P4的队列中？放在别的队列就需要去判断这个P是不是闲置的，还可能需要加锁等等，会变得很复杂。
+那么如果在main中创建了1000个G，它们就得等P1/M1中当前的任务执行完了才会得到执行，可能P2、P3、P4都是闲置的，这明显不合理。如何在多个P之间去平衡任务呢？使用了两种方法，一种是规定了每个P本地队列只能放256个G，一次放的过多时会按一定规则比如放一半到全局队列中去；另一种是某个P若闲置了就会在全局队列中去找(可能有很多P都在全局中找，就需要排队去找)，找到了就把一部分任务移动到自己的本地队列中，没有找到就会去其他P中偷一部分任务过来，从全局队里或其他P中偷都是需要加锁的，效率相对会低一些。
+这样的平衡方式也就决定了我们没有办法确定哪个方法先执行，哪个后执行，除非我们自己写逻辑去判断先后。我们再来看一个关于执行顺序的示例:
+func main() { runtime.GOMAXPROCS(1) // 设置P为1  for i := 0; i &lt; 10; i&#43;&#43; { go func(id int) { // 创建10个G  time.Sleep(time.Second) fmt.Println(id) }(i) } time.Sleep(time.Second * 2) } 执行结果:
+[ubuntu] ~/.mac/gocode $ go run goroutine.go 9 0 1 2 3 4 5 6 7 8  为什么当P为1的时候，它不是顺序输出的，9总是在第一个？"><meta property="og:title" content="Go并发机制" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/docs/go/goroutine/" />
 
 <title>Go并发机制 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
-
-
-<link rel="stylesheet" href="/book.min.eddc90f1d1267cb826e7cffc53c434e50061c4bfe41146a43670842ce6cb3bf6.css" integrity="sha256-7dyQ8dEmfLgm58/8U8Q05QBhxL/kEUakNnCELObLO/Y=">
-
-
-<script defer src="/cn.search.min.e84213de8510d68758f21b25e561c271477ff56e577b69426cf8f6b5ce7a28b5.js" integrity="sha256-6EIT3oUQ1odY8hsl5WHCcUd/9W5Xe2lCbPj2tc56KLU="></script>
-
+<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
+<script defer src="/cn.search.min.a5a058c7ebcd8173dd2a818abe096fc9fbc2cc95163cb34a9f190773a8468d6c.js" integrity="sha256-paBYx&#43;vNgXPdKoGKvglvyfvCzJUWPLNKnxkHc6hGjWw="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/go/goroutine/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -29,10 +40,10 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
   <a href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
   </a>
@@ -40,7 +51,7 @@ https://github.com/alex-shpak/hugo-book
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -49,7 +60,13 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+
+
+  <ul>
 <li><strong>计算机基础</strong>
 <ul>
 <li><a href="/docs/sicp/hardware/">硬件</a></li>
@@ -94,31 +111,75 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
-    <img src="/svg/menu.svg" alt="Menu" />
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>Go并发机制</strong>
-</header>
+
+  <label for="toc-control">
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#背景知识">背景知识</a>
+      <ul>
+        <li><a href="#并发与并行">并发与并行</a></li>
+        <li><a href="#线程与协程">线程与协程</a></li>
+      </ul>
+    </li>
+    <li><a href="#运行时">运行时</a></li>
+    <li><a href="#任务平衡">任务平衡</a>
+      <ul>
+        <li><a href="#正向分析">正向分析</a></li>
+        <li><a href="#逆向分析">逆向分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#调度执行">调度执行</a>
+      <ul>
+        <li><a href="#pm解绑">P、M解绑</a></li>
+        <li><a href="#任务饿死">任务饿死</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
 
       
-<article class="markdown"><h1 id="go并发调度">Go并发调度</h1>
+      
+  <article class="markdown"><h1 id="go并发调度">Go并发调度</h1>
 <h2 id="背景知识">背景知识</h2>
 <p>GO和其他语言不同的就是我们很少在GO中听到多线程的概念，其提供的API中也没有创建线程这种东西。因为这门语言从用户写的第一行代码开始就是并发状态的。</p>
 <h3 id="并发与并行">并发与并行</h3>
@@ -181,7 +242,7 @@ https://github.com/alex-shpak/hugo-book
 <p>假设现在有3个P/M，我们就可以把一个大的队列拆分成3个小的队列，让每个P/M持有一个私有的队列，这种优化策略使得锁的问题可以解决掉。但也带来新的问题，可能P1已执行完自己的任务，P2、P3还得执行很久，我们可能一开始按任务的数量平均分配至各个私有队列，但有的任务执行时间很长，有的任务很快就能执行完。</p>
 <p>因此，P1应该去P2、P3中拿取任务才是合理的，所有人有义务去完成整个系统的任务。P1直接去拿就会和P2、P3打起来形成竞争效应，第二步的优化策略就是保留一个全局队列，P1可以先去全局队列里找，而P2、P3有很大概率是在本地队列去找的，P1获得锁的概率就会更大，全局队列使得锁的压力被分摊，同时也使得P2、P3中若有多余的任务也可以放进去。</p>
 <p>当P1的本地队列已执行完，全局队列中的任务也被执行完时，它就会任选P2或P3，形成直接的竞争。这时候我们考虑的优化策略，就是把本地队列一分为二，上面是runnext用于本地执行，下面是runq[256]用来给P1偷的。</p>
-<p><img src="./images/queue.png" alt="task queue"></p>
+<p><img src="./images/queue.png" alt="task queue" /></p>
 <p>这种结构很像CPU的存储结构，通过分散距离、增加存储层次来减少直接竞争冲突的概率。</p>
 <h2 id="调度执行">调度执行</h2>
 <h3 id="pm解绑">P、M解绑</h3>
@@ -280,41 +341,52 @@ cSCHED 10047ms: gomaxprocs<span style="color:#f92672">=</span><span style="color
   test.go:5		0x4525e8		ebc6			JMP main.test<span style="color:#f92672">(</span>SB<span style="color:#f92672">)</span>	</code></pre></div>
 <p>我们发现头部的三条指令和尾部的两条指令都是编译器插入的。<code>runtime.morestack_noctxt</code>会做两件事情，一是检查当前栈帧空间是否足够，如果不够可以帮助扩容；二是检查是否有人发出了抢占式调度信号，如果发现了信号，它就让出执行权限。函数前使用<code>go:nosplit</code>可以禁止编译器插入这样的指令。</p>
 </article>
+ 
+      
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/f8b0a0ee517ea9997b10393cb3ff6c0550d75328" title='Last modified by hjlarry | December 23, 2019' target="_blank">
-      <img src="/svg/calendar.svg" alt="Calendar" />
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/f8b0a0ee517ea9997b10393cb3ff6c0550d75328" title='最后修改者 hjlarry | December 23, 2019' target="_blank" rel="noopener">
+      <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>December 23, 2019</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/go/goroutine/_index.md" target="_blank">
-      <img src="/svg/edit.svg" alt="Edit" />
-      <span>Edit this page</span>
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/go/goroutine/_index.md" target="_blank" rel="noopener">
+      <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>编辑本页</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        <br>
+<div style="text-align: center;font-size:xx-small;">
+    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
+</div>
+      </footer>
+
       
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
     </div>
 
     
-  
-
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents">
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
   <ul>
     <li><a href="#背景知识">背景知识</a>
       <ul>
@@ -337,13 +409,25 @@ cSCHED 10047ms: gomaxprocs<span style="color:#f92672">=</span><span style="color
     </li>
   </ul>
 </nav>
-  </aside>
 
-
-
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

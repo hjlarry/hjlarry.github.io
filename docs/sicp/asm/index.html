@@ -4,20 +4,19 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Asm"><meta property="og:title" content="" />
+<meta name="description" content="汇编语言 基础知识 编程语言是给人看的，CPU看不懂汇编语言，CPU能看懂的只有二进制指令。早期通过纸带打孔的方式输入指令，后来逐渐发展出了助记符，也就是例如跳转、循环之类的指令，再由编译器(汇编器)把这些助记符还原为二进制的指令。所以汇编语言可以理解为机器语言的一种方言，方便人类去记忆它，汇编语言和机器语言就存在着一定程度上的一一对应的关系。
+汇编是面向机器编程的语言，不同的硬件的指令可能是不同的，它能直接访问硬件的存储和端口，最大程度发挥出硬件的能力。它还有一些其他的使用场景，例如优化代码追求极致效率、直接调试和修改没有源码的程序、诊断恶意软件、进行逆向分析等。汇编的缺点也显而易见，对多数人而言，汇编代码难懂，不易维护，难于调试，不易移植，开发效率低。
+汇编语言的风格分为两种，Intel的和AT&amp;T的，相当于用不同的方言描述机器语言。AT&amp;T风格主要是GNU使用的，汇编器主要是GAS/as;Intel风格主要是windows使用的，汇编器有MASM、NASM、TASM、FASM。它们的主要区别在于AT&amp;T会在寄存器名字前加%，在立即操作数前加$前缀，且源和目标操作数的顺序和Intel相反。详细区别可参考wiki，以及这篇文章。
+本文使用NASM汇编器，它采用Intel语法风格，支持很多种格式，包括ELF、COFF、Mach-O、Win32、Win64等，可使用nasm -hf查看其所有支持的格式。
+处理过程 Hello world示例程序: global _start section .data hello : db `hello, world!\n` section .text _start: mov rax, 1 ; system call number should be store in rax  mov rdi, 1 ; argument #1 in rdi: where to write (descriptor)?  mov rsi, hello ; argument #2 in rsi: where does the string start?  mov rdx, 14 ; argument #3 in rdx: how many bytes to write?"><meta property="og:title" content="" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/docs/sicp/asm/" />
 
 <title>Asm | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
-
-
-<link rel="stylesheet" href="/book.min.eddc90f1d1267cb826e7cffc53c434e50061c4bfe41146a43670842ce6cb3bf6.css" integrity="sha256-7dyQ8dEmfLgm58/8U8Q05QBhxL/kEUakNnCELObLO/Y=">
-
-
-<script defer src="/cn.search.min.e84213de8510d68758f21b25e561c271477ff56e577b69426cf8f6b5ce7a28b5.js" integrity="sha256-6EIT3oUQ1odY8hsl5WHCcUd/9W5Xe2lCbPj2tc56KLU="></script>
-
+<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
+<script defer src="/cn.search.min.a5a058c7ebcd8173dd2a818abe096fc9fbc2cc95163cb34a9f190773a8468d6c.js" integrity="sha256-paBYx&#43;vNgXPdKoGKvglvyfvCzJUWPLNKnxkHc6hGjWw="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/sicp/asm/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -29,10 +28,10 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
   <a href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
   </a>
@@ -40,7 +39,7 @@ https://github.com/alex-shpak/hugo-book
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -49,7 +48,13 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+
+
+  <ul>
 <li><strong>计算机基础</strong>
 <ul>
 <li><a href="/docs/sicp/hardware/">硬件</a></li>
@@ -94,31 +99,83 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
-    <img src="/svg/menu.svg" alt="Menu" />
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>Asm</strong>
-</header>
+
+  <label for="toc-control">
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#基础知识">基础知识</a></li>
+    <li><a href="#处理过程">处理过程</a>
+      <ul>
+        <li><a href="#编译">编译</a></li>
+        <li><a href="#链接">链接</a></li>
+      </ul>
+    </li>
+    <li><a href="#源码结构">源码结构</a>
+      <ul>
+        <li><a href="#标签">标签</a></li>
+        <li><a href="#本地标签">本地标签</a></li>
+        <li><a href="#入口标签">入口标签</a></li>
+        <li><a href="#段标签与内存地址">段标签与内存地址</a></li>
+      </ul>
+    </li>
+    <li><a href="#语言规范">语言规范</a>
+      <ul>
+        <li><a href="#寻址方式">寻址方式</a></li>
+        <li><a href="#变量">变量</a></li>
+        <li><a href="#常量">常量</a></li>
+        <li><a href="#指令">指令</a></li>
+        <li><a href="#控制流">控制流</a></li>
+        <li><a href="#数据结构">数据结构</a></li>
+        <li><a href="#宏">宏</a></li>
+      </ul>
+    </li>
+    <li><a href="#调用libc">调用libc</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
 
       
-<article class="markdown"><h1 id="汇编语言">汇编语言</h1>
+      
+  <article class="markdown"><h1 id="汇编语言">汇编语言</h1>
 <h2 id="基础知识">基础知识</h2>
 <p>编程语言是给人看的，CPU看不懂汇编语言，CPU能看懂的只有二进制指令。早期通过纸带打孔的方式输入指令，后来逐渐发展出了助记符，也就是例如跳转、循环之类的指令，再由编译器(汇编器)把这些助记符还原为二进制的指令。所以汇编语言可以理解为机器语言的一种方言，方便人类去记忆它，汇编语言和机器语言就存在着一定程度上的一一对应的关系。</p>
 <p>汇编是面向机器编程的语言，不同的硬件的指令可能是不同的，它能直接访问硬件的存储和端口，最大程度发挥出硬件的能力。它还有一些其他的使用场景，例如优化代码追求极致效率、直接调试和修改没有源码的程序、诊断恶意软件、进行逆向分析等。汇编的缺点也显而易见，对多数人而言，汇编代码难懂，不易维护，难于调试，不易移植，开发效率低。</p>
@@ -192,7 +249,7 @@ cat &gt;$WORK/b001/importcfg <span style="color:#e6db74">&lt;&lt; &#39;EOF&#39; 
 </span><span style="color:#e6db74">packagefile runtime=/usr/local/go/pkg/linux_amd64/runtime.a
 </span><span style="color:#e6db74">EOF</span>
 cd /root/.mac/gocode
-<span style="display:block;width:100%;background-color:#3c3d38">/usr/local/go/pkg/tool/linux_amd64/compile -o $WORK/b001/_pkg_.a -trimpath <span style="color:#e6db74">&#34;</span>$WORK<span style="color:#e6db74">/b001=&gt;</span><span style="color:#e6db74">&#34;</span> -p main -complete -buildid dR1ZsbI6brd59SPrnOhX/dR1ZsbI6brd59SPrnOhX -goversion go1.13 -D _/root/.mac/gocode -importcfg $WORK/b001/importcfg -pack -c<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> ./main.go
+<span style="display:block;width:100%;background-color:#3c3d38">/usr/local/go/pkg/tool/linux_amd64/compile -o $WORK/b001/_pkg_.a -trimpath <span style="color:#e6db74">&#34;</span>$WORK<span style="color:#e6db74">/b001=&gt;&#34;</span> -p main -complete -buildid dR1ZsbI6brd59SPrnOhX/dR1ZsbI6brd59SPrnOhX -goversion go1.13 -D _/root/.mac/gocode -importcfg $WORK/b001/importcfg -pack -c<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> ./main.go
 </span>/usr/local/go/pkg/tool/linux_amd64/buildid -w $WORK/b001/_pkg_.a <span style="color:#75715e"># internal</span>
 cp $WORK/b001/_pkg_.a /root/.cache/go-build/dd/ddfadd34424d01a7a08b5c1cad7d09610caf9d21c8372338aed2d3331c8802cd-d <span style="color:#75715e"># internal</span>
 cat &gt;$WORK/b001/importcfg.link <span style="color:#e6db74">&lt;&lt; &#39;EOF&#39; # internal
@@ -382,7 +439,7 @@ Disassembly of section .text:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm">    _start:
         <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span>
         <span style="color:#a6e22e">test</span>    <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">rax</span> <span style="color:#75715e">; 如果AX为0，则把ZF设为1，否则把ZF设为0
-</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">jne</span>     <span style="color:#66d9ef">.exit</span>    <span style="color:#960050;background-color:#1e0010">;</span> <span style="color:#960050;background-color:#1e0010">如</span><span style="color:#960050;background-color:#1e0010">果</span><span style="color:#66d9ef">ZF为0</span><span style="color:#960050;background-color:#1e0010">，</span><span style="color:#960050;background-color:#1e0010">则</span><span style="color:#960050;background-color:#1e0010">跳</span><span style="color:#960050;background-color:#1e0010">转</span><span style="color:#960050;background-color:#1e0010">至</span><span style="color:#66d9ef">.exit标签</span></code></pre></div></p>
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">jne</span>     <span style="color:#66d9ef">.exit</span>    <span style="color:#960050;background-color:#1e0010">;</span> <span style="color:#960050;background-color:#1e0010">如果</span><span style="color:#66d9ef">ZF为0</span><span style="color:#960050;background-color:#1e0010">，则跳转至</span><span style="color:#66d9ef">.exit标签</span></code></pre></div></p>
 <p>第三种是使用<code>cmp</code>比较两个参数，比较的结果存到相应的状态寄存器中，根据状态寄存器的值再配合相关指令完成跳转:</p>
 <ul>
 <li>je (==), jne (!=), jz (==0), jnz (!=0)</li>
@@ -483,41 +540,52 @@ hello world!
 	libc.so.6 <span style="color:#f92672">=</span>&gt; /lib/x86_64-linux-gnu/libc.so.6 <span style="color:#f92672">(</span>0x00007fe329bdd000<span style="color:#f92672">)</span>
 	/lib64/ld-linux-x86-64.so.2 <span style="color:#f92672">(</span>0x00007fe329fce000<span style="color:#f92672">)</span></code></pre></div></p>
 </article>
+ 
+      
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/d803d0e16359e70019145365604fba908cc36c30" title='Last modified by hjlarry | January 14, 2020' target="_blank">
-      <img src="/svg/calendar.svg" alt="Calendar" />
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/d803d0e16359e70019145365604fba908cc36c30" title='最后修改者 hjlarry | January 14, 2020' target="_blank" rel="noopener">
+      <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>January 14, 2020</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/sicp/asm/_index.md" target="_blank">
-      <img src="/svg/edit.svg" alt="Edit" />
-      <span>Edit this page</span>
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/sicp/asm/_index.md" target="_blank" rel="noopener">
+      <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>编辑本页</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        <br>
+<div style="text-align: center;font-size:xx-small;">
+    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
+</div>
+      </footer>
+
       
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
     </div>
 
     
-  
-
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents">
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
   <ul>
     <li><a href="#基础知识">基础知识</a></li>
     <li><a href="#处理过程">处理过程</a>
@@ -548,13 +616,25 @@ hello world!
     <li><a href="#调用libc">调用libc</a></li>
   </ul>
 </nav>
-  </aside>
 
-
-
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

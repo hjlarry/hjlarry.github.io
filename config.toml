@@ -1,9 +1,10 @@
 baseURL = "/"
 languageCode = "zh-cn"
 title = "Home"
-theme = "hugo-book"
+theme = "book"
 publishdir = "."
 defaultContentLanguage = "cn"
+disqusShortname = "hjlarry"
 
 # Book configuration
 disablePathToLower = true
@@ -20,6 +21,7 @@ enableGitInfo = true
     BookLogo = 'logo.png'
     BookRepo = 'https://github.com/hjlarry/hjlarry.github.io'
     BookSearch = true
+    BookComments = false
     BookEditPath = 'edit/master/content'
     BookMenuBundle = '/menu'
 

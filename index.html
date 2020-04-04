@@ -2,23 +2,19 @@
 <html lang="cn">
 
 <head>
-	<meta name="generator" content="Hugo 0.64.1" />
+	<meta name="generator" content="Hugo 0.68.3" />
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Introduction"><meta property="og:title" content="Introduction" />
+<meta name="description" content="非法操作的笔记 主要用于记录学习过程中的重要知识点，内容属于加工提炼，并非原创，由于不会用于传播，所以并未注明出处。
+关于作者  Github  Twitter  Email  Telegram  "><meta property="og:title" content="Introduction" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/" />
 
 <title>Introduction | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
-
-
-<link rel="stylesheet" href="/book.min.eddc90f1d1267cb826e7cffc53c434e50061c4bfe41146a43670842ce6cb3bf6.css" integrity="sha256-7dyQ8dEmfLgm58/8U8Q05QBhxL/kEUakNnCELObLO/Y=">
-
-
-<script defer src="/cn.search.min.e84213de8510d68758f21b25e561c271477ff56e577b69426cf8f6b5ce7a28b5.js" integrity="sha256-6EIT3oUQ1odY8hsl5WHCcUd/9W5Xe2lCbPj2tc56KLU="></script>
-
+<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
+<script defer src="/cn.search.min.a5a058c7ebcd8173dd2a818abe096fc9fbc2cc95163cb34a9f190773a8468d6c.js" integrity="sha256-paBYx&#43;vNgXPdKoGKvglvyfvCzJUWPLNKnxkHc6hGjWw="></script>
 <link rel="alternate" type="application/rss+xml" href="/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -30,10 +26,10 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
   <a href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
   </a>
@@ -41,7 +37,7 @@ https://github.com/alex-shpak/hugo-book
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -50,7 +46,13 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+
+
+  <ul>
 <li><strong>计算机基础</strong>
 <ul>
 <li><a href="/docs/sicp/hardware/">硬件</a></li>
@@ -95,31 +97,45 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
-    <img src="/svg/menu.svg" alt="Menu" />
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>Introduction</strong>
-</header>
+
+  <label for="toc-control">
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+ 
+      </header>
 
       
-<article class="markdown"><h1 id="非法操作的知识库">非法操作的知识库</h1>
+      
+  <article class="markdown"><h1 id="非法操作的笔记">非法操作的笔记</h1>
 <p>主要用于记录学习过程中的重要知识点，内容属于加工提炼，并非原创，由于不会用于传播，所以并未注明出处。</p>
 <h2 id="关于作者">关于作者</h2>
 <p>
@@ -167,44 +183,64 @@ https://github.com/alex-shpak/hugo-book
 </a>
 </p>
 </article>
+ 
+      
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/bf0c17f6366fe8a8c753342bdb6643952b084568" title='Last modified by hjlarry | January 14, 2020' target="_blank">
-      <img src="/svg/calendar.svg" alt="Calendar" />
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/bf0c17f6366fe8a8c753342bdb6643952b084568" title='最后修改者 hjlarry | January 14, 2020' target="_blank" rel="noopener">
+      <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>January 14, 2020</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/_index.md" target="_blank">
-      <img src="/svg/edit.svg" alt="Edit" />
-      <span>Edit this page</span>
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/_index.md" target="_blank" rel="noopener">
+      <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>编辑本页</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        <br>
+<div style="text-align: center;font-size:xx-small;">
+    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
+</div>
+      </footer>
+
       
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
     </div>
 
     
-  
-
-
-
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

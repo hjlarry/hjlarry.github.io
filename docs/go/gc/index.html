@@ -4,20 +4,36 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="垃圾回收器"><meta property="og:title" content="垃圾回收器" />
+<meta name="description" content="垃圾回收器的设计 背景知识 垃圾回收器的首要任务就是节约内存，尽可能的节约内存也意味着要尽可能的增加执行频率，这样就会影响性能。如果不想影响用户代码的性能，就得尽量隔久一些执行一次垃圾回收，这就可能导致大量内存无法回收，空间浪费严重。所以垃圾回收器的设计难点就是在这两者间取得平衡，很难做到完美。
+我们说垃圾回收通常是针对堆上的垃圾，堆内存都是要释放的，区别只是有的语言需要手动释放，有的语言由垃圾回收器来释放，不释放就是内存泄漏了。而栈内存是绑定在线程上，在Go中也就是M(G0)以及G，默认的2KB会当做一个对象来处理，垃圾回收器通常不会介入。
+Go中的垃圾回收属于很传统的策略，基于标记清理，标记出死了的对象然后清理掉，但它不会压缩内存，有的语言会压缩好处在于可以空出大量的连续内存空间，但Go由于支持指针不会这样做。
+另外，由于Go需要支持垃圾回收和用户逻辑的并发，也让垃圾回收这件事复杂了很多。就像我们要打扫一条街，那把街两头堵住打扫完了再打开是最方便的，但现在要在打扫的同时不能影响游客游览，这就可能这条街永远打扫不干净。
+即便是并发，也会有一个短暂的暂停行为，被称为STW(stop the world)。需要在这个时间内去通知所有的P，我要开始垃圾回收了，并做一些相关的状态设置，用户代码被冻结。所以有时候用户程序对垃圾回收器不友好是可能造成卡顿的，比如说在极短的时间内大量创建了微小对象，逼的垃圾回收器执行频率升高，卡顿就会明显，这种情况就要考虑用对象池等方式来优化。
+垃圾回收的过程主要涉及怎么触发、怎么启动、怎么标记、怎么清理这些问题，我们下面来详细了解这些问题。
+触发 有三种情况会触发垃圾回收，通过自动触发，手工触发，系统监控程序来触发。
+自动触发是有一个阈值(nextGC)，默认可能是4MB或者8MB，当在堆上分配的内存超过该阈值，则自动启动回收，每次启动后调整下次阈值翻倍。
+手工强制使用runtime.GC这样的代码来执行垃圾回收，这种方式不会去检查阈值，往往用来模拟和测试。
+为什么还需要系统监控程序触发呢？假设某段时间有个热点，内存突然使用了100MB，那么自动触发的阈值就会被推高到200MB，这时候热点消失内存只使用了50MB时，可能在50~200之间一直没法触发自动回收而产生大量垃圾。系统监控程序会检查上次垃圾回收若已经超过2分钟，则强制执行一次垃圾回收，这种方式也不会检查阈值。
+那么自动触发时如何检查阈值是否达到呢？正常想法可能是每次执行malloc(size)函数的时候累加其size并检查一次，这种效率会很低，每次分配都去检查，且这个函数被所有的P/M共享就涉及到需要加锁。Go中采用的优化策略是不在malloc(size)时检查，只有在大对象分配的时候才检查，因为内存分配只有两种情况，要么从操作系统拿回一大块内存来分配给某个大对象，要么拿回一大块内存切成N多小块复用。
+启动 启动的第一步就是开启STW，让所有的P/M进入到一种特殊的状态。其实开启STW之前还要做一件事情，上一个垃圾回收周期的清理工作。然后垃圾回收的相关指令和函数会被打包为一个个worker，进而作为G对象交给调度器执行，垃圾回收代码和用户代码都是G对象从而实现了并发。
+worker worker分为三种，第一种属于正式工，专门做垃圾回收；第二种属于小时工，执行一段时间垃圾回收就释放P/M执行用户逻辑；第三种是临时工，没有用户G的时候，P/M会闲置，就可能有临时工来执行一段时间。如果没有正式工，小时工和临时工随时都可能因为抢占式调度去执行用户代码，可能导致垃圾回收无法结束；如果都是正式工也不行，正式工不会被抢占，用户逻辑可能被饿死；所以有了小时工和临时工，小时工算是辅助正式工来加快垃圾回收的效率，而临时工更不靠谱，只有在P/M闲置时才可能来帮忙。
+这种种措施就是要保证:
+ 垃圾回收一定能够完成 垃圾回收尽可能快的完成 垃圾回收不能影响用户代码的执行  controller 在一个垃圾回收的周期内，会有一个controller来收集信息，它会收集完成这个周期花了多少物理时间，花了多少CPU时间，开始和结束的时候堆的大小，使用的正式工、临时工、小时工的数量。通过这些信息，controller就会去推算下一个周期垃圾回收的阈值应升高还是降低，比如nextGC当前是4MB，下一次就应该是8MB，通过controller推算出应该降低10%，那最终触发的阈值就是7.2MB；另外，controller也会去推算多少正式工、临时工、小时工参与是合理的。这些推算都是概率问题，属于局部性原则的一种应用，本次垃圾回收的压力大，那么下次垃圾回收压力大的概率就高一些。这种简单的策略为垃圾回收增加了一些灵活性，比僵化的阈值设定要好一些。
+标记 三色标记 启动之后就要开始执行标记操作，标记有一个基本的规则叫三色标记原则。
+我们把任一段代码编译之后，会发现编译器插入一些例如PCDATA这样的指令，它属于伪指令，是为了在编译时记录对象的相关信息以及一些元数据信息，这些信息可以用来给内存分配器提供参考:当在堆上分配一个对象的时候，除了去分配相应的内存(比如起始位置0x100100)，还会在一个位图中查找到索引0x100100的位置，按照元数据中的类型信息标记出该对象的第几个位置是指针。
+而一个对象要么是从全局变量引用下来，要么是从栈上引用下来，自然就会有根对象，这个根对象就是位图中的指针。垃圾回收的时候就是先去查看位图有没有指针，根据指针一路追踪扫描下去。
+在一次扫描开始时，会认为所有的对象是白色的。根对象一定是活的，那么被它引用的对象也一定是活的，就把它标记为灰色的，并把它的引用放在一个队列中去。接着把这个队列的灰色对象依次拿出来，比如先拿出了灰色的A，看A引用的对象是什么，把A引用的对象重新加到队列中去，并把A标记为黑色。重复执行这个过程，那么最终就只会剩下两种对象，黑色的和白色的，黑色的是活着的，白色的是死掉的。
+写屏障 但还有个问题没有解决，标记的同时用户代码也在执行，如果已经标记为黑色的对象又引用了一个白色对象C怎么办，因为不会对黑色对象进行二次扫描，在最终清理时就会把这个C也误杀掉。为了解决这个问题，在编译期编译器就会对指针写操作的语句插入一段写屏障代码，这段代码会判断如果当前正在垃圾回收，指针的写操作不会立即执行，而是先执行写屏障逻辑。写屏障逻辑会判断这个指针若是黑色的，就把它重新变成灰色的加入队列进行二次扫描。
+具体如何加入写屏障的，我们可以看如下示例: var x *int func main(){ x = new(int) println(x) }
+然后我们编译并反汇编: [ubuntu] ~/.mac $ go tool objdump -s &#34;main\.main&#34; test TEXT main.main(SB) /root/.mac/test.go test.go:5	0x452330	64488b0c25f8ffffff	MOVQ FS:0xfffffff8, CX test.go:5	0x452339	483b6110	CMPQ 0x10(CX), SP test."><meta property="og:title" content="垃圾回收器" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/docs/go/gc/" />
 
 <title>垃圾回收器 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
-
-
-<link rel="stylesheet" href="/book.min.eddc90f1d1267cb826e7cffc53c434e50061c4bfe41146a43670842ce6cb3bf6.css" integrity="sha256-7dyQ8dEmfLgm58/8U8Q05QBhxL/kEUakNnCELObLO/Y=">
-
-
-<script defer src="/cn.search.min.e84213de8510d68758f21b25e561c271477ff56e577b69426cf8f6b5ce7a28b5.js" integrity="sha256-6EIT3oUQ1odY8hsl5WHCcUd/9W5Xe2lCbPj2tc56KLU="></script>
-
+<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
+<script defer src="/cn.search.min.a5a058c7ebcd8173dd2a818abe096fc9fbc2cc95163cb34a9f190773a8468d6c.js" integrity="sha256-paBYx&#43;vNgXPdKoGKvglvyfvCzJUWPLNKnxkHc6hGjWw="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/go/gc/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -29,10 +45,10 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
   <a href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
   </a>
@@ -40,7 +56,7 @@ https://github.com/alex-shpak/hugo-book
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -49,7 +65,13 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+
+
+  <ul>
 <li><strong>计算机基础</strong>
 <ul>
 <li><a href="/docs/sicp/hardware/">硬件</a></li>
@@ -94,31 +116,73 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
-    <img src="/svg/menu.svg" alt="Menu" />
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>垃圾回收器</strong>
-</header>
+
+  <label for="toc-control">
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#背景知识">背景知识</a></li>
+    <li><a href="#触发">触发</a></li>
+    <li><a href="#启动">启动</a>
+      <ul>
+        <li><a href="#worker">worker</a></li>
+        <li><a href="#controller">controller</a></li>
+      </ul>
+    </li>
+    <li><a href="#标记">标记</a>
+      <ul>
+        <li><a href="#三色标记">三色标记</a></li>
+        <li><a href="#写屏障">写屏障</a></li>
+        <li><a href="#挣工分">挣工分</a></li>
+      </ul>
+    </li>
+    <li><a href="#清理">清理</a></li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
 
       
-<article class="markdown"><h1 id="垃圾回收器的设计">垃圾回收器的设计</h1>
+      
+  <article class="markdown"><h1 id="垃圾回收器的设计">垃圾回收器的设计</h1>
 <h2 id="背景知识">背景知识</h2>
 <p>垃圾回收器的首要任务就是节约内存，尽可能的节约内存也意味着要尽可能的增加执行频率，这样就会影响性能。如果不想影响用户代码的性能，就得尽量隔久一些执行一次垃圾回收，这就可能导致大量内存无法回收，空间浪费严重。所以垃圾回收器的设计难点就是在这两者间取得平衡，很难做到完美。</p>
 <p>我们说垃圾回收通常是针对堆上的垃圾，堆内存都是要释放的，区别只是有的语言需要手动释放，有的语言由垃圾回收器来释放，不释放就是内存泄漏了。而栈内存是绑定在线程上，在Go中也就是M(G0)以及G，默认的2KB会当做一个对象来处理，垃圾回收器通常不会介入。</p>
@@ -208,41 +272,52 @@ TEXT main.main<span style="color:#f92672">(</span>SB<span style="color:#f92672">
 <h2 id="总结">总结</h2>
 <p>在研究垃圾回收器的设计过程中，我们发现整个处理过程是比较复杂的。垃圾回收器的设计中有大量的细节处理是在找平衡，在执行效率和空间占用中找到平衡。</p>
 </article>
+ 
+      
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/f8b0a0ee517ea9997b10393cb3ff6c0550d75328" title='Last modified by hjlarry | December 23, 2019' target="_blank">
-      <img src="/svg/calendar.svg" alt="Calendar" />
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/f8b0a0ee517ea9997b10393cb3ff6c0550d75328" title='最后修改者 hjlarry | December 23, 2019' target="_blank" rel="noopener">
+      <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>December 23, 2019</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/go/gc/_index.md" target="_blank">
-      <img src="/svg/edit.svg" alt="Edit" />
-      <span>Edit this page</span>
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/go/gc/_index.md" target="_blank" rel="noopener">
+      <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>编辑本页</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        <br>
+<div style="text-align: center;font-size:xx-small;">
+    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
+</div>
+      </footer>
+
       
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
     </div>
 
     
-  
-
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents">
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
   <ul>
     <li><a href="#背景知识">背景知识</a></li>
     <li><a href="#触发">触发</a></li>
@@ -263,13 +338,25 @@ TEXT main.main<span style="color:#f92672">(</span>SB<span style="color:#f92672">
     <li><a href="#总结">总结</a></li>
   </ul>
 </nav>
-  </aside>
 
-
-
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

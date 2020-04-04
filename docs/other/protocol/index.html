@@ -4,20 +4,49 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="网络协议"><meta property="og:title" content="网络协议" />
+<meta name="description" content="网络协议 TCP TCP是一种可靠的网络协议，很多应用层协议都依赖它。
+包头格式 如图所示，源端口号和目标端口号用来确定发送和接收数据的双方。
+包的序号为了解决包的先后顺序问题，确认序号为了确认发出去的包对方是否已经收到，如果没有收到就会有不断重传机制来确保不会丢包。
+接下来是一些状态位，例如SYN表示发起一个连接，ACK是回复，RST是重新连接，FIN是结束连接等。TCP是面向连接的，因而双方都要维护连接的状态，这些带状态位的包的发送会引起双方状态的变更。
+下面是窗口大小，因为TCP要做流量控制和拥塞控制，通信的双方需要各声明一个窗口来标识自己当前的数据处理能力。
+三次握手 TCP建立连接的过程，请求&gt;应答&gt;应答之应答，我们常称为三次握手。也经常会有人问，为什么不是两次？为什么不是四次？
+连接过程 当A发起一个连接请求，会有很多种可能，比如包丢了、超时了、B没有响应等等。A无法确认结果，只能重复发送，即使B收到了，但A不知道，还是可能再发。
+B收到以后，就知道了A的存在，以及A想和它建立连接。B若愿意建立连接的话，就需要发送一个应答包，但它若不能确定这个应答包A收到了，也就不能认为当前的连接以及建立好了。所以两次握手肯定是不行的。
+A接收到应答包之后，对于A来说它的消息有去有回，A可以认为连接是建立的，它再发送应答之应答，到了B之后，B才认为它的消息也是有去有回的，B才能确认连接是建立的。
+初始化序列号 网络的不确定性会导致数据包的丢失、顺序颠倒、重复发送等问题，为了解决这些问题，TCP协议就要求发送方在数据包种加入序列号字段，有了序列号，接收方就可以通过序列号来对数据包去重和排序，发送方就可以在对应的数据包未被ACK时进行重复发送。
+既然序列号的意义如此重要，那么在建立连接的时候就需要把序列号初始化好。A和B双方都需要向对方发送SYN控制消息并携带自己期望的初始化序列号SEQ，对方在收到SYN消息后会回复ACK控制消息以及SEQ&#43;1来进行确认。这个过程可以表示为: 我们需要四条消息才能把序列号初始化好，由于TCP消息头的设计，B向A发送时可以一次性发送SYN和ACK消息，所以基于初始化序列号，我们也是需要三次握手的。
+历史连接 此外，A多次发送建立连接的请求，当网络状况较差时，B只能接受或拒绝A的请求，如果只有两次握手，B并不清楚这一次的请求是不是由于网络阻塞而早已过期的请求。
+TCP在连接时引入了RST消息，当接收方发回给发送方ACK, seq&#43;1时，发送方就可以根据时间来判断这是不是一条过期超时的消息，如果是，发送方就会发RST来中止这一次连接。
+所以，三次握手和RST才能让发送的双方有足够的信息去判断当前的连接是否是错误的或者过期的。
+四次挥手 TCP关闭连接的过程可以用状态时序图表示为: 和建立连接不同，关闭连接需要四步。A作为主动关闭方，先发送FIN，收到B的ACK后，A进入半关闭状态不能再发送传输数据。此时，B进入到了CLOSE_WAIT状态，这个状态是为了让B发送还未传输完的数据，传完之后B才能发出FIN，等到A回的ACK，B关闭连接。
+但此时A进入TIME_WAIT状态，因为它没法知道ACK是否到达B。它等的结果无非是两种，要么B没有收到ACK，那么B就一定会为它的FIN消息进行超时重传，A就需要收到FIN之后再次发送ACK；要么B收到ACK了，那么A就可以关闭了，等待时间至少是B的timeout&#43;FIN的传输时间，为保证可靠，采用了更加保守的等待时间2MSL(Maximum Segment Life)。
+状态机 将建立连接和关闭连接的两个时序图合起来就是著名的TCP状态机： 流量控制 拥塞控制 UDP 包头格式 和TCP相比，UDP具有非常简单的包头格式，可以说除了端口号就没有什么了。它不会去建立连接，只要监听相应的端口号，谁都可以传给他数据，他也可以传给任何人数据，甚至可以同时传给多个人数据。
+与TCP比较 TCP是面向连接的，而UDP是面向无连接的。所谓建立连接，就是为了在客户端和服务端之间维护连接，通过一定的数据结构来维持双方交互的状态，来保证面向连接的特性。
+TCP提供的是可靠交付，通过序号可以保证包不丢失、不重复、按序到达，但UDP是不保证不丢失，也不保证按顺序到达。
+TCP面向字节流，发送的时候发的是一个流，没头没尾。而UDP继承IP包的特性，基于数据报，一个个地发，一个个地收。
+TCP是可以进行拥塞控制的，它会根据网络环境调整自己发送的快慢，而UDP就不会。
+TCP是有状态的，UDP是无状态的。
+使用场景 基于UDP的特点，它适合于这些使用场景:
+ 需要资源少，在网络情况较好的内网或者对于丢包不敏感的应用 无需一对一沟通，建立连接，而是可以广播的应用 需要处理速度快，时延低，可以容忍少数丢包，但要求即便拥塞也一往无前的时候  Socket Socket在Linux中以文件的形式存在，它是一种特殊的文件，是对打开open –&gt; 读写write/read –&gt; 关闭close模式的一个实现。
+在服务端和客户端通信之前，双方都要建立一个Socket，指定是IPv4还是IPv6，是基于数据流SOCK_STREAM的(TCP)还是基于数据报SOCK_DGRAM的(UDP)。
+基于TCP 基于TCP协议的Socket程序函数的调用过程如下图所示:
+服务端先调用bind函数为该socket赋予一个IP地址和端口，有了它就可以调用listen函数进入监听状态，客户端就可以发起连接。
+服务端内核为每个Socket维护了两个队列。一个队列是已经建立了连接的，三次握手已完成，处于ESTABLISHED状态；另一个是还没有完全建立连接的，处于SYN_RCVD状态。
+接着，服务端调用accept函数时，会拿出一个已完成的连接进行处理。如果没有已完成的连接，就要等着。服务端等待的时候，客户端可以通过connect函数发起连接，socket函数中声明要连接的IP地址和端口号，然后发起三次握手，一旦握手成功，服务端的accept函数会返回另一个socket。
+所以，服务端监听用的socket和真正用来传输数据的socket是两个，分别叫做监听Socket和已连接Socket。连接建立成功后，双方开始通过read和write函数读写数据。
+内核中既然socket是一个文件，那就有对应的文件描述符。每个进程中有个task_struct数组，里面指向该进程打开的所有文件，文件描述符可以理解为数组的index。每个文件又会有一个inode，socket对应的inode不像普通文件放在硬盘上，而是在内存中，这个inode指向了socket在内核中的Socket结构:
+这个Socket结构主要是两个队列，发送队列和接收队列，队列里面保存的是缓存sk_buff，每个sk_buff就能看到完整的包的结构。
+基于UDP 由于UDP的过程非常简单，没有建立连接，没有三次握手，只需要绑定IP和端口号。而且无需维护连接状态，服务端也就不需为每对连接建立一组socket，只需要一个socket就能和多个客户端通信，而且每次通信的时候通过调用sendto和recvfrom还能再传入IP地址和端口。
+并发处理 通过之前的基于TCP或UDP的socket函数建立连接之后，需要一个while循环，客户端和服务端不断的接收数据，就构成了一个基本的网络交互程序。但这个程序是一对一的，如何让服务端能服务更多的客户端呢？
+多进程 当建立连接之后，就会有一个已连接的socket，这时候可以fork出一个子进程，把接下来的数据接收的事情交给子进程来做。在Linux内核，子进程会复制文件描述符的列表，以及内存空间，还有当前执行到程序的哪一条语句。之前父进程accept之后创建的已连接socket也是一个文件描述符，就会被子进程获得。子进程通信完毕后，就需要退出，需要父进程通过子进程PID来查看它是否需要退出。"><meta property="og:title" content="网络协议" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/docs/other/protocol/" />
 
 <title>网络协议 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
-
-
-<link rel="stylesheet" href="/book.min.eddc90f1d1267cb826e7cffc53c434e50061c4bfe41146a43670842ce6cb3bf6.css" integrity="sha256-7dyQ8dEmfLgm58/8U8Q05QBhxL/kEUakNnCELObLO/Y=">
-
-
-<script defer src="/cn.search.min.e84213de8510d68758f21b25e561c271477ff56e577b69426cf8f6b5ce7a28b5.js" integrity="sha256-6EIT3oUQ1odY8hsl5WHCcUd/9W5Xe2lCbPj2tc56KLU="></script>
-
+<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
+<script defer src="/cn.search.min.a5a058c7ebcd8173dd2a818abe096fc9fbc2cc95163cb34a9f190773a8468d6c.js" integrity="sha256-paBYx&#43;vNgXPdKoGKvglvyfvCzJUWPLNKnxkHc6hGjWw="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/other/protocol/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -29,10 +58,10 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
   <a href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
   </a>
@@ -40,7 +69,7 @@ https://github.com/alex-shpak/hugo-book
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -49,7 +78,13 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+
+
+  <ul>
 <li><strong>计算机基础</strong>
 <ul>
 <li><a href="/docs/sicp/hardware/">硬件</a></li>
@@ -94,227 +129,43 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
-    <img src="/svg/menu.svg" alt="Menu" />
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>网络协议</strong>
-</header>
 
-      
-<article class="markdown"><h1 id="网络协议">网络协议</h1>
-<h2 id="tcp">TCP</h2>
-<p>TCP是一种可靠的网络协议，很多应用层协议都依赖它。</p>
-<h3 id="包头格式">包头格式</h3>
-<p><img src="./images/tcp_package.png" alt="tcp"></p>
-<p>如图所示，源端口号和目标端口号用来确定发送和接收数据的双方。</p>
-<p>包的序号为了解决包的先后顺序问题，确认序号为了确认发出去的包对方是否已经收到，如果没有收到就会有不断重传机制来确保不会丢包。</p>
-<p>接下来是一些状态位，例如SYN表示发起一个连接，ACK是回复，RST是重新连接，FIN是结束连接等。TCP是面向连接的，因而双方都要维护连接的状态，这些带状态位的包的发送会引起双方状态的变更。</p>
-<p>下面是窗口大小，因为TCP要做流量控制和拥塞控制，通信的双方需要各声明一个窗口来标识自己当前的数据处理能力。</p>
-<h3 id="三次握手">三次握手</h3>
-<p>TCP建立连接的过程，请求&gt;应答&gt;应答之应答，我们常称为三次握手。也经常会有人问，为什么不是两次？为什么不是四次？</p>
-<h4 id="连接过程">连接过程</h4>
-<p>当A发起一个连接请求，会有很多种可能，比如包丢了、超时了、B没有响应等等。A无法确认结果，只能重复发送，即使B收到了，但A不知道，还是可能再发。</p>
-<p>B收到以后，就知道了A的存在，以及A想和它建立连接。B若愿意建立连接的话，就需要发送一个应答包，但它若不能确定这个应答包A收到了，也就不能认为当前的连接以及建立好了。所以两次握手肯定是不行的。</p>
-<p>A接收到应答包之后，对于A来说它的消息有去有回，A可以认为连接是建立的，它再发送应答之应答，到了B之后，B才认为它的消息也是有去有回的，B才能确认连接是建立的。</p>
-<h4 id="初始化序列号">初始化序列号</h4>
-<p>网络的不确定性会导致数据包的丢失、顺序颠倒、重复发送等问题，为了解决这些问题，TCP协议就要求发送方在数据包种加入序列号字段，有了序列号，接收方就可以通过序列号来对数据包去重和排序，发送方就可以在对应的数据包未被ACK时进行重复发送。</p>
-<p>既然序列号的意义如此重要，那么在建立连接的时候就需要把序列号初始化好。A和B双方都需要向对方发送SYN控制消息并携带自己期望的初始化序列号SEQ，对方在收到SYN消息后会回复ACK控制消息以及SEQ+1来进行确认。这个过程可以表示为:
-<img src="./images/3_handshake.png" alt="handshake">
-我们需要四条消息才能把序列号初始化好，由于TCP消息头的设计，B向A发送时可以一次性发送SYN和ACK消息，所以基于初始化序列号，我们也是需要三次握手的。</p>
-<h4 id="历史连接">历史连接</h4>
-<p>此外，A多次发送建立连接的请求，当网络状况较差时，B只能接受或拒绝A的请求，如果只有两次握手，B并不清楚这一次的请求是不是由于网络阻塞而早已过期的请求。</p>
-<p>TCP在连接时引入了RST消息，当接收方发回给发送方<code>ACK, seq+1</code>时，发送方就可以根据时间来判断这是不是一条过期超时的消息，如果是，发送方就会发<code>RST</code>来中止这一次连接。</p>
-<p>所以，三次握手和RST才能让发送的双方有足够的信息去判断当前的连接是否是错误的或者过期的。</p>
-<h3 id="四次挥手">四次挥手</h3>
-<p>TCP关闭连接的过程可以用状态时序图表示为:
-<img src="./images/4_handwave.png" alt="handshake"></p>
-<p>和建立连接不同，关闭连接需要四步。A作为主动关闭方，先发送FIN，收到B的ACK后，A进入半关闭状态不能再发送传输数据。此时，B进入到了CLOSE_WAIT状态，这个状态是为了让B发送还未传输完的数据，传完之后B才能发出FIN，等到A回的ACK，B关闭连接。</p>
-<p>但此时A进入TIME_WAIT状态，因为它没法知道ACK是否到达B。它等的结果无非是两种，要么B没有收到ACK，那么B就一定会为它的FIN消息进行超时重传，A就需要收到FIN之后再次发送ACK；要么B收到ACK了，那么A就可以关闭了，等待时间至少是B的timeout+FIN的传输时间，为保证可靠，采用了更加保守的等待时间2MSL(Maximum Segment Life)。</p>
-<h3 id="状态机">状态机</h3>
-<p>将建立连接和关闭连接的两个时序图合起来就是著名的TCP状态机：
-<img src="./images/tcp_status_machine.png" alt="status"></p>
-<h3 id="流量控制">流量控制</h3>
-<h3 id="拥塞控制">拥塞控制</h3>
-<h2 id="udp">UDP</h2>
-<h3 id="包头格式-1">包头格式</h3>
-<p><img src="./images/udp_package.png" alt="udp"></p>
-<p>和TCP相比，UDP具有非常简单的包头格式，可以说除了端口号就没有什么了。它不会去建立连接，只要监听相应的端口号，谁都可以传给他数据，他也可以传给任何人数据，甚至可以同时传给多个人数据。</p>
-<h3 id="与tcp比较">与TCP比较</h3>
-<p>TCP是面向连接的，而UDP是面向无连接的。所谓建立连接，就是为了在客户端和服务端之间维护连接，通过一定的数据结构来维持双方交互的状态，来保证面向连接的特性。</p>
-<p>TCP提供的是可靠交付，通过序号可以保证包不丢失、不重复、按序到达，但UDP是不保证不丢失，也不保证按顺序到达。</p>
-<p>TCP面向字节流，发送的时候发的是一个流，没头没尾。而UDP继承IP包的特性，基于数据报，一个个地发，一个个地收。</p>
-<p>TCP是可以进行拥塞控制的，它会根据网络环境调整自己发送的快慢，而UDP就不会。</p>
-<p>TCP是有状态的，UDP是无状态的。</p>
-<h3 id="使用场景">使用场景</h3>
-<p>基于UDP的特点，它适合于这些使用场景:</p>
-<ol>
-<li>需要资源少，在网络情况较好的内网或者对于丢包不敏感的应用</li>
-<li>无需一对一沟通，建立连接，而是可以广播的应用</li>
-<li>需要处理速度快，时延低，可以容忍少数丢包，但要求即便拥塞也一往无前的时候</li>
-</ol>
-<h2 id="socket">Socket</h2>
-<p>Socket在Linux中以文件的形式存在，它是一种特殊的文件，是对<code>打开open –&gt; 读写write/read –&gt; 关闭close</code>模式的一个实现。</p>
-<p>在服务端和客户端通信之前，双方都要建立一个Socket，指定是IPv4还是IPv6，是基于数据流SOCK_STREAM的(TCP)还是基于数据报SOCK_DGRAM的(UDP)。</p>
-<h3 id="基于tcp">基于TCP</h3>
-<p>基于TCP协议的Socket程序函数的调用过程如下图所示:</p>
-<p><img src="./images/tcp_socket.png" alt="tcp"></p>
-<p>服务端先调用bind函数为该socket赋予一个IP地址和端口，有了它就可以调用listen函数进入监听状态，客户端就可以发起连接。</p>
-<p>服务端内核为每个Socket维护了两个队列。一个队列是已经建立了连接的，三次握手已完成，处于ESTABLISHED状态；另一个是还没有完全建立连接的，处于SYN_RCVD状态。</p>
-<p>接着，服务端调用accept函数时，会拿出一个已完成的连接进行处理。如果没有已完成的连接，就要等着。服务端等待的时候，客户端可以通过connect函数发起连接，socket函数中声明要连接的IP地址和端口号，然后发起三次握手，一旦握手成功，服务端的accept函数会返回另一个socket。</p>
-<p>所以，服务端监听用的socket和真正用来传输数据的socket是两个，分别叫做监听Socket和已连接Socket。连接建立成功后，双方开始通过read和write函数读写数据。</p>
-<p>内核中既然socket是一个文件，那就有对应的文件描述符。每个进程中有个task_struct数组，里面指向该进程打开的所有文件，文件描述符可以理解为数组的index。每个文件又会有一个inode，socket对应的inode不像普通文件放在硬盘上，而是在内存中，这个inode指向了socket在内核中的Socket结构:</p>
-<p><img src="./images/socket_queue.png" alt="socket"></p>
-<p>这个Socket结构主要是两个队列，发送队列和接收队列，队列里面保存的是缓存sk_buff，每个sk_buff就能看到完整的包的结构。</p>
-<h3 id="基于udp">基于UDP</h3>
-<p>由于UDP的过程非常简单，没有建立连接，没有三次握手，只需要绑定IP和端口号。而且无需维护连接状态，服务端也就不需为每对连接建立一组socket，只需要一个socket就能和多个客户端通信，而且每次通信的时候通过调用sendto和recvfrom还能再传入IP地址和端口。</p>
-<p><img src="./images/udp_socket.png" alt="udp"></p>
-<h3 id="并发处理">并发处理</h3>
-<p>通过之前的基于TCP或UDP的socket函数建立连接之后，需要一个while循环，客户端和服务端不断的接收数据，就构成了一个基本的网络交互程序。但这个程序是一对一的，如何让服务端能服务更多的客户端呢？</p>
-<h4 id="多进程">多进程</h4>
-<p>当建立连接之后，就会有一个已连接的socket，这时候可以fork出一个子进程，把接下来的数据接收的事情交给子进程来做。在Linux内核，子进程会复制文件描述符的列表，以及内存空间，还有当前执行到程序的哪一条语句。之前父进程accept之后创建的已连接socket也是一个文件描述符，就会被子进程获得。子进程通信完毕后，就需要退出，需要父进程通过子进程PID来查看它是否需要退出。</p>
-<h4 id="多线程">多线程</h4>
-<p>每次和一个客户端连接就创建一个进程是很奢侈的事情，相对而言，创建一个线程就要轻量级很多。这些线程共享文件描述符列表、进程空间，也可以通过已连接的socket来处理客户端请求。</p>
-<p>但是一台机器无法创建过多的进程或线程，著名的<a href="https://en.wikipedia.org/wiki/C10k_problem">C10K</a>问题就是指单机操作系统无法维护过多的进程或线程，在早期成为一个瓶颈。为了解决这个问题，就发明了IO多路复用的方式。</p>
-<h4 id="io多路复用select">IO多路复用，select</h4>
-<p>select的方式是有一个线程专门去监控所有的socket，因为socket是文件描述符，所有的socket都可以放在一个叫做fd_set的集合中，然后select函数来监听这个集合是否有变化。一旦有变化，就依次查看每个文件描述符，那些发生变化的文件描述符在fd_set中对应的位会设为1，表示socket可读或可写，从而可以进行读写操作。接着再次调用select函数，进入下一轮变化的监听。</p>
-<p>但是select仍然有个问题，就是当连接过多的时候，每次都通过轮询查看一遍fd_set效率不高。它虽然比多线程效率高很多，但仍然没有完全解决C10K的问题，于是有了epoll的方案。</p>
-<p><a href="https://github.com/hjlarry/practise-py/blob/master/standard_library/Concurrency/Select/select_echo_server.py">示例程序</a></p>
-<h4 id="io多路复用epoll">IO多路复用，epoll</h4>
-<p>epoll通过注册callback函数，当某个文件描述符发生变化的时候，就会主动通知。</p>
-<p>epoll_create会创建一个epoll对象，它也是一个文件，对应一个文件描述符，它里面有一个红黑树，这个红黑树中就保存着要监听的所有socket。当epoll_ctl添加一个socket时，就是把它加入这个红黑树，同时红黑树中的节点指向一个结构，并将这个结构挂在被监听的socket事件列表中。当一个socket发生一个事件的时候，可以从这个列表中得到epoll对象，并调用callback通知它。</p>
-<p>epoll并非在所有情况都比select高效，例如在少于1024个文件描述符监听，且大多数socket都是处于活跃繁忙状态的时候，select会比epoll更高效，因为epoll会有更多次的系统调用，内核态和用户态的切换更为频繁。</p>
-<p><a href="https://github.com/hjlarry/practise-py/blob/master/standard_library/Concurrency/Select/select_poll_echo_server.py">示例程序</a></p>
-<h2 id="http">HTTP</h2>
-<h3 id="请求准备">请求准备</h3>
-<p>当我们输入一个域名，按下回车键时，浏览器会将它发送给DNS服务器，让它解析为IP地址。接着就可以通过三次握手建立TCP连接了。如果是HTTP1.1的协议，它开启了Keep-Alive，这样建立的TCP连接会在多次请求中复用，从而减少了不断建立连接和断开连接的消耗。</p>
-<h3 id="请求构建">请求构建</h3>
-<p>连接建立以后，就开始构建这样格式的请求:</p>
-<p><img src="./images/http_request.png" alt="request"></p>
-<h4 id="请求行">请求行</h4>
-<p>方法常用的有GET、POST、PUT、DELETE、HEAD、OPTIONS等。HEAD和GET请求同一个URL时服务端返回的响应头信息应该相同，只是对于HEAD服务端响应时不返回消息体，常用于测试该URL的有效性、是否有更新等。OPTIONS属于预检请求，常用于确认服务端该资源是否支持跨域以及支持哪些请求方法等。GET和HEAD属于安全的方法，GET、PUT、DELETE、HEAD、OPTIONS都是幂等的。</p>
-<p>URL一般是相对路径。版本一般是<code>HTTP/1.1</code>。</p>
-<h4 id="请求头">请求头</h4>
-<p>请求头都是一行行key-value的字段，比较重要的有：</p>
-<ul>
-<li>Host，HTTP/1.1中的必需字段，服务器的域名和端口号(80可忽略)</li>
-<li>User-Agent，浏览器身份标识字符串</li>
-<li>Content-Type，请求体的MIME类型(POST和PUT请求中)</li>
-<li>Authorization，认证信息</li>
-</ul>
-<h3 id="请求发送">请求发送</h3>
-<p>HTTP协议基于TCP协议，所以它使用面向连接的方式发送请求，通过stream二进制流的方式传给对方。在TCP层，二进制了会变成一个个报文段发送给服务器，发送时要求对方有一个回应的ACK，没有回应就会重新传输直到可达。</p>
-<p>TCP层发送每个报文时都会加上自己的地址和目标的地址，把这两个信息放在IP头里交给IP层传输。IP层查看目标地址是否和自己在一个局域网，如果是，就发送ARP协议来请求目标地址对应的MAC地址，然后将源MAC和目标MAC放入MAC头，发送出去即可；如果不在，就先多一步发送到网关，在通过ARP得到网关的MAC地址，把源MAC和网关MAC放入MAC头发出。</p>
-<p>网关收到包发现MAC符合就取出目标IP地址，根据路由协议找到下一跳的路由器，获取下一跳的路由器MAC并将包发过去。这样一跳一跳最终到达目标的局域网，在这个局域网上发送ARP就可以获得目标地址的MAC，并将包发出去。</p>
-<p>服务器发现MAC地址符合，根据IP头中的协议项知道是TCP协议，然后解析TCP头，根据里面的序号确定是要回ACK还是丢弃掉。TCP头里面有端口号，HTTP进程正在监听，于是服务器最终把包交给这个进程去处理。</p>
-<h3 id="返回构建">返回构建</h3>
-<p>返回也有自己的格式:</p>
-<p><img src="./images/http_response.png" alt="response"></p>
-<p>状态码有五种可能的取值:</p>
-<ul>
-<li>1**，指示信息，表示请求已接收，需请求者继续处理</li>
-<li>2**，成功，操作被重新接收并处理</li>
-<li>3**，重定向，要完成请求必须进行更进一步的操作</li>
-<li>4**，客户端错误，请求语法错误或请求无法实现</li>
-<li>5**，服务端错误，服务器处理请求过程中发生了错误</li>
-</ul>
-<p>响应头重要的字段有:</p>
-<ul>
-<li>Content-Type，响应体的MIME类型</li>
-<li>Content-Length，响应体的长度</li>
-<li>Access-Control-Allow-Origin，指定哪些网站可参与到跨资源共享过程中</li>
-<li>Allow，对于该资源有效的动作(HTTP方法)</li>
-<li>Cache-Control，向从服务器直到客户端在内的所有缓存机制告知，它们是否可以缓存这个对象。如<code>Cache-Control: max-age=3600</code></li>
-<li>Expires，超过该时间则认为此回应已过期</li>
-<li>Last-Modified，所请求的对象最后修改日期</li>
-<li>Location，用于重定向</li>
-<li>Refresh，设定可定时的重定向，例如<code>Refresh: 5; url=http://a.com</code>设定了5秒后跳转至a.com</li>
-<li>Set-Cookie，设置Cookie</li>
-</ul>
-<p>响应构建好之后，也只是把请求发送的过程逆向来发送回去。</p>
-<h3 id="http-20">HTTP 2.0</h3>
-<p>HTTP1.1在应用层是以纯文本的方式通信的，每次通信都要带上HTTP头部，在不考虑<a href="https://zh.wikipedia.org/wiki/HTTP%E7%AE%A1%E7%B7%9A%E5%8C%96">pipeline</a>模式的情况下，每次的过程都是一去一回，这样在实时性和并发性上都有问题。</p>
-<p>为了解决这些问题，HTTP 2.0对HTTP头进行了压缩，将原来每次都要携带的头部key-value在两端都建立了一个索引表，对相同的字段只发送表中的索引即可。</p>
-<p>另外，HTTP 2.0还将一个TCP连接分为若干个流，每个流中可以传输若干消息，每个消息由若干最小的二进制帧组成。常见的帧有Header帧，用于传输Header内容，并且会开启一个新的流；还有Data帧，用来传输正文实体，多个Data帧属于同一个流。</p>
-<p>通过这两种机制，HTTP 2.0的客户端可以将多个请求分到不同的流中，然后将请求内容拆成帧，进行二进制传输。这些帧可以打散乱序发送， 然后根据每个帧首部的流标识符重新组装，并且可以根据优先级，决定优先处理哪个流的数据。例如:</p>
-<p><img src="./images/http2.png" alt="http2"></p>
-<p>HTTP 2.0其实就是将三个请求变成三个流，将数据分成帧，乱序发送到一个TCP连接中。</p>
-<h2 id="https">HTTPS</h2>
-<p>HTTP协议最大的问题就是相当于在互联网上裸奔，任何一个中间人都可以截获客户端和服务端传输的数据包，没有任何隐私可言。HTTPS就是解决这个问题的，怎么解决？只能加密。</p>
-<h3 id="对称加密">对称加密</h3>
-<p>在对称加密算法中，加密和解密使用相同的一个密钥。它的优点是加密解密的效率很高，但是密钥若被窃取存在安全风险。因此，保证数据安全只要去保证双方约定好的密钥没有其他人知道就行了。</p>
-<p>那么新的问题就是，在http这个场景中，怎样让客户端和服务端约定一个密钥而不被中间人知晓？我们会发现，无论怎样设计，除非是线下传输，否则仅靠对称加密没有办法可靠的把密钥发送给对方。</p>
-<h3 id="非对称加密">非对称加密</h3>
-<p>这时候我们想到了可以引入非对称加密的算法，它将密钥分为公钥和私钥。使用公钥加密的数据只能用私钥才能解开，使用私钥加密的数据也只有用公钥才能解开。它的优点是安全性高一些，缺点就是加解密的效率相比于对称加密就要差很多了。</p>
-<p>这时，我们想往服务端传递一段信息，就可以使用服务端提供的公钥加密，这样其他人都解不开，只有服务端自己有私钥才能解开。我们传递的这段信息既然是安全的，就可以让这段信息是一个随机生成的对称加密算法的密钥，这样双方之后的通信都可以基于对称加密对于工作效率的提升就很大了。</p>
-<h3 id="证书">证书</h3>
-<p>这样看起来好像没有问题，但是我们怎样才能获取到服务端的公钥呢？公钥虽然是公开的数据，但我们在通过网络传输获取的过程中，被别人篡改了怎么办？</p>
-<p>这时，只能引入一个新的第三方:CA机构，它作为一个权威机构专门给各个网站颁发证书(Certificate)。</p>
-<p>网站管理员用自己的公钥、域名、有效时长等信息向CA申请制作证书，证书做好以后经由CA机构的私钥进行加密得到一个字符串，网站管理员把这个字符串放在服务端。我们每次访问网站时，服务端把这个字符串给浏览器，浏览器使用CA提供的公钥进行解密，若解密成功就会得到这个证书，证书内又包含有服务端的公钥，就可以按之前说的方式继续通信了。</p>
-<p>问题从如何安全获取服务端的公钥变为如何安全获取CA机构的公钥了，这个就好解决了，我们无法把成千上万个网站的公钥内置在系统中，但可以把有限的几个CA机构的公钥内置进来，所以只要我们用正版的操作系统就好了。</p>
-<p>中间人此时能不能做个假网站，也去CA机构申请一个证书，然后在双方通信的时候用自己的字符串替换掉服务端返回的字符串呢？这样浏览器去CA解密也可以成功，但证书包含了网站的域名，依然是会被浏览器识破的。</p>
-<h3 id="工作过程">工作过程</h3>
-<p>HTTPS可以理解为在HTTP和TCP之间加了一层TLS/SSL，它的工作过程可以用下图表示:</p>
-<p><img src="./images/https.png" alt="https"></p>
-<p>当我们登录一个网站的时候，客户端先发送Client Hello消息到服务端，以明文传输TLS版本信息、加密套件候选列表、压缩算法候选列表等信息，还包括一个随机数，用于之后协商对称密钥。</p>
-<p>服务端收到以后返回Server Hello消息，并附带服务器选择使用的协议版本、加密套件、压缩算法等，同样也会有一个随机数之后协商对称密钥用。然后再发送一个服务端的证书，并附带Server Hello Done表示信息都发完了。</p>
-<p>客户端拿到证书以后就从自己信任的CA仓库中，拿CA里的公钥去解密这个证书，如果能够成功，则说明证书是可信的，那么也就得到了证书中包含的服务端的公钥。接着通过计算产生随机数字Pre-master，发送Client Key Exchange，并用服务端公钥加密发送过去。</p>
-<p>现在，客户端和服务端都有了三个随机数字，分别是自己的、对端的以及刚刚生成的Pre-master。通过它们就可以在服务端和客户端之间生成相同的对称密钥了。</p>
-<p>有了对称密钥，客户端会发送Change Cipher Spec意思是之后可以用该密钥来加密通信了，并附带一条Encrypted Handshake Message发送给服务端用于数据与握手验证。服务端也做类似的事情，之后过程就和HTTP一样了。</p>
-<p>以上是大多数的场景，只需单向认证。在一些特殊场合，有更加严格要求时，也可能启动双向认证，双方互相验证证书。</p>
-<h2 id="rpc">RPC</h2>
-</article>
-
-      <div class="book-footer justify-between">
-  
-
-  
-  
-  <div>
-    
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/d715d1d7f88e80ca225dad07fcf43bb4a4aa5d3e" title='Last modified by hjlarry | March 11, 2020' target="_blank">
-      <img src="/svg/calendar.svg" alt="Calendar" />
-      <span>March 11, 2020</span>
-    </a>
-  </div>
-  
-  
-
-  
-  <div>
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/other/protocol/_index.md" target="_blank">
-      <img src="/svg/edit.svg" alt="Edit" />
-      <span>Edit this page</span>
-    </a>
-  </div>
-  
-
+  <label for="toc-control">
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
 </div>
 
-      
-    </div>
 
-    
   
-
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents">
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
   <ul>
     <li><a href="#tcp">TCP</a>
       <ul>
@@ -360,13 +211,310 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#rpc">RPC</a></li>
   </ul>
 </nav>
-  </aside>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="网络协议">网络协议</h1>
+<h2 id="tcp">TCP</h2>
+<p>TCP是一种可靠的网络协议，很多应用层协议都依赖它。</p>
+<h3 id="包头格式">包头格式</h3>
+<p><img src="./images/tcp_package.png" alt="tcp" /></p>
+<p>如图所示，源端口号和目标端口号用来确定发送和接收数据的双方。</p>
+<p>包的序号为了解决包的先后顺序问题，确认序号为了确认发出去的包对方是否已经收到，如果没有收到就会有不断重传机制来确保不会丢包。</p>
+<p>接下来是一些状态位，例如SYN表示发起一个连接，ACK是回复，RST是重新连接，FIN是结束连接等。TCP是面向连接的，因而双方都要维护连接的状态，这些带状态位的包的发送会引起双方状态的变更。</p>
+<p>下面是窗口大小，因为TCP要做流量控制和拥塞控制，通信的双方需要各声明一个窗口来标识自己当前的数据处理能力。</p>
+<h3 id="三次握手">三次握手</h3>
+<p>TCP建立连接的过程，请求&gt;应答&gt;应答之应答，我们常称为三次握手。也经常会有人问，为什么不是两次？为什么不是四次？</p>
+<h4 id="连接过程">连接过程</h4>
+<p>当A发起一个连接请求，会有很多种可能，比如包丢了、超时了、B没有响应等等。A无法确认结果，只能重复发送，即使B收到了，但A不知道，还是可能再发。</p>
+<p>B收到以后，就知道了A的存在，以及A想和它建立连接。B若愿意建立连接的话，就需要发送一个应答包，但它若不能确定这个应答包A收到了，也就不能认为当前的连接以及建立好了。所以两次握手肯定是不行的。</p>
+<p>A接收到应答包之后，对于A来说它的消息有去有回，A可以认为连接是建立的，它再发送应答之应答，到了B之后，B才认为它的消息也是有去有回的，B才能确认连接是建立的。</p>
+<h4 id="初始化序列号">初始化序列号</h4>
+<p>网络的不确定性会导致数据包的丢失、顺序颠倒、重复发送等问题，为了解决这些问题，TCP协议就要求发送方在数据包种加入序列号字段，有了序列号，接收方就可以通过序列号来对数据包去重和排序，发送方就可以在对应的数据包未被ACK时进行重复发送。</p>
+<p>既然序列号的意义如此重要，那么在建立连接的时候就需要把序列号初始化好。A和B双方都需要向对方发送SYN控制消息并携带自己期望的初始化序列号SEQ，对方在收到SYN消息后会回复ACK控制消息以及SEQ+1来进行确认。这个过程可以表示为:
+<img src="./images/3_handshake.png" alt="handshake" />
+我们需要四条消息才能把序列号初始化好，由于TCP消息头的设计，B向A发送时可以一次性发送SYN和ACK消息，所以基于初始化序列号，我们也是需要三次握手的。</p>
+<h4 id="历史连接">历史连接</h4>
+<p>此外，A多次发送建立连接的请求，当网络状况较差时，B只能接受或拒绝A的请求，如果只有两次握手，B并不清楚这一次的请求是不是由于网络阻塞而早已过期的请求。</p>
+<p>TCP在连接时引入了RST消息，当接收方发回给发送方<code>ACK, seq+1</code>时，发送方就可以根据时间来判断这是不是一条过期超时的消息，如果是，发送方就会发<code>RST</code>来中止这一次连接。</p>
+<p>所以，三次握手和RST才能让发送的双方有足够的信息去判断当前的连接是否是错误的或者过期的。</p>
+<h3 id="四次挥手">四次挥手</h3>
+<p>TCP关闭连接的过程可以用状态时序图表示为:
+<img src="./images/4_handwave.png" alt="handshake" /></p>
+<p>和建立连接不同，关闭连接需要四步。A作为主动关闭方，先发送FIN，收到B的ACK后，A进入半关闭状态不能再发送传输数据。此时，B进入到了CLOSE_WAIT状态，这个状态是为了让B发送还未传输完的数据，传完之后B才能发出FIN，等到A回的ACK，B关闭连接。</p>
+<p>但此时A进入TIME_WAIT状态，因为它没法知道ACK是否到达B。它等的结果无非是两种，要么B没有收到ACK，那么B就一定会为它的FIN消息进行超时重传，A就需要收到FIN之后再次发送ACK；要么B收到ACK了，那么A就可以关闭了，等待时间至少是B的timeout+FIN的传输时间，为保证可靠，采用了更加保守的等待时间2MSL(Maximum Segment Life)。</p>
+<h3 id="状态机">状态机</h3>
+<p>将建立连接和关闭连接的两个时序图合起来就是著名的TCP状态机：
+<img src="./images/tcp_status_machine.png" alt="status" /></p>
+<h3 id="流量控制">流量控制</h3>
+<h3 id="拥塞控制">拥塞控制</h3>
+<h2 id="udp">UDP</h2>
+<h3 id="包头格式-1">包头格式</h3>
+<p><img src="./images/udp_package.png" alt="udp" /></p>
+<p>和TCP相比，UDP具有非常简单的包头格式，可以说除了端口号就没有什么了。它不会去建立连接，只要监听相应的端口号，谁都可以传给他数据，他也可以传给任何人数据，甚至可以同时传给多个人数据。</p>
+<h3 id="与tcp比较">与TCP比较</h3>
+<p>TCP是面向连接的，而UDP是面向无连接的。所谓建立连接，就是为了在客户端和服务端之间维护连接，通过一定的数据结构来维持双方交互的状态，来保证面向连接的特性。</p>
+<p>TCP提供的是可靠交付，通过序号可以保证包不丢失、不重复、按序到达，但UDP是不保证不丢失，也不保证按顺序到达。</p>
+<p>TCP面向字节流，发送的时候发的是一个流，没头没尾。而UDP继承IP包的特性，基于数据报，一个个地发，一个个地收。</p>
+<p>TCP是可以进行拥塞控制的，它会根据网络环境调整自己发送的快慢，而UDP就不会。</p>
+<p>TCP是有状态的，UDP是无状态的。</p>
+<h3 id="使用场景">使用场景</h3>
+<p>基于UDP的特点，它适合于这些使用场景:</p>
+<ol>
+<li>需要资源少，在网络情况较好的内网或者对于丢包不敏感的应用</li>
+<li>无需一对一沟通，建立连接，而是可以广播的应用</li>
+<li>需要处理速度快，时延低，可以容忍少数丢包，但要求即便拥塞也一往无前的时候</li>
+</ol>
+<h2 id="socket">Socket</h2>
+<p>Socket在Linux中以文件的形式存在，它是一种特殊的文件，是对<code>打开open –&gt; 读写write/read –&gt; 关闭close</code>模式的一个实现。</p>
+<p>在服务端和客户端通信之前，双方都要建立一个Socket，指定是IPv4还是IPv6，是基于数据流SOCK_STREAM的(TCP)还是基于数据报SOCK_DGRAM的(UDP)。</p>
+<h3 id="基于tcp">基于TCP</h3>
+<p>基于TCP协议的Socket程序函数的调用过程如下图所示:</p>
+<p><img src="./images/tcp_socket.png" alt="tcp" /></p>
+<p>服务端先调用bind函数为该socket赋予一个IP地址和端口，有了它就可以调用listen函数进入监听状态，客户端就可以发起连接。</p>
+<p>服务端内核为每个Socket维护了两个队列。一个队列是已经建立了连接的，三次握手已完成，处于ESTABLISHED状态；另一个是还没有完全建立连接的，处于SYN_RCVD状态。</p>
+<p>接着，服务端调用accept函数时，会拿出一个已完成的连接进行处理。如果没有已完成的连接，就要等着。服务端等待的时候，客户端可以通过connect函数发起连接，socket函数中声明要连接的IP地址和端口号，然后发起三次握手，一旦握手成功，服务端的accept函数会返回另一个socket。</p>
+<p>所以，服务端监听用的socket和真正用来传输数据的socket是两个，分别叫做监听Socket和已连接Socket。连接建立成功后，双方开始通过read和write函数读写数据。</p>
+<p>内核中既然socket是一个文件，那就有对应的文件描述符。每个进程中有个task_struct数组，里面指向该进程打开的所有文件，文件描述符可以理解为数组的index。每个文件又会有一个inode，socket对应的inode不像普通文件放在硬盘上，而是在内存中，这个inode指向了socket在内核中的Socket结构:</p>
+<p><img src="./images/socket_queue.png" alt="socket" /></p>
+<p>这个Socket结构主要是两个队列，发送队列和接收队列，队列里面保存的是缓存sk_buff，每个sk_buff就能看到完整的包的结构。</p>
+<h3 id="基于udp">基于UDP</h3>
+<p>由于UDP的过程非常简单，没有建立连接，没有三次握手，只需要绑定IP和端口号。而且无需维护连接状态，服务端也就不需为每对连接建立一组socket，只需要一个socket就能和多个客户端通信，而且每次通信的时候通过调用sendto和recvfrom还能再传入IP地址和端口。</p>
+<p><img src="./images/udp_socket.png" alt="udp" /></p>
+<h3 id="并发处理">并发处理</h3>
+<p>通过之前的基于TCP或UDP的socket函数建立连接之后，需要一个while循环，客户端和服务端不断的接收数据，就构成了一个基本的网络交互程序。但这个程序是一对一的，如何让服务端能服务更多的客户端呢？</p>
+<h4 id="多进程">多进程</h4>
+<p>当建立连接之后，就会有一个已连接的socket，这时候可以fork出一个子进程，把接下来的数据接收的事情交给子进程来做。在Linux内核，子进程会复制文件描述符的列表，以及内存空间，还有当前执行到程序的哪一条语句。之前父进程accept之后创建的已连接socket也是一个文件描述符，就会被子进程获得。子进程通信完毕后，就需要退出，需要父进程通过子进程PID来查看它是否需要退出。</p>
+<h4 id="多线程">多线程</h4>
+<p>每次和一个客户端连接就创建一个进程是很奢侈的事情，相对而言，创建一个线程就要轻量级很多。这些线程共享文件描述符列表、进程空间，也可以通过已连接的socket来处理客户端请求。</p>
+<p>但是一台机器无法创建过多的进程或线程，著名的<a href="https://en.wikipedia.org/wiki/C10k_problem">C10K</a>问题就是指单机操作系统无法维护过多的进程或线程，在早期成为一个瓶颈。为了解决这个问题，就发明了IO多路复用的方式。</p>
+<h4 id="io多路复用select">IO多路复用，select</h4>
+<p>select的方式是有一个线程专门去监控所有的socket，因为socket是文件描述符，所有的socket都可以放在一个叫做fd_set的集合中，然后select函数来监听这个集合是否有变化。一旦有变化，就依次查看每个文件描述符，那些发生变化的文件描述符在fd_set中对应的位会设为1，表示socket可读或可写，从而可以进行读写操作。接着再次调用select函数，进入下一轮变化的监听。</p>
+<p>但是select仍然有个问题，就是当连接过多的时候，每次都通过轮询查看一遍fd_set效率不高。它虽然比多线程效率高很多，但仍然没有完全解决C10K的问题，于是有了epoll的方案。</p>
+<p><a href="https://github.com/hjlarry/practise-py/blob/master/standard_library/Concurrency/Select/select_echo_server.py">示例程序</a></p>
+<h4 id="io多路复用epoll">IO多路复用，epoll</h4>
+<p>epoll通过注册callback函数，当某个文件描述符发生变化的时候，就会主动通知。</p>
+<p>epoll_create会创建一个epoll对象，它也是一个文件，对应一个文件描述符，它里面有一个红黑树，这个红黑树中就保存着要监听的所有socket。当epoll_ctl添加一个socket时，就是把它加入这个红黑树，同时红黑树中的节点指向一个结构，并将这个结构挂在被监听的socket事件列表中。当一个socket发生一个事件的时候，可以从这个列表中得到epoll对象，并调用callback通知它。</p>
+<p>epoll并非在所有情况都比select高效，例如在少于1024个文件描述符监听，且大多数socket都是处于活跃繁忙状态的时候，select会比epoll更高效，因为epoll会有更多次的系统调用，内核态和用户态的切换更为频繁。</p>
+<p><a href="https://github.com/hjlarry/practise-py/blob/master/standard_library/Concurrency/Select/select_poll_echo_server.py">示例程序</a></p>
+<h2 id="http">HTTP</h2>
+<h3 id="请求准备">请求准备</h3>
+<p>当我们输入一个域名，按下回车键时，浏览器会将它发送给DNS服务器，让它解析为IP地址。接着就可以通过三次握手建立TCP连接了。如果是HTTP1.1的协议，它开启了Keep-Alive，这样建立的TCP连接会在多次请求中复用，从而减少了不断建立连接和断开连接的消耗。</p>
+<h3 id="请求构建">请求构建</h3>
+<p>连接建立以后，就开始构建这样格式的请求:</p>
+<p><img src="./images/http_request.png" alt="request" /></p>
+<h4 id="请求行">请求行</h4>
+<p>方法常用的有GET、POST、PUT、DELETE、HEAD、OPTIONS等。HEAD和GET请求同一个URL时服务端返回的响应头信息应该相同，只是对于HEAD服务端响应时不返回消息体，常用于测试该URL的有效性、是否有更新等。OPTIONS属于预检请求，常用于确认服务端该资源是否支持跨域以及支持哪些请求方法等。GET和HEAD属于安全的方法，GET、PUT、DELETE、HEAD、OPTIONS都是幂等的。</p>
+<p>URL一般是相对路径。版本一般是<code>HTTP/1.1</code>。</p>
+<h4 id="请求头">请求头</h4>
+<p>请求头都是一行行key-value的字段，比较重要的有：</p>
+<ul>
+<li>Host，HTTP/1.1中的必需字段，服务器的域名和端口号(80可忽略)</li>
+<li>User-Agent，浏览器身份标识字符串</li>
+<li>Content-Type，请求体的MIME类型(POST和PUT请求中)</li>
+<li>Authorization，认证信息</li>
+</ul>
+<h3 id="请求发送">请求发送</h3>
+<p>HTTP协议基于TCP协议，所以它使用面向连接的方式发送请求，通过stream二进制流的方式传给对方。在TCP层，二进制了会变成一个个报文段发送给服务器，发送时要求对方有一个回应的ACK，没有回应就会重新传输直到可达。</p>
+<p>TCP层发送每个报文时都会加上自己的地址和目标的地址，把这两个信息放在IP头里交给IP层传输。IP层查看目标地址是否和自己在一个局域网，如果是，就发送ARP协议来请求目标地址对应的MAC地址，然后将源MAC和目标MAC放入MAC头，发送出去即可；如果不在，就先多一步发送到网关，在通过ARP得到网关的MAC地址，把源MAC和网关MAC放入MAC头发出。</p>
+<p>网关收到包发现MAC符合就取出目标IP地址，根据路由协议找到下一跳的路由器，获取下一跳的路由器MAC并将包发过去。这样一跳一跳最终到达目标的局域网，在这个局域网上发送ARP就可以获得目标地址的MAC，并将包发出去。</p>
+<p>服务器发现MAC地址符合，根据IP头中的协议项知道是TCP协议，然后解析TCP头，根据里面的序号确定是要回ACK还是丢弃掉。TCP头里面有端口号，HTTP进程正在监听，于是服务器最终把包交给这个进程去处理。</p>
+<h3 id="返回构建">返回构建</h3>
+<p>返回也有自己的格式:</p>
+<p><img src="./images/http_response.png" alt="response" /></p>
+<p>状态码有五种可能的取值:</p>
+<ul>
+<li>1**，指示信息，表示请求已接收，需请求者继续处理</li>
+<li>2**，成功，操作被重新接收并处理</li>
+<li>3**，重定向，要完成请求必须进行更进一步的操作</li>
+<li>4**，客户端错误，请求语法错误或请求无法实现</li>
+<li>5**，服务端错误，服务器处理请求过程中发生了错误</li>
+</ul>
+<p>响应头重要的字段有:</p>
+<ul>
+<li>Content-Type，响应体的MIME类型</li>
+<li>Content-Length，响应体的长度</li>
+<li>Access-Control-Allow-Origin，指定哪些网站可参与到跨资源共享过程中</li>
+<li>Allow，对于该资源有效的动作(HTTP方法)</li>
+<li>Cache-Control，向从服务器直到客户端在内的所有缓存机制告知，它们是否可以缓存这个对象。如<code>Cache-Control: max-age=3600</code></li>
+<li>Expires，超过该时间则认为此回应已过期</li>
+<li>Last-Modified，所请求的对象最后修改日期</li>
+<li>Location，用于重定向</li>
+<li>Refresh，设定可定时的重定向，例如<code>Refresh: 5; url=http://a.com</code>设定了5秒后跳转至a.com</li>
+<li>Set-Cookie，设置Cookie</li>
+</ul>
+<p>响应构建好之后，也只是把请求发送的过程逆向来发送回去。</p>
+<h3 id="http-20">HTTP 2.0</h3>
+<p>HTTP1.1在应用层是以纯文本的方式通信的，每次通信都要带上HTTP头部，在不考虑<a href="https://zh.wikipedia.org/wiki/HTTP%E7%AE%A1%E7%B7%9A%E5%8C%96">pipeline</a>模式的情况下，每次的过程都是一去一回，这样在实时性和并发性上都有问题。</p>
+<p>为了解决这些问题，HTTP 2.0对HTTP头进行了压缩，将原来每次都要携带的头部key-value在两端都建立了一个索引表，对相同的字段只发送表中的索引即可。</p>
+<p>另外，HTTP 2.0还将一个TCP连接分为若干个流，每个流中可以传输若干消息，每个消息由若干最小的二进制帧组成。常见的帧有Header帧，用于传输Header内容，并且会开启一个新的流；还有Data帧，用来传输正文实体，多个Data帧属于同一个流。</p>
+<p>通过这两种机制，HTTP 2.0的客户端可以将多个请求分到不同的流中，然后将请求内容拆成帧，进行二进制传输。这些帧可以打散乱序发送， 然后根据每个帧首部的流标识符重新组装，并且可以根据优先级，决定优先处理哪个流的数据。例如:</p>
+<p><img src="./images/http2.png" alt="http2" /></p>
+<p>HTTP 2.0其实就是将三个请求变成三个流，将数据分成帧，乱序发送到一个TCP连接中。</p>
+<h2 id="https">HTTPS</h2>
+<p>HTTP协议最大的问题就是相当于在互联网上裸奔，任何一个中间人都可以截获客户端和服务端传输的数据包，没有任何隐私可言。HTTPS就是解决这个问题的，怎么解决？只能加密。</p>
+<h3 id="对称加密">对称加密</h3>
+<p>在对称加密算法中，加密和解密使用相同的一个密钥。它的优点是加密解密的效率很高，但是密钥若被窃取存在安全风险。因此，保证数据安全只要去保证双方约定好的密钥没有其他人知道就行了。</p>
+<p>那么新的问题就是，在http这个场景中，怎样让客户端和服务端约定一个密钥而不被中间人知晓？我们会发现，无论怎样设计，除非是线下传输，否则仅靠对称加密没有办法可靠的把密钥发送给对方。</p>
+<h3 id="非对称加密">非对称加密</h3>
+<p>这时候我们想到了可以引入非对称加密的算法，它将密钥分为公钥和私钥。使用公钥加密的数据只能用私钥才能解开，使用私钥加密的数据也只有用公钥才能解开。它的优点是安全性高一些，缺点就是加解密的效率相比于对称加密就要差很多了。</p>
+<p>这时，我们想往服务端传递一段信息，就可以使用服务端提供的公钥加密，这样其他人都解不开，只有服务端自己有私钥才能解开。我们传递的这段信息既然是安全的，就可以让这段信息是一个随机生成的对称加密算法的密钥，这样双方之后的通信都可以基于对称加密对于工作效率的提升就很大了。</p>
+<h3 id="证书">证书</h3>
+<p>这样看起来好像没有问题，但是我们怎样才能获取到服务端的公钥呢？公钥虽然是公开的数据，但我们在通过网络传输获取的过程中，被别人篡改了怎么办？</p>
+<p>这时，只能引入一个新的第三方:CA机构，它作为一个权威机构专门给各个网站颁发证书(Certificate)。</p>
+<p>网站管理员用自己的公钥、域名、有效时长等信息向CA申请制作证书，证书做好以后经由CA机构的私钥进行加密得到一个字符串，网站管理员把这个字符串放在服务端。我们每次访问网站时，服务端把这个字符串给浏览器，浏览器使用CA提供的公钥进行解密，若解密成功就会得到这个证书，证书内又包含有服务端的公钥，就可以按之前说的方式继续通信了。</p>
+<p>问题从如何安全获取服务端的公钥变为如何安全获取CA机构的公钥了，这个就好解决了，我们无法把成千上万个网站的公钥内置在系统中，但可以把有限的几个CA机构的公钥内置进来，所以只要我们用正版的操作系统就好了。</p>
+<p>中间人此时能不能做个假网站，也去CA机构申请一个证书，然后在双方通信的时候用自己的字符串替换掉服务端返回的字符串呢？这样浏览器去CA解密也可以成功，但证书包含了网站的域名，依然是会被浏览器识破的。</p>
+<h3 id="工作过程">工作过程</h3>
+<p>HTTPS可以理解为在HTTP和TCP之间加了一层TLS/SSL，它的工作过程可以用下图表示:</p>
+<p><img src="./images/https.png" alt="https" /></p>
+<p>当我们登录一个网站的时候，客户端先发送Client Hello消息到服务端，以明文传输TLS版本信息、加密套件候选列表、压缩算法候选列表等信息，还包括一个随机数，用于之后协商对称密钥。</p>
+<p>服务端收到以后返回Server Hello消息，并附带服务器选择使用的协议版本、加密套件、压缩算法等，同样也会有一个随机数之后协商对称密钥用。然后再发送一个服务端的证书，并附带Server Hello Done表示信息都发完了。</p>
+<p>客户端拿到证书以后就从自己信任的CA仓库中，拿CA里的公钥去解密这个证书，如果能够成功，则说明证书是可信的，那么也就得到了证书中包含的服务端的公钥。接着通过计算产生随机数字Pre-master，发送Client Key Exchange，并用服务端公钥加密发送过去。</p>
+<p>现在，客户端和服务端都有了三个随机数字，分别是自己的、对端的以及刚刚生成的Pre-master。通过它们就可以在服务端和客户端之间生成相同的对称密钥了。</p>
+<p>有了对称密钥，客户端会发送Change Cipher Spec意思是之后可以用该密钥来加密通信了，并附带一条Encrypted Handshake Message发送给服务端用于数据与握手验证。服务端也做类似的事情，之后过程就和HTTP一样了。</p>
+<p>以上是大多数的场景，只需单向认证。在一些特殊场合，有更加严格要求时，也可能启动双向认证，双方互相验证证书。</p>
+<h2 id="rpc">RPC</h2>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
 
 
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/d715d1d7f88e80ca225dad07fcf43bb4a4aa5d3e" title='最后修改者 hjlarry | March 11, 2020' target="_blank" rel="noopener">
+      <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>March 11, 2020</span>
+    </a>
+  </div>
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/other/protocol/_index.md" target="_blank" rel="noopener">
+      <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>编辑本页</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        <br>
+<div style="text-align: center;font-size:xx-small;">
+    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
+</div>
+      </footer>
+
+      
+  
+  <div class="book-comments">
+<div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hjlarry" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#tcp">TCP</a>
+      <ul>
+        <li><a href="#包头格式">包头格式</a></li>
+        <li><a href="#三次握手">三次握手</a></li>
+        <li><a href="#四次挥手">四次挥手</a></li>
+        <li><a href="#状态机">状态机</a></li>
+        <li><a href="#流量控制">流量控制</a></li>
+        <li><a href="#拥塞控制">拥塞控制</a></li>
+      </ul>
+    </li>
+    <li><a href="#udp">UDP</a>
+      <ul>
+        <li><a href="#包头格式-1">包头格式</a></li>
+        <li><a href="#与tcp比较">与TCP比较</a></li>
+        <li><a href="#使用场景">使用场景</a></li>
+      </ul>
+    </li>
+    <li><a href="#socket">Socket</a>
+      <ul>
+        <li><a href="#基于tcp">基于TCP</a></li>
+        <li><a href="#基于udp">基于UDP</a></li>
+        <li><a href="#并发处理">并发处理</a></li>
+      </ul>
+    </li>
+    <li><a href="#http">HTTP</a>
+      <ul>
+        <li><a href="#请求准备">请求准备</a></li>
+        <li><a href="#请求构建">请求构建</a></li>
+        <li><a href="#请求发送">请求发送</a></li>
+        <li><a href="#返回构建">返回构建</a></li>
+        <li><a href="#http-20">HTTP 2.0</a></li>
+      </ul>
+    </li>
+    <li><a href="#https">HTTPS</a>
+      <ul>
+        <li><a href="#对称加密">对称加密</a></li>
+        <li><a href="#非对称加密">非对称加密</a></li>
+        <li><a href="#证书">证书</a></li>
+        <li><a href="#工作过程">工作过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#rpc">RPC</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
