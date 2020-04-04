@@ -102,5 +102,61 @@ sys
 {{< /highlight >}}
 
 ### 历史
+通过`%history -n`可用查看在ipython中全部输入的历史，也可以通过`_i`查看上一个，`_ii`和`_iii`查看上两个和三个，`_i<n>`查看上n个:
+{{< highlight sh>}}
+In [6]: _i2
+Out[6]: '?sys.get*'
+
+In [7]: %history -n
+   1: import sys
+   2: ?sys.get*
+   3: ?sys.get*of
+   4: ?s *
+   5: ?s*
+   6: _i2
+   7: %history -n
+
+In [8]: _i, _ii, _iii
+Out[8]: ('%history -n', '_i2', '?s*')
+{{< /highlight >}}
+
+还可以把历史命令中的某些行编写为一个宏，通过宏可以重复调用，下例中把第9至第10行、外加第12行编写入了一个宏:
+{{< highlight sh>}}
+In [9]: x,y=1,2
+
+In [10]: print(x+y)
+3
+
+In [11]: y=10
+
+In [12]: print(x+y)
+11
+
+In [13]: %macro tes 9-10 12
+Macro `tes` created. To execute, type its name (without quotes).
+=== Macro contents: ===
+x,y=1,2
+print(x+y)
+print(x+y)
+
+In [14]: tes
+3
+3
+{{< /highlight >}}
+
+还可以使用`%save`把宏或者某些行保存在一个文件中:
+{{< highlight sh>}}
+In [15]: %save test.py tes
+The following commands were written to file `test.py`:
+x,y=1,2
+print(x+y)
+print(x+y)
+
+In [16]: %save test.py 9-10
+File `test.py` exists. Overwrite (y/[N])?  y
+The following commands were written to file `test.py`:
+x,y=1,2
+print(x+y)
+{{< /highlight >}}
 
 ### 命令
