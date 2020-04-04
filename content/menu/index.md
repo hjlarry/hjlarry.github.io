@@ -26,4 +26,4 @@ bookMenuLevels: 1
   - [git]({{< relref "/docs/other/git" >}})
   - [docker]({{< relref "/docs/other/docker" >}})
   - [网络协议]({{< relref "/docs/other/protocol" >}})
-  - [基础系统工具]({{< relref "/docs/other/tools" >}})
+  - [系统工具]({{< relref "/docs/other/tools" >}})

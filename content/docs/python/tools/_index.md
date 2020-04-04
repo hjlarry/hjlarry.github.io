@@ -22,7 +22,7 @@ Available line magics:
 Available cell magics:
 %%!  %%HTML  %%SVG  %%bash  %%capture  %%debug  %%file  %%html  %%javascript  %%js  %%latex  %%markdown  %%perl  %%prun  %%pypy  %%python  %%python2  %%python3  %%ruby  %%script  %%sh  %%svg  %%sx  %%system  %%time  %%timeit  %%writefile
 {{< /highlight >}}
-接着可通过给某个魔法函数前加问号的方式例如`?alias`来查看它的具体使用方法。
+接着可通过给某个魔法函数前加问号的方式例如`?alias`来查看它的具体使用方法。单个`%`表示执行当前行的内容，`%%`用于支持把多行内容作用于该魔法函数。
 
 ### 自省
 在ipython中，通常使用`?<object>`的方式查看一个对象是什么，当输入某个对象后可以按下tab键查看其成员，通过`%pdoc`可查看其docstring，`%psource`可查看某个目标对象的源码(如果对象是module，需要用`%pfile`)，`%who`和`%whos`查看当前环境中的对象列表。
@@ -160,3 +160,24 @@ print(x+y)
 {{< /highlight >}}
 
 ### 命令
+可以通过`!`执行shell中的命令，命令执行结果可以直接赋值给python变量，也可以将python变量传入shell:
+{{< highlight sh>}}
+In [26]: !ls
+6.824        basic                 dump.rdb         get-pip.py         my_git       test.py
+MIT-6.824    cliu8siteprivate.key  fastapi-vue-cms  helloworld.key     practise-go
+__pycache__  demo.py               flask-shop       hjlarry.github.io  practise-py
+
+In [27]: a = !ls
+
+In [28]: a
+Out[28]:
+['6.824',
+ 'MIT-6.824',
+ '__pycache__',
+ ...]
+
+In [31]: x=100
+
+In [32]: !echo "python.x={x+20}"
+python.x=120
+{{< /highlight >}}
