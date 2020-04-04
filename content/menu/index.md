@@ -18,6 +18,7 @@ bookMenuLevels: 1
 - **Python语言**
   - [描述符]({{< relref "/docs/python/descriptor" >}})
   - [解释器]({{< relref "/docs/python/interpreter" >}})
+  - [技巧工具]({{< relref "/docs/python/tools" >}})
 - **Mysql**
   - [查询]({{< relref "/docs/mysql/query" >}})
   - [原理]({{< relref "/docs/mysql/theory" >}})
