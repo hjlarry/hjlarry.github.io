@@ -66,6 +66,40 @@ demo       module    <module 'demo' from '/home/hejl/demo.py'>
 {{< /highlight >}}
 
 ### 搜索
+ipython支持搜索可用的函数，以及当前环境下的对象:
+{{< highlight sh>}}
+In [1]: import sys
+
+In [2]: ?sys.get*
+sys.get_asyncgen_hooks
+sys.get_coroutine_wrapper
+sys.getallocatedblocks
+sys.getcheckinterval
+sys.getdefaultencoding
+sys.getdlopenflags
+sys.getfilesystemencodeerrors
+sys.getfilesystemencoding
+sys.getprofile
+sys.getrecursionlimit
+sys.getrefcount
+sys.getsizeof
+sys.getswitchinterval
+sys.gettrace
+
+In [3]: ?sys.get*of
+sys.getsizeof
+
+In [4]: ?s*
+set
+setattr
+slice
+sorted
+staticmethod
+str
+sum
+super
+sys
+{{< /highlight >}}
 
 ### 历史
 
