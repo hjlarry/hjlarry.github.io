@@ -3,16 +3,6 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/docs/sicp/hardware/</loc>
-    <lastmod>2019-12-23T15:22:19+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/docs/sicp/software/</loc>
-    <lastmod>2020-01-13T16:50:13+08:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/docs/go/lock/</loc>
     <lastmod>2019-12-23T15:22:19+08:00</lastmod>
   </url>
@@ -105,8 +95,18 @@
   </url>
   
   <url>
+    <loc>/docs/sicp/hardware/</loc>
+    <lastmod>2020-04-20T14:36:07+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/docs/other/protocol/</loc>
     <lastmod>2020-04-04T17:51:43+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/docs/sicp/software/</loc>
+    <lastmod>2020-01-13T16:50:13+08:00</lastmod>
   </url>
   
   <url>
