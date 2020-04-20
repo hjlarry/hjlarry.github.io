@@ -67,7 +67,7 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2020-01-14T10:44:26+08:00</lastmod>
+    <lastmod>2020-04-04T23:30:08+08:00</lastmod>
   </url>
   
   <url>
@@ -78,6 +78,11 @@
   <url>
     <loc>/docs/mysql/query/</loc>
     <lastmod>2019-12-23T15:22:19+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/docs/python/tools/</loc>
+    <lastmod>2020-04-04T23:30:08+08:00</lastmod>
   </url>
   
   <url>
@@ -101,7 +106,7 @@
   
   <url>
     <loc>/docs/other/protocol/</loc>
-    <lastmod>2020-03-11T15:09:58+08:00</lastmod>
+    <lastmod>2020-04-04T17:51:43+08:00</lastmod>
   </url>
   
   <url>

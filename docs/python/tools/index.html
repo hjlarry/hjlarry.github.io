@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="cn">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Python常用工具 IPython 通过%quickref可以查看功能导览，通过%lsmagic可以列出ipython中支持的魔法函数: In [9]: %lsmagic Out[9]: Available line magics: %alias %alias_magic %autoawait %autocall %autoindent %automagic %bookmark %cat %cd %clear %colors %conda %config %cp %cpaste %debug %dhist %dirs %doctest_mode %ed %edit %env %gui %hist %history %killbgscripts %ldir %less %lf %lk %ll %load %load_ext %loadpy %logoff %logon %logstart %logstate %logstop %ls %lsmagic %lx %macro %magic %man %matplotlib %mkdir %more %mv %notebook %page %paste %pastebin %pdb %pdef %pdoc %pfile %pinfo %pinfo2 %pip %popd %pprint %precision %prun %psearch %psource %pushd %pwd %pycat %pylab %quickref %recall %rehashx %reload_ext %rep %rerun %reset %reset_selective %rm %rmdir %run %save %sc %set_env %store %sx %system %tb %time %timeit %unalias %unload_ext %who %who_ls %whos %xdel %xmode Available cell magics: %%!"><meta property="og:title" content="Python常用工具" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="/docs/python/tools/" />
+
+<title>Python常用工具 | Home</title>
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
+<script defer src="/cn.search.min.08ce20144b9b8fed9274d46bd002df62ab170ea86206f8e2e1d7b9f2f083d17f.js" integrity="sha256-CM4gFEubj&#43;2SdNRr0ALfYqsXDqhiBvji4de58vCD0X8="></script>
+<link rel="alternate" type="application/rss+xml" href="/docs/python/tools/index.xml" title="Home" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><strong>计算机基础</strong>
+<ul>
+<li><a href="/docs/sicp/hardware/">硬件</a></li>
+<li><a href="/docs/sicp/software/">软件</a></li>
+<li><a href="/docs/sicp/asm/">汇编</a></li>
+</ul>
+</li>
+<li><strong>GO语言</strong>
+<ul>
+<li><a href="/docs/go/map/">字典</a></li>
+<li><a href="/docs/go/closure/">闭包</a></li>
+<li><a href="/docs/go/defer/">延迟调用</a></li>
+<li><a href="/docs/go/gc/">垃圾回收</a></li>
+<li><a href="/docs/go/alloc/">内存分配</a></li>
+<li><a href="/docs/go/goroutine/">并发调度</a></li>
+<li><a href="/docs/go/lock/">锁</a></li>
+</ul>
+</li>
+<li><strong>Python语言</strong>
+<ul>
+<li><a href="/docs/python/descriptor/">描述符</a></li>
+<li><a href="/docs/python/interpreter/">解释器</a></li>
+<li><a href="/docs/python/tools/"class=active>技巧工具</a></li>
+</ul>
+</li>
+<li><strong>Mysql</strong>
+<ul>
+<li><a href="/docs/mysql/query/">查询</a></li>
+<li><a href="/docs/mysql/theory/">原理</a></li>
+</ul>
+</li>
+<li><strong>其他</strong>
+<ul>
+<li><a href="/docs/other/git/">git</a></li>
+<li><a href="/docs/other/docker/">docker</a></li>
+<li><a href="/docs/other/protocol/">网络协议</a></li>
+<li><a href="/docs/other/tools/">系统工具</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Python常用工具</strong>
+
+  <label for="toc-control">
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#ipython">IPython</a>
+      <ul>
+        <li><a href="#自省">自省</a></li>
+        <li><a href="#搜索">搜索</a></li>
+        <li><a href="#历史">历史</a></li>
+        <li><a href="#命令">命令</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="python常用工具">Python常用工具</h1>
+<h2 id="ipython">IPython</h2>
+<p>通过<code>%quickref</code>可以查看功能导览，通过<code>%lsmagic</code>可以列出ipython中支持的魔法函数:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>9<span style="color:#f92672">]</span>: %lsmagic
+Out<span style="color:#f92672">[</span>9<span style="color:#f92672">]</span>:
+Available line magics:
+%alias  %alias_magic  %autoawait  %autocall  %autoindent  %automagic  %bookmark  %cat  %cd  %clear
+%colors  %conda  %config  %cp  %cpaste  %debug  %dhist  %dirs  %doctest_mode  %ed  %edit  %env  %gui  %hist  %history  %killbgscripts  %ldir  %less  %lf  %lk  %ll  %load  %load_ext  %loadpy  %logoff
+%logon  %logstart  %logstate  %logstop  %ls  %lsmagic  %lx  %macro  %magic  %man  %matplotlib  %mkdir  %more  %mv  %notebook  %page  %paste  %pastebin  %pdb  %pdef  %pdoc  %pfile  %pinfo  %pinfo2  %pip  %popd  %pprint  %precision  %prun  %psearch  %psource  %pushd  %pwd  %pycat  %pylab  %quickref  %recall  %rehashx  %reload_ext  %rep  %rerun  %reset  %reset_selective  %rm  %rmdir  %run  %save  %sc  %set_env  %store  %sx  %system  %tb  %time  %timeit  %unalias  %unload_ext  %who  %who_ls  %whos
+%xdel  %xmode
+
+Available cell magics:
+%%!  %%HTML  %%SVG  %%bash  %%capture  %%debug  %%file  %%html  %%javascript  %%js  %%latex  %%markdown  %%perl  %%prun  %%pypy  %%python  %%python2  %%python3  %%ruby  %%script  %%sh  %%svg  %%sx  %%system  %%time  %%timeit  %%writefile</code></pre></div>
+接着可通过给某个魔法函数前加问号的方式例如<code>?alias</code>来查看它的具体使用方法。单个<code>%</code>表示执行当前行的内容，<code>%%</code>用于支持把多行内容作用于该魔法函数。</p>
+<h3 id="自省">自省</h3>
+<p>在ipython中，通常使用<code>?&lt;object&gt;</code>的方式查看一个对象是什么，当输入某个对象后可以按下tab键查看其成员，通过<code>%pdoc</code>可查看其docstring，<code>%psource</code>可查看某个目标对象的源码(如果对象是module，需要用<code>%pfile</code>)，<code>%who</code>和<code>%whos</code>查看当前环境中的对象列表。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>1<span style="color:#f92672">]</span>: import demo
+
+In <span style="color:#f92672">[</span>2<span style="color:#f92672">]</span>: ?demo
+Type:        module
+String form: &lt;module <span style="color:#e6db74">&#39;demo&#39;</span> from <span style="color:#e6db74">&#39;/home/hejl/demo.py&#39;</span>&gt;
+File:        ~/demo.py
+Docstring:   test <span style="color:#66d9ef">for</span> doc module
+
+In <span style="color:#f92672">[</span>3<span style="color:#f92672">]</span>: %pdoc demo
+Class docstring:
+    test <span style="color:#66d9ef">for</span> doc module
+
+In <span style="color:#f92672">[</span>4<span style="color:#f92672">]</span>: %psource demo.b
+def b<span style="color:#f92672">()</span>:
+    print<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;helloworld!&#34;</span><span style="color:#f92672">)</span>
+
+In <span style="color:#f92672">[</span>5<span style="color:#f92672">]</span>: %pfile demo
+<span style="color:#e6db74">&#34;&#34;&#34;
+</span><span style="color:#e6db74">test for doc module
+</span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+
+a <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+
+def b<span style="color:#f92672">()</span>:
+    print<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;helloworld!&#34;</span><span style="color:#f92672">)</span>
+
+In <span style="color:#f92672">[</span>6<span style="color:#f92672">]</span>: c <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+
+In <span style="color:#f92672">[</span>7<span style="color:#f92672">]</span>: %who
+c        demo
+
+In <span style="color:#f92672">[</span>8<span style="color:#f92672">]</span>: %whos
+Variable   Type      Data/Info
+------------------------------
+c          int       <span style="color:#ae81ff">2</span>
+demo       module    &lt;module <span style="color:#e6db74">&#39;demo&#39;</span> from <span style="color:#e6db74">&#39;/home/hejl/demo.py&#39;</span>&gt;</code></pre></div></p>
+<h3 id="搜索">搜索</h3>
+<p>ipython支持搜索可用的函数，以及当前环境下的对象:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>1<span style="color:#f92672">]</span>: import sys
+
+In <span style="color:#f92672">[</span>2<span style="color:#f92672">]</span>: ?sys.get*
+sys.get_asyncgen_hooks
+sys.get_coroutine_wrapper
+sys.getallocatedblocks
+sys.getcheckinterval
+sys.getdefaultencoding
+sys.getdlopenflags
+sys.getfilesystemencodeerrors
+sys.getfilesystemencoding
+sys.getprofile
+sys.getrecursionlimit
+sys.getrefcount
+sys.getsizeof
+sys.getswitchinterval
+sys.gettrace
+
+In <span style="color:#f92672">[</span>3<span style="color:#f92672">]</span>: ?sys.get*of
+sys.getsizeof
+
+In <span style="color:#f92672">[</span>4<span style="color:#f92672">]</span>: ?s*
+set
+setattr
+slice
+sorted
+staticmethod
+str
+sum
+super
+sys</code></pre></div></p>
+<h3 id="历史">历史</h3>
+<p>通过<code>%history -n</code>可用查看在ipython中全部输入的历史，也可以通过<code>_i</code>查看上一个，<code>_ii</code>和<code>_iii</code>查看上两个和三个，<code>_i&lt;n&gt;</code>查看上n个:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>6<span style="color:#f92672">]</span>: _i2
+Out<span style="color:#f92672">[</span>6<span style="color:#f92672">]</span>: <span style="color:#e6db74">&#39;?sys.get*&#39;</span>
+
+In <span style="color:#f92672">[</span>7<span style="color:#f92672">]</span>: %history -n
+   1: import sys
+   2: ?sys.get*
+   3: ?sys.get*of
+   4: ?s *
+   5: ?s*
+   6: _i2
+   7: %history -n
+
+In <span style="color:#f92672">[</span>8<span style="color:#f92672">]</span>: _i, _ii, _iii
+Out<span style="color:#f92672">[</span>8<span style="color:#f92672">]</span>: <span style="color:#f92672">(</span><span style="color:#e6db74">&#39;%history -n&#39;</span>, <span style="color:#e6db74">&#39;_i2&#39;</span>, <span style="color:#e6db74">&#39;?s*&#39;</span><span style="color:#f92672">)</span></code></pre></div></p>
+<p>还可以把历史命令中的某些行编写为一个宏，通过宏可以重复调用，下例中把第9至第10行、外加第12行编写入了一个宏:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>9<span style="color:#f92672">]</span>: x,y<span style="color:#f92672">=</span>1,2
+
+In <span style="color:#f92672">[</span>10<span style="color:#f92672">]</span>: print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
+<span style="color:#ae81ff">3</span>
+
+In <span style="color:#f92672">[</span>11<span style="color:#f92672">]</span>: y<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
+
+In <span style="color:#f92672">[</span>12<span style="color:#f92672">]</span>: print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
+<span style="color:#ae81ff">11</span>
+
+In <span style="color:#f92672">[</span>13<span style="color:#f92672">]</span>: %macro tes 9-10 <span style="color:#ae81ff">12</span>
+Macro <span style="color:#e6db74">`</span>tes<span style="color:#e6db74">`</span> created. To execute, type its name <span style="color:#f92672">(</span>without quotes<span style="color:#f92672">)</span>.
+<span style="color:#f92672">===</span> Macro contents: <span style="color:#f92672">===</span>
+x,y<span style="color:#f92672">=</span>1,2
+print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
+print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
+
+In <span style="color:#f92672">[</span>14<span style="color:#f92672">]</span>: tes
+<span style="color:#ae81ff">3</span>
+<span style="color:#ae81ff">3</span></code></pre></div></p>
+<p>还可以使用<code>%save</code>把宏或者某些行保存在一个文件中:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>15<span style="color:#f92672">]</span>: %save test.py tes
+The following commands were written to file <span style="color:#e6db74">`</span>test.py<span style="color:#e6db74">`</span>:
+x,y<span style="color:#f92672">=</span>1,2
+print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
+print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
+
+In <span style="color:#f92672">[</span>16<span style="color:#f92672">]</span>: %save test.py 9-10
+File <span style="color:#e6db74">`</span>test.py<span style="color:#e6db74">`</span> exists. Overwrite <span style="color:#f92672">(</span>y/<span style="color:#f92672">[</span>N<span style="color:#f92672">])</span>?  y
+The following commands were written to file <span style="color:#e6db74">`</span>test.py<span style="color:#e6db74">`</span>:
+x,y<span style="color:#f92672">=</span>1,2
+print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span></code></pre></div></p>
+<h3 id="命令">命令</h3>
+<p>可以通过<code>!</code>执行shell中的命令，命令执行结果可以直接赋值给python变量，也可以将python变量传入shell:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>26<span style="color:#f92672">]</span>: !ls
+6.824        basic                 dump.rdb         get-pip.py         my_git       test.py
+MIT-6.824    cliu8siteprivate.key  fastapi-vue-cms  helloworld.key     practise-go
+__pycache__  demo.py               flask-shop       hjlarry.github.io  practise-py
+
+In <span style="color:#f92672">[</span>27<span style="color:#f92672">]</span>: a <span style="color:#f92672">=</span> !ls
+
+In <span style="color:#f92672">[</span>28<span style="color:#f92672">]</span>: a
+Out<span style="color:#f92672">[</span>28<span style="color:#f92672">]</span>:
+<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;6.824&#39;</span>,
+ <span style="color:#e6db74">&#39;MIT-6.824&#39;</span>,
+ <span style="color:#e6db74">&#39;__pycache__&#39;</span>,
+ ...<span style="color:#f92672">]</span>
+
+In <span style="color:#f92672">[</span>31<span style="color:#f92672">]</span>: x<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span>
+
+In <span style="color:#f92672">[</span>32<span style="color:#f92672">]</span>: !echo <span style="color:#e6db74">&#34;python.x={x+20}&#34;</span>
+python.x<span style="color:#f92672">=</span><span style="color:#ae81ff">120</span></code></pre></div></p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/d7858e1fe7c05ed8eed6bd126b287f3554da2161" title='最后修改者 hjlarry | April 4, 2020' target="_blank" rel="noopener">
+      <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>April 4, 2020</span>
+    </a>
+  </div>
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/python/tools/_index.md" target="_blank" rel="noopener">
+      <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>编辑本页</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        <br>
+<div style="text-align: center;font-size:xx-small;">
+    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
+</div>
+      </footer>
+
+      
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#ipython">IPython</a>
+      <ul>
+        <li><a href="#自省">自省</a></li>
+        <li><a href="#搜索">搜索</a></li>
+        <li><a href="#历史">历史</a></li>
+        <li><a href="#命令">命令</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
