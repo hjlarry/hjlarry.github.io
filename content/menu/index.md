@@ -11,12 +11,13 @@ bookMenuLevels: 1
   - [字典]({{< relref "/docs/go/map" >}})
   - [闭包]({{< relref "/docs/go/closure" >}})
   - [延迟调用]({{< relref "/docs/go/defer" >}})
-  - [垃圾回收]({{< relref "/docs/go/gc" >}})
-  - [内存分配]({{< relref "/docs/go/alloc" >}})
   - [并发调度]({{< relref "/docs/go/goroutine" >}})
+  - [内存分配]({{< relref "/docs/go/alloc" >}})
+  - [垃圾回收]({{< relref "/docs/go/gc" >}})
   - [锁]({{< relref "/docs/go/lock" >}})
 - **Python语言**
   - [描述符]({{< relref "/docs/python/descriptor" >}})
+  - [内存管理]]({{< relref "/docs/python/memory" >}})
   - [解释器]({{< relref "/docs/python/interpreter" >}})
   - [技巧工具]({{< relref "/docs/python/tools" >}})
 - **Mysql**
