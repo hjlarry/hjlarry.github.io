@@ -13,7 +13,7 @@ draft: false
 
 ### 引用
 当我们把一个变量赋值给另一个变量，传递的是实际对象的引用，python总是按引用传递的，包括函数的参数也是:
-{{< highlight sh>}}
+{{< highlight python>}}
 In [1]: a=12345
 In [2]: def test(x):
    ...:     return x is a
@@ -23,6 +23,38 @@ Out[3]: True
 而像Go、C这样的语言，总是会按值传递，也就是说不管是把一个变量赋值给另一个变量，还是函数传参，都会把这个实际的对象`12345`复制一份。
 
 对于`del a`这样的语句，只是把`a`和`12345`这个映射关系解除，并把`12345`的引用计数减一，当`12345`的引用计数为0时它会自动被垃圾回收器回收。使用`sys.getrefcount(a)`这个函数会得到a对应的实际对象的引用计数，但它总会比实际的计数多1，因为它本身也传入了a为参数。
+
+### 弱引用
+名字和对象之间的强引用关系影响了对象的生命周期，但有时我们希望能以"路人甲"的身份进行一些观察、日志、监测等，既能够观察到目标的状态，又不会干扰到其被回收。这时候我们就需要用弱引用。
+{{< highlight python>}}
+In [1]: import weakref
+In [2]: class X:
+   ...:     def __del__(self):
+   ...:         print("in del real obj")
+   ...:     def test(self):
+   ...:         print("X.test")
+In [3]: o = X()             # 创建实例
+In [4]: w = weakref.ref(o)  # 为该实例创建弱引用
+In [5]: w() is o            # 通过弱引用引用目标
+Out[5]: True
+In [6]: w().test()          # 基于弱引用进行方法调用
+X.test
+In [7]: del o               # 弱引用不影响目标被回收
+in del real obj
+In [8]: w() is None         # 目标被回收后弱引用不再引用
+Out[8]: True
+{{< /highlight >}}
+还有一种代理的方式，它看上去会和原本的调用方式更类似一些，它内部会做一些包装处理，但通过它很难找到原本的对象。
+{{< highlight python>}}
+In [10]: o = X()
+In [11]: p = weakref.proxy(o)   # 为该实例创建代理
+In [12]: p.test()               # 通过代理可直接调用实例的方法
+X.test
+In [13]: p is o                 # 但代理不是原对象
+Out[13]: False
+In [14]: p.test.__self__ is o   # 可以曲折的找到原对象
+Out[14]: True
+{{< /highlight >}}
 
 内存分配
 -------
