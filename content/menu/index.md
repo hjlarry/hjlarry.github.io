@@ -17,7 +17,7 @@ bookMenuLevels: 1
   - [锁]({{< relref "/docs/go/lock" >}})
 - **Python语言**
   - [描述符]({{< relref "/docs/python/descriptor" >}})
-  - [内存管理]]({{< relref "/docs/python/memory" >}})
+  - [内存管理]({{< relref "/docs/python/memory" >}})
   - [解释器]({{< relref "/docs/python/interpreter" >}})
   - [技巧工具]({{< relref "/docs/python/tools" >}})
 - **Mysql**
