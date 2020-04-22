@@ -56,6 +56,26 @@ In [14]: p.test.__self__ is o   # 可以曲折的找到原对象
 Out[14]: True
 {{< /highlight >}}
 
+### 复制
+有时候，对于可变对象，我们更喜欢选择值传递的方式，因为克隆体无论怎么折腾，都不会影响到原来的对象。这时候就需要复制对象，又分为浅拷贝(shallow copy)和深度拷贝(deep copy)两种，前者只复制对象自身，不包括它引用的其他对象，后者则递归复制所有引用目标。
+{{< highlight python>}}
+In [1]: class X: pass
+In [2]: x = X()
+In [3]: x.data = [1,2,3]
+In [4]: import copy
+In [5]: x1 = copy.copy(x)
+In [6]: x2 = copy.deepcopy(x)
+In [7]: x1 is x
+Out[7]: False
+In [8]: x2 is x
+Out[8]: False
+In [9]: x1.data is x.data       # 浅拷贝不包括所引用的目标
+Out[9]: True
+In [10]: x2.data is x.data      # 深拷贝连同引用目标也被复制
+Out[10]: False
+{{< /highlight >}}
+此外，也可以通过序列化和反序列化的方式，达到深度拷贝的目的。
+
 内存分配
 -------
 
