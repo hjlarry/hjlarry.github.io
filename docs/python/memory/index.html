@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="cn">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="内存管理 对象 在Python中，变量只是一个名字，并不意味着内存地址。也就是说对于a=12345这样一个表达式来说，堆上有一块内存区域存储了变量的名称a，它是一个字符串；还有一块区域存储了12345这个实际的对象；还有一块区域我们称为名字空间，它是一个字典，存储了a和12345建立的映射关系。
+对于这个实际的对象，它又分为两部分，头部存储元数据，包括它的引用计数，以及它是什么类型的；而数据部分对于固定长度的，则直接是它的数据，对于可变长度的，则首先有一部分描述该对象有多少个元素。
+引用 当我们把一个变量赋值给另一个变量，传递的是实际对象的引用，python总是按引用传递的，包括函数的参数也是: In [1]: a=12345 In [2]: def test(x): ...: return x is a In [3]: test(a) Out[3]: True 而像Go、C这样的语言，总是会按值传递，也就是说不管是把一个变量赋值给另一个变量，还是函数传参，都会把这个实际的对象12345复制一份。
+对于del a这样的语句，只是把a和12345这个映射关系解除，并把12345的引用计数减一，当12345的引用计数为0时它会自动被垃圾回收器回收。使用sys.getrefcount(a)这个函数会得到a对应的实际对象的引用计数，但它总会比实际的计数多1，因为它本身也传入了a为参数。
+弱引用 名字和对象之间的强引用关系影响了对象的生命周期，但有时我们希望能以&quot;路人甲&quot;的身份进行一些观察、日志、监测等，既能够观察到目标的状态，又不会干扰到其被回收。这时候我们就需要用弱引用。 In [1]: import weakref In [2]: class X: ...: def __del__(self): ...: print(&#34;in del real obj&#34;) ...: def test(self): ...: print(&#34;X.test&#34;) In [3]: o = X() # 创建实例 In [4]: w = weakref.ref(o) # 为该实例创建弱引用 In [5]: w() is o # 通过弱引用引用目标 Out[5]: True In [6]: w()."><meta property="og:title" content="内存管理" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="/docs/python/memory/" />
+
+<title>内存管理 | Home</title>
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
+<script defer src="/cn.search.min.19b24feb04a59b459cf2c7f7a7e2d9aa8941bcb173d57a3a9e553431b2fee722.js" integrity="sha256-GbJP6wSlm0Wc8sf3p&#43;LZqolBvLFz1Xo6nlU0MbL&#43;5yI="></script>
+<link rel="alternate" type="application/rss+xml" href="/docs/python/memory/index.xml" title="Home" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><strong>计算机基础</strong>
+<ul>
+<li><a href="/docs/sicp/hardware/">硬件</a></li>
+<li><a href="/docs/sicp/software/">软件</a></li>
+<li><a href="/docs/sicp/asm/">汇编</a></li>
+</ul>
+</li>
+<li><strong>GO语言</strong>
+<ul>
+<li><a href="/docs/go/map/">字典</a></li>
+<li><a href="/docs/go/closure/">闭包</a></li>
+<li><a href="/docs/go/defer/">延迟调用</a></li>
+<li><a href="/docs/go/goroutine/">并发调度</a></li>
+<li><a href="/docs/go/alloc/">内存分配</a></li>
+<li><a href="/docs/go/gc/">垃圾回收</a></li>
+<li><a href="/docs/go/lock/">锁</a></li>
+</ul>
+</li>
+<li><strong>Python语言</strong>
+<ul>
+<li><a href="/docs/python/descriptor/">描述符</a></li>
+<li><a href="/docs/python/memory/"class=active>内存管理</a></li>
+<li><a href="/docs/python/interpreter/">解释器</a></li>
+<li><a href="/docs/python/tools/">技巧工具</a></li>
+</ul>
+</li>
+<li><strong>Mysql</strong>
+<ul>
+<li><a href="/docs/mysql/query/">查询</a></li>
+<li><a href="/docs/mysql/theory/">原理</a></li>
+</ul>
+</li>
+<li><strong>其他</strong>
+<ul>
+<li><a href="/docs/other/git/">git</a></li>
+<li><a href="/docs/other/docker/">docker</a></li>
+<li><a href="/docs/other/protocol/">网络协议</a></li>
+<li><a href="/docs/other/tools/">系统工具</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>内存管理</strong>
+
+  <label for="toc-control">
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#对象">对象</a>
+      <ul>
+        <li><a href="#引用">引用</a></li>
+        <li><a href="#弱引用">弱引用</a></li>
+        <li><a href="#复制">复制</a></li>
+      </ul>
+    </li>
+    <li><a href="#内存分配">内存分配</a></li>
+    <li><a href="#垃圾回收">垃圾回收</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="内存管理">内存管理</h1>
+<h2 id="对象">对象</h2>
+<p>在Python中，变量只是一个名字，并不意味着内存地址。也就是说对于<code>a=12345</code>这样一个表达式来说，堆上有一块内存区域存储了变量的名称<code>a</code>，它是一个字符串；还有一块区域存储了<code>12345</code>这个实际的对象；还有一块区域我们称为名字空间，它是一个字典，存储了<code>a</code>和<code>12345</code>建立的映射关系。</p>
+<p>对于这个实际的对象，它又分为两部分，头部存储元数据，包括它的引用计数，以及它是什么类型的；而数据部分对于固定长度的，则直接是它的数据，对于可变长度的，则首先有一部分描述该对象有多少个元素。</p>
+<h3 id="引用">引用</h3>
+<p>当我们把一个变量赋值给另一个变量，传递的是实际对象的引用，python总是按引用传递的，包括函数的参数也是:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#ae81ff">1</span>]: a<span style="color:#f92672">=</span><span style="color:#ae81ff">12345</span>
+In [<span style="color:#ae81ff">2</span>]: <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test</span>(x):
+   <span style="color:#f92672">...</span>:     <span style="color:#66d9ef">return</span> x <span style="color:#f92672">is</span> a
+In [<span style="color:#ae81ff">3</span>]: test(a)
+Out[<span style="color:#ae81ff">3</span>]: True</code></pre></div>
+而像Go、C这样的语言，总是会按值传递，也就是说不管是把一个变量赋值给另一个变量，还是函数传参，都会把这个实际的对象<code>12345</code>复制一份。</p>
+<p>对于<code>del a</code>这样的语句，只是把<code>a</code>和<code>12345</code>这个映射关系解除，并把<code>12345</code>的引用计数减一，当<code>12345</code>的引用计数为0时它会自动被垃圾回收器回收。使用<code>sys.getrefcount(a)</code>这个函数会得到a对应的实际对象的引用计数，但它总会比实际的计数多1，因为它本身也传入了a为参数。</p>
+<h3 id="弱引用">弱引用</h3>
+<p>名字和对象之间的强引用关系影响了对象的生命周期，但有时我们希望能以&quot;路人甲&quot;的身份进行一些观察、日志、监测等，既能够观察到目标的状态，又不会干扰到其被回收。这时候我们就需要用弱引用。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#ae81ff">1</span>]: <span style="color:#f92672">import</span> weakref
+In [<span style="color:#ae81ff">2</span>]: <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">X</span>:
+   <span style="color:#f92672">...</span>:     <span style="color:#66d9ef">def</span> __del__(self):
+   <span style="color:#f92672">...</span>:         <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;in del real obj&#34;</span>)
+   <span style="color:#f92672">...</span>:     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test</span>(self):
+   <span style="color:#f92672">...</span>:         <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;X.test&#34;</span>)
+In [<span style="color:#ae81ff">3</span>]: o <span style="color:#f92672">=</span> X()             <span style="color:#75715e"># 创建实例</span>
+In [<span style="color:#ae81ff">4</span>]: w <span style="color:#f92672">=</span> weakref<span style="color:#f92672">.</span>ref(o)  <span style="color:#75715e"># 为该实例创建弱引用</span>
+In [<span style="color:#ae81ff">5</span>]: w() <span style="color:#f92672">is</span> o            <span style="color:#75715e"># 通过弱引用引用目标</span>
+Out[<span style="color:#ae81ff">5</span>]: True
+In [<span style="color:#ae81ff">6</span>]: w()<span style="color:#f92672">.</span>test()          <span style="color:#75715e"># 基于弱引用进行方法调用</span>
+X<span style="color:#f92672">.</span>test
+In [<span style="color:#ae81ff">7</span>]: <span style="color:#66d9ef">del</span> o               <span style="color:#75715e"># 弱引用不影响目标被回收</span>
+<span style="color:#f92672">in</span> <span style="color:#66d9ef">del</span> real obj
+In [<span style="color:#ae81ff">8</span>]: w() <span style="color:#f92672">is</span> None         <span style="color:#75715e"># 目标被回收后弱引用不再引用</span>
+Out[<span style="color:#ae81ff">8</span>]: True</code></pre></div>
+还有一种代理的方式，它看上去会和原本的调用方式更类似一些，它内部会做一些包装处理，但通过它很难找到原本的对象。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#ae81ff">10</span>]: o <span style="color:#f92672">=</span> X()
+In [<span style="color:#ae81ff">11</span>]: p <span style="color:#f92672">=</span> weakref<span style="color:#f92672">.</span>proxy(o)   <span style="color:#75715e"># 为该实例创建代理</span>
+In [<span style="color:#ae81ff">12</span>]: p<span style="color:#f92672">.</span>test()               <span style="color:#75715e"># 通过代理可直接调用实例的方法</span>
+X<span style="color:#f92672">.</span>test
+In [<span style="color:#ae81ff">13</span>]: p <span style="color:#f92672">is</span> o                 <span style="color:#75715e"># 但代理不是原对象</span>
+Out[<span style="color:#ae81ff">13</span>]: False
+In [<span style="color:#ae81ff">14</span>]: p<span style="color:#f92672">.</span>test<span style="color:#f92672">.</span>__self__ <span style="color:#f92672">is</span> o   <span style="color:#75715e"># 可以曲折的找到原对象</span>
+Out[<span style="color:#ae81ff">14</span>]: True</code></pre></div></p>
+<h3 id="复制">复制</h3>
+<p>有时候，对于可变对象，我们更喜欢选择值传递的方式，因为克隆体无论怎么折腾，都不会影响到原来的对象。这时候就需要复制对象，又分为浅拷贝(shallow copy)和深度拷贝(deep copy)两种，前者只复制对象自身，不包括它引用的其他对象，后者则递归复制所有引用目标。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#ae81ff">1</span>]: <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">X</span>: <span style="color:#66d9ef">pass</span>
+In [<span style="color:#ae81ff">2</span>]: x <span style="color:#f92672">=</span> X()
+In [<span style="color:#ae81ff">3</span>]: x<span style="color:#f92672">.</span>data <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>]
+In [<span style="color:#ae81ff">4</span>]: <span style="color:#f92672">import</span> copy
+In [<span style="color:#ae81ff">5</span>]: x1 <span style="color:#f92672">=</span> copy<span style="color:#f92672">.</span>copy(x)
+In [<span style="color:#ae81ff">6</span>]: x2 <span style="color:#f92672">=</span> copy<span style="color:#f92672">.</span>deepcopy(x)
+In [<span style="color:#ae81ff">7</span>]: x1 <span style="color:#f92672">is</span> x
+Out[<span style="color:#ae81ff">7</span>]: False
+In [<span style="color:#ae81ff">8</span>]: x2 <span style="color:#f92672">is</span> x
+Out[<span style="color:#ae81ff">8</span>]: False
+In [<span style="color:#ae81ff">9</span>]: x1<span style="color:#f92672">.</span>data <span style="color:#f92672">is</span> x<span style="color:#f92672">.</span>data       <span style="color:#75715e"># 浅拷贝不包括所引用的目标</span>
+Out[<span style="color:#ae81ff">9</span>]: True
+In [<span style="color:#ae81ff">10</span>]: x2<span style="color:#f92672">.</span>data <span style="color:#f92672">is</span> x<span style="color:#f92672">.</span>data      <span style="color:#75715e"># 深拷贝连同引用目标也被复制</span>
+Out[<span style="color:#ae81ff">10</span>]: False</code></pre></div>
+此外，也可以通过序列化和反序列化的方式，达到深度拷贝的目的。</p>
+<h2 id="内存分配">内存分配</h2>
+<h2 id="垃圾回收">垃圾回收</h2>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/8e527f30e9d618eb6f3005f63ddc3e62a9bf5ed7" title='最后修改者 hjlarry | April 22, 2020' target="_blank" rel="noopener">
+      <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>April 22, 2020</span>
+    </a>
+  </div>
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/python/memory/_index.md" target="_blank" rel="noopener">
+      <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>编辑本页</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        <br>
+<div style="text-align: center;font-size:xx-small;">
+    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
+</div>
+      </footer>
+
+      
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#对象">对象</a>
+      <ul>
+        <li><a href="#引用">引用</a></li>
+        <li><a href="#弱引用">弱引用</a></li>
+        <li><a href="#复制">复制</a></li>
+      </ul>
+    </li>
+    <li><a href="#内存分配">内存分配</a></li>
+    <li><a href="#垃圾回收">垃圾回收</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

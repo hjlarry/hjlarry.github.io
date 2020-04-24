@@ -3,28 +3,8 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/docs/go/lock/</loc>
-    <lastmod>2019-12-23T15:22:19+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/docs/other/docker/</loc>
-    <lastmod>2020-02-03T16:07:13+08:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/docs/python/descriptor/</loc>
     <lastmod>2020-01-14T10:44:26+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/docs/python/interpreter/</loc>
-    <lastmod>2020-02-15T18:17:06+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/docs/sicp/asm/</loc>
-    <lastmod>2020-01-14T14:08:43+08:00</lastmod>
   </url>
   
   <url>
@@ -32,8 +12,18 @@
   </url>
   
   <url>
+    <loc>/docs/python/interpreter/</loc>
+    <lastmod>2020-04-21T16:28:48+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/docs/go/defer/</loc>
     <lastmod>2019-12-23T15:22:19+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/docs/other/docker/</loc>
+    <lastmod>2020-04-21T16:28:48+08:00</lastmod>
   </url>
   
   <url>
@@ -47,7 +37,7 @@
   
   <url>
     <loc>/docs/go/alloc/</loc>
-    <lastmod>2019-12-25T15:28:33+08:00</lastmod>
+    <lastmod>2020-04-24T15:50:47+08:00</lastmod>
   </url>
   
   <url>
@@ -80,6 +70,11 @@
   </url>
   
   <url>
+    <loc>/docs/python/memory/</loc>
+    <lastmod>2020-04-22T15:09:18+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/docs/go/gc/</loc>
     <lastmod>2019-12-23T15:22:19+08:00</lastmod>
   </url>
@@ -91,22 +86,32 @@
   
   <url>
     <loc>/docs/other/tools/</loc>
-    <lastmod>2020-01-09T11:42:39+08:00</lastmod>
+    <lastmod>2020-04-21T16:28:48+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/docs/sicp/asm/</loc>
+    <lastmod>2020-04-21T16:28:48+08:00</lastmod>
   </url>
   
   <url>
     <loc>/docs/sicp/hardware/</loc>
-    <lastmod>2020-04-20T14:36:07+08:00</lastmod>
+    <lastmod>2020-04-20T21:33:50+08:00</lastmod>
   </url>
   
   <url>
     <loc>/docs/other/protocol/</loc>
-    <lastmod>2020-04-04T17:51:43+08:00</lastmod>
+    <lastmod>2020-04-21T16:28:48+08:00</lastmod>
   </url>
   
   <url>
     <loc>/docs/sicp/software/</loc>
-    <lastmod>2020-01-13T16:50:13+08:00</lastmod>
+    <lastmod>2020-04-24T14:57:13+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/docs/go/lock/</loc>
+    <lastmod>2020-04-21T16:28:48+08:00</lastmod>
   </url>
   
   <url>

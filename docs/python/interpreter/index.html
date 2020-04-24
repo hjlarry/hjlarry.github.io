@@ -5,15 +5,15 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="CPython解释器 字节码 Python中的字节码并不能被CPU执行，而是由栈式虚拟机执行，每条指令的背后都对应了一大堆C实现的机器指令。
-字节码被存储在代码对象(即__code__)的co_code中，以一个函数为例: &gt;&gt;&gt; def add(x, y): ... z = x &#43; y ... return z &gt;&gt;&gt; &#34; &#34;.join(str(b) for b in add.__code__.co_code) &#39;124 0 124 1 23 0 125 2 124 2 83 0&#39; 字节码中每两个数字为一组，第一个为指令，第二个为参数，指令对应的二进制数可以在CPython源码中找到: &lt;!-- cpython/Include/opcode.h --&gt; #define BINARY_ADD 23 #define RETURN_VALUE 83 #define LOAD_FAST 124 #define STORE_FAST 125 这就可以和dis的输出结果对应起来: &gt;&gt;&gt; dis.dis(add) &lt;!-- 源码行 偏移量 指令 参数(目标对象) --&gt; 2 0 LOAD_FAST 0 (x) 2 LOAD_FAST 1 (y) 4 BINARY_ADD 6 STORE_FAST 2 (z) 3 8 LOAD_FAST 2 (z) 10 RETURN_VALUE 指令所对应的源码行这个信息其实保存在代码对象的两个相关属性中，co_firstlineno用来存储该段代码起始的行号，co_lnotab由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。每条字节码指令代表的意义可通过官方文档此处查询到。"><meta property="og:title" content="" />
+字节码被存储在代码对象(即__code__)的co_code中，以一个函数为例: &gt;&gt;&gt; def add(x, y): ... z = x &#43; y ... return z &gt;&gt;&gt; &#34; &#34;.join(str(b) for b in add.__code__.co_code) &#39;124 0 124 1 23 0 125 2 124 2 83 0&#39; 字节码中每两个数字为一组，第一个为指令，第二个为参数，指令对应的二进制数可以在CPython源码中找到: &lt;!-- cpython/Include/opcode.h --&gt; #define BINARY_ADD 23 #define RETURN_VALUE 83 #define LOAD_FAST 124 #define STORE_FAST 125 这就可以和dis的输出结果对应起来: &gt;&gt;&gt; dis.dis(add) &lt;!-- 源码行 偏移量 指令 参数(目标对象) --&gt; 2 0 LOAD_FAST 0 (x) 2 LOAD_FAST 1 (y) 4 BINARY_ADD 6 STORE_FAST 2 (z) 3 8 LOAD_FAST 2 (z) 10 RETURN_VALUE 指令所对应的源码行这个信息其实保存在代码对象的两个相关属性中，co_firstlineno用来存储该段代码起始的行号，co_lnotab由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。每条字节码指令代表的意义可通过官方文档此处查询到。"><meta property="og:title" content="CPython解释器" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/docs/python/interpreter/" />
 
-<title>Interpreter | Home</title>
+<title>CPython解释器 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.47cfff06a9b67ab02e67d9cfacdc0f35fe51b1a2f5b45d1ebcd68377790394da.js" integrity="sha256-R8//Bqm2erAuZ9nPrNwPNf5RsaL1tF0evNaDd3kDlNo="></script>
+<script defer src="/cn.search.min.19b24feb04a59b459cf2c7f7a7e2d9aa8941bcb173d57a3a9e553431b2fee722.js" integrity="sha256-GbJP6wSlm0Wc8sf3p&#43;LZqolBvLFz1Xo6nlU0MbL&#43;5yI="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/python/interpreter/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -64,15 +64,16 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/docs/go/map/">字典</a></li>
 <li><a href="/docs/go/closure/">闭包</a></li>
 <li><a href="/docs/go/defer/">延迟调用</a></li>
-<li><a href="/docs/go/gc/">垃圾回收</a></li>
-<li><a href="/docs/go/alloc/">内存分配</a></li>
 <li><a href="/docs/go/goroutine/">并发调度</a></li>
+<li><a href="/docs/go/alloc/">内存分配</a></li>
+<li><a href="/docs/go/gc/">垃圾回收</a></li>
 <li><a href="/docs/go/lock/">锁</a></li>
 </ul>
 </li>
 <li><strong>Python语言</strong>
 <ul>
 <li><a href="/docs/python/descriptor/">描述符</a></li>
+<li><a href="/docs/python/memory/">内存管理</a></li>
 <li><a href="/docs/python/interpreter/"class=active>解释器</a></li>
 <li><a href="/docs/python/tools/">技巧工具</a></li>
 </ul>
@@ -121,7 +122,7 @@ https://github.com/alex-shpak/hugo-book
     <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
 
-  <strong>Interpreter</strong>
+  <strong>CPython解释器</strong>
 
   <label for="toc-control">
     <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
@@ -600,9 +601,9 @@ PyObject<span style="color:#f92672">*</span> _Py_HOT_FUNCTION _PyEval_EvalFrameD
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/5a7893a09b3fe8e9d358ca0818caaef2deb6021f" title='最后修改者 hjlarry | February 15, 2020' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/f8150d4d79b0bd5434db9dad6eea68562baf2245" title='最后修改者 hjlarry | April 21, 2020' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>February 15, 2020</span>
+      <span>April 21, 2020</span>
     </a>
   </div>
 
