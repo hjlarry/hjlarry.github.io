@@ -26,5 +26,6 @@ bookMenuLevels: 1
 - **其他**
   - [git]({{< relref "/docs/other/git" >}})
   - [docker]({{< relref "/docs/other/docker" >}})
+  - [raft]({{< relref "/docs/other/raft" >}})
   - [网络协议]({{< relref "/docs/other/protocol" >}})
   - [系统工具]({{< relref "/docs/other/tools" >}})
