@@ -82,3 +82,19 @@ S3:  3  3  5
 此时，s3在term6被选举为leader，它如何同步follower的日志？
 
 s3下次发出的`AppendEntries`请求会包含`prevLogIndex=12, prevLogTerm=5, Entries=[log6]`，s2接收到请求以后发现prevLogTerm不匹配，返回false，同样s1也返回false。s3收到返回后，其nextIndex[s2]和nextIndex[s1]的值均减1变为12，下次发出的请求包含`prevLogIndex=11, prevLogTerm=3, Entries=[log5, log6]`，s2会接受这个请求以及相应的日志，删掉自己index12上的log，并返回true。同理，s1最终也会在下一次请求中得到同步。最终所有节点的日志得到同步，nextIndex[s2]和nextIndex[s1]的值变为14。
+
+也就是说，每个follower都会删掉自己尾部和leader不一致的日志项，并从那个不一致的地方开始接受leader的日志，使得其日志和leader同步。
+
+**上例中s2的index为12、term为4的日志被丢掉不会有什么问题吗？**  
+是没有问题的，这条日志并没有得到大多数服务器的确认，所以不会被提交，命令也不会被执行。那么有没有可能已经提交的日志项，在被新leader同步时被丢掉呢？实际上leader的选举机制会保证，要选举为leader的节点必须含有全部的已提交的日志。
+
+**为什么不选择日志最长的服务器作为leader？**  
+假设有这样一种情况:
+```
+S1: 5 6 7
+S2: 5 8
+S3: 5 8
+```
+这种情况如何产生的呢？比如s1赢得了term6的选举，此时客户端发送一条命令，s1还没有来得及发送给其他节点时就已经crash了。s1很快的重启以后赶上了term7的选举并赢得了这轮选举，它依然收到一条客户端命令后还没发出去就crash，只是这次crash的时间很长。s2当选为了leader，并且应该为term8(因为s1要赢得term7的选举，s2或s3中有一个肯定给它投票了，投票时它的term就已经是7了)。此时s2接到客户端指令，并且也已发送给s3，s2和s3都将log8提交后发生了crash，此时s1也重连了进来。所以，简单的选择日志最长的服务器s1作为leader是不合适的，因为log8已经提交了，那么新的leader只能是s2或s3。
+
+选举规则上，要求了候选人的最后日志项的term更高，或者term相同时，和follower比有更长或者相同的日志，follower才能投票给它。那么在这个例子中，s2和s3不会投票给s1，只会相互投票，其中之一赢得选举。s1的log6和log7将被丢弃，也不会对客户端发送相应的reply，客户端发现指令丢失后会重新发送丢掉的指令。
