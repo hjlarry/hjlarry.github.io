@@ -60,3 +60,25 @@ raft节点是在如图所示的三种状态中变换的，但在一个典型的�
 **旧的leader不知道新的leader被选举出怎么办？**  
 也许是由于网络波动，旧的leader和少部分节点的网络在处理一部分客户端请求，新的leader和大部分节点的网络在处理一部分客户端请求，旧的leader并不知道新的leader产生，这难道不会造成旧的leader错误的执行？  
 旧的leader发出的`AppendEntries`RPC请求只会让少部分节点收到，那么它就不会去提交任何新的日志项目，也就不会去执行命令并返回给客户端。
+
+日志
+-------
+只要leader存在，客户端只能和leader交互，而无法看到任何follower的状态或日志。那么当leader更替时，会不会出现一些异常？比如说存在两个不同的副本，丢失一些操作，重复一些操作等等。
+
+**在发生crash后日志是如何同步的？**  
+假设有三个节点，在某次s3(leader)还没有发送完`AppendEntries`时crash了，那么它们的日志情况可能是这样的:
+```
+S1: 3
+S2: 3 3
+S3: 3 3
+```
+之后，s2在term4被选举为leader并接收到一个客户端请求添加了一条日志后crash，s3在term5发生了同样的事情，会形成这种情况:
+```
+    10 11 12 13  <- log entry #  
+S1:  3  
+S2:  3  3  4  
+S3:  3  3  5  
+```
+此时，s3在term6被选举为leader，它如何同步follower的日志？
+
+s3下次发出的`AppendEntries`请求会包含`prevLogIndex=12, prevLogTerm=5, Entries=[log6]`，s2接收到请求以后发现prevLogTerm不匹配，返回false，同样s1也返回false。s3收到返回后，其nextIndex[s2]和nextIndex[s1]的值均减1变为12，下次发出的请求包含`prevLogIndex=11, prevLogTerm=3, Entries=[log5, log6]`，s2会接受这个请求以及相应的日志，删掉自己index12上的log，并返回true。同理，s1最终也会在下一次请求中得到同步。最终所有节点的日志得到同步，nextIndex[s2]和nextIndex[s1]的值变为14。
