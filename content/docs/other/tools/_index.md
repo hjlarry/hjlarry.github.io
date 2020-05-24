@@ -384,3 +384,36 @@ clean:
 {{< /highlight >}}
 
 对于这段构建代码，`hello:`后的部分就是告诉它要去检查哪些文件的修改时间；`$@`就表示当前这段的目标`hello`，`$<`表示这段的第一个依赖项，`$^`表示这段的所有依赖项；命令前加`-`表示该命令如有错误则忽略；`PHONY`表示没有目标，没有依赖，总是执行规则，在该例中，若恰好文件夹内有一个名为`clean`的文件，没有`PHONY`时则`make clean`不会执行；另外，由于历史原因makefile只能使用tab来缩进，不能使用空格。
+
+
+日常工具
+-------
+
+### find
+使用`find 起始目录 参数`可以方便的查找文件，常用的参数为:
+
+* -name，按文件名，-iname也是按文件名但可忽略大小写
+* -type，按文件类型，d为目录，f为文件
+* -perm，按权限，例如0755
+* -user，按所属用户查找
+* -group，按所属用户组查找
+* -mtime，按修改时间查找，+表示以前，-表示以内，在mac下，`-1d2h`表示1天2小时以内修改过的文件，在linux下只能跟一个数字，例如`-1`表示1天内，如果需要多少分钟内应该用-mmin
+* -size，按大小查找，+表示大于，-表示小于，可以跟单位k、M、G、T
+* -maxdepth，指定最大搜索深度
+* -executable，可执行文件
+* -exec，执行相关命令
+
+{{< highlight sh>}}
+# 文件名匹配ind*.html的文件
+➜  hjlarry.github.io git:(master) ✗ find . -iname ind*.html
+./tags/index.html
+./docs/sicp/software-introduction/index.html
+# 文件修改时间在2小时内的文件
+➜  hjlarry.github.io git:(master) ✗ find . -type f -mmin -120 | xargs ls -lh
+-rw-rw-rw- 1 hejl hejl   98 May 24 10:12 ./.git/FETCH_HEAD
+-rw-r--r-- 1 hejl hejl   41 May 24 10:12 ./.git/ORIG_HEAD
+# 文件大小大于2M的文件
+➜  hjlarry.github.io git:(master) ✗ find . -type f -size +2M | xargs ls -lh
+-r--r--r-- 1 hejl hejl 5.7M Apr  4 17:41 ./.git/modules/themes/book/objects/pack/pack-3a8d2ad7db7fe81a41409e60d27dce22b77b6c68.pack
+-r--r--r-- 1 hejl hejl 3.0M Apr 20 14:36 ./.git/objects/pack/pack-472a07bf934d028116265bd13cbea79d367c5e90.pack
+{{< /highlight >}}
