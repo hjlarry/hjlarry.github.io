@@ -41,7 +41,7 @@ S1: 3 S2: 3 3 S3: 3 3 之后，s2在term4被选举为leader并接收到一个客
 <title>raft | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.e9e7f19f81fc0df7ab1f4586881bd317c2c7e06717416f9bab8edaa07e45143c.js" integrity="sha256-6efxn4H8DferH0WGiBvTF8LH4GcXQW&#43;bq47aoH5FFDw="></script>
+<script defer src="/cn.search.min.0e6c33709a5717656d0030a9cdafcc86eb92a082726cc5cd121683fe35f12bc8.js" integrity="sha256-DmwzcJpXF2VtADCpza/MhuuSoIJybMXNEhaD/jXxK8g="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/other/raft/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -255,6 +255,50 @@ raft能够继续工作，但崩溃的节点需要尽快的重新加入进来，�
 这是可以的，因为崩溃重启并重新加入集群后，一旦收到当前leader发送的<code>AppendEntries</code>请求，leader就会告诉它正确的<code>commitIndex</code>。而<code>lastApplied</code>需要从0开始，因为论文中的raft算法是假定了应用本身不会保存任何持久化状态，需要通过重新执行每条日志中的指令来重新创建它的状态，这样效率是非常低的，使用快照机制并仅执行尾部的一些日志可以显著的提升效率。</p>
 <p><strong>持久化的性能瓶颈</strong><br>
 持久化通常是性能的瓶颈，因为一次数据写入硬盘的操作需要10ms，SSD也需要0.1ms，所以持久化就限制了我们每秒钟只能处理100个操作（SSD则是10000个，另一个瓶颈是局域网RPC，每次需要小于1ms的时间）。也有一些方式能够解决这个瓶颈，例如一些新的日志项是批量写入硬盘的、使用带有电源的内存设备等。</p>
+<h2 id="日志压缩和快照">日志压缩和快照</h2>
+<p>随着服务的运行，日志会变得越来越大，而且有的日志在raft层是多条，但在应用层可能只是一条，例如<code>x=1</code>、<code>x=2</code>在raft中是两条日志，但在K/V数据库应用中只会有<code>x=2</code>。那么当服务器节点重启或者有新的节点加入，重头执行一遍日志势必会造成大量的时间浪费。</p>
+<p><strong>如何解决？</strong><br>
+解决方案就是服务器应用层定期的创建快照，快照就是一部分日志执行后的服务器应用层状态机，然后把快照存储在持久性设备上(硬盘)，快照会记录最后一条用于创建快照的日志索引并告诉raft层，已经用于创建快照的日志就可以在任意时刻丢掉。</p>
+<p><strong>服务器崩溃重启之后怎么做？</strong><br>
+重启后应用层从硬盘中读取快照，raft层从硬盘中读取日志，然后应用层告诉raft层最后一条用于创建快照的日志索引以避免重复执行日志中的命令。<br>
+那么就有一种特殊情况了，follower的最后日志索引是可能高于leader的，因为follower掉线以后，leader建立了快照并丢弃了一部分日志，丢弃之后leader的nextIndex[i]将变为leader日志的起始位置，所以leader通过<code>AppendEntries</code>已经不能修复这种情况，因此才有了<code>InstallSnapshot</code>RPC请求。</p>
+<h2 id="线性一致性">线性一致性</h2>
+<p>在一个分布式系统中，有很多复杂的情况，比如并发、复制、RPC重传、Leader变化等等，如何保证客户端的读写行为是正确的？线性一致是最常见的、最直观的定义，使之看起来像在单个服务器运行一样。</p>
+<p>那么怎样达成线性一致性呢？针对于所有的操作，我们能把它们和时间线匹配上，并且读取得到某个值时，之前是发生过该值的写入操作而没有被覆盖掉的。例如:</p>
+<p><img src="./images/linearizability.drawio.svg" alt="" /></p>
+<p><code>Wx1</code>表示客户端A写入x的值为1，<code>Rx1</code>表示客户端B读取x的值得到1。对于某条线段，例如<code>Wx1</code>，它的起点表示客户端发起请求，终点表示服务端返回的时间点，但是本身的读取、写入这些操作在服务器上的执行时间是很短的，相对于整个请求可以认为是瞬间完成，那么就可以认为是在时间轴上的一个点，这个点既可以在线段的最前面，也可以在最后面。我们可以从图2中看到x值的变化。</p>
+<p>对于图1，我们可以找到这样一个顺序，Wx1-&gt;Rx1-&gt;Wx2-&gt;Rx2，它符合值的约束(写入发生在读取之前)，以及实时操作的约束(先是Wx1然后Wx2)，所以它是符合线性一致的。再来看一个例子:</p>
+<pre><code>  |-Wx1-| |-Wx2-|
+    |--Rx2--|
+              |-Rx1-|
+</code></pre><p>这个例子中，要实现Wx1-&gt;Rx1-&gt;Wx2-&gt;Rx2这样的顺序是不可能的，因为基于实时性约束，Rx2结束了才会发生Rx1，所以它是非线性一致的。</p>
+<pre><code>|--Wx0--|  |--Wx1--|
+            |--Wx2--|
+        |-Rx2-| |-Rx1-|
+</code></pre><p>这个例子我们也能找到一个顺序，Wx0-&gt;Wx2-&gt;Rx2-&gt;Wx1-&gt;Rx1，所以它是线性一致的。</p>
+<pre><code>|--Wx0--|  |--Wx1--|
+            |--Wx2--|
+C1:     |-Rx2-| |-Rx1-|
+C2:     |-Rx1-| |-Rx2-|
+</code></pre><p>这个例子中，先是Wx2-&gt;C1的Rx2-&gt;Wx1-&gt;C1的Rx1和C2的Rx1，此时C2需要得到Rx2，则又需要Wx2，形成了一个循环，因此它不是线性一致的。也就是说对于服务端，可以选择任一顺序进行并发写入，但对于所有的客户端，它们看到的写入顺序应该是一致的，这点是很重要的。</p>
+<pre><code>|-Wx1-|
+        |-Wx2-|
+                |-Rx1-|
+</code></pre><p>这个例子只有一种执行顺序，即Wx1-&gt;Wx2-&gt;Rx1，但读到Rx1显然不可能，所以说明读取必须返回最新的数据，旧的数据是非线性一致的。</p>
+<pre><code>C1: |-Wx3-|          |-Wx4-|
+C2:          |-Rx--------------|
+</code></pre><p>现在假设C2在发送出一个读取请求的时候，服务端回复的消息丢失了，过了一段时间它重新发送，服务端看到重复的读取请求返回了第一次的结果，此时Rx3是线性化的，虽然它是一个陈旧的数据。</p>
+<h2 id="rpc重复的情况">RPC重复的情况</h2>
+<p><strong>当客户端发起的Get/Put的RPC请求超时会发生什么？</strong><br>
+如果服务器已经挂掉了或者请求丢掉了，那么重新发送没有问题，但还有情况是服务器已经执行了，返回给客户端的请求丢掉了，这个时候如果客户端重新发送是非常危险的，因为可能造成服务端执行两次而得到错误的结果。</p>
+<p><strong>如何解决？</strong><br>
+为了解决这样的问题，我们需要对重复的RPC请求进行检测。我们给每个请求分配一个ID，如果客户端发现超时而重新发送的请求使用相同的ID。服务端需要维护一个表，以这个ID为索引，把每个RPC请求的结果也放进去，如果发现了相同的ID，就可以直接把结果返回。</p>
+<p><strong>什么时候可以删除表中的条目？</strong><br>
+为了让表尽可能的小，我们可以把表中每条记录对应每个客户端，而非每条RPC请求。每个客户端同时只能有一个未完成的RPC请求，我们给每个客户端一个ClientID，它发出的请求带一个序号Seq。对于每个请求先检测表中有没有ClientID的记录，有的话就去比较Seq，当请求中的Seq更大时才去执行raft中的Start()方法，在raft中的每条Log也记录上ClientID和Seq，这样当applyCh中出现记录时，再把新的Seq更新至表中。</p>
+<p><strong>如果一个新的leader接手，怎么把表传给它？</strong><br>
+所有的follower节点都应该在执行更新时自身维护一份该表，所以不存在传的问题，如果变为leader本身就有。</p>
+<p><strong>如果服务器崩溃，如何恢复该表？</strong><br>
+如果没有快照，重新执行日志时会运行并计算出该表。如果有快照，快照中应该保存一份该表。</p>
 </article>
  
       
@@ -267,9 +311,9 @@ raft能够继续工作，但崩溃的节点需要尽快的重新加入进来，�
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/5d0a4436133862c05be45762aeada09717216ef5" title='最后修改者 hjlarry | May 13, 2020' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/ba00363f3c17838def4062c506e8239a7efd5136" title='最后修改者 hjlarry | May 27, 2020' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>May 13, 2020</span>
+      <span>May 27, 2020</span>
     </a>
   </div>
 
