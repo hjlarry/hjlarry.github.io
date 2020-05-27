@@ -417,3 +417,36 @@ clean:
 -r--r--r-- 1 hejl hejl 5.7M Apr  4 17:41 ./.git/modules/themes/book/objects/pack/pack-3a8d2ad7db7fe81a41409e60d27dce22b77b6c68.pack
 -r--r--r-- 1 hejl hejl 3.0M Apr 20 14:36 ./.git/objects/pack/pack-472a07bf934d028116265bd13cbea79d367c5e90.pack
 {{< /highlight >}}
+
+### grep
+使用该命令可以从文件或管道中查找具体的内容，其支持多文件名，支持通配符，内容匹配时支持正则表达式。常用的参数为:
+
+* -r，递归搜索所有子目录
+* -l，仅输出文件名
+* -n，输出行号
+* -c，按文件统计匹配次数
+* -v，排除指定内容
+* -i，忽略大小写
+* -e，多模式匹配，命中其一即可
+* -An，输出其后n行内容
+* -Bn，输出其前n行内容
+* -Cn，输出其前后n行内容
+
+{{< highlight sh>}}
+[ubuntu] ~/.mac $ grep -c "main" *
+alpine.sh:0
+grep: assem: Is a directory
+test.c:1
+test.go:2
+tt:17
+[ubuntu] ~/.mac $ grep -n -i "\bmain" *.go
+1:package main
+5:func main() {
+[ubuntu] ~/.mac $ objdump -d -M intel test | grep -A3 "<main.main>"
+0000000000452330 <main.main>:
+  452330:	64 48 8b 0c 25 f8 ff 	mov    rcx,QWORD PTR fs:0xfffffffffffffff8
+  452337:	ff ff
+  452339:	48 3b 61 10          	cmp    rsp,QWORD PTR [rcx+0x10]
+--
+  4523ae:	eb 80                	jmp    452330 <main.main>
+{{< /highlight >}}
