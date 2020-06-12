@@ -15,3 +15,39 @@ bookToc: false
 所以，shell也是一种交互方式，有很多种类型的shell，例如系统自带的Windows的powershell、Linux的bash(Bourne-Again SHell)，还有开发者编写的zsh(Z Shell)、fish等都比较常见。
 
 
+使用
+-------
+
+### 基础技巧
+`$`表示当前不是root用户，`#`表示当前是root用户。
+
+除了内置的函数，shell通过递归`$PATH`中的目录找到合适的执行程序:
+{{< highlight sh>}}
+[ubuntu] / $ echo $PATH
+/usr/local/go/bin:/root/go/bin:/usr/local/go/bin:/root/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+[ubuntu] / $ which echo
+/bin/echo
+[ubuntu] / $ /bin/echo $PATH
+/usr/local/go/bin:/root/go/bin:/usr/local/go/bin:/root/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+{{< /highlight >}}
+
+当传递的参数包含空格时，应该使用单引号或双引号将其包起来，或者使用`\`转义一下，否则会被认为是两个参数:
+{{< highlight sh>}}
+[ubuntu] ~ $ mkdir My Photo
+[ubuntu] ~ $ ls
+My  Photo  go1.13.linux-amd64.tar.gz
+[ubuntu] ~ $ mkdir My\ Photo
+[ubuntu] ~ $ ls
+ My  'My Photo'   Photo   go1.13.linux-amd64.tar.gz
+{{< /highlight >}}
+
+`/`表示根目录，`~`表示home目录，`.`表示当前目录，`..`表示上级目录，还可以使用`-`来切换目录:
+{{< highlight sh>}}
+[ubuntu] ~ $ cd /tmp
+[ubuntu] /tmp $ cd -
+/root
+[ubuntu] ~ $ cd -
+/tmp
+{{< /highlight >}}
+
+可以使用`man`程序来查看一些其他shell程序的使用方法和参数，例如`man ls`，但`man`程序可能并非系统自带，需要额外安装。
