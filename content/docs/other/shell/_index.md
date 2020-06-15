@@ -51,3 +51,27 @@ My  Photo  go1.13.linux-amd64.tar.gz
 {{< /highlight >}}
 
 可以使用`man`程序来查看一些其他shell程序的使用方法和参数，例如`man ls`，但`man`程序可能并非系统自带，需要额外安装。
+
+### 程序间的连接
+在shell中，程序都有两个主要的流，即输入流和输出流。当程序需要读取数据时就是从输入流读取，这通常是你的键盘；当程序需要打印信息时，它会将信息放在输出流中，这通常是你的屏幕。然而我们也可以修改默认的输入输出流。
+
+例如，通过`> file`我们可以把输出流的内容放在一个文件中，通过`< file`我们可以从一个文件中读取内容作为输入流:
+{{< highlight sh>}}
+[ubuntu] /tmp $ echo 'hello world' > hello.txt
+[ubuntu] /tmp $ cat < hello.txt > hello2.txt
+[ubuntu] /tmp $ cat hello2.txt
+hello world
+{{< /highlight >}}
+也可以通过`>> file`把输出流的内容追加到文件的尾部，通过`|`把前面一个程序的输出作为后一个程序的输入:
+{{< highlight sh>}}
+[ubuntu] /tmp $ echo 1234 >> hello2.txt
+[ubuntu] /tmp $ cat hello2.txt
+hello world
+1234
+[ubuntu] /tmp $ ls -l | tail -n1
+drwx------  2 root root    4096 Dec  6  2019 tmux-0
+[ubuntu] /tmp $ ls -l | tail -n3
+-rw-r--r--  1 root root       1 Jun 15 10:13 hello3.txt
+-rwxr-xr-x  1 root root 1148709 Dec  9  2019 test
+drwx------  2 root root    4096 Dec  6  2019 tmux-0
+{{< /highlight >}}
