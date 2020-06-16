@@ -50,7 +50,7 @@ My  Photo  go1.13.linux-amd64.tar.gz
 /tmp
 {{< /highlight >}}
 
-可以使用`man`程序来查看一些其他shell程序的使用方法和参数，例如`man ls`，但`man`程序可能并非系统自带，需要额外安装。
+可以使用`man`程序来查看一些其他shell程序的使用方法和参数，例如`man ls`。
 
 ### 程序间的连接
 在shell中，程序都有两个主要的流，即输入流和输出流。当程序需要读取数据时就是从输入流读取，这通常是你的键盘；当程序需要打印信息时，它会将信息放在输出流中，这通常是你的屏幕。然而我们也可以修改默认的输入输出流。
@@ -75,3 +75,19 @@ drwx------  2 root root    4096 Dec  6  2019 tmux-0
 -rwxr-xr-x  1 root root 1148709 Dec  9  2019 test
 drwx------  2 root root    4096 Dec  6  2019 tmux-0
 {{< /highlight >}}
+
+### root
+在大多数类Unix系统中，`root`用户都是很特殊的用户，它几乎可以不受限制的创建、读取、修改和删除系统中的任意文件。所以我们为避免对系统造成一定的破坏，通常不会使用root用户去登录，取而代之的是在需要的时候使用`sudo`命令。
+
+例如，Linux系统的笔记本的屏幕亮度是写在`/sys/class/backlight`文件中，我们通过修改它可以修改屏幕亮度，这就需要`sudo`，我们可能做这样的尝试:
+{{< highlight sh>}}
+$ cd /sys/class/backlight/thinkpad_screen
+$ sudo echo 3 > brightness
+An error occurred while redirecting file 'brightness'
+open: Permission denied
+{{< /highlight >}}
+我们依然会得到错误的没有权限的提示，这是因为shell中`|`,`>`,`<`各个具体的程序是不知道他们的存在的，echo只知道把内容写入到某个输入流中，具体哪个它不知道，所以我们应该使用:
+{{< highlight sh>}}
+$ echo 3 | sudo tee brightness
+{{< /highlight >}}
+这样打开brightness的是tee这个程序，且这个程序是有root权限的，才能正确的修改。
