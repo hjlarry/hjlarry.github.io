@@ -83,7 +83,15 @@ CPython使用系统线程，且没有实现线程调度。所以，具体哪个�
 
 执行过程
 -------
+### 编码规范
+像`PEP8`一样，CPython也有自己的一套编码规范，为[PEP7](https://www.python.org/dev/peps/pep-0007/)，有一些命名规范可以帮助我们更好的阅读源码:
 
+* 使用`Py`前缀的方法为公共方法，但不会用于静态方法。`Py_`前缀是为`Py_FatalError`这样的全局服务性函数保留的，对于特殊的类型(比如某类对象的API)会使用更长的前缀，例如`PyString_`都是字符串类的方法
+* 公共函数和变量使用驼峰加上下划线，例如PyObject_GetAttr, Py_BuildValue, PyExc_TypeError等
+* 偶尔有一些内部的函数，却需要对加载器可见，我们使用`_Py`前缀，例如_PyObject_Dump
+* 宏使用驼峰前缀加大写，例如PyString_AS_STRING, Py_PRINT_RAW等
+
+### 执行方式
 Python的执行方式有五种:
 
 * 使用`python -c`执行单条语句
