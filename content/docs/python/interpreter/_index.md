@@ -84,7 +84,20 @@ CPython使用系统线程，且没有实现线程调度。所以，具体哪个�
 执行过程
 -------
 
-### 入口
+Python的执行方式有五种:
+
+* 使用`python -c`执行单条语句
+* 使用`python -m`执行某个模块
+* 通常使用的运行某个文件
+* 使用shell的管道连接，将`stdin`的内容作为python的输入
+* 使用交互式命令行环境(REPL)
+
+通过这三个文件，我们能观察到一个整体的执行过程:
+
+1. Programs/python.c，一个简单的最初的程序入口
+2. Modules/main.c，把整个执行过程的抽象打包再一起，包含加载环境信息、执行代码和清理内存
+3. Python/initconfig.c，从系统中加载环境变量等信息，以及命令行中的参数等
+
 {{< highlight c>}}
 <!-- cpython/Programs/python.c -->
 int main(int argc, char **argv)
@@ -156,6 +169,10 @@ static void pymain_run_python(_PyMain *pymain)
     pymain_repl(pymain, &cf);
 }
 {{< /highlight >}}
+
+这个流程图能清晰的表达出上述代码:
+
+![](./images/exe_process.png)
 
 ### 初始化
 主要是初始化内置类型，以及创建buildins、sys模块，并初始化sys.modules，sys.path等运行所需的环境配置。
