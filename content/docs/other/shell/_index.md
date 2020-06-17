@@ -93,6 +93,48 @@ $ echo 3 | sudo tee brightness
 编写脚本
 -------
 
+大多数shell都有自己的一套脚本语言，包括变量、控制流和自己的语法。本文主要使用`bash`脚本，它是目前应用最广泛的脚本。
+
+### 变量
+可以使用`foo=bar`来定义变量foo，但要注意空格。输出变量值时，单引号和双引号也有区别:
+{{< highlight sh>}}
+[ubuntu] /tmp/missing $ foo = bar
+bash: foo: command not found
+[ubuntu] /tmp/missing $ foo=bar
+[ubuntu] /tmp/missing $ echo 'this is $foo'
+this is $foo
+[ubuntu] /tmp/missing $ echo "this is $foo"
+this is bar
+{{< /highlight >}}
+
+同时，bash中也提供了一些特殊的变量:
+* `$0`，脚本名
+* `$1`至`$9`，脚本的第几个参数
+* `$@`，脚本的所有参数
+* `$#`，参数的个数
+* `$?`，前一个命令的返回值
+* `$$`，返回当前脚本的进程ID(PID)
+* `!!`，表示上一条命令，提示权限不足时可以使用`sudo !!`再次执行
+* `$_`，上一条命令的最后一个参数
+
+执行一条命令后，通常使用STDOUT返回输出的值，STDERR返回错误及错误码，正常执行通常是0，也就是`$?`得到的值。
+
+### 函数
+可以在一个脚本中编写函数:
+{{< highlight sh>}}
+mcd () {
+    mkdir -p "$1"
+    cd "$1"
+}
+{{< /highlight >}}
+
+然后使用source导入就可以使用该函数:
+{{< highlight sh>}}
+[ubuntu] /tmp/missing $ source ./test.sh
+[ubuntu] /tmp/missing $ mcd tt
+[ubuntu] /tmp/missing/tt $
+{{< /highlight >}}
+
 
 常用工具
 -------
