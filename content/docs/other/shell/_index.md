@@ -199,6 +199,35 @@ bar123  foo123
 a  b  c  d  e  f  g  h
 {{< /highlight >}}
 
+### 脚本
+脚本也可以使用其他语言编写，只要标记好`shebang`，例如:
+{{< highlight python>}}
+#!/usr/local/bin/python
+import sys
+for arg in reversed(sys.argv[1:]):
+    print(arg)
+{{< /highlight >}}
+
+写完以后要赋予它权限，才能正确执行:
+{{< highlight sh>}}
+[ubuntu] /tmp/missing/tt $ ./test.py
+bash: ./test.py: Permission denied
+[ubuntu] /tmp/missing/tt $ chmod a+x test.py
+[ubuntu] /tmp/missing/tt $ ./test.py a n cs
+cs
+n
+a
+{{< /highlight >}}
+
+但是其他电脑的python程序并不一定位于`/usr/local/bin/python`，如何让这个脚本通用呢？我们可以利用环境变量中的程序来解析该脚本，将shebang信息改为`#!/usr/bin/env python`即可。
+
+此外，shell函数和脚本是有一些不同点的:
+* 函数只能用shell语言，脚本可以用任意语言，只要脚本中包含shebang就行
+* 函数仅在定义时被加载，脚本是在每次执行时加载的。所以函数的加载略快，但每次修改得自己手动重新加载
+* 函数会在当前的shell环境中执行，脚本会在单独的进程中执行
+* 函数可以对环境变量直接进行修改，脚本则只能使用`export`将环境变量导出
+
+
 常用工具
 -------
 
