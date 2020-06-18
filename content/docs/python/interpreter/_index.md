@@ -182,6 +182,24 @@ static void pymain_run_python(_PyMain *pymain)
 
 ![](./images/exe_process.png)
 
+### 建立运行时环境
+通过上图，我们可以看到无论执行任何python代码，运行时首先会建立相关环境。这个环境在`Include/cpython/initconfig.h`中定义为[PyConfig](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/cpython/initconfig.h#L407)，该结构体中的数据包括:
+
+* 运行模式的标记，比如debug或optimized模式
+* 执行的模式，比如是以文件的方式、或者模块的方式、stdin的方式
+* 通过`-X <option>`附加的拓展选项
+* 运行时设置的环境变量
+
+这些值，我们也可以在运行时中查看到:
+{{< highlight python>}}
+[ubuntu] /tmp/missing/tt $ python3 -X dev -q -v
+>>> import sys
+>>> sys.flags
+sys.flags(debug=0, inspect=0, interactive=0, optimize=0, dont_write_bytecode=0, no_user_site=0, no_site=0, ignore_environment=0, verbose=1, bytes_warning=0, quiet=1, hash_randomization=1, isolated=0)
+>>> sys._xoptions
+{'dev': True}
+{{< /highlight >}}
+
 ### 初始化
 主要是初始化内置类型，以及创建buildins、sys模块，并初始化sys.modules，sys.path等运行所需的环境配置。
 {{< highlight c>}}
