@@ -117,7 +117,7 @@ this is bar
 * `!!`，表示上一条命令，提示权限不足时可以使用`sudo !!`再次执行
 * `$_`，上一条命令的最后一个参数
 
-执行一条命令后，通常使用STDOUT返回输出的值，STDERR返回错误及错误码，正常执行通常是0，也就是`$?`得到的值。
+执行一条命令后，通常使用STDOUT返回输出的值，STDERR返回错误及错误码，正常执行的错误码是0，也就是`$?`得到的值。
 
 ### 函数
 可以在一个脚本中编写函数:
@@ -134,6 +134,46 @@ mcd () {
 [ubuntu] /tmp/missing $ mcd tt
 [ubuntu] /tmp/missing/tt $
 {{< /highlight >}}
+
+### 命令替换
+可以通过`$(CMD)`的方式先来执行CMD，执行得到的结果替换掉$(CMD)。例如，`for file in $(ls)`使shell首先调用ls，然后遍历得到的这些返回值。此外，还可以通过`<(CMD)`去先执行CMD，然后将结果输出到一个临时文件中，并将<(CMD)替换成临时文件名。
+{{< highlight sh>}}
+[ubuntu] /tmp $ echo "Starting program at $(date)"
+Starting program at Wed Jun 17 16:13:34 CST 2020
+[ubuntu] /tmp $ diff <(ls go) <(ls missing)
+1,18c1,4
+< AUTHORS
+< CONTRIBUTING.md
+...
+---
+> 3
+> semester
+> test.sh
+> tt
+{{< /highlight >}}
+
+### 控制流
+我们先来看一个例子:
+{{< highlight sh>}}
+#!/bin/bash
+
+echo "Starting program at $(date)" # Date will be substituted
+
+echo "Running program $0 with $# arguments with pid $$"
+
+for file in "$@"; do
+    grep foobar "$file" > /dev/null 2> /dev/null
+    # When pattern is not found, grep has exit status 1
+    # We redirect STDOUT and STDERR to a null register since we do not care about them
+    if [[ $? -ne 0 ]]; then
+        echo "File $file does not have any foobar, adding one"
+        echo "# foobar" >> "$file"
+    fi
+done
+{{< /highlight >}}
+例如，运行`./test.sh a b c`，则遍历a、b、c三个文件，分别去寻找`foobar`字符串，如果没找到，错误返回值就是1。接着使用`-ne`来做比较`$?`不等于0，则把`# foobar`追加到这个文件中。
+
+注意，做比较时尽量使用双方括号`[[]]`，而非单方括号，可以降低犯错的几率。具体的原因和其他比较条件可参考[此文章](http://mywiki.wooledge.org/BashFAQ/031)。
 
 
 常用工具
