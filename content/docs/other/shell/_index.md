@@ -175,6 +175,29 @@ done
 
 注意，做比较时尽量使用双方括号`[[]]`，而非单方括号，可以降低犯错的几率。具体的原因和其他比较条件可参考[此文章](http://mywiki.wooledge.org/BashFAQ/031)。
 
+### 通配符
+在shell中，可能经常需要输入一批类似的参数，例如`mkdir foo1 foo2 foo3`等等，如果挨个输入会很不方便，因此有了通配符。
+
+可以分别使用`?`和`*`来匹配一个或任意个字符，花括号`{}`中可以包含一系列的指令。
+{{< highlight sh>}}
+[ubuntu] /tmp/missing/tt $ touch foo{1..20}.txt
+[ubuntu] /tmp/missing/tt $ ls
+foo1.txt   foo11.txt  foo13.txt  foo15.txt  foo17.txt  foo19.txt  foo20.txt  foo4.txt  foo6.txt  foo8.txt
+foo10.txt  foo12.txt  foo14.txt  foo16.txt  foo18.txt  foo2.txt   foo3.txt   foo5.txt  foo7.txt  foo9.txt
+[ubuntu] /tmp/missing/tt $ rm foo?
+rm: cannot remove 'foo?': No such file or directory
+[ubuntu] /tmp/missing/tt $ rm foo?.txt
+[ubuntu] /tmp/missing/tt $ ls
+foo10.txt  foo11.txt  foo12.txt  foo13.txt  foo14.txt  foo15.txt  foo16.txt  foo17.txt  foo18.txt  foo19.txt  foo20.txt
+[ubuntu] /tmp/missing/tt $ rm foo*
+[ubuntu] /tmp/missing/tt $ ls
+[ubuntu] /tmp/missing/tt $ mkdir {foo,bar}123
+[ubuntu] /tmp/missing/tt $ ls
+bar123  foo123
+[ubuntu] /tmp/missing/tt $ touch {foo,bar}123/{a..h}
+[ubuntu] /tmp/missing/tt $ ls bar123
+a  b  c  d  e  f  g  h
+{{< /highlight >}}
 
 常用工具
 -------
