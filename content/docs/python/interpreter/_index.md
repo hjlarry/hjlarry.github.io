@@ -254,8 +254,41 @@ PyRun_StringFlags(const char *str, int start, PyObject *globals,
     return ret;
 {{< /highlight >}}
 
+#### -m的方式
+另一种执行Python命令的方式是-m选项和模块名称，例如`python -m unittest`可以运行标准库中的unittest模块。实际上它就是在sys.path中去搜索名为unittest的模块然后去执行。
 
+CPython是先通过一个C的API函数[PyImport_ImportModule()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/import.c#L1409)来导入标准库`runpy`，它返回的是一个PyObject核心对象类型，然后需要一些特殊的方法获取它的属性再调用。例如`hi.upper()`相当于`hi.upper.__call__()`，在C中[PyObject_GetAttrString()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/object.c#L831)就是用来获得hi的upper属性，然后通过[PyObject_Call()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/call.c#L214)就是去执行__call__()。
 
+{{< highlight c>}}
+// modname就是通过-m传递进来的参数
+static int
+pymain_run_module(const wchar_t *modname, int set_argv0)
+{
+    PyObject *module, *runpy, *runmodule, *runargs, *result;
+    runpy = PyImport_ImportModule("runpy");
+ ...
+    runmodule = PyObject_GetAttrString(runpy, "_run_module_as_main");
+ ...
+    module = PyUnicode_FromWideChar(modname, wcslen(modname));
+ ...
+    runargs = Py_BuildValue("(Oi)", module, set_argv0);
+ ...
+    result = PyObject_Call(runmodule, runargs, NULL);
+ ...
+    if (result == NULL) {
+        return pymain_exit_err_print();
+    }
+    Py_DECREF(result);
+    return 0;
+}
+{{< /highlight >}}
+这段代码说明`python -m <module>`本质上是`python -m runpy <module>`，module只是参数，runpy对其进行了一层包装。runpy是用纯python写的位于`Lib/runpy.py`，它的目的是抽象在不同操作系统上定位和执行模块的过程，具体干这些事:
+
+* 调用用户提供的模块的`__import__()`方法
+* 设置该模块的名字空间为`__main__`
+* 在`__main__`的名字空间下执行该模块
+
+runpy模块同样也可以用来执行某个目录或者zip文件。
 
 ### 初始化
 主要是初始化内置类型，以及创建buildins、sys模块，并初始化sys.modules，sys.path等运行所需的环境配置。
