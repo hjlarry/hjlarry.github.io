@@ -200,6 +200,63 @@ sys.flags(debug=0, inspect=0, interactive=0, optimize=0, dont_write_bytecode=0, 
 {'dev': True}
 {{< /highlight >}}
 
+### 通过输入运行
+
+#### -c的方式
+例如`python -c "print('hi')"`，它的运行流程如图所示:
+
+![pymain_run_command](./images/pymain_run_command.png)
+
+[pymain_run_command()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Modules/main.c#L240)的核心逻辑如下:
+{{< highlight c>}}
+// 首个参数就是-c传递的指令
+// wchar_t*类型通常是CPython中用于存储Unicode数据的低级存储类型，因为该类型的大小也可以存储UTF8字符
+static int
+pymain_run_command(wchar_t *command, PyCompilerFlags *cf)
+{
+    PyObject *unicode, *bytes;
+
+    // 转换为PyUnicode对象
+    unicode = PyUnicode_FromWideChar(command, -1);
+
+    // 对unicode进行utf8编码得到一个python字节对象
+    bytes = PyUnicode_AsUTF8String(unicode);
+
+    // 重新解码为字符串丢去执行
+    ret = PyRun_SimpleStringFlags(PyBytes_AsString(bytes), cf);
+
+    return (ret != 0);
+}
+{{< /highlight >}}
+
+而[PyRun_SimpleStringFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L453)的目的是创建一个Python模块`__main__`，和一个字典，再将命令一起打包调用[PyRun_StringFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1008)，这个函数将创建一个假的文件名，接着就是调用Python解析器创建AST并返回模块mod了:
+{{< highlight c>}}
+int
+PyRun_SimpleStringFlags(const char *command, PyCompilerFlags *flags)
+{
+    PyObject *m, *d, *v;
+    // 建立入口模块
+    m = PyImport_AddModule("__main__");
+    // 创建字典，用于globals()和locals()
+    d = PyModule_GetDict(m);
+    v = PyRun_StringFlags(command, Py_file_input, d, d, flags);
+    return 0;
+}
+
+PyObject *
+PyRun_StringFlags(const char *str, int start, PyObject *globals,
+                  PyObject *locals, PyCompilerFlags *flags)
+{
+...
+    mod = PyParser_ASTFromStringObject(str, filename, start, flags, arena);
+    ret = run_mod(mod, filename, globals, locals, flags, arena);
+    PyArena_Free(arena);
+    return ret;
+{{< /highlight >}}
+
+
+
+
 ### 初始化
 主要是初始化内置类型，以及创建buildins、sys模块，并初始化sys.modules，sys.path等运行所需的环境配置。
 {{< highlight c>}}
