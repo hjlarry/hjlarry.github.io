@@ -290,6 +290,82 @@ pymain_run_module(const wchar_t *modname, int set_argv0)
 
 runpy模块同样也可以用来执行某个目录或者zip文件。
 
+#### file模式
+如果是`python test.py`这种方式，CPython会打开一个文件句柄，然后传递给`Python/pythonrun.c`中的[PyRun_SimpleFileExFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L372)方法:
+{{< highlight c>}}
+int
+PyRun_SimpleFileExFlags(FILE *fp, const char *filename, int closeit,
+                        PyCompilerFlags *flags)
+{
+ ...
+    m = PyImport_AddModule("__main__");
+ ...
+    // 如果是pyc文件，则调用run_pyc_file()
+    if (maybe_pyc_file(fp, filename, ext, closeit)) {
+ ...
+        v = run_pyc_file(pyc_fp, filename, d, d, flags);
+    } else {
+        // .py和stdin模式都运行PyRun_FileExFlags()
+        if (strcmp(filename, "<stdin>") != 0 &&
+            set_main_loader(d, filename, "SourceFileLoader") < 0) {
+            fprintf(stderr, "python: failed to set __main__.__loader__\n");
+            ret = -1;
+            goto done;
+        }
+        v = PyRun_FileExFlags(fp, filename, Py_file_input, d, d,
+                              closeit, flags);
+    }
+ ...
+    return ret;
+}
+{{< /highlight >}}
+
+而[PyRun_FileExFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1032)和前文介绍的通过-c输入的PyRun_SimpleStringFlags()作用类似，都是去创建AST返回mod然后运行mod:
+{{< highlight c>}}
+PyObject *
+PyRun_FileExFlags(FILE *fp, const char *filename_str, int start, PyObject *globals,
+                  PyObject *locals, int closeit, PyCompilerFlags *flags)
+{
+ ...
+    mod = PyParser_ASTFromFileObject(fp, filename, NULL, start, 0, 0,
+                                     flags, NULL, arena);
+ ...
+    ret = run_mod(mod, filename, globals, locals, flags, arena);
+}
+{{< /highlight >}}
+
+[run_mod()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1125)负责把模块发送给AST编译为一个代码对象，即文章开头提到过的存储字节码以及保存在.pyc文件中的对象:
+{{< highlight c>}}
+static PyObject *
+run_mod(mod_ty mod, PyObject *filename, PyObject *globals, PyObject *locals,
+            PyCompilerFlags *flags, PyArena *arena)
+{
+    PyCodeObject *co;
+    PyObject *v;
+    co = PyAST_CompileObject(mod, filename, flags, -1, arena);
+    v = run_eval_code_obj(co, globals, locals);
+    return v;
+}
+{{< /highlight >}}
+之后的run_eval_code_obj()就属于执行逻辑了，后文中再描述。
+
+[run_pyc_file()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1145)可以理解为省略了创建AST的过程，而是通过marshal把pyc文件中的内容复制到内存并将其转换为特定的数据结构。硬盘上的pyc文件就是CPython编译器缓存已编译代码的方式，因此无需每次调用脚本时再编译一次:
+{{< highlight c>}}
+static PyObject *
+run_pyc_file(FILE *fp, const char *filename, PyObject *globals,
+             PyObject *locals, PyCompilerFlags *flags)
+{
+    PyCodeObject *co;
+    PyObject *v;
+  ...
+    v = PyMarshal_ReadLastObjectFromFile(fp);
+  ...
+    co = (PyCodeObject *)v;
+    v = run_eval_code_obj(co, globals, locals);
+    return v;
+}
+{{< /highlight >}}
+
 ### 初始化
 主要是初始化内置类型，以及创建buildins、sys模块，并初始化sys.modules，sys.path等运行所需的环境配置。
 {{< highlight c>}}
