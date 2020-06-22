@@ -22,7 +22,7 @@
 <title>软件部分 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.0e6c33709a5717656d0030a9cdafcc86eb92a082726cc5cd121683fe35f12bc8.js" integrity="sha256-DmwzcJpXF2VtADCpza/MhuuSoIJybMXNEhaD/jXxK8g="></script>
+<script defer src="/cn.search.min.a4cb0937590ffc43b866a7d582dc5d0363ef2283ad9c4f0da81826451903456e.js" integrity="sha256-pMsJN1kP/EO4ZqfVgtxdA2PvIoOtnE8NqBgmRRkDRW4="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/sicp/software/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -98,6 +98,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/docs/other/git/">git</a></li>
 <li><a href="/docs/other/docker/">docker</a></li>
 <li><a href="/docs/other/raft/">raft</a></li>
+<li><a href="/docs/other/shell/">shell</a></li>
 <li><a href="/docs/other/protocol/">网络协议</a></li>
 <li><a href="/docs/other/tools/">系统工具</a></li>
 </ul>
@@ -157,9 +158,15 @@ https://github.com/alex-shpak/hugo-book
       </ul>
     </li>
     <li><a href="#线程">线程</a></li>
-    <li><a href="#虚拟存储器">虚拟存储器</a>
+    <li><a href="#并发与并行">并发与并行</a>
       <ul>
         <li><a href="#基础概念-1">基础概念</a></li>
+        <li><a href="#并发模型">并发模型</a></li>
+      </ul>
+    </li>
+    <li><a href="#虚拟存储器">虚拟存储器</a>
+      <ul>
+        <li><a href="#基础概念-2">基础概念</a></li>
         <li><a href="#内存分配过程">内存分配过程</a></li>
         <li><a href="#换入换出">换入换出</a></li>
         <li><a href="#性能相关">性能相关</a></li>
@@ -264,7 +271,7 @@ C语言、Go语言通过标准库进行系统调用，他们的标准库中的�
 <li>waiting:因IO blocking、sync等原因⽆无法继续执⾏</li>
 </ul>
 <h3 id="调度">调度</h3>
-<p>采用**抢占式调度，**CPU分配时间片，时间片结束则强制性切换并保存上下文。另外一种调度模式叫协作式调度，一般是在用户空间实现的。</p>
+<p>采用<strong>抢占式调度</strong>，CPU分配时间片，时间片结束则强制性切换并保存上下文。另外一种调度模式叫协作式调度，一般是在用户空间实现的。</p>
 <h2 id="线程">线程</h2>
 <p>也称<strong>轻量级进程</strong>(LWP)，是进程中的实际执行单位，由程序计数器、寄存器、栈内存组成。</p>
 <ul>
@@ -277,8 +284,24 @@ C语言、Go语言通过标准库进行系统调用，他们的标准库中的�
 <p><strong>内核线程和用户线程是有区别的</strong>，我们一般使用的线程都是被包装过的，很少通过系统调用来使用线程。用户线程可能是系统线程的包装体，它们是一对一关系；也可能是多个用户线程对应一个系统线程，多个用户线程分享一个时间片，这是多对一关系；还有一种可能是多对多关系，类似于Go的机制，某个时刻一个用户线程必然对应一个系统线程，但总体来看用户线程可能比系统线程更多或者更少。</p>
 <p>那么为什么要包装内核线程呢？假如我们再做一个文件读操作，它要通过系统调用来完成，实际会分为用户态代码和内核态代码，这就涉及到上下文的切换，内核线程的调度、创建等，如果这种文件读操作很频繁，那么成本是很高的。我们就会考虑，在用户态和内核态的基础上能不能建立类似于Pool的模型来复用。这样一来，内核态的系统线程负责执行，用户态的用户线程负责存储状态，从而避免了频繁创建系统线程，用户态可以创建很多用来存储状态的执行单位，执行时把它绑定到一个内核线程中去，执行完释放内核线程，内核线程把绑定状态删除后放入池中，不需要杀掉内核线程，接下来另一个执行单位重新绑定到该内核线程中去执行。</p>
 <p>所以当我们选择一门语言或者一种并发库的时候，是要知道它究竟由内核线程实现还是用户线程实现的，这在性能上是有很大区别的。</p>
-<h2 id="虚拟存储器">虚拟存储器</h2>
+<h2 id="并发与并行">并发与并行</h2>
 <h3 id="基础概念-1">基础概念</h3>
+<p><strong>并发与并行</strong>关注的是程序逻辑的执行。并发是从逻辑角度出发的，指的是多个任务能同时执行，这个同时是相对的概念，比如在一小时内完成。而并行是指物理上的同一时刻执行多个并发任务，这就要求多机器或多核。所以说并发是并行的基础，并行是并发的理想执行模式。</p>
+<p><strong>同步和异步</strong>关注的是消息通信机制。同步就是在调用者发出一个调用时，主动等待该调用的结果。而异步则是发出调用之后就不管了，调用者不会立即得到结果，等待被调用方通过状态、通知等告诉调用者，或是通过回调函数处理该调用。</p>
+<p><strong>阻塞和非阻塞</strong>关注的是程序在等待调用结果(消息或返回值)时的状态。阻塞调用是指调用结果返回之前，当前线程被挂起，只有在得到结果之后才返回。非阻塞调用是指在不能立刻得到结果之前，该调用并不会阻塞当前的线程。</p>
+<h3 id="并发模型">并发模型</h3>
+<p>实现并发通常有三种模型，即多进程、多线程、协程。</p>
+<p>多进程模型把线程a封装到进程1，把线程b封装到进程2，然后用多个进程执行。对于CPU密集型场景，好处有三点:</p>
+<ul>
+<li>对于操作系统来说，这个进程的优先级好控制，分配的时间片和接收任务的时间片是分离的</li>
+<li>容易部署迁移至其他机器。两个进程相互通信最简单的方式是RPC或Socket、MQ、数据库等</li>
+<li>数量更有弹性。在一个进程里创建多个线程对于操作系统来说都是被监管的，并没有多个进程处理起来更流畅</li>
+</ul>
+<p>多进程的缺点就在于数据复制以及创建进程时的开销大了。</p>
+<p>正常情况优先使用多线程模型，多线程会尽可能多的获取时间片，操作系统有操作时间片的调度器，该调度器会计算每个线程的时间片使用完以后保存线程的寄存器等状态，进行上下文的切换。</p>
+<p>协程模型是程序通过自己切换的方式实现在单个线程内、单个CPU上执行来提高CPU的利用率，它充分利用了IO等待时浪费的时间片。</p>
+<h2 id="虚拟存储器">虚拟存储器</h2>
+<h3 id="基础概念-2">基础概念</h3>
 <p>操作系统会有一个很大的地址空间，也叫<strong>虚拟地址空间</strong>。这个空间的前面一大段是操作系统用的，之后的每个进程也都会有一个独立的很大的地址空间。这样不同的程序可以使用相同的虚拟地址，当程序在运行时访问某个地址就是访问进程内的虚拟地址，通过<strong>内存管理单元</strong>(MMU)翻译映射到一个物理地址。这样的好处就是无论在程序内的地址空间怎么折腾都不会影响到其他的程序，对编译器也更友好更方便，可以提前分配。</p>
 <p>我们在编译时看到的都是虚拟地址，物理地址在运行期才能看到。虚拟地址空间未必会全部映射到主存中，也会给各个设备保留一段空间。</p>
 <p><strong>虚拟存储器</strong>可以看成硬盘保存的一个字节数组，虚拟地址空间有256TB，而实际的物理内存可能只有8GB，有这么大的虚拟地址空间就不能阻止程序去使用，不够的物理存储体我们就通过硬盘上的交换分区来弥补。也有可能物理内存加上交换分区都不够程序使用，在Linux中就会引发OOM机制。</p>
@@ -637,9 +660,9 @@ End of assembler dump.</code></pre></div>
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/ba3f312c8e2f8e11483973338c18b196a57ab539" title='最后修改者 hjlarry | April 24, 2020' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/cac3049212d3bedfe43ad6b9cc07abaadfb206a6" title='最后修改者 hjlarry | June 3, 2020' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>April 24, 2020</span>
+      <span>June 3, 2020</span>
     </a>
   </div>
 
@@ -685,9 +708,15 @@ End of assembler dump.</code></pre></div>
       </ul>
     </li>
     <li><a href="#线程">线程</a></li>
-    <li><a href="#虚拟存储器">虚拟存储器</a>
+    <li><a href="#并发与并行">并发与并行</a>
       <ul>
         <li><a href="#基础概念-1">基础概念</a></li>
+        <li><a href="#并发模型">并发模型</a></li>
+      </ul>
+    </li>
+    <li><a href="#虚拟存储器">虚拟存储器</a>
+      <ul>
+        <li><a href="#基础概念-2">基础概念</a></li>
         <li><a href="#内存分配过程">内存分配过程</a></li>
         <li><a href="#换入换出">换入换出</a></li>
         <li><a href="#性能相关">性能相关</a></li>

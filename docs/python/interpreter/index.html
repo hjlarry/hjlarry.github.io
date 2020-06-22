@@ -13,7 +13,7 @@
 <title>CPython解释器 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.0e6c33709a5717656d0030a9cdafcc86eb92a082726cc5cd121683fe35f12bc8.js" integrity="sha256-DmwzcJpXF2VtADCpza/MhuuSoIJybMXNEhaD/jXxK8g="></script>
+<script defer src="/cn.search.min.a4cb0937590ffc43b866a7d582dc5d0363ef2283ad9c4f0da81826451903456e.js" integrity="sha256-pMsJN1kP/EO4ZqfVgtxdA2PvIoOtnE8NqBgmRRkDRW4="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/python/interpreter/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -89,6 +89,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/docs/other/git/">git</a></li>
 <li><a href="/docs/other/docker/">docker</a></li>
 <li><a href="/docs/other/raft/">raft</a></li>
+<li><a href="/docs/other/shell/">shell</a></li>
 <li><a href="/docs/other/protocol/">网络协议</a></li>
 <li><a href="/docs/other/tools/">系统工具</a></li>
 </ul>
@@ -141,7 +142,10 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#gil">GIL</a></li>
     <li><a href="#执行过程">执行过程</a>
       <ul>
-        <li><a href="#入口">入口</a></li>
+        <li><a href="#编码规范">编码规范</a></li>
+        <li><a href="#执行方式">执行方式</a></li>
+        <li><a href="#建立运行时环境">建立运行时环境</a></li>
+        <li><a href="#通过输入运行">通过输入运行</a></li>
         <li><a href="#初始化">初始化</a></li>
         <li><a href="#执行">执行</a></li>
         <li><a href="#终止">终止</a></li>
@@ -218,7 +222,29 @@ main_loop:
 CPython使用系统线程，且没有实现线程调度。所以，具体哪个等待线程被切换执行，由操作系统决定。甚至，发出请求和被切换执行的未必就是同一个线程。</p>
 <p>对于CPU密集型任务，除了使用多进程架构绕开，也可以使用C来编写多线程的扩展也能绕开GIL限制。</p>
 <h2 id="执行过程">执行过程</h2>
-<h3 id="入口">入口</h3>
+<h3 id="编码规范">编码规范</h3>
+<p>像<code>PEP8</code>一样，CPython也有自己的一套编码规范，为<a href="https://www.python.org/dev/peps/pep-0007/">PEP7</a>，有一些命名规范可以帮助我们更好的阅读源码:</p>
+<ul>
+<li>使用<code>Py</code>前缀的方法为公共方法，但不会用于静态方法。<code>Py_</code>前缀是为<code>Py_FatalError</code>这样的全局服务性函数保留的，对于特殊的类型(比如某类对象的API)会使用更长的前缀，例如<code>PyString_</code>都是字符串类的方法</li>
+<li>公共函数和变量使用驼峰加上下划线，例如PyObject_GetAttr, Py_BuildValue, PyExc_TypeError等</li>
+<li>偶尔有一些内部的函数，却需要对加载器可见，我们使用<code>_Py</code>前缀，例如_PyObject_Dump</li>
+<li>宏使用驼峰前缀加大写，例如PyString_AS_STRING, Py_PRINT_RAW等</li>
+</ul>
+<h3 id="执行方式">执行方式</h3>
+<p>Python的执行方式有五种:</p>
+<ul>
+<li>使用<code>python -c</code>执行单条语句</li>
+<li>使用<code>python -m</code>执行某个模块</li>
+<li>通常使用的运行某个文件</li>
+<li>使用shell的管道连接，将<code>stdin</code>的内容作为python的输入</li>
+<li>使用交互式命令行环境(REPL)</li>
+</ul>
+<p>通过这三个文件，我们能观察到一个整体的执行过程:</p>
+<ol>
+<li>Programs/python.c，一个简单的最初的程序入口</li>
+<li>Modules/main.c，把整个执行过程的抽象打包再一起，包含加载环境信息、执行代码和清理内存</li>
+<li>Python/initconfig.c，从系统中加载环境变量等信息，以及命令行中的参数等</li>
+</ol>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Programs<span style="color:#f92672">/</span>python.c <span style="color:#f92672">--&gt;</span>
 <span style="color:#66d9ef">int</span> main(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>argv)
 {
@@ -284,6 +310,163 @@ done:
     }
 
     pymain_repl(pymain, <span style="color:#f92672">&amp;</span>cf);
+}</code></pre></div></p>
+<p>这个流程图能清晰的表达出上述代码:</p>
+<p><img src="./images/exe_process.png" alt="" /></p>
+<h3 id="建立运行时环境">建立运行时环境</h3>
+<p>通过上图，我们可以看到无论执行任何python代码，运行时首先会建立相关环境。这个环境在<code>Include/cpython/initconfig.h</code>中定义为<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/cpython/initconfig.h#L407">PyConfig</a>，该结构体中的数据包括:</p>
+<ul>
+<li>运行模式的标记，比如debug或optimized模式</li>
+<li>执行的模式，比如是以文件的方式、或者模块的方式、stdin的方式</li>
+<li>通过<code>-X &lt;option&gt;</code>附加的拓展选项</li>
+<li>运行时设置的环境变量</li>
+</ul>
+<p>这些值，我们也可以在运行时中查看到:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">[ubuntu] <span style="color:#f92672">/</span>tmp<span style="color:#f92672">/</span>missing<span style="color:#f92672">/</span>tt <span style="color:#960050;background-color:#1e0010">$</span> python3 <span style="color:#f92672">-</span>X dev <span style="color:#f92672">-</span>q <span style="color:#f92672">-</span>v
+<span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">import</span> sys
+<span style="color:#f92672">&gt;&gt;&gt;</span> sys<span style="color:#f92672">.</span>flags
+sys<span style="color:#f92672">.</span>flags(debug<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, inspect<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, interactive<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, optimize<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, dont_write_bytecode<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, no_user_site<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, no_site<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, ignore_environment<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, verbose<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, bytes_warning<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, quiet<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, hash_randomization<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, isolated<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+<span style="color:#f92672">&gt;&gt;&gt;</span> sys<span style="color:#f92672">.</span>_xoptions
+{<span style="color:#e6db74">&#39;dev&#39;</span>: True}</code></pre></div></p>
+<h3 id="通过输入运行">通过输入运行</h3>
+<h4 id="-c的方式">-c的方式</h4>
+<p>例如<code>python -c &quot;print('hi')&quot;</code>，它的运行流程如图所示:</p>
+<p><img src="./images/pymain_run_command.png" alt="pymain_run_command" /></p>
+<p><a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Modules/main.c#L240">pymain_run_command()</a>的核心逻辑如下:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// 首个参数就是-c传递的指令
+</span><span style="color:#75715e">// wchar_t*类型通常是CPython中用于存储Unicode数据的低级存储类型，因为该类型的大小也可以存储UTF8字符
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span>
+<span style="color:#a6e22e">pymain_run_command</span>(wchar_t <span style="color:#f92672">*</span>command, PyCompilerFlags <span style="color:#f92672">*</span>cf)
+{
+    PyObject <span style="color:#f92672">*</span>unicode, <span style="color:#f92672">*</span>bytes;
+
+    <span style="color:#75715e">// 转换为PyUnicode对象
+</span><span style="color:#75715e"></span>    unicode <span style="color:#f92672">=</span> PyUnicode_FromWideChar(command, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>);
+
+    <span style="color:#75715e">// 对unicode进行utf8编码得到一个python字节对象
+</span><span style="color:#75715e"></span>    bytes <span style="color:#f92672">=</span> PyUnicode_AsUTF8String(unicode);
+
+    <span style="color:#75715e">// 重新解码为字符串丢去执行
+</span><span style="color:#75715e"></span>    ret <span style="color:#f92672">=</span> PyRun_SimpleStringFlags(PyBytes_AsString(bytes), cf);
+
+    <span style="color:#66d9ef">return</span> (ret <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>);
+}</code></pre></div></p>
+<p>而<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L453">PyRun_SimpleStringFlags()</a>的目的是创建一个Python模块<code>__main__</code>，和一个字典，再将命令一起打包调用<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1008">PyRun_StringFlags()</a>，这个函数将创建一个假的文件名，接着就是调用Python解析器创建AST并返回模块mod了:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span>
+<span style="color:#a6e22e">PyRun_SimpleStringFlags</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>command, PyCompilerFlags <span style="color:#f92672">*</span>flags)
+{
+    PyObject <span style="color:#f92672">*</span>m, <span style="color:#f92672">*</span>d, <span style="color:#f92672">*</span>v;
+    <span style="color:#75715e">// 建立入口模块
+</span><span style="color:#75715e"></span>    m <span style="color:#f92672">=</span> PyImport_AddModule(<span style="color:#e6db74">&#34;__main__&#34;</span>);
+    <span style="color:#75715e">// 创建字典，用于globals()和locals()
+</span><span style="color:#75715e"></span>    d <span style="color:#f92672">=</span> PyModule_GetDict(m);
+    v <span style="color:#f92672">=</span> PyRun_StringFlags(command, Py_file_input, d, d, flags);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+PyObject <span style="color:#f92672">*</span>
+<span style="color:#a6e22e">PyRun_StringFlags</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>str, <span style="color:#66d9ef">int</span> start, PyObject <span style="color:#f92672">*</span>globals,
+                  PyObject <span style="color:#f92672">*</span>locals, PyCompilerFlags <span style="color:#f92672">*</span>flags)
+{
+...
+    mod <span style="color:#f92672">=</span> PyParser_ASTFromStringObject(str, filename, start, flags, arena);
+    ret <span style="color:#f92672">=</span> run_mod(mod, filename, globals, locals, flags, arena);
+    PyArena_Free(arena);
+    <span style="color:#66d9ef">return</span> ret;</code></pre></div></p>
+<h4 id="-m的方式">-m的方式</h4>
+<p>另一种执行Python命令的方式是-m选项和模块名称，例如<code>python -m unittest</code>可以运行标准库中的unittest模块。实际上它就是在sys.path中去搜索名为unittest的模块然后去执行。</p>
+<p>CPython是先通过一个C的API函数<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/import.c#L1409">PyImport_ImportModule()</a>来导入标准库<code>runpy</code>，它返回的是一个PyObject核心对象类型，然后需要一些特殊的方法获取它的属性再调用。例如<code>hi.upper()</code>相当于<code>hi.upper.__call__()</code>，在C中<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/object.c#L831">PyObject_GetAttrString()</a>就是用来获得hi的upper属性，然后通过<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/call.c#L214">PyObject_Call()</a>就是去执行__call__()。</p>
+<p><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// modname就是通过-m传递进来的参数
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span>
+<span style="color:#a6e22e">pymain_run_module</span>(<span style="color:#66d9ef">const</span> wchar_t <span style="color:#f92672">*</span>modname, <span style="color:#66d9ef">int</span> set_argv0)
+{
+    PyObject <span style="color:#f92672">*</span>module, <span style="color:#f92672">*</span>runpy, <span style="color:#f92672">*</span>runmodule, <span style="color:#f92672">*</span>runargs, <span style="color:#f92672">*</span>result;
+    runpy <span style="color:#f92672">=</span> PyImport_ImportModule(<span style="color:#e6db74">&#34;runpy&#34;</span>);
+ ...
+    runmodule <span style="color:#f92672">=</span> PyObject_GetAttrString(runpy, <span style="color:#e6db74">&#34;_run_module_as_main&#34;</span>);
+ ...
+    module <span style="color:#f92672">=</span> PyUnicode_FromWideChar(modname, wcslen(modname));
+ ...
+    runargs <span style="color:#f92672">=</span> Py_BuildValue(<span style="color:#e6db74">&#34;(Oi)&#34;</span>, module, set_argv0);
+ ...
+    result <span style="color:#f92672">=</span> PyObject_Call(runmodule, runargs, NULL);
+ ...
+    <span style="color:#66d9ef">if</span> (result <span style="color:#f92672">==</span> NULL) {
+        <span style="color:#66d9ef">return</span> pymain_exit_err_print();
+    }
+    Py_DECREF(result);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}</code></pre></div>
+这段代码说明<code>python -m &lt;module&gt;</code>本质上是<code>python -m runpy &lt;module&gt;</code>，module只是参数，runpy对其进行了一层包装。runpy是用纯python写的位于<code>Lib/runpy.py</code>，它的目的是抽象在不同操作系统上定位和执行模块的过程，具体干这些事:</p>
+<ul>
+<li>调用用户提供的模块的<code>__import__()</code>方法</li>
+<li>设置该模块的名字空间为<code>__main__</code></li>
+<li>在<code>__main__</code>的名字空间下执行该模块</li>
+</ul>
+<p>runpy模块同样也可以用来执行某个目录或者zip文件。</p>
+<h4 id="file模式">file模式</h4>
+<p>如果是<code>python test.py</code>这种方式，CPython会打开一个文件句柄，然后传递给<code>Python/pythonrun.c</code>中的<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L372">PyRun_SimpleFileExFlags()</a>方法:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span>
+<span style="color:#a6e22e">PyRun_SimpleFileExFlags</span>(FILE <span style="color:#f92672">*</span>fp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>filename, <span style="color:#66d9ef">int</span> closeit,
+                        PyCompilerFlags <span style="color:#f92672">*</span>flags)
+{
+ ...
+    m <span style="color:#f92672">=</span> PyImport_AddModule(<span style="color:#e6db74">&#34;__main__&#34;</span>);
+ ...
+    <span style="color:#75715e">// 如果是pyc文件，则调用run_pyc_file()
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (maybe_pyc_file(fp, filename, ext, closeit)) {
+ ...
+        v <span style="color:#f92672">=</span> run_pyc_file(pyc_fp, filename, d, d, flags);
+    } <span style="color:#66d9ef">else</span> {
+        <span style="color:#75715e">// .py和stdin模式都运行PyRun_FileExFlags()
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (strcmp(filename, <span style="color:#e6db74">&#34;&lt;stdin&gt;&#34;</span>) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span>
+            set_main_loader(d, filename, <span style="color:#e6db74">&#34;SourceFileLoader&#34;</span>) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+            fprintf(stderr, <span style="color:#e6db74">&#34;python: failed to set __main__.__loader__</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+            ret <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+            <span style="color:#66d9ef">goto</span> done;
+        }
+        v <span style="color:#f92672">=</span> PyRun_FileExFlags(fp, filename, Py_file_input, d, d,
+                              closeit, flags);
+    }
+ ...
+    <span style="color:#66d9ef">return</span> ret;
+}</code></pre></div></p>
+<p>而<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1032">PyRun_FileExFlags()</a>和前文介绍的通过-c输入的PyRun_SimpleStringFlags()作用类似，都是去创建AST返回mod然后运行mod:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">PyObject <span style="color:#f92672">*</span>
+<span style="color:#a6e22e">PyRun_FileExFlags</span>(FILE <span style="color:#f92672">*</span>fp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>filename_str, <span style="color:#66d9ef">int</span> start, PyObject <span style="color:#f92672">*</span>globals,
+                  PyObject <span style="color:#f92672">*</span>locals, <span style="color:#66d9ef">int</span> closeit, PyCompilerFlags <span style="color:#f92672">*</span>flags)
+{
+ ...
+    mod <span style="color:#f92672">=</span> PyParser_ASTFromFileObject(fp, filename, NULL, start, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>,
+                                     flags, NULL, arena);
+ ...
+    ret <span style="color:#f92672">=</span> run_mod(mod, filename, globals, locals, flags, arena);
+}</code></pre></div></p>
+<p><a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1125">run_mod()</a>负责把模块发送给AST编译为一个代码对象，即文章开头提到过的存储字节码以及保存在.pyc文件中的对象:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> PyObject <span style="color:#f92672">*</span>
+<span style="color:#a6e22e">run_mod</span>(mod_ty mod, PyObject <span style="color:#f92672">*</span>filename, PyObject <span style="color:#f92672">*</span>globals, PyObject <span style="color:#f92672">*</span>locals,
+            PyCompilerFlags <span style="color:#f92672">*</span>flags, PyArena <span style="color:#f92672">*</span>arena)
+{
+    PyCodeObject <span style="color:#f92672">*</span>co;
+    PyObject <span style="color:#f92672">*</span>v;
+    co <span style="color:#f92672">=</span> PyAST_CompileObject(mod, filename, flags, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, arena);
+    v <span style="color:#f92672">=</span> run_eval_code_obj(co, globals, locals);
+    <span style="color:#66d9ef">return</span> v;
+}</code></pre></div>
+之后的run_eval_code_obj()就属于执行逻辑了，后文中再描述。</p>
+<p><a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1145">run_pyc_file()</a>可以理解为省略了创建AST的过程，而是通过marshal把pyc文件中的内容复制到内存并将其转换为特定的数据结构。硬盘上的pyc文件就是CPython编译器缓存已编译代码的方式，因此无需每次调用脚本时再编译一次:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> PyObject <span style="color:#f92672">*</span>
+<span style="color:#a6e22e">run_pyc_file</span>(FILE <span style="color:#f92672">*</span>fp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>filename, PyObject <span style="color:#f92672">*</span>globals,
+             PyObject <span style="color:#f92672">*</span>locals, PyCompilerFlags <span style="color:#f92672">*</span>flags)
+{
+    PyCodeObject <span style="color:#f92672">*</span>co;
+    PyObject <span style="color:#f92672">*</span>v;
+  ...
+    v <span style="color:#f92672">=</span> PyMarshal_ReadLastObjectFromFile(fp);
+  ...
+    co <span style="color:#f92672">=</span> (PyCodeObject <span style="color:#f92672">*</span>)v;
+    v <span style="color:#f92672">=</span> run_eval_code_obj(co, globals, locals);
+    <span style="color:#66d9ef">return</span> v;
 }</code></pre></div></p>
 <h3 id="初始化">初始化</h3>
 <p>主要是初始化内置类型，以及创建buildins、sys模块，并初始化sys.modules，sys.path等运行所需的环境配置。
@@ -602,9 +785,9 @@ PyObject<span style="color:#f92672">*</span> _Py_HOT_FUNCTION _PyEval_EvalFrameD
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/f8150d4d79b0bd5434db9dad6eea68562baf2245" title='最后修改者 hjlarry | April 21, 2020' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/d50aee575d7d8acd1a520b5fe4b263ddd89ab2d4" title='最后修改者 hjlarry | June 22, 2020' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>April 21, 2020</span>
+      <span>June 22, 2020</span>
     </a>
   </div>
 
@@ -643,7 +826,10 @@ PyObject<span style="color:#f92672">*</span> _Py_HOT_FUNCTION _PyEval_EvalFrameD
     <li><a href="#gil">GIL</a></li>
     <li><a href="#执行过程">执行过程</a>
       <ul>
-        <li><a href="#入口">入口</a></li>
+        <li><a href="#编码规范">编码规范</a></li>
+        <li><a href="#执行方式">执行方式</a></li>
+        <li><a href="#建立运行时环境">建立运行时环境</a></li>
+        <li><a href="#通过输入运行">通过输入运行</a></li>
         <li><a href="#初始化">初始化</a></li>
         <li><a href="#执行">执行</a></li>
         <li><a href="#终止">终止</a></li>
