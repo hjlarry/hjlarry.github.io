@@ -366,6 +366,49 @@ run_pyc_file(FILE *fp, const char *filename, PyObject *globals,
 }
 {{< /highlight >}}
 
+### 语义解析
+在前文中我们了解到在执行时会先去创建AST，那么这步具体是怎么做的呢:
+{{< highlight c>}}
+mod_ty
+PyParser_ASTFromFileObject(FILE *fp, PyObject *filename, const char* enc,
+                           int start, const char *ps1,
+                           const char *ps2, PyCompilerFlags *flags, int *errcode,
+                           PyArena *arena)
+{
+    ...
+    node *n = PyParser_ParseFileObject(fp, filename, enc,
+                                       &_PyParser_Grammar,
+                                       start, ps1, ps2, &err, &iflags);
+    ...
+    if (n) {
+        flags->cf_flags |= iflags & PyCF_MASK;
+        mod = PyAST_FromNodeObject(n, flags, filename, arena);
+        PyNode_Free(n);
+    ...
+    return mod;
+}
+{{< /highlight >}}
+在[PyParser_ASTFromFileObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L772)方法中，会将文件句柄、编译器标志、以及内存块对象打包给[PyParser_ParseFileObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/parsetok.c#L163)转换为一个node对象:
+{{< highlight c>}}
+node *
+PyParser_ParseFileObject(FILE *fp, PyObject *filename,
+                         const char *enc, grammar *g, int start,
+                         const char *ps1, const char *ps2,
+                         perrdetail *err_ret, int *flags)
+{
+    struct tok_state *tok;
+...
+    if ((tok = PyTokenizer_FromFile(fp, enc, ps1, ps2)) == NULL) {
+        err_ret->error = E_NOMEM;
+        return NULL;
+    }
+...
+    return parsetok(tok, g, start, err_ret, flags);
+}
+{{< /highlight >}}
+该方法把两项重要的任务组合了起来，一是使用[PyTokenizer_FromFile()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/tokenizer.h#L78)实例化一个tok_state，tok_state也只是一个数据结构，存储由tokenizer生成的临时数据；二是使用[parsetok()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/parsetok.c#L232)将token转换为一个具体的解析树(节点列表)。
+
+
 ### 初始化
 主要是初始化内置类型，以及创建buildins、sys模块，并初始化sys.modules，sys.path等运行所需的环境配置。
 {{< highlight c>}}
