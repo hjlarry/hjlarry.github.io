@@ -433,7 +433,70 @@ tok_get(struct tok_state *tok, char **p_start, char **p_end)
 ...
 }
 {{< /highlight >}}
+parsetok()返回的是一个node节点类型:
+{{< highlight c>}}
+typedef struct _node {
+    short               n_type;
+    char                *n_str;
+    int                 n_lineno;
+    int                 n_col_offset;
+    int                 n_nchildren;
+    struct _node        *n_child;
+    int                 n_end_lineno;
+    int                 n_end_col_offset;
+} node;
+{{< /highlight >}}
+这些个节点组成的树我们叫CST，每个节点包含了语法、tokenID、符号，但这个树不能用于编译器做出快速决策，编译器需要更高一级抽象即AST，我们可以通过内部的API观察到CST的输出结果:
+{{< highlight python>}}
+import symbol
+import token
+import parser
 
+# 为了输出结果的可读性，做了一层处理
+def lex(expression):
+    symbols = {v: k for k, v in symbol.__dict__.items() if isinstance(v, int)}
+    tokens = {v: k for k, v in token.__dict__.items() if isinstance(v, int)}
+    lexicon = {**symbols, **tokens}
+    st = parser.expr(expression)
+    st_list = parser.st2list(st)
+
+    def replace(l: list):
+        r = []
+        for i in l:
+            if isinstance(i, list):
+                r.append(replace(i))
+            else:
+                if i in lexicon:
+                    r.append(lexicon[i])
+                else:
+                    r.append(i)
+        return r
+
+    return replace(st_list)
+
+# 小写的就是符号，大写的就是token
+>>> pprint(lex('a + 1'))
+['eval_input',
+ ['testlist',
+  ['test',
+   ['or_test',
+    ['and_test',
+     ['not_test',
+      ['comparison',
+       ['expr',
+        ['xor_expr',
+         ['and_expr',
+          ['shift_expr',
+           ['arith_expr',
+            ['term',
+             ['factor', ['power', ['atom_expr', ['atom', ['NAME', 'a']]]]]],
+            ['PLUS', '+'],
+            ['term',
+             ['factor',
+              ['power', ['atom_expr', ['atom', ['NUMBER', '1']]]]]]]]]]]]]]]]],
+ ['NEWLINE', ''],
+ ['ENDMARKER', '']]
+{{< /highlight >}}
 
 
 ### 初始化
