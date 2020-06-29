@@ -498,6 +498,24 @@ def lex(expression):
  ['ENDMARKER', '']]
 {{< /highlight >}}
 
+### AST
+CPython的下一个阶段就是将CST转换为能够执行的、更有逻辑的东西，也就是AST(Abstract Syntax Trees，抽象语法树)。虽然这一步是解释器内联生成，我们也有其他办法能方便的观察到，例如使用`instaviz`库，它能在一个网页中展示AST以及每个节点的属性:
+{{< highlight python>}}
+>>> import instaviz
+>>> def example():
+       a = 1
+       b = a + 1
+       return b
+>>> instaviz.show(example)
+{{< /highlight >}}
+我们能看到这样的界面:
+![instaviz_web](./images/instaviz_web.png)
+
+然后可以点击AST中的节点:
+![instaviz_node](./images/instaviz_node.png)
+例如如果点击图中的Assign节点，它代表的是`b=a+1`这一行，右侧会展示出这个节点的属性，它有两个属性，一个是targets，代表变量名称，它有时可能是一个列表，因为解包操作就会有多个变量；另一个是value，代表变量的值，在这里就是`a+1`这个表达式。如果我们再点击BinOp节点，就可以看到它的3个属性，left表示运算符左边是什么，op表示运算符，right表示运算符右边。
+
+用C语言编译AST并不是一件容易的事，所以实际上真正的编译模块有5000行代码，在`Python/ast.c`中。
 
 ### 终止
 执行完之后，结束之前还要进行一系列的清理操作。
