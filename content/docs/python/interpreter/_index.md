@@ -517,6 +517,99 @@ CPython的下一个阶段就是将CST转换为能够执行的、更有逻辑的�
 
 用C语言编译AST并不是一件容易的事，所以实际上真正的编译模块有5000行代码，在`Python/ast.c`中。
 
+具体到核心代码流程来说，之前通过PyParser_ParseFileObject()得到的CST对象node，接着传入[PyAST_FromNodeObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L772)，并附带文件名、编译flag和PyArena。得到函数返回的mod_ty，是一个容器结构，属于Python5种模块类型之一:Module、Interactive、Expression、FunctionType、Suite。在`Include/Python-ast.h`中能看到每种类型需要的字段:
+{{< highlight c>}}
+enum _mod_kind {Module_kind=1, Interactive_kind=2, Expression_kind=3,
+                 FunctionType_kind=4, Suite_kind=5};
+struct _mod {
+    enum _mod_kind kind;
+    union {
+        struct {
+            asdl_seq *body;
+            asdl_seq *type_ignores;
+        } Module;
+
+        struct {
+            asdl_seq *body;
+        } Interactive;
+
+        struct {
+            expr_ty body;
+        } Expression;
+
+        struct {
+            asdl_seq *argtypes;
+            expr_ty returns;
+        } FunctionType;
+
+        struct {
+            asdl_seq *body;
+        } Suite;
+
+    } v;
+};
+{{< /highlight >}}
+除了模块类型，其他的AST类型都列在`Parser/Python.asdl`中，包括statement、expression、operators、comprehensions等等。在该文件中我们能看到类型字段的定义也是用在这里的:
+{{< highlight c>}}
+-- ASDL's 5 builtin types are:
+-- identifier, int, string, object, constant
+
+module Python
+{
+    mod = Module(stmt* body, type_ignore *type_ignores)
+        | Interactive(stmt* body)
+        | Expression(expr body)
+        | FunctionType(expr* argtypes, expr returns)
+{{< /highlight >}}
+
+接着，PyAST_FromNodeObject()使用TYPE(n)确定首个CST节点的类型来执行不同的逻辑，如果是文件输入，返回的结果就是Module，eval_input就是Expression，总之是Module, Interactive, Expression, FunctionType中的一种:
+{{< highlight c>}}
+mod_ty
+PyAST_FromNodeObject(const node *n, PyCompilerFlags *flags,
+                     PyObject *filename, PyArena *arena)
+{
+    ...
+    switch (TYPE(n)) {
+        case file_input:
+            stmts = _Py_asdl_seq_new(num_stmts(n), arena);
+            for (i = 0; i < NCH(n) - 1; i++) {
+                ch = CHILD(n, i);
+                if (TYPE(ch) == NEWLINE)
+                    continue;
+                num = num_stmts(ch);
+                if (num == 1) {
+                    s = ast_for_stmt(&c, ch);
+                }
+                else {
+                    ch = CHILD(ch, 0);
+                    REQ(ch, simple_stmt);
+                    for (j = 0; j < num; j++) {
+                        s = ast_for_stmt(&c, CHILD(ch, j * 2));
+                    }
+                }
+            }
+            /* Type ignores are stored under the ENDMARKER in file_input. */
+            ...
+            res = Module(stmts, type_ignores, arena);
+            break;
+        case eval_input: {
+            expr_ty testlist_ast;
+            testlist_ast = ast_for_testlist(&c, CHILD(n, 0));
+            res = Expression(testlist_ast, arena);
+            break;
+        }
+        case single_input:
+            ...
+            break;
+        case func_type_input:
+            ...
+        ...
+    return res;
+}
+{{< /highlight >}}
+
+遍历孩子节点并创建相应的AST语句节点逻辑在[ast_for_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L4512)中，该函数内还需要再根据不同的语句类型调用不同的函数创建节点，都是类似于ast_for_*()，例如`2**4`这样的语句最终能找到ast_for_power()这样的方法。
+
 ### 终止
 执行完之后，结束之前还要进行一系列的清理操作。
 {{< highlight c>}}
