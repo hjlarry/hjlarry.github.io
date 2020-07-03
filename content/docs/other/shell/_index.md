@@ -228,6 +228,67 @@ a
 * 函数可以对环境变量直接进行修改，脚本则只能使用`export`将环境变量导出
 
 
+任务控制
+-------
+shell使用UNIX提供的信号机制来执行进程间的通信。当一个进程接收到信号时，它会停止执行、处理该信号并基于信号传递的信息来改变其执行，所以信号相当于是软件中断。
+
+例如当我们在键盘上输入`Ctrl-C`时，shell会发送一个`SIGINT`信号到进程，来终止这个程序。当然，进程中是可以捕获信号去做别的处理的，例如:
+{{< highlight python>}}
+#!/usr/bin/env python
+import signal, time
+
+def handler(signum, time):
+    print("\nI got a SIGINT, but I am not stopping")
+
+signal.signal(signal.SIGINT, handler)
+i = 0
+while True:
+    time.sleep(.1)
+    print("\r{}".format(i), end="")
+    i += 1
+{{< /highlight >}}
+此时，我们通过`Ctrl-C`就已经无法终止该程序了:
+{{< highlight sh>}}
+$ python sigint.py
+24^C
+I got a SIGINT, but I am not stopping
+26^C
+I got a SIGINT, but I am not stopping
+30^\[1]    39913 quit       python sigint.py
+{{< /highlight >}}
+我们可以通过发送其他中断信号来停止该程序，例如`SIGQUIT`或`SIGTERM`等。那么如果一个程序捕获了所有的信号，是不是它就无法被外部停止了？实际上有一个特殊的信号`SIGKILL`是无法被捕获的，也就是我们经常使用的`kill -9 <pid>`发出的信号。
+
+通过`man signal`能查看到信号的更多详细信息，`kill -l`显示出信号列表，然后`kill -<信号名称> <pid>`发送某个信号。
+
+我们可以使用命令加一个后缀`&`来让该命令在后台运行，然后通过`jobs`命令能列出当前shell会话中未完成的全部任务。但后台进程仍然是当前终端会话进程的子进程，一旦关闭终端就会发送一个信号`SIGHUP`导致这些后台的进程被终止掉，命令前加`nohup`就是用来防止这种情况的。
+{{< highlight sh>}}
+$ sleep 1000
+^Z      # 使用ctrl+Z发送了一个SIGTSTP信号从而暂停了任务
+[1]  + 18653 suspended  sleep 1000
+
+$ nohup sleep 2000 &
+[2] 18745
+appending output to nohup.out
+
+$ jobs
+[1]  + suspended  sleep 1000
+[2]  - running    nohup sleep 2000
+
+$ bg %1     # 后台接着启动暂停中的1号任务，也可以使用fg来前台启动
+[1]  - 18653 continued  sleep 1000
+
+$ jobs
+[1]  - running    sleep 1000
+[2]  + running    nohup sleep 2000
+
+$ kill -SIGHUP %1   # 也可以使用%任务编号的形式，不一定要用PID
+[1]  + 18653 hangup     sleep 1000
+
+$ jobs
+[2]  + running    nohup sleep 2000
+{{< /highlight >}}
+
+
 常用工具
 -------
 
