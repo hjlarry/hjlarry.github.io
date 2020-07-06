@@ -49,7 +49,29 @@ HEAD  branches  config  description  hooks  info  objects  refs
 {{< /highlight >}}
 它的过程实际上是通过`sha1`算法计算出文件内容也就是`abc`的hash值，是一个40位的16进制的字符串，字符串的前两位作为一个文件夹名称，后38位作为文件名称。因为大多数的文件系统都讨厌单个目录中包含太多的文件，这会减慢其爬取的速度，Git用这个方法使得第一级目录最多256个。文件本身就是Git object，它的头部定义了类型，紧跟着是一个ASCII的空格(0x20)，然后是对象的大小多少字节，紧跟着一个null(0x00)，最后是对象本身的内容。整个文件通过`zlib`压缩存储。
 
-有四种类型的对象，它们分别是`blob`,`commit`,`tree`,`tag`。
+有四种类型的对象，它们分别是`blob`,`commit`,`tree`,`tag`。对象的寻址我们也可以通过伪码来表达:
+```
+type object = blob | commit | tree | tag
+objects = map<string, object>
+
+def store(object):
+    id = sha1(object)
+    objects[id] = object
+
+def load(id):
+    return objects[id]
+```
+而每种对象的数据结果也可以通过伪码表示:
+```
+type blob = array<byte>
+type tree = map<string, tree | file>
+type commit = struct{
+    parent: array<commit>
+    author: string
+    message: string
+    snapshot: tree
+}
+```
 
 #### blob
 该种类型的对象存储的原始内容，例如刚才新增的对象就是这种类型:
@@ -130,6 +152,19 @@ git中还有一种对象类型就是tag，它通常和commit差不多。见下�
 ➜  testgit git:(master) cat .git/refs/heads/master
 79380b0625150b1b71940cfac0b2a501793eac0c
 {{< /highlight >}}
+其可以用伪码来表示:
+```
+references = map<string, string>
+def update_ref(name, id):
+    references[name] = id
+def read_ref(name):
+    return references[name]
+def load_ref(name_or_id):
+    if name_or_id in references: # 说明是name
+        return load(references[name_or_id])
+    else:   # 说明是id
+        return load(name_or_id)
+```
 
 #### 分支引用
 当我们新建一个分支时，就会在`.git/refs/heads`文件夹下多一个名称为分支名称的文件，内容就是一个commit的sha。当我们提交一次commit时，当前分支的引用的commit就会自动发生改变。
