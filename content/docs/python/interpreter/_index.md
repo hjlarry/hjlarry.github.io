@@ -610,6 +610,74 @@ PyAST_FromNodeObject(const node *n, PyCompilerFlags *flags,
 
 遍历孩子节点并创建相应的AST语句节点逻辑在[ast_for_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L4512)中，该函数内还需要再根据不同的语句类型调用不同的函数创建节点，都是类似于ast_for_*()，例如`2**4`这样的语句最终能找到ast_for_power()这样的方法。
 
+### 编译
+现在解释器有了AST，也就有了每个操作、函数、类和名字空间所需要的属性，下一步就是把AST编译为CPU能够理解的东西，这就是编译。编译可以分为两个部分:一是遍历树并创建一个控制流图(control-flow-graph)，用来表示逻辑执行的顺序；另外就是将控制流图中的节点转换为较小的可执行语句，称为字节码。
+
+[PyAST_CompileObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L312)函数是编译器部分的主要入口，它以Python模块作为主要参数，同解释器进程早期创建过的文件名称、全局变量、局部变量以及PyArena一起打包传入。然后先创建一个全局的编译器状态结构体，用来存储一些属性、编译标识、栈等等:
+{{< highlight c>}}
+<!-- cpython/Python/compile.c -->
+struct compiler {
+    PyObject *c_filename;
+    struct symtable *c_st;
+    PyFutureFeatures *c_future; /* pointer to module's __future__ */
+    PyCompilerFlags *c_flags;
+    int c_optimize;              /* optimization level */
+    int c_interactive;           /* true if in interactive mode */
+    int c_nestlevel;
+    int c_do_not_emit_bytecode;  
+    PyObject *c_const_cache;     /* Python dict holding all constants, including names tuple */
+    struct compiler_unit *u; /* compiler state for current block */
+    PyObject *c_stack;           /* Python list holding compiler_unit ptrs */
+    PyArena *c_arena;            /* pointer to memory allocation arena */
+};
+{{< /highlight >}}
+接着有11个主要步骤:
+
+1. 如果模块不存在`__doc__`则创建一个新的
+2. 如果模块不存在`__annotations__`则创建一个新的
+3. 设置全局编译器状态中的文件名为传入的文件名
+4. 将编译器的内存区域设置为解释器使用的那个
+5. 将模块中所有的`__future__`标识复制至全局编译器状态中
+6. 合并命令行或环境变量中提供的运行时标识
+7. 启用编译器中所有的`__future__`
+8. 设置编译的优化级别为参数提供的，或者是默认的
+9. 根据模块对象构建符号表
+10. 运行编译器，返回代码对象
+11. 编译器释放编译过程中所分配的所有内存
+
+核心代码:
+{{< highlight c>}}
+PyCodeObject *
+PyAST_CompileObject(mod_ty mod, PyObject *filename, PyCompilerFlags *flags,
+                   int optimize, PyArena *arena)
+{
+    struct compiler c;
+    PyCodeObject *co = NULL;
+    if (!__doc__) {
+        __doc__ = PyUnicode_InternFromString("__doc__");
+    }
+    if (!__annotations__) {
+        __annotations__ = PyUnicode_InternFromString("__annotations__");
+    }
+    c.c_filename = filename;
+    c.c_arena = arena;
+    c.c_future = PyFuture_FromASTObject(mod, filename);
+    merged = c.c_future->ff_features | flags->cf_flags;
+    c.c_future->ff_features = merged;
+    flags->cf_flags = merged;
+    c.c_flags = flags;
+    c.c_optimize = (optimize == -1) ? config->optimization_level : optimize;
+    c.c_nestlevel = 0;
+    c.c_do_not_emit_bytecode = 0;
+    co = compiler_mod(&c, mod);
+ finally:
+    compiler_free(&c);
+    return co;
+}
+{{< /highlight >}}
+
+
+
 ### 终止
 执行完之后，结束之前还要进行一系列的清理操作。
 {{< highlight c>}}
