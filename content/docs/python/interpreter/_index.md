@@ -676,7 +676,12 @@ PyAST_CompileObject(mod_ty mod, PyObject *filename, PyCompilerFlags *flags,
 }
 {{< /highlight >}}
 
+#### Future标识和编译标识
+编译器运行前，有两种标识可以切换编译器内部的功能。
 
+第一种是通过命令行或环境变量设置的解释器状态，例如命令行执行时添加`-O`标志(也可以通过设置环境变量PYTHONOPTIMIZE=1达到同样效果)，则所有的断言语句都会被编译器忽略掉，这些断言语句往往是调试时才需要。
+
+另一种是实际的源代码中加入future语句，例如`from __future__ import annotations`，它是Python3.7新加入的，因为使用type hints时可能类型还没有被创建，该语句可以让类型注解延迟求值。
 
 ### 终止
 执行完之后，结束之前还要进行一系列的清理操作。
