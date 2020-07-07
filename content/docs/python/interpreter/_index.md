@@ -683,6 +683,33 @@ PyAST_CompileObject(mod_ty mod, PyObject *filename, PyCompilerFlags *flags,
 
 另一种是实际的源代码中加入future语句，例如`from __future__ import annotations`，它是Python3.7新加入的，因为使用type hints时可能类型还没有被创建，该语句可以让类型注解延迟求值。
 
+#### 符号表
+符号表为编译器提供了一个查找引用全局变量、局部变量等的作用域，它的结构是这样的:
+{{< highlight c>}}
+struct symtable {
+    PyObject *st_filename;          /* name of file being compiled, decoded from the filesystem encoding */
+    struct _symtable_entry *st_cur; /* current symbol table entry */
+    struct _symtable_entry *st_top; /* symbol table entry for module */
+    PyObject *st_blocks;            /* dict: map AST node addresses to symbol table entries */
+    PyObject *st_stack;             /* list: stack of namespace info */
+    PyObject *st_global;            /* borrowed ref to st_top->ste_symbols */
+    int st_nblocks;                 /* number of blocks used. kept for consistency with the corresponding compiler structure */
+    PyObject *st_private;           /* name of current class or NULL */
+    PyFutureFeatures *st_future;    /* module's future features that affect the symbol table */
+    int recursion_depth;            /* current recursion depth */
+    int recursion_limit;            /* recursion limit */
+};
+{{< /highlight >}}
+其中的一些API通过Python的标准库symtable模块可以调用:
+{{< highlight python>}}
+>>> import symtable
+>>> s = symtable.symtable('b + 1', filename='test.py', compile_type='eval')
+>>> [symbol.__dict__ for symbol in s.get_symbols()]
+[{'_Symbol__name': 'b', '_Symbol__flags': 6160, '_Symbol__scope': 3, '_Symbol__namespaces': ()}]
+{{< /highlight >}}
+核心的C代码在[PySymtable_BuildObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/symtable.c#L262)函数中，它也是依据传入的mod_ty类型的不同使用不同的访问函数，有[symtable_visit_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/symtable.c#L1176)、symtable_visit_expr()等，这些访问函数里面也是一个巨长的switch语句对应着定义在Parser/Python.asdl中的每种语句类型以及各自的逻辑。例如对于一个函数定义，它需要做的特殊处理有:检测递归深度超过限制则引发异常、将函数名称加入到局部变量中、解析顺序参数和关键字参数的默认值、解析参数和返回值的类型注释、解析函数的装饰器等等。
+
+
 ### 终止
 执行完之后，结束之前还要进行一系列的清理操作。
 {{< highlight c>}}
