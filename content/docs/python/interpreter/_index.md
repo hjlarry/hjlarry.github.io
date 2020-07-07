@@ -709,6 +709,89 @@ struct symtable {
 {{< /highlight >}}
 核心的C代码在[PySymtable_BuildObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/symtable.c#L262)函数中，它也是依据传入的mod_ty类型的不同使用不同的访问函数，有[symtable_visit_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/symtable.c#L1176)、symtable_visit_expr()等，这些访问函数里面也是一个巨长的switch语句对应着定义在Parser/Python.asdl中的每种语句类型以及各自的逻辑。例如对于一个函数定义，它需要做的特殊处理有:检测递归深度超过限制则引发异常、将函数名称加入到局部变量中、解析顺序参数和关键字参数的默认值、解析参数和返回值的类型注释、解析函数的装饰器等等。
 
+#### 核心编译过程
+现在PyAST_CompileObject()有了一个编译器状态、一个符号表、一个模块形式的AST，真正的编译才开始。这个阶段的目标是将state、symtable、AST转化为CFG，以及捕获逻辑和代码异常并抛出。
+
+我们可以通过Python提供的内置函数compile()完成编译过程，传入的是表达式则mode选择eval，传入类、方法、模块等mode要选择exec，它返回的是一个代码对象:
+{{< highlight python>}}
+In [1]: compile("a+1", "a.py", mode="eval")                     
+Out[1]: <code object <module> at 0x1120e58a0, file "a.py", line 1>
+In [2]: _.co_code                      
+Out[2]: b'e\x00d\x00\x17\x00S\x00'
+{{< /highlight >}}
+
+怎样得到这个代码对象的，实际就是[compiler_mod()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L1782):
+{{< highlight c>}}
+static PyCodeObject *
+compiler_mod(struct compiler *c, mod_ty mod)
+{
+    PyCodeObject *co;
+    ...
+    switch (mod->kind) {
+    case Module_kind:
+        if (!compiler_body(c, mod->v.Module.body)) {
+            return 0;
+        }
+        break;
+    case Interactive_kind:
+        ...
+    case Expression_kind:
+        ...
+    case Suite_kind:
+        ...
+    ...
+    co = assemble(c, addNone);
+    return co;
+}
+{{< /highlight >}}
+
+[compiler_body()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L1743)循环访问模块中的每条语句，和symtable的工作方式类似:
+{{< highlight c>}}
+static int
+compiler_body(struct compiler *c, asdl_seq *stmts)
+{
+    int i = 0;
+    stmt_ty st;
+    PyObject *docstring;
+    ...
+    for (; i < asdl_seq_LEN(stmts); i++)
+        VISIT(c, stmt, (stmt_ty)asdl_seq_GET(stmts, i));
+    return 1;
+}
+{{< /highlight >}}
+[asdl_seq_GET()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/asdl.h#L32)查看每个AST节点的类型得到语句的类型，然后通过宏，VISIT调用compiler_visit_*函数:
+{{< highlight c>}}
+#define VISIT(C, TYPE, V) {\
+    if (!compiler_visit_ ## TYPE((C), (V))) \
+        return 0; \
+}
+{{< /highlight >}}
+对于语句类型来说，就是到[compiler_visit_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L3310)函数，然后具体每条语句也有自己的编译函数:
+{{< highlight c>}}
+static int
+compiler_visit_stmt(struct compiler *c, stmt_ty s)
+{
+    Py_ssize_t i, n;
+
+    /* Always assign a lineno to the next instruction for a stmt. */
+    c->u->u_lineno = s->lineno;
+    c->u->u_col_offset = s->col_offset;
+    c->u->u_lineno_set = 0;
+
+    switch (s->kind) {
+    case FunctionDef_kind:
+        return compiler_function(c, s, 0);
+    case ClassDef_kind:
+        return compiler_class(c, s);
+    ...
+    case For_kind:
+        return compiler_for(c, s);
+    ...
+    }
+
+    return 1;
+}
+{{< /highlight >}}
 
 ### 终止
 执行完之后，结束之前还要进行一系列的清理操作。
