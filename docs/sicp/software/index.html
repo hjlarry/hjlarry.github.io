@@ -22,7 +22,7 @@
 <title>软件部分 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.a4cb0937590ffc43b866a7d582dc5d0363ef2283ad9c4f0da81826451903456e.js" integrity="sha256-pMsJN1kP/EO4ZqfVgtxdA2PvIoOtnE8NqBgmRRkDRW4="></script>
+<script defer src="/cn.search.min.e2f9991fce850051589d642e11744c0e5b670dd7865582e37742416e531704a5.js" integrity="sha256-4vmZH86FAFFYnWQuEXRMDltnDdeGVYLjd0JBblMXBKU="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/sicp/software/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -150,6 +150,7 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#操作系统">操作系统</a></li>
     <li><a href="#内核">内核</a></li>
     <li><a href="#系统调用">系统调用</a></li>
+    <li><a href="#文件系统">文件系统</a></li>
     <li><a href="#进程">进程</a>
       <ul>
         <li><a href="#基础概念">基础概念</a></li>
@@ -251,6 +252,29 @@ https://github.com/alex-shpak/hugo-book
         <span style="color:#a6e22e">syscall</span></code></pre></div>
 C语言、Go语言通过标准库进行系统调用，他们的标准库中的函数也只是在汇编之上的一种包装。在汇编语言中通过在不同寄存器中放不同的参数，再执行<code>syscall</code>这条指令就可以进行系统调用。<code>syscall</code>是64位操作系统改进的一条指令，x86下是<code>int 0x80</code>，这种改进效率上也更高一些。</p>
 <p>RAX寄存器存放不同系统调用的序号，相当于函数名称；RDI、RSI、RDX、R10、R8、R9依次存放参数；再用RAX存返回值。这是系统调用的调用约定。可以通过<a href="http://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/">这里</a>查看到系统调用函数有哪些，分别是如何传参的。</p>
+<h2 id="文件系统">文件系统</h2>
+<p>大多数Linux发行版的文件系统都有着非常类似的结构，除了<code>ls</code>，<code>tree</code>也是一个很好的观察其结构的工具。常用的目录及其用途:</p>
+<ul>
+<li>/bin，包含基本的系统级二进制可执行文件，例如<code>ls</code></li>
+<li>/sbin，包含需要root权限才能执行的可执行文件</li>
+<li>/usr，只读的用户数据
+<ul>
+<li>/usr/bin，非必须的或者是用户自己安装的可执行文件</li>
+<li>/usr/sbin，非必须的二进制文件，但需root执行</li>
+<li>/usr/local/bin，用户自行编译后的文件</li>
+</ul>
+</li>
+<li>/home，用户的个人目录</li>
+<li>/root，root用户的目录，root是特殊用户所以不会放在/home中</li>
+<li>/dev，设备文件，通常是硬件设备的接口文件</li>
+<li>/etc，包含了大部分的系统配置文件，例如系统名称、硬盘上的安装位置等</li>
+<li>/lib，库文件以及显卡、声卡等硬件工作的驱动文件</li>
+<li>/opt，用户安装一些大型程序，或者是一些服务程序的安装目录</li>
+<li>/sys，包含系统的信息，和连接到计算机的设备的信息</li>
+<li>/var，最初这样命名是因为它经常变化，存储日志等内容</li>
+<li>/tmp，临时文件，重启系统后里面的文件都会被删除</li>
+</ul>
+<p>更多的目录结构及用途见<a href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">wiki</a>。</p>
 <h2 id="进程">进程</h2>
 <h3 id="基础概念">基础概念</h3>
 <p>程序和进程有什么区别？</p>
@@ -660,9 +684,9 @@ End of assembler dump.</code></pre></div>
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/cac3049212d3bedfe43ad6b9cc07abaadfb206a6" title='最后修改者 hjlarry | June 3, 2020' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/64d011a5be1f943a0b68c76ab4db1e53ff70a0f8" title='最后修改者 hjlarry | July 16, 2020' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>June 3, 2020</span>
+      <span>July 16, 2020</span>
     </a>
   </div>
 
@@ -700,6 +724,7 @@ End of assembler dump.</code></pre></div>
     <li><a href="#操作系统">操作系统</a></li>
     <li><a href="#内核">内核</a></li>
     <li><a href="#系统调用">系统调用</a></li>
+    <li><a href="#文件系统">文件系统</a></li>
     <li><a href="#进程">进程</a>
       <ul>
         <li><a href="#基础概念">基础概念</a></li>

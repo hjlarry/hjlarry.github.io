@@ -15,7 +15,7 @@ dstat 它能实时查看一些基本信息，默认情况下它会包括:
 <title>常用工具整理 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.a4cb0937590ffc43b866a7d582dc5d0363ef2283ad9c4f0da81826451903456e.js" integrity="sha256-pMsJN1kP/EO4ZqfVgtxdA2PvIoOtnE8NqBgmRRkDRW4="></script>
+<script defer src="/cn.search.min.e2f9991fce850051589d642e11744c0e5b670dd7865582e37742416e531704a5.js" integrity="sha256-4vmZH86FAFFYnWQuEXRMDltnDdeGVYLjd0JBblMXBKU="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/other/tools/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -154,10 +154,17 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#strip">strip</a></li>
         <li><a href="#objcopy">objcopy</a></li>
         <li><a href="#objdump">objdump</a></li>
+        <li><a href="#vim">vim</a></li>
       </ul>
     </li>
     <li><a href="#调试工具">调试工具</a></li>
-    <li><a href="#构建工具">构建工具</a></li>
+    <li><a href="#项目构建">项目构建</a>
+      <ul>
+        <li><a href="#构建工具">构建工具</a></li>
+        <li><a href="#依赖管理">依赖管理</a></li>
+        <li><a href="#持续集成">持续集成</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 
@@ -437,6 +444,29 @@ Disassembly of section .text:
   4000d5:	b8 3c <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>       	mov    eax,0x3c
   4000da:	<span style="color:#ae81ff">48</span> <span style="color:#ae81ff">31</span> ff             	xor    rdi,rdi
   4000dd:	0f <span style="color:#ae81ff">05</span>                	syscall</code></pre></div></p>
+<h3 id="vim">vim</h3>
+<p>vim提供了多种操作模式，它的设计基于大多数时间都花在阅读、浏览和少量编辑:</p>
+<ul>
+<li>正常模式，默认的情况，在其他模式中使用<code>&lt;Esc&gt;</code>返回该模式</li>
+<li>插入模式，用于插入文本，正常模式通过<code>i</code>进入</li>
+<li>替换模式，用于替换文本，正常模式通过<code>R</code>进入</li>
+<li>可视化模式，用于选中文本块，正常模式下<code>v</code>进入一般可视模式，<code>V</code>进入可视行模式，<code>&lt;ctrl&gt;+v</code>进入可视块模式</li>
+<li>命令模式，用于执行命令，正常模式通过<code>:</code>进入</li>
+</ul>
+<p>移动时常用的快捷键:</p>
+<ul>
+<li>左下上右，<code>hjkl</code></li>
+<li>词，下一个词<code>w</code>，下一个词尾<code>e</code>，上一个词初<code>b</code></li>
+<li>行，该行头部<code>0</code>，该行尾部<code>$</code>，该行的第一个非空格字符<code>^</code></li>
+<li>屏幕，屏幕首行<code>H</code>，屏幕中间<code>M</code>，屏幕底部<code>L</code></li>
+<li>翻页，上翻<code>&lt;ctrl&gt;+u</code>，下翻<code>&lt;ctrl&gt;+d</code></li>
+<li>文件，文件头部<code>gg</code>，文件尾部<code>G</code></li>
+<li>某一行，<code>:{行数}</code>或<code>{行数}G</code></li>
+<li>杂项，<code>%</code>匹配一些配对的地方，例如括号对，<code>/* */</code>注释对等</li>
+<li>查找本行的下一个字符，<code>f{字符}</code>向前查找，<code>F{字符}</code>向后查找</li>
+<li>全文搜索，<code>/{正则表达式}</code>回车，然后使用<code>n</code>跳转到下一个匹配的项，<code>N</code>跳转到上一个</li>
+<li>计数，向前移动3个词<code>3w</code>，向下移动5行<code>5j</code>，删除7个词<code>7dw</code></li>
+</ul>
 <h2 id="调试工具">调试工具</h2>
 <p>GNU通用的调试工具，也叫<strong>gdb</strong>。binutils属于静态的观察，而gdb就可以动态的观察到每一个汇编指令的执行。<a href="https://www.gnu.org/software/gdb/">官方网站</a></p>
 <p>也可以使用一些带图形界面的类似工具，例如<a href="https://www.gdbgui.com/">gdbgui</a>。还有些<a href="https://kapeli.com/cheat_sheets/GDB.docset/Contents/Resources/Documents/index">cheatsheet</a>很好用。</p>
@@ -511,7 +541,8 @@ Disassembly of section .text:
 </tr>
 </tbody>
 </table>
-<h2 id="构建工具">构建工具</h2>
+<h2 id="项目构建">项目构建</h2>
+<h3 id="构建工具">构建工具</h3>
 <p>GNU的自动构建工具为<strong>make</strong>，有些像脚本语言，把一堆命令放一起批量执行。使用它做编译属于增量编译，即通过对比修改时间来判断是否需要重新执行。<a href="https://www.gnu.org/software/make/">官方网站</a></p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-make" data-lang="make"><span style="color:#a6e22e">hello</span><span style="color:#f92672">:</span> hello.s
     nasm -g -f elf64 -o hello.o hello.s
@@ -524,6 +555,27 @@ Disassembly of section .text:
 <span style="color:#a6e22e">.PHONY</span><span style="color:#f92672">:</span> clean
 </code></pre></div>
 <p>对于这段构建代码，<code>hello:</code>后的部分就是告诉它要去检查哪些文件的修改时间；<code>$@</code>就表示当前这段的目标<code>hello</code>，<code>$&lt;</code>表示这段的第一个依赖项，<code>$^</code>表示这段的所有依赖项；命令前加<code>-</code>表示该命令如有错误则忽略；<code>PHONY</code>表示没有目标，没有依赖，总是执行规则，在该例中，若恰好文件夹内有一个名为<code>clean</code>的文件，没有<code>PHONY</code>时则<code>make clean</code>不会执行；另外，由于历史原因makefile只能使用tab来缩进，不能使用空格。</p>
+<h3 id="依赖管理">依赖管理</h3>
+<p>一个项目可能会依赖很多其他的项目，对于大多数语言来讲，都会有一些软件仓库或工具，这些仓库在某个地方托管着大量的依赖，而这些依赖的项目往往有很多不同的版本。</p>
+<p>试想一下，如果你的项目使用了软件A中的某个函数，当软件A升级以后该函数也移除掉了，那么会造成你的项目也无法运行。版本控制就是为了解决这个问题，我们可以指定当前项目需要基于某个版本或者某个范围的版本构建。这样也许解决了项目的运行问题，但如果软件A出现了安全漏洞，需要进行升级，怎么样让依赖它的项目都进行升级呢？</p>
+<p>因此，人们定义了一套比较常用的版本号标准，称为<a href="https://semver.org/">Semantic Version</a>。它使用<code>major.minor.patch</code>的形式，例如Python的<code>3.7.3</code>，其中:</p>
+<ul>
+<li>如果新的版本中没有改变任何API，应该将patch number递增</li>
+<li>如果添加了API且改动是向后兼容的，应该将minor number递增</li>
+<li>如果修改了API且它并不向后兼容，应将major number递增</li>
+</ul>
+<p>此外，依赖管理系统中往往会遇到锁文件(lock files)的概念。该文件中列出了当前项目每个依赖对应的具体版本号，它可以避免不必要的重新编译或者避免直接自动安装升级到最新的版本。</p>
+<p>还有一种极端的依赖锁定叫vendoring，它把依赖的所有的代码拷贝到项目中，使你能够完全掌握代码的任意修改或者将自己的修改加进去。</p>
+<h3 id="持续集成">持续集成</h3>
+<p>随着项目规模越来越大，修改代码之后额外的工作也会越来越多，可能是上传新版的文档、上传编译后的文件、发布代码到Pypi、执行测试等等，这些工作都可以通过持续集成系统(Continuous integration)来解决。有很多成熟的工具，例如Travis CI、Github Actions等，它们的工作原理也类似，在仓库中添加一个文件，该文件用于描述当前仓库发生任何修改时，应该做什么。比较常见的规则是如果有人提交代码时，则执行测试套件。然后CI提供方会启动一个或多个虚拟机，执行你制定的规则，并且记录下来相关的执行结果。</p>
+<p>常见的测试方法和术语，我们需要有个了解:</p>
+<ul>
+<li>Test suite，所有测试的统称</li>
+<li>Unit test，单元测试，用于对某个封装的特性进行测试</li>
+<li>Integration test，集成测试，针对系统的某一大部分，测试其不同的组件是否能协同工作</li>
+<li>Regression test，回归测试，用于保证之前引发的bug不会复现</li>
+<li>Mocking，使用假的数据，避免测试不相关的内容例如网络等造成影响</li>
+</ul>
 </article>
  
       
@@ -536,9 +588,9 @@ Disassembly of section .text:
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/82aee5d109e2df5abfc22a7247b26e641a9faee5" title='最后修改者 hjlarry | June 17, 2020' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/ebf18577a04b672cb0ceaba98617cf5fd39ca937" title='最后修改者 hjlarry | July 13, 2020' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>June 17, 2020</span>
+      <span>July 13, 2020</span>
     </a>
   </div>
 
@@ -610,10 +662,17 @@ Disassembly of section .text:
         <li><a href="#strip">strip</a></li>
         <li><a href="#objcopy">objcopy</a></li>
         <li><a href="#objdump">objdump</a></li>
+        <li><a href="#vim">vim</a></li>
       </ul>
     </li>
     <li><a href="#调试工具">调试工具</a></li>
-    <li><a href="#构建工具">构建工具</a></li>
+    <li><a href="#项目构建">项目构建</a>
+      <ul>
+        <li><a href="#构建工具">构建工具</a></li>
+        <li><a href="#依赖管理">依赖管理</a></li>
+        <li><a href="#持续集成">持续集成</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 

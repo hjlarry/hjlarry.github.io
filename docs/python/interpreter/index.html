@@ -13,7 +13,7 @@
 <title>CPython解释器 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.a4cb0937590ffc43b866a7d582dc5d0363ef2283ad9c4f0da81826451903456e.js" integrity="sha256-pMsJN1kP/EO4ZqfVgtxdA2PvIoOtnE8NqBgmRRkDRW4="></script>
+<script defer src="/cn.search.min.e2f9991fce850051589d642e11744c0e5b670dd7865582e37742416e531704a5.js" integrity="sha256-4vmZH86FAFFYnWQuEXRMDltnDdeGVYLjd0JBblMXBKU="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/python/interpreter/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -146,8 +146,9 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#执行方式">执行方式</a></li>
         <li><a href="#建立运行时环境">建立运行时环境</a></li>
         <li><a href="#通过输入运行">通过输入运行</a></li>
-        <li><a href="#初始化">初始化</a></li>
-        <li><a href="#执行">执行</a></li>
+        <li><a href="#语义解析">语义解析</a></li>
+        <li><a href="#ast">AST</a></li>
+        <li><a href="#编译">编译</a></li>
         <li><a href="#终止">终止</a></li>
       </ul>
     </li>
@@ -468,237 +469,385 @@ PyObject <span style="color:#f92672">*</span>
     v <span style="color:#f92672">=</span> run_eval_code_obj(co, globals, locals);
     <span style="color:#66d9ef">return</span> v;
 }</code></pre></div></p>
-<h3 id="初始化">初始化</h3>
-<p>主要是初始化内置类型，以及创建buildins、sys模块，并初始化sys.modules，sys.path等运行所需的环境配置。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>pylifecycle.c <span style="color:#f92672">--&gt;</span>
-_PyInitError _Py_InitializeCore(<span style="color:#66d9ef">const</span> _PyCoreConfig <span style="color:#f92672">*</span>core_config)
+<h3 id="语义解析">语义解析</h3>
+<p>在前文中我们了解到在执行时会先去创建AST，那么这步具体是怎么做的呢:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">mod_ty
+<span style="color:#a6e22e">PyParser_ASTFromFileObject</span>(FILE <span style="color:#f92672">*</span>fp, PyObject <span style="color:#f92672">*</span>filename, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> enc,
+                           <span style="color:#66d9ef">int</span> start, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>ps1,
+                           <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>ps2, PyCompilerFlags <span style="color:#f92672">*</span>flags, <span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>errcode,
+                           PyArena <span style="color:#f92672">*</span>arena)
 {
-    <span style="color:#75715e">// 创建解释器状态实例
-</span><span style="color:#75715e"></span>    interp <span style="color:#f92672">=</span> PyInterpreterState_New();
-
-    <span style="color:#75715e">// 创建主线程状态实例
-</span><span style="color:#75715e"></span>    tstate <span style="color:#f92672">=</span> PyThreadState_New(interp);
-    (<span style="color:#66d9ef">void</span>) PyThreadState_Swap(tstate);
-
-    <span style="color:#75715e">/* Auto-thread-state API */</span>
-    _PyGILState_Init(interp, tstate);
-
-    <span style="color:#75715e">/* Create the GIL */</span>
-    PyEval_InitThreads();
-
-    <span style="color:#75715e">// 创建并初始化内置类型
-</span><span style="color:#75715e"></span>    _Py_ReadyTypes();
-
-    <span style="color:#75715e">// 初始化带有对象缓存的内置类型
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>_PyLong_Init())
-        <span style="color:#66d9ef">return</span> _Py_INIT_ERR(<span style="color:#e6db74">&#34;can&#39;t init longs&#34;</span>);
-
-    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>PyByteArray_Init())
-        <span style="color:#66d9ef">return</span> _Py_INIT_ERR(<span style="color:#e6db74">&#34;can&#39;t init bytearray&#34;</span>);
-
-    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>_PyFloat_Init())
-        <span style="color:#66d9ef">return</span> _Py_INIT_ERR(<span style="color:#e6db74">&#34;can&#39;t init float&#34;</span>);
-
-    PyObject <span style="color:#f92672">*</span>modules <span style="color:#f92672">=</span> PyDict_New();
-
-    <span style="color:#75715e">// 创建sys.modules,存储运行期被导入的模块
-</span><span style="color:#75715e"></span>    interp<span style="color:#f92672">-&gt;</span>modules <span style="color:#f92672">=</span> modules;
-
-    <span style="color:#75715e">// 初始化sys模块
-</span><span style="color:#75715e"></span>    err <span style="color:#f92672">=</span> _PySys_BeginInit(<span style="color:#f92672">&amp;</span>sysmod);
-    interp<span style="color:#f92672">-&gt;</span>sysdict <span style="color:#f92672">=</span> PyModule_GetDict(sysmod);
-    Py_INCREF(interp<span style="color:#f92672">-&gt;</span>sysdict);
-    PyDict_SetItemString(interp<span style="color:#f92672">-&gt;</span>sysdict, <span style="color:#e6db74">&#34;modules&#34;</span>, modules);
-    _PyImport_FixupBuiltin(sysmod, <span style="color:#e6db74">&#34;sys&#34;</span>, modules);
-
-    <span style="color:#75715e">// 初始化 __buildin__ 模块
-</span><span style="color:#75715e"></span>    bimod <span style="color:#f92672">=</span> _PyBuiltin_Init();
-    _PyImport_FixupBuiltin(bimod, <span style="color:#e6db74">&#34;builtins&#34;</span>, modules);
-    interp<span style="color:#f92672">-&gt;</span>builtins <span style="color:#f92672">=</span> PyModule_GetDict(bimod);
-    Py_INCREF(interp<span style="color:#f92672">-&gt;</span>builtins);
-
-    <span style="color:#75715e">// 初始化内置异常类型
-</span><span style="color:#75715e"></span>    _PyExc_Init(bimod);
-
-    <span style="color:#75715e">// 初始化导入机制
-</span><span style="color:#75715e"></span>    err <span style="color:#f92672">=</span> _PyImport_Init(interp);
-    err <span style="color:#f92672">=</span> _PyImportHooks_Init();
-
-    <span style="color:#75715e">/* Initialize _warnings. */</span>
-    <span style="color:#66d9ef">if</span> (_PyWarnings_Init() <span style="color:#f92672">==</span> NULL) {
-        <span style="color:#66d9ef">return</span> _Py_INIT_ERR(<span style="color:#e6db74">&#34;can&#39;t initialize warnings&#34;</span>);
-    }
-
-    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>_PyContext_Init())
-        <span style="color:#66d9ef">return</span> _Py_INIT_ERR(<span style="color:#e6db74">&#34;can&#39;t init context&#34;</span>);
-
-    <span style="color:#75715e">/* Only when we get here is the runtime core fully initialized */</span>
-    _PyRuntime.core_initialized <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">_Py_INIT_OK</span>();
-}</code></pre></div></p>
-<h3 id="执行">执行</h3>
-<p>完成初始化之后，就进入执行流程，这里以文件模式的执行为例:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Modules<span style="color:#f92672">/</span>main.c <span style="color:#f92672">--&gt;</span>
-<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> pymain_run_file(FILE <span style="color:#f92672">*</span>fp, <span style="color:#66d9ef">const</span> wchar_t <span style="color:#f92672">*</span>filename, PyCompilerFlags <span style="color:#f92672">*</span>p_cf)
-{
-    run <span style="color:#f92672">=</span> PyRun_AnyFileExFlags(fp, filename_str, filename <span style="color:#f92672">!=</span> NULL, p_cf);
-    <span style="color:#66d9ef">return</span> run <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>;
-}</code></pre></div></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>pythonrun.c <span style="color:#f92672">--&gt;</span>
-<span style="color:#75715e">/* Parse input from a file and execute it */</span>
-<span style="color:#66d9ef">int</span> PyRun_AnyFileExFlags(FILE <span style="color:#f92672">*</span>fp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>filename, <span style="color:#66d9ef">int</span> closeit, ...)
-{
-    <span style="color:#66d9ef">return</span> PyRun_SimpleFileExFlags(fp, filename, closeit, flags);
-}
-
-<span style="color:#66d9ef">int</span> PyRun_SimpleFileExFlags(FILE <span style="color:#f92672">*</span>fp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>filename, <span style="color:#66d9ef">int</span> closeit, ...)
-{
-    <span style="color:#75715e">// 获取__main__.__dict__，添加__file__ 信息
-</span><span style="color:#75715e"></span>    m <span style="color:#f92672">=</span> PyImport_AddModule(<span style="color:#e6db74">&#34;__main__&#34;</span>);
-    d <span style="color:#f92672">=</span> PyModule_GetDict(m);
-    <span style="color:#66d9ef">if</span> (PyDict_GetItemString(d, <span style="color:#e6db74">&#34;__file__&#34;</span>) <span style="color:#f92672">==</span> NULL) {
-        PyObject <span style="color:#f92672">*</span>f;
-        f <span style="color:#f92672">=</span> PyUnicode_DecodeFSDefault(filename);
-        <span style="color:#66d9ef">if</span> (f <span style="color:#f92672">==</span> NULL)
-            <span style="color:#66d9ef">goto</span> done;
-        <span style="color:#66d9ef">if</span> (PyDict_SetItemString(d, <span style="color:#e6db74">&#34;__file__&#34;</span>, f) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
-            Py_DECREF(f);
-            <span style="color:#66d9ef">goto</span> done;
-        }
-        <span style="color:#66d9ef">if</span> (PyDict_SetItemString(d, <span style="color:#e6db74">&#34;__cached__&#34;</span>, Py_None) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
-            Py_DECREF(f);
-            <span style="color:#66d9ef">goto</span> done;
-        }
-    }
-
-    <span style="color:#75715e">// 运行入口文件（检查pyc缓存），将__main__.__dict__做为名字空间传入
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (maybe_pyc_file(fp, filename, ext, closeit)) {
-        <span style="color:#75715e">// 运行缓存文件
-</span><span style="color:#75715e"></span>        v <span style="color:#f92672">=</span> run_pyc_file(pyc_fp, filename, d, d, flags);
-        fclose(pyc_fp);
-    } <span style="color:#66d9ef">else</span> {
-        <span style="color:#75715e">// 运行py文件
-</span><span style="color:#75715e"></span>        v <span style="color:#f92672">=</span> PyRun_FileExFlags(fp, filename, Py_file_input, d, d,
-                              closeit, flags);
-    }
-  done:
-    <span style="color:#66d9ef">if</span> (set_file_name <span style="color:#f92672">&amp;&amp;</span> PyDict_DelItemString(d, <span style="color:#e6db74">&#34;__file__&#34;</span>))
-        PyErr_Clear();
-    Py_DECREF(m);
-    <span style="color:#66d9ef">return</span> ret;
-}
-
-<span style="color:#75715e">// 编译源文件，随后进入字节码执行流程
-</span><span style="color:#75715e"></span>PyObject <span style="color:#f92672">*</span> PyRun_FileExFlags(FILE <span style="color:#f92672">*</span>fp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>filename_str, <span style="color:#66d9ef">int</span> start, ...)
-{
-    filename <span style="color:#f92672">=</span> PyUnicode_DecodeFSDefault(filename_str);
-    arena <span style="color:#f92672">=</span> PyArena_New();
-
-    <span style="color:#75715e">// 编译源文件
-</span><span style="color:#75715e"></span>    mod <span style="color:#f92672">=</span> PyParser_ASTFromFileObject(fp, filename, NULL, start, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>,
-                                     flags, NULL, arena);
-    <span style="color:#75715e">// 字节码执行流程
-</span><span style="color:#75715e"></span>    ret <span style="color:#f92672">=</span> run_mod(mod, filename, globals, locals, flags, arena);
-    <span style="color:#66d9ef">return</span> ret;
-}
-
-<span style="color:#66d9ef">static</span> PyObject <span style="color:#f92672">*</span> run_mod(mod_ty mod, PyObject <span style="color:#f92672">*</span>filename, ...)
-{
-    co <span style="color:#f92672">=</span> PyAST_CompileObject(mod, filename, flags, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, arena);
-    v <span style="color:#f92672">=</span> PyEval_EvalCode((PyObject<span style="color:#f92672">*</span>)co, globals, locals);
+    ...
+    node <span style="color:#f92672">*</span>n <span style="color:#f92672">=</span> PyParser_ParseFileObject(fp, filename, enc,
+                                       <span style="color:#f92672">&amp;</span>_PyParser_Grammar,
+                                       start, ps1, ps2, <span style="color:#f92672">&amp;</span>err, <span style="color:#f92672">&amp;</span>iflags);
+    ...
+    <span style="color:#66d9ef">if</span> (n) {
+        flags<span style="color:#f92672">-&gt;</span>cf_flags <span style="color:#f92672">|=</span> iflags <span style="color:#f92672">&amp;</span> PyCF_MASK;
+        mod <span style="color:#f92672">=</span> PyAST_FromNodeObject(n, flags, filename, arena);
+        PyNode_Free(n);
+    ...
+    <span style="color:#66d9ef">return</span> mod;
 }</code></pre></div>
-<p>之后创建执行所需的栈帧对象，并准备好参数等待执行数据。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>ceval.c <span style="color:#f92672">--&gt;</span>
-PyObject <span style="color:#f92672">*</span> PyEval_EvalCode(PyObject <span style="color:#f92672">*</span>co, PyObject <span style="color:#f92672">*</span>globals, PyObject <span style="color:#f92672">*</span>locals)
+在<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L772">PyParser_ASTFromFileObject()</a>方法中，会将文件句柄、编译器标志、以及内存块对象打包给<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/parsetok.c#L163">PyParser_ParseFileObject()</a>转换为一个node对象:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">node <span style="color:#f92672">*</span>
+<span style="color:#a6e22e">PyParser_ParseFileObject</span>(FILE <span style="color:#f92672">*</span>fp, PyObject <span style="color:#f92672">*</span>filename,
+                         <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>enc, grammar <span style="color:#f92672">*</span>g, <span style="color:#66d9ef">int</span> start,
+                         <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>ps1, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>ps2,
+                         perrdetail <span style="color:#f92672">*</span>err_ret, <span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>flags)
 {
-    <span style="color:#66d9ef">return</span> PyEval_EvalCodeEx(co, globals, locals, ...);
-}
-PyObject <span style="color:#f92672">*</span> PyEval_EvalCodeEx(PyObject <span style="color:#f92672">*</span>_co, PyObject <span style="color:#f92672">*</span>globals, PyObject <span style="color:#f92672">*</span>locals, ...)
+    <span style="color:#66d9ef">struct</span> tok_state <span style="color:#f92672">*</span>tok;
+...
+    <span style="color:#66d9ef">if</span> ((tok <span style="color:#f92672">=</span> PyTokenizer_FromFile(fp, enc, ps1, ps2)) <span style="color:#f92672">==</span> NULL) {
+        err_ret<span style="color:#f92672">-&gt;</span>error <span style="color:#f92672">=</span> E_NOMEM;
+        <span style="color:#66d9ef">return</span> NULL;
+    }
+...
+    <span style="color:#66d9ef">return</span> parsetok(tok, g, start, err_ret, flags);
+}</code></pre></div>
+该方法把两项重要的任务组合了起来，一是使用<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/tokenizer.h#L78">PyTokenizer_FromFile()</a>实例化一个tok_state，tok_state也只是一个数据结构(容器)，存储由tokenizer生成的临时数据；二是使用<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/parsetok.c#L232">parsetok()</a>将token转换为一个具体的解析树(节点列表)。</p>
+<p>在parsetok()中，将循环调用<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/tokenizer.c#L1110">tok_get()</a>方法，该方法像是一个迭代器，不断获取解析树的下一个token，parsetok()在根据不同token设置tok_state中相关的值。它也是CPython中最复杂的方法之一，因为要兼容各种各样的边缘情况、数十年的历史原因、新的语言特性等等原因。我们来看其中一种简单的解析，如何把每行结尾变为token<code>NEWLINE</code>的:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span>
+<span style="color:#a6e22e">tok_get</span>(<span style="color:#66d9ef">struct</span> tok_state <span style="color:#f92672">*</span>tok, <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>p_start, <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>p_end)
 {
-    <span style="color:#66d9ef">return</span> _PyEval_EvalCodeWithName(_co, globals, locals, ...);
-}
-PyObject <span style="color:#f92672">*</span> _PyEval_EvalCodeWithName(PyObject <span style="color:#f92672">*</span>_co, PyObject <span style="color:#f92672">*</span>globals, PyObject <span style="color:#f92672">*</span>locals, ...)
-{
-
-    <span style="color:#75715e">// 创建栈帧
-</span><span style="color:#75715e"></span>    tstate <span style="color:#f92672">=</span> PyThreadState_GET();
-    f <span style="color:#f92672">=</span> _PyFrame_New_NoTrack(tstate, co, globals, locals);
-
-    <span style="color:#75715e">// 填充参数、自由变量（闭包）等数据
-</span><span style="color:#75715e"></span>    retval <span style="color:#f92672">=</span> PyEval_EvalFrameEx(f,<span style="color:#ae81ff">0</span>);
-}
-PyObject <span style="color:#f92672">*</span> PyEval_EvalFrameEx(PyFrameObject <span style="color:#f92672">*</span>f, <span style="color:#66d9ef">int</span> throwflag)
-{
-    PyThreadState <span style="color:#f92672">*</span>tstate <span style="color:#f92672">=</span> PyThreadState_GET();
-    <span style="color:#66d9ef">return</span> tstate<span style="color:#f92672">-&gt;</span>interp<span style="color:#f92672">-&gt;</span>eval_frame(f, throwflag);
-}
-PyObject<span style="color:#f92672">*</span> _Py_HOT_FUNCTION _PyEval_EvalFrameDefault(PyFrameObject <span style="color:#f92672">*</span>f, <span style="color:#66d9ef">int</span> throwflag)
-{
-    <span style="color:#75715e">// 指令参数所需的相关名字列表
-</span><span style="color:#75715e"></span>    co <span style="color:#f92672">=</span> f<span style="color:#f92672">-&gt;</span>f_code;
-    names <span style="color:#f92672">=</span> co<span style="color:#f92672">-&gt;</span>co_names;
-    consts <span style="color:#f92672">=</span> co<span style="color:#f92672">-&gt;</span>co_consts;
-    fastlocals <span style="color:#f92672">=</span> f<span style="color:#f92672">-&gt;</span>f_localsplus;
-    freevars <span style="color:#f92672">=</span> f<span style="color:#f92672">-&gt;</span>f_localsplus <span style="color:#f92672">+</span> co<span style="color:#f92672">-&gt;</span>co_nlocals;
-
-    <span style="color:#75715e">// 类似于SP、PC寄存器，下一条指令及栈帧顶位置
-</span><span style="color:#75715e"></span>    first_instr <span style="color:#f92672">=</span> (_Py_CODEUNIT <span style="color:#f92672">*</span>) PyBytes_AS_STRING(co<span style="color:#f92672">-&gt;</span>co_code);
-    next_instr <span style="color:#f92672">=</span> first_instr;
-    stack_pointer <span style="color:#f92672">=</span> f<span style="color:#f92672">-&gt;</span>f_stacktop;
-
-    <span style="color:#75715e">// 解释循环
-</span><span style="color:#75715e"></span>    main_loop:
-    <span style="color:#66d9ef">for</span> (;;) {
-        <span style="color:#75715e">// 检查并处理GIL
-</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (_Py_atomic_load_relaxed(<span style="color:#f92672">&amp;</span>_PyRuntime.ceval.eval_breaker)) {
+...
+    <span style="color:#75715e">/* Newline */</span>
+    <span style="color:#66d9ef">if</span> (c <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;\n&#39;</span>) {
+        tok<span style="color:#f92672">-&gt;</span>atbol <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+        <span style="color:#66d9ef">if</span> (blankline <span style="color:#f92672">||</span> tok<span style="color:#f92672">-&gt;</span>level <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+            <span style="color:#66d9ef">goto</span> nextline;
         }
-
-    fast_next_opcode:
-        <span style="color:#75715e">// 下一条指令和参数
-</span><span style="color:#75715e"></span>        NEXTOPARG();
-    dispatch_opcode:
-
-        <span style="color:#75715e">// 指令执行，每条指令由C实现具体过程
-</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">switch</span> (opcode) {
-
-        TARGET(NOP)
-            FAST_DISPATCH();
-
-        TARGET(LOAD_FAST) {
-            PyObject <span style="color:#f92672">*</span>value <span style="color:#f92672">=</span> GETLOCAL(oparg);
-            Py_INCREF(value);
-            PUSH(value);
-            FAST_DISPATCH();
+        <span style="color:#f92672">*</span>p_start <span style="color:#f92672">=</span> tok<span style="color:#f92672">-&gt;</span>start;
+        <span style="color:#f92672">*</span>p_end <span style="color:#f92672">=</span> tok<span style="color:#f92672">-&gt;</span>cur <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">/* Leave &#39;\n&#39; out of the string */</span>
+        tok<span style="color:#f92672">-&gt;</span>cont_line <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+        <span style="color:#66d9ef">if</span> (tok<span style="color:#f92672">-&gt;</span>async_def) {
+            <span style="color:#75715e">/* We&#39;re somewhere inside an &#39;async def&#39; function, and
+</span><span style="color:#75715e">               we&#39;ve encountered a NEWLINE after its signature. */</span>
+            tok<span style="color:#f92672">-&gt;</span>async_def_nl <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
         }
-     }
-     exit_eval_frame:
-        Py_LeaveRecursiveCall();
-        f<span style="color:#f92672">-&gt;</span>f_executing <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-        tstate<span style="color:#f92672">-&gt;</span>frame <span style="color:#f92672">=</span> f<span style="color:#f92672">-&gt;</span>f_back;
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">_Py_CheckFunctionResult</span>(NULL, retval, <span style="color:#e6db74">&#34;PyEval_EvalFrameEx&#34;</span>);
+        <span style="color:#66d9ef">return</span> NEWLINE;
+    }
+...
+}</code></pre></div>
+parsetok()返回的是一个node节点类型:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> _node {
+    <span style="color:#66d9ef">short</span>               n_type;
+    <span style="color:#66d9ef">char</span>                <span style="color:#f92672">*</span>n_str;
+    <span style="color:#66d9ef">int</span>                 n_lineno;
+    <span style="color:#66d9ef">int</span>                 n_col_offset;
+    <span style="color:#66d9ef">int</span>                 n_nchildren;
+    <span style="color:#66d9ef">struct</span> _node        <span style="color:#f92672">*</span>n_child;
+    <span style="color:#66d9ef">int</span>                 n_end_lineno;
+    <span style="color:#66d9ef">int</span>                 n_end_col_offset;
+} node;</code></pre></div>
+这些个节点组成的树我们叫CST，每个节点包含了语法、tokenID、符号，但这个树不能用于编译器做出快速决策，编译器需要更高一级抽象即AST，我们可以通过内部的API观察到CST的输出结果:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> symbol
+<span style="color:#f92672">import</span> token
+<span style="color:#f92672">import</span> parser
+
+<span style="color:#75715e"># 为了输出结果的可读性，做了一层处理</span>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">lex</span>(expression):
+    symbols <span style="color:#f92672">=</span> {v: k <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> symbol<span style="color:#f92672">.</span>__dict__<span style="color:#f92672">.</span>items() <span style="color:#66d9ef">if</span> isinstance(v, int)}
+    tokens <span style="color:#f92672">=</span> {v: k <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> token<span style="color:#f92672">.</span>__dict__<span style="color:#f92672">.</span>items() <span style="color:#66d9ef">if</span> isinstance(v, int)}
+    lexicon <span style="color:#f92672">=</span> {<span style="color:#f92672">**</span>symbols, <span style="color:#f92672">**</span>tokens}
+    st <span style="color:#f92672">=</span> parser<span style="color:#f92672">.</span>expr(expression)
+    st_list <span style="color:#f92672">=</span> parser<span style="color:#f92672">.</span>st2list(st)
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">replace</span>(l: list):
+        r <span style="color:#f92672">=</span> []
+        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> l:
+            <span style="color:#66d9ef">if</span> isinstance(i, list):
+                r<span style="color:#f92672">.</span>append(replace(i))
+            <span style="color:#66d9ef">else</span>:
+                <span style="color:#66d9ef">if</span> i <span style="color:#f92672">in</span> lexicon:
+                    r<span style="color:#f92672">.</span>append(lexicon[i])
+                <span style="color:#66d9ef">else</span>:
+                    r<span style="color:#f92672">.</span>append(i)
+        <span style="color:#66d9ef">return</span> r
+
+    <span style="color:#66d9ef">return</span> replace(st_list)
+
+<span style="color:#75715e"># 小写的就是符号，大写的就是token</span>
+<span style="color:#f92672">&gt;&gt;&gt;</span> pprint(lex(<span style="color:#e6db74">&#39;a + 1&#39;</span>))
+[<span style="color:#e6db74">&#39;eval_input&#39;</span>,
+ [<span style="color:#e6db74">&#39;testlist&#39;</span>,
+  [<span style="color:#e6db74">&#39;test&#39;</span>,
+   [<span style="color:#e6db74">&#39;or_test&#39;</span>,
+    [<span style="color:#e6db74">&#39;and_test&#39;</span>,
+     [<span style="color:#e6db74">&#39;not_test&#39;</span>,
+      [<span style="color:#e6db74">&#39;comparison&#39;</span>,
+       [<span style="color:#e6db74">&#39;expr&#39;</span>,
+        [<span style="color:#e6db74">&#39;xor_expr&#39;</span>,
+         [<span style="color:#e6db74">&#39;and_expr&#39;</span>,
+          [<span style="color:#e6db74">&#39;shift_expr&#39;</span>,
+           [<span style="color:#e6db74">&#39;arith_expr&#39;</span>,
+            [<span style="color:#e6db74">&#39;term&#39;</span>,
+             [<span style="color:#e6db74">&#39;factor&#39;</span>, [<span style="color:#e6db74">&#39;power&#39;</span>, [<span style="color:#e6db74">&#39;atom_expr&#39;</span>, [<span style="color:#e6db74">&#39;atom&#39;</span>, [<span style="color:#e6db74">&#39;NAME&#39;</span>, <span style="color:#e6db74">&#39;a&#39;</span>]]]]]],
+            [<span style="color:#e6db74">&#39;PLUS&#39;</span>, <span style="color:#e6db74">&#39;+&#39;</span>],
+            [<span style="color:#e6db74">&#39;term&#39;</span>,
+             [<span style="color:#e6db74">&#39;factor&#39;</span>,
+              [<span style="color:#e6db74">&#39;power&#39;</span>, [<span style="color:#e6db74">&#39;atom_expr&#39;</span>, [<span style="color:#e6db74">&#39;atom&#39;</span>, [<span style="color:#e6db74">&#39;NUMBER&#39;</span>, <span style="color:#e6db74">&#39;1&#39;</span>]]]]]]]]]]]]]]]]],
+ [<span style="color:#e6db74">&#39;NEWLINE&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>],
+ [<span style="color:#e6db74">&#39;ENDMARKER&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>]]</code></pre></div></p>
+<h3 id="ast">AST</h3>
+<p>CPython的下一个阶段就是将CST转换为能够执行的、更有逻辑的东西，也就是AST(Abstract Syntax Trees，抽象语法树)。虽然这一步是解释器内联生成，我们也有其他办法能方便的观察到，例如使用<code>instaviz</code>库，它能在一个网页中展示AST以及每个节点的属性:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">import</span> instaviz
+<span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">example</span>():
+       a <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+       b <span style="color:#f92672">=</span> a <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+       <span style="color:#66d9ef">return</span> b
+<span style="color:#f92672">&gt;&gt;&gt;</span> instaviz<span style="color:#f92672">.</span>show(example)</code></pre></div>
+我们能看到这样的界面:
+<img src="./images/instaviz_web.png" alt="instaviz_web" /></p>
+<p>然后可以点击AST中的节点:
+<img src="./images/instaviz_node.png" alt="instaviz_node" />
+例如如果点击图中的Assign节点，它代表的是<code>b=a+1</code>这一行，右侧会展示出这个节点的属性，它有两个属性，一个是targets，代表变量名称，它有时可能是一个列表，因为解包操作就会有多个变量；另一个是value，代表变量的值，在这里就是<code>a+1</code>这个表达式。如果我们再点击BinOp节点，就可以看到它的3个属性，left表示运算符左边是什么，op表示运算符，right表示运算符右边。</p>
+<p>用C语言编译AST并不是一件容易的事，所以实际上真正的编译模块有5000行代码，在<code>Python/ast.c</code>中。</p>
+<p>具体到核心代码流程来说，之前通过PyParser_ParseFileObject()得到的CST对象node，接着传入<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L772">PyAST_FromNodeObject()</a>，并附带文件名、编译flag和PyArena。得到函数返回的mod_ty，是一个容器结构，属于Python5种模块类型之一:Module、Interactive、Expression、FunctionType、Suite。在<code>Include/Python-ast.h</code>中能看到每种类型需要的字段:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">enum</span> _mod_kind {Module_kind<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, Interactive_kind<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, Expression_kind<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>,
+                 FunctionType_kind<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span>, Suite_kind<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>};
+<span style="color:#66d9ef">struct</span> _mod {
+    <span style="color:#66d9ef">enum</span> _mod_kind kind;
+    <span style="color:#66d9ef">union</span> {
+        <span style="color:#66d9ef">struct</span> {
+            asdl_seq <span style="color:#f92672">*</span>body;
+            asdl_seq <span style="color:#f92672">*</span>type_ignores;
+        } Module;
+
+        <span style="color:#66d9ef">struct</span> {
+            asdl_seq <span style="color:#f92672">*</span>body;
+        } Interactive;
+
+        <span style="color:#66d9ef">struct</span> {
+            expr_ty body;
+        } Expression;
+
+        <span style="color:#66d9ef">struct</span> {
+            asdl_seq <span style="color:#f92672">*</span>argtypes;
+            expr_ty returns;
+        } FunctionType;
+
+        <span style="color:#66d9ef">struct</span> {
+            asdl_seq <span style="color:#f92672">*</span>body;
+        } Suite;
+
+    } v;
+};</code></pre></div>
+除了模块类型，其他的AST类型都列在<code>Parser/Python.asdl</code>中，包括statement、expression、operators、comprehensions等等。在该文件中我们能看到类型字段的定义也是用在这里的:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">--</span> ASDL<span style="color:#960050;background-color:#1e0010">&#39;</span>s <span style="color:#ae81ff">5</span> builtin types are:
+<span style="color:#f92672">--</span> identifier, <span style="color:#66d9ef">int</span>, string, object, constant
+
+module Python
+{
+    mod <span style="color:#f92672">=</span> Module(stmt<span style="color:#f92672">*</span> body, type_ignore <span style="color:#f92672">*</span>type_ignores)
+        <span style="color:#f92672">|</span> Interactive(stmt<span style="color:#f92672">*</span> body)
+        <span style="color:#f92672">|</span> Expression(expr body)
+        <span style="color:#f92672">|</span> FunctionType(expr<span style="color:#f92672">*</span> argtypes, expr returns)</code></pre></div></p>
+<p>接着，PyAST_FromNodeObject()使用TYPE(n)确定首个CST节点的类型来执行不同的逻辑，如果是文件输入，返回的结果就是Module，eval_input就是Expression，总之是Module, Interactive, Expression, FunctionType中的一种:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">mod_ty
+<span style="color:#a6e22e">PyAST_FromNodeObject</span>(<span style="color:#66d9ef">const</span> node <span style="color:#f92672">*</span>n, PyCompilerFlags <span style="color:#f92672">*</span>flags,
+                     PyObject <span style="color:#f92672">*</span>filename, PyArena <span style="color:#f92672">*</span>arena)
+{
+    ...
+    <span style="color:#66d9ef">switch</span> (TYPE(n)) {
+        <span style="color:#66d9ef">case</span> file_input:
+            stmts <span style="color:#f92672">=</span> _Py_asdl_seq_new(num_stmts(n), arena);
+            <span style="color:#66d9ef">for</span> (i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> NCH(n) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; i<span style="color:#f92672">++</span>) {
+                ch <span style="color:#f92672">=</span> CHILD(n, i);
+                <span style="color:#66d9ef">if</span> (TYPE(ch) <span style="color:#f92672">==</span> NEWLINE)
+                    <span style="color:#66d9ef">continue</span>;
+                num <span style="color:#f92672">=</span> num_stmts(ch);
+                <span style="color:#66d9ef">if</span> (num <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) {
+                    s <span style="color:#f92672">=</span> ast_for_stmt(<span style="color:#f92672">&amp;</span>c, ch);
+                }
+                <span style="color:#66d9ef">else</span> {
+                    ch <span style="color:#f92672">=</span> CHILD(ch, <span style="color:#ae81ff">0</span>);
+                    REQ(ch, simple_stmt);
+                    <span style="color:#66d9ef">for</span> (j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; j <span style="color:#f92672">&lt;</span> num; j<span style="color:#f92672">++</span>) {
+                        s <span style="color:#f92672">=</span> ast_for_stmt(<span style="color:#f92672">&amp;</span>c, CHILD(ch, j <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>));
+                    }
+                }
+            }
+            <span style="color:#75715e">/* Type ignores are stored under the ENDMARKER in file_input. */</span>
+            ...
+            res <span style="color:#f92672">=</span> Module(stmts, type_ignores, arena);
+            <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> eval_input: {
+            expr_ty testlist_ast;
+            testlist_ast <span style="color:#f92672">=</span> ast_for_testlist(<span style="color:#f92672">&amp;</span>c, CHILD(n, <span style="color:#ae81ff">0</span>));
+            res <span style="color:#f92672">=</span> Expression(testlist_ast, arena);
+            <span style="color:#66d9ef">break</span>;
+        }
+        <span style="color:#66d9ef">case</span> single_input:
+            ...
+            <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> func_type_input:
+            ...
+        ...
+    <span style="color:#66d9ef">return</span> res;
 }</code></pre></div></p>
-<p>用户栈内存按地址从低向高分配，每次执行时会递增指令计数器。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>ceval.c <span style="color:#f92672">--&gt;</span>
-<span style="color:#75715e">#define NEXTOPARG()  do { \
-</span><span style="color:#75715e">        _Py_CODEUNIT word = *next_instr; \
-</span><span style="color:#75715e">        opcode = _Py_OPCODE(word); \
-</span><span style="color:#75715e">        oparg = _Py_OPARG(word); \
-</span><span style="color:#75715e">        next_instr++; \
-</span><span style="color:#75715e">    } while (0)
-</span><span style="color:#75715e">#define EMPTY()           (STACK_LEVEL() == 0)
-</span><span style="color:#75715e">#define TOP()             (stack_pointer[-1])
-</span><span style="color:#75715e">#define SECOND()          (stack_pointer[-2])
-</span><span style="color:#75715e">#define THIRD()           (stack_pointer[-3])
-</span><span style="color:#75715e">#define FOURTH()          (stack_pointer[-4])
-</span><span style="color:#75715e">#define PEEK(n)           (stack_pointer[-(n)])
-</span><span style="color:#75715e">#define SET_TOP(v)        (stack_pointer[-1] = (v))
-</span><span style="color:#75715e">#define SET_SECOND(v)     (stack_pointer[-2] = (v))
-</span><span style="color:#75715e">#define SET_THIRD(v)      (stack_pointer[-3] = (v))
-</span><span style="color:#75715e">#define SET_FOURTH(v)     (stack_pointer[-4] = (v))
-</span><span style="color:#75715e">#define SET_VALUE(n, v)   (stack_pointer[-(n)] = (v))
-</span><span style="color:#75715e">#define BASIC_STACKADJ(n) (stack_pointer += n)
-</span><span style="color:#75715e">#define BASIC_PUSH(v)     (*stack_pointer++ = (v)) </span><span style="color:#75715e">// 地址从低向高进行
-</span><span style="color:#75715e"></span><span style="color:#75715e">#define BASIC_POP()       (*--stack_pointer)</span></code></pre></div></p>
+<p>遍历孩子节点并创建相应的AST语句节点逻辑在<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L4512">ast_for_stmt()</a>中，该函数内还需要再根据不同的语句类型调用不同的函数创建节点，都是类似于ast_for_*()，例如<code>2**4</code>这样的语句最终能找到ast_for_power()这样的方法。</p>
+<h3 id="编译">编译</h3>
+<p>现在解释器有了AST，也就有了每个操作、函数、类和名字空间所需要的属性，下一步就是把AST编译为CPU能够理解的东西，这就是编译。编译可以分为两个部分:一是遍历树并创建一个控制流图(control-flow-graph)，用来表示逻辑执行的顺序；另外就是将控制流图中的节点转换为较小的可执行语句，称为字节码。</p>
+<p><a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L312">PyAST_CompileObject()</a>函数是编译器部分的主要入口，它以Python模块作为主要参数，同解释器进程早期创建过的文件名称、全局变量、局部变量以及PyArena一起打包传入。然后先创建一个全局的编译器状态结构体，用来存储一些属性、编译标识、栈等等:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>compile.c <span style="color:#f92672">--&gt;</span>
+<span style="color:#66d9ef">struct</span> compiler {
+    PyObject <span style="color:#f92672">*</span>c_filename;
+    <span style="color:#66d9ef">struct</span> symtable <span style="color:#f92672">*</span>c_st;
+    PyFutureFeatures <span style="color:#f92672">*</span>c_future; <span style="color:#75715e">/* pointer to module&#39;s __future__ */</span>
+    PyCompilerFlags <span style="color:#f92672">*</span>c_flags;
+    <span style="color:#66d9ef">int</span> c_optimize;              <span style="color:#75715e">/* optimization level */</span>
+    <span style="color:#66d9ef">int</span> c_interactive;           <span style="color:#75715e">/* true if in interactive mode */</span>
+    <span style="color:#66d9ef">int</span> c_nestlevel;
+    <span style="color:#66d9ef">int</span> c_do_not_emit_bytecode;  
+    PyObject <span style="color:#f92672">*</span>c_const_cache;     <span style="color:#75715e">/* Python dict holding all constants, including names tuple */</span>
+    <span style="color:#66d9ef">struct</span> compiler_unit <span style="color:#f92672">*</span>u; <span style="color:#75715e">/* compiler state for current block */</span>
+    PyObject <span style="color:#f92672">*</span>c_stack;           <span style="color:#75715e">/* Python list holding compiler_unit ptrs */</span>
+    PyArena <span style="color:#f92672">*</span>c_arena;            <span style="color:#75715e">/* pointer to memory allocation arena */</span>
+};</code></pre></div>
+接着有11个主要步骤:</p>
+<ol>
+<li>如果模块不存在<code>__doc__</code>则创建一个新的</li>
+<li>如果模块不存在<code>__annotations__</code>则创建一个新的</li>
+<li>设置全局编译器状态中的文件名为传入的文件名</li>
+<li>将编译器的内存区域设置为解释器使用的那个</li>
+<li>将模块中所有的<code>__future__</code>标识复制至全局编译器状态中</li>
+<li>合并命令行或环境变量中提供的运行时标识</li>
+<li>启用编译器中所有的<code>__future__</code></li>
+<li>设置编译的优化级别为参数提供的，或者是默认的</li>
+<li>根据模块对象构建符号表</li>
+<li>运行编译器，返回代码对象</li>
+<li>编译器释放编译过程中所分配的所有内存</li>
+</ol>
+<p>核心代码:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">PyCodeObject <span style="color:#f92672">*</span>
+<span style="color:#a6e22e">PyAST_CompileObject</span>(mod_ty mod, PyObject <span style="color:#f92672">*</span>filename, PyCompilerFlags <span style="color:#f92672">*</span>flags,
+                   <span style="color:#66d9ef">int</span> optimize, PyArena <span style="color:#f92672">*</span>arena)
+{
+    <span style="color:#66d9ef">struct</span> compiler c;
+    PyCodeObject <span style="color:#f92672">*</span>co <span style="color:#f92672">=</span> NULL;
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>__doc__) {
+        __doc__ <span style="color:#f92672">=</span> PyUnicode_InternFromString(<span style="color:#e6db74">&#34;__doc__&#34;</span>);
+    }
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>__annotations__) {
+        __annotations__ <span style="color:#f92672">=</span> PyUnicode_InternFromString(<span style="color:#e6db74">&#34;__annotations__&#34;</span>);
+    }
+    c.c_filename <span style="color:#f92672">=</span> filename;
+    c.c_arena <span style="color:#f92672">=</span> arena;
+    c.c_future <span style="color:#f92672">=</span> PyFuture_FromASTObject(mod, filename);
+    merged <span style="color:#f92672">=</span> c.c_future<span style="color:#f92672">-&gt;</span>ff_features <span style="color:#f92672">|</span> flags<span style="color:#f92672">-&gt;</span>cf_flags;
+    c.c_future<span style="color:#f92672">-&gt;</span>ff_features <span style="color:#f92672">=</span> merged;
+    flags<span style="color:#f92672">-&gt;</span>cf_flags <span style="color:#f92672">=</span> merged;
+    c.c_flags <span style="color:#f92672">=</span> flags;
+    c.c_optimize <span style="color:#f92672">=</span> (optimize <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) <span style="color:#f92672">?</span> config<span style="color:#f92672">-&gt;</span>optimization_level : optimize;
+    c.c_nestlevel <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    c.c_do_not_emit_bytecode <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    co <span style="color:#f92672">=</span> compiler_mod(<span style="color:#f92672">&amp;</span>c, mod);
+ finally:
+    compiler_free(<span style="color:#f92672">&amp;</span>c);
+    <span style="color:#66d9ef">return</span> co;
+}</code></pre></div></p>
+<h4 id="future标识和编译标识">Future标识和编译标识</h4>
+<p>编译器运行前，有两种标识可以切换编译器内部的功能。</p>
+<p>第一种是通过命令行或环境变量设置的解释器状态，例如命令行执行时添加<code>-O</code>标志(也可以通过设置环境变量PYTHONOPTIMIZE=1达到同样效果)，则所有的断言语句都会被编译器忽略掉，这些断言语句往往是调试时才需要。</p>
+<p>另一种是实际的源代码中加入future语句，例如<code>from __future__ import annotations</code>，它是Python3.7新加入的，因为使用type hints时可能类型还没有被创建，该语句可以让类型注解延迟求值。</p>
+<h4 id="符号表">符号表</h4>
+<p>符号表为编译器提供了一个查找引用全局变量、局部变量等的作用域，它的结构是这样的:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">struct</span> symtable {
+    PyObject <span style="color:#f92672">*</span>st_filename;          <span style="color:#75715e">/* name of file being compiled, decoded from the filesystem encoding */</span>
+    <span style="color:#66d9ef">struct</span> _symtable_entry <span style="color:#f92672">*</span>st_cur; <span style="color:#75715e">/* current symbol table entry */</span>
+    <span style="color:#66d9ef">struct</span> _symtable_entry <span style="color:#f92672">*</span>st_top; <span style="color:#75715e">/* symbol table entry for module */</span>
+    PyObject <span style="color:#f92672">*</span>st_blocks;            <span style="color:#75715e">/* dict: map AST node addresses to symbol table entries */</span>
+    PyObject <span style="color:#f92672">*</span>st_stack;             <span style="color:#75715e">/* list: stack of namespace info */</span>
+    PyObject <span style="color:#f92672">*</span>st_global;            <span style="color:#75715e">/* borrowed ref to st_top-&gt;ste_symbols */</span>
+    <span style="color:#66d9ef">int</span> st_nblocks;                 <span style="color:#75715e">/* number of blocks used. kept for consistency with the corresponding compiler structure */</span>
+    PyObject <span style="color:#f92672">*</span>st_private;           <span style="color:#75715e">/* name of current class or NULL */</span>
+    PyFutureFeatures <span style="color:#f92672">*</span>st_future;    <span style="color:#75715e">/* module&#39;s future features that affect the symbol table */</span>
+    <span style="color:#66d9ef">int</span> recursion_depth;            <span style="color:#75715e">/* current recursion depth */</span>
+    <span style="color:#66d9ef">int</span> recursion_limit;            <span style="color:#75715e">/* recursion limit */</span>
+};</code></pre></div>
+其中的一些API通过Python的标准库symtable模块可以调用:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">import</span> symtable
+<span style="color:#f92672">&gt;&gt;&gt;</span> s <span style="color:#f92672">=</span> symtable<span style="color:#f92672">.</span>symtable(<span style="color:#e6db74">&#39;b + 1&#39;</span>, filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;test.py&#39;</span>, compile_type<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;eval&#39;</span>)
+<span style="color:#f92672">&gt;&gt;&gt;</span> [symbol<span style="color:#f92672">.</span>__dict__ <span style="color:#66d9ef">for</span> symbol <span style="color:#f92672">in</span> s<span style="color:#f92672">.</span>get_symbols()]
+[{<span style="color:#e6db74">&#39;_Symbol__name&#39;</span>: <span style="color:#e6db74">&#39;b&#39;</span>, <span style="color:#e6db74">&#39;_Symbol__flags&#39;</span>: <span style="color:#ae81ff">6160</span>, <span style="color:#e6db74">&#39;_Symbol__scope&#39;</span>: <span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#39;_Symbol__namespaces&#39;</span>: ()}]</code></pre></div>
+核心的C代码在<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/symtable.c#L262">PySymtable_BuildObject()</a>函数中，它也是依据传入的mod_ty类型的不同使用不同的访问函数，有<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/symtable.c#L1176">symtable_visit_stmt()</a>、symtable_visit_expr()等，这些访问函数里面也是一个巨长的switch语句对应着定义在Parser/Python.asdl中的每种语句类型以及各自的逻辑。例如对于一个函数定义，它需要做的特殊处理有:检测递归深度超过限制则引发异常、将函数名称加入到局部变量中、解析顺序参数和关键字参数的默认值、解析参数和返回值的类型注释、解析函数的装饰器等等。</p>
+<h4 id="核心编译过程">核心编译过程</h4>
+<p>现在PyAST_CompileObject()有了一个编译器状态、一个符号表、一个模块形式的AST，真正的编译才开始。这个阶段的目标是将state、symtable、AST转化为CFG，以及捕获逻辑和代码异常并抛出。</p>
+<p>我们可以通过Python提供的内置函数compile()完成编译过程，传入的是表达式则mode选择eval，传入类、方法、模块等mode要选择exec，它返回的是一个代码对象:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#ae81ff">1</span>]: compile(<span style="color:#e6db74">&#34;a+1&#34;</span>, <span style="color:#e6db74">&#34;a.py&#34;</span>, mode<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;eval&#34;</span>)                     
+Out[<span style="color:#ae81ff">1</span>]: <span style="color:#f92672">&lt;</span>code object <span style="color:#f92672">&lt;</span>module<span style="color:#f92672">&gt;</span> at <span style="color:#ae81ff">0x1120e58a0</span>, file <span style="color:#e6db74">&#34;a.py&#34;</span>, line <span style="color:#ae81ff">1</span><span style="color:#f92672">&gt;</span>
+In [<span style="color:#ae81ff">2</span>]: _<span style="color:#f92672">.</span>co_code                      
+Out[<span style="color:#ae81ff">2</span>]: <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;e</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">d</span><span style="color:#ae81ff">\x00\x17\x00</span><span style="color:#e6db74">S</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span></code></pre></div></p>
+<p>怎样得到这个代码对象的，实际就是<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L1782">compiler_mod()</a>:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> PyCodeObject <span style="color:#f92672">*</span>
+<span style="color:#a6e22e">compiler_mod</span>(<span style="color:#66d9ef">struct</span> compiler <span style="color:#f92672">*</span>c, mod_ty mod)
+{
+    PyCodeObject <span style="color:#f92672">*</span>co;
+    ...
+    <span style="color:#66d9ef">switch</span> (mod<span style="color:#f92672">-&gt;</span>kind) {
+    <span style="color:#66d9ef">case</span> Module_kind:
+        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>compiler_body(c, mod<span style="color:#f92672">-&gt;</span>v.Module.body)) {
+            <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+        }
+        <span style="color:#66d9ef">break</span>;
+    <span style="color:#66d9ef">case</span> Interactive_kind:
+        ...
+    <span style="color:#66d9ef">case</span> Expression_kind:
+        ...
+    <span style="color:#66d9ef">case</span> Suite_kind:
+        ...
+    ...
+    co <span style="color:#f92672">=</span> assemble(c, addNone);
+    <span style="color:#66d9ef">return</span> co;
+}</code></pre></div></p>
+<p><a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L1743">compiler_body()</a>循环访问模块中的每条语句，和symtable的工作方式类似:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span>
+<span style="color:#a6e22e">compiler_body</span>(<span style="color:#66d9ef">struct</span> compiler <span style="color:#f92672">*</span>c, asdl_seq <span style="color:#f92672">*</span>stmts)
+{
+    <span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    stmt_ty st;
+    PyObject <span style="color:#f92672">*</span>docstring;
+    ...
+    <span style="color:#66d9ef">for</span> (; i <span style="color:#f92672">&lt;</span> asdl_seq_LEN(stmts); i<span style="color:#f92672">++</span>)
+        VISIT(c, stmt, (stmt_ty)asdl_seq_GET(stmts, i));
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+}</code></pre></div>
+<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/asdl.h#L32">asdl_seq_GET()</a>查看每个AST节点的类型得到语句的类型，然后通过宏，VISIT调用compiler_visit_*函数:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define VISIT(C, TYPE, V) {\
+</span><span style="color:#75715e">    if (!compiler_visit_ ## TYPE((C), (V))) \
+</span><span style="color:#75715e">        return 0; \
+</span><span style="color:#75715e">}</span></code></pre></div>
+对于语句类型来说，就是到<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L3310">compiler_visit_stmt()</a>函数，然后具体每条语句也有自己的编译函数:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span>
+<span style="color:#a6e22e">compiler_visit_stmt</span>(<span style="color:#66d9ef">struct</span> compiler <span style="color:#f92672">*</span>c, stmt_ty s)
+{
+    Py_ssize_t i, n;
+
+    <span style="color:#75715e">/* Always assign a lineno to the next instruction for a stmt. */</span>
+    c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_lineno <span style="color:#f92672">=</span> s<span style="color:#f92672">-&gt;</span>lineno;
+    c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_col_offset <span style="color:#f92672">=</span> s<span style="color:#f92672">-&gt;</span>col_offset;
+    c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_lineno_set <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+
+    <span style="color:#66d9ef">switch</span> (s<span style="color:#f92672">-&gt;</span>kind) {
+    <span style="color:#66d9ef">case</span> FunctionDef_kind:
+        <span style="color:#66d9ef">return</span> compiler_function(c, s, <span style="color:#ae81ff">0</span>);
+    <span style="color:#66d9ef">case</span> ClassDef_kind:
+        <span style="color:#66d9ef">return</span> compiler_class(c, s);
+    ...
+    <span style="color:#66d9ef">case</span> For_kind:
+        <span style="color:#66d9ef">return</span> compiler_for(c, s);
+    ...
+    }
+
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+}</code></pre></div></p>
+<p>我们以for语句为例:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> iterable:
+    <span style="color:#75715e"># block</span>
+<span style="color:#66d9ef">else</span>:  <span style="color:#75715e"># optional if iterable is False</span>
+    <span style="color:#75715e"># block</span></code></pre></div>
+对于一个For类型的语句，它会调用compiler_for()。所有的语句和表达式类型都有相应的compiler_*()函数，大多数类型直接在其中创建字节码，也有些比较复杂的语句类型还会调用其他函数。许多语句都可能会有子句，for循环在赋值和迭代时也可能遇到复杂的表达式。</p>
 <h3 id="终止">终止</h3>
 <p>执行完之后，结束之前还要进行一系列的清理操作。
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>pylifecycle.c <span style="color:#f92672">--&gt;</span>
@@ -785,9 +934,9 @@ PyObject<span style="color:#f92672">*</span> _Py_HOT_FUNCTION _PyEval_EvalFrameD
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/d50aee575d7d8acd1a520b5fe4b263ddd89ab2d4" title='最后修改者 hjlarry | June 22, 2020' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/6a8e6f321bed04644121d045a8035261ef90e03e" title='最后修改者 hjlarry | July 7, 2020' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>June 22, 2020</span>
+      <span>July 7, 2020</span>
     </a>
   </div>
 
@@ -830,8 +979,9 @@ PyObject<span style="color:#f92672">*</span> _Py_HOT_FUNCTION _PyEval_EvalFrameD
         <li><a href="#执行方式">执行方式</a></li>
         <li><a href="#建立运行时环境">建立运行时环境</a></li>
         <li><a href="#通过输入运行">通过输入运行</a></li>
-        <li><a href="#初始化">初始化</a></li>
-        <li><a href="#执行">执行</a></li>
+        <li><a href="#语义解析">语义解析</a></li>
+        <li><a href="#ast">AST</a></li>
+        <li><a href="#编译">编译</a></li>
         <li><a href="#终止">终止</a></li>
       </ul>
     </li>
