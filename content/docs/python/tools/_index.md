@@ -181,3 +181,93 @@ In [31]: x=100
 In [32]: !echo "python.x={x+20}"
 python.x=120
 {{< /highlight >}}
+
+
+内置模块
+-------
+
+### 查看包路径
+{{< highlight sh>}}
+~/projects » python3 -m site                                                                         
+sys.path = [
+    '/Users/hejl/projects',
+    '/usr/local/Cellar/python@3.8/3.8.4/Frameworks/Python.framework/Versions/3.8/lib/python38.zip',
+    '/usr/local/Cellar/python@3.8/3.8.4/Frameworks/Python.framework/Versions/3.8/lib/python3.8',
+    '/usr/local/Cellar/python@3.8/3.8.4/Frameworks/Python.framework/Versions/3.8/lib/python3.8/lib-dynload',
+    '/usr/local/lib/python3.8/site-packages',
+    '/usr/local/Cellar/protobuf/3.12.3/libexec/lib/python3.8/site-packages',
+    '/usr/local/Cellar/python@3.8/3.8.4/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages',
+]
+USER_BASE: '/Users/hejl/Library/Python/3.8' (doesn't exist)
+USER_SITE: '/Users/hejl/Library/Python/3.8/lib/python/site-packages' (doesn't exist)
+ENABLE_USER_SITE: True
+{{< /highlight >}}
+
+### 格式化json
+{{< highlight sh>}}
+~/projects » cat test.json                  
+{"_id":"5f12d319624e57e27d1291fe","index":0,"name":"MasseySaunders","gender":"male","company":"TALAE","email":"masseysaunders@talae.com","phone":"+1(853)508-3237","address":"246IndianaPlace,Glenbrook,Iowa,3896","registered":"2017-02-06T06:42:20-08:00","latitude":-10.269827,"longitude":-103.12419,"friends":[{"id":0,"name":"DorotheaShields"},{"id":1,"name":"AnnaRosales"},{"id":2,"name":"GravesBryant"}],"greeting":"Hello,MasseySaunders!Youhave8unreadmessages.","favoriteFruit":"apple"}
+------------------------------------------------------------
+~/projects » python3 -m json.tool test.json                             
+{
+    "_id": "5f12d319624e57e27d1291fe",
+    "index": 0,
+    "name": "MasseySaunders",
+    "gender": "male",
+    "company": "TALAE",
+    "email": "masseysaunders@talae.com",
+    "phone": "+1(853)508-3237",
+    "address": "246IndianaPlace,Glenbrook,Iowa,3896",
+    "registered": "2017-02-06T06:42:20-08:00",
+    "latitude": -10.269827,
+    "longitude": -103.12419,
+    "friends": [
+        {
+            "id": 0,
+            "name": "DorotheaShields"
+        },
+        {
+            "id": 1,
+            "name": "AnnaRosales"
+        },
+        {
+            "id": 2,
+            "name": "GravesBryant"
+        }
+    ],
+    "greeting": "Hello,MasseySaunders!Youhave8unreadmessages.",
+    "favoriteFruit": "apple"
+}
+{{< /highlight >}}
+
+### 搭建http服务器
+{{< highlight sh>}}
+~/projects » python3 -m http.server 8002                                                        
+Serving HTTP on :: port 8002 (http://[::]:8002/) ...
+{{< /highlight >}}
+
+### 打开py文档
+{{< highlight sh>}}
+~/projects » python3 -m pydoc -p 8002                                                            
+Server ready at http://localhost:8002/
+Server commands: [b]rowser, [q]uit
+server>
+{{< /highlight >}}
+
+### 直接进入pdb
+{{< highlight sh>}}
+~/projects » python3 -m pdb test.py                                                            
+> /Users/hejl/projects/test.py(1)<module>()
+-> print("hello")
+(Pdb) 
+{{< /highlight >}}
+
+### 安装包
+{{< highlight sh>}}
+$ python3.8 -m pip install requests
+{{< /highlight >}}
+
+### 虚拟环境
+{{< highlight sh>}}
+~/projects » python3 -m venv .venv 
+{{< /highlight >}}
