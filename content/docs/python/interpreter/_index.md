@@ -852,6 +852,37 @@ compiler_for(struct compiler *c, stmt_ty s)
 
 [dfs()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5397)方法是通过每一个block的b_next指针进行深度优先遍历的，遍历过的会标记该block的b_seen，然后按相反的顺序把它们添加至汇编器的**a_postorder列表中。
 
+#### 创建代码对象
+[makecode()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5854)方法通过编译器状态、一些汇编器的属性，然后调用[PyCode_New()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/codeobject.c#L246)把它们放在一个PyCodeObject中:
+{{< highlight c>}}
+static PyCodeObject *
+makecode(struct compiler *c, struct assembler *a)
+{
+...
+    consts = consts_dict_keys_inorder(c->u->u_consts);
+    names = dict_keys_inorder(c->u->u_names, 0);
+    varnames = dict_keys_inorder(c->u->u_varnames, 0);
+...
+    cellvars = dict_keys_inorder(c->u->u_cellvars, 0);
+...
+    freevars = dict_keys_inorder(c->u->u_freevars, PyTuple_GET_SIZE(cellvars));
+...
+    flags = compute_code_flags(c);
+    if (flags < 0)
+        goto error;
+    bytecode = PyCode_Optimize(a->a_bytecode, consts, names, a->a_lnotab);
+...
+    co = PyCode_NewWithPosOnlyArgs(posonlyargcount+posorkeywordargcount,
+                                   posonlyargcount, kwonlyargcount, nlocals_int, 
+                                   maxdepth, flags, bytecode, consts, names,
+                                   varnames, freevars, cellvars, c->c_filename,
+                                   c->u->u_name, c->u->u_firstlineno, a->a_lnotab);
+...
+    return co;
+}
+{{< /highlight >}}
+变量名称、常量等都是code对象的属性，此外[PyCode_Optimize()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/peephole.c#L230)方法还对字节码进行了一定程度的优化，这个优化器叫窥孔优化器，被放在一个专门的`Python/peephole.c`中，它会仔细检查每条指令，并在合适的情况下将部分指令替换为其他指令。例如其中有一项优化叫常量展开，它能把语句`a = 1 + 5`优化为`a = 6`。
+
 ### 终止
 执行完之后，结束之前还要进行一系列的清理操作。
 {{< highlight c>}}
