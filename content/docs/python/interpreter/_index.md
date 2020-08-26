@@ -841,6 +841,17 @@ compiler_for(struct compiler *c, stmt_ty s)
 
 当这一步执行完，编译器就有了一组frame block，其中的每一个都包含一组指令以及指向下一个block的指针。
 
+#### 汇编器
+通过编译器状态，汇编器对block进行深度优先搜索，并把它们的指令合并为一个字节码序列。核心方法[assemble()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5971)的主要任务有:
+* 计算出有多少个block，以便于分配内存
+* 确保所有最后的block都返回None，这也是每个方法都返回None不管它有没有return语句的原因
+* 解决所有的标记为相对跳转语句的偏移量
+* 调用dfs()方法去深度优先搜索执行block
+* 把所有的指令提交给编译器
+* 调用makecode()方法并传入编译器状态，用来生成PyCodeObject
+
+[dfs()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5397)方法是通过每一个block的b_next指针进行深度优先遍历的，遍历过的会标记该block的b_seen，然后按相反的顺序把它们添加至汇编器的**a_postorder列表中。
+
 ### 终止
 执行完之后，结束之前还要进行一系列的清理操作。
 {{< highlight c>}}
