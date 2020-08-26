@@ -772,12 +772,10 @@ static int
 compiler_visit_stmt(struct compiler *c, stmt_ty s)
 {
     Py_ssize_t i, n;
-
     /* Always assign a lineno to the next instruction for a stmt. */
     c->u->u_lineno = s->lineno;
     c->u->u_col_offset = s->col_offset;
     c->u->u_lineno_set = 0;
-
     switch (s->kind) {
     case FunctionDef_kind:
         return compiler_function(c, s, 0);
@@ -788,10 +786,60 @@ compiler_visit_stmt(struct compiler *c, stmt_ty s)
         return compiler_for(c, s);
     ...
     }
-
     return 1;
 }
 {{< /highlight >}}
+
+我们以for语句为例:
+{{< highlight python>}}
+for i in iterable:
+    # block
+else:  # optional if iterable is False
+    # block
+{{< /highlight >}}
+对于一个For类型的语句，它会调用compiler_for()。所有的语句和表达式类型都有相应的compiler_*()函数，大多数类型直接在其中创建字节码，也有些比较复杂的语句类型还会调用其他函数。许多语句都可能会有子句，for循环在赋值和迭代时也可能遇到复杂的表达式。compiler_for()将blocks发送给编译器状态，这些blocks包含指令(指令对应着opcode)，参数，目标block(如果是跳转指令)，以及行号:
+{{< highlight c>}}
+typedef struct basicblock_ {
+    struct basicblock_ *b_list; //指向编译器状态的block列表
+    int b_iused;                // 已经使用的指令数组的容量
+    int b_ialloc;               // 分配给指令数组的容量
+    struct instr *b_instr;      // 指向指令数组
+    struct basicblock_ *b_next; // 指向下一个block
+    unsigned b_seen : 1;        // 当编译器深度优先遍历时，是否已看到该block
+    unsigned b_return : 1;      // 如果该block有返回值
+    int b_startdepth;           // 该block的栈深度
+    int b_offset;               // 汇编程序的指令偏移量
+} basicblock;
+{{< /highlight >}}
+对于For类型语句的解析，编译器进行了15步操作:
+{{< highlight c>}}
+static int
+compiler_for(struct compiler *c, stmt_ty s)
+{
+    basicblock *start, *cleanup, *end;
+    start = compiler_new_block(c);                       // 1.创建start代码块，分配内存并创建一个basicblock指针
+    cleanup = compiler_new_block(c);                     // 2.创建cleanup代码块
+    end = compiler_new_block(c);                         // 3.创建end代码块
+    if (start == NULL || end == NULL || cleanup == NULL)
+        return 0;
+    if (!compiler_push_fblock(c, FOR_LOOP, start, end))  // 4.将frame block压栈，类型是FOR_LOOP，入口block是start，退出block是end
+        return 0;
+    VISIT(c, expr, s->v.For.iter);                       // 5.访问迭代器表达式，该表达式对迭代器添加操作
+    ADDOP(c, GET_ITER);                                  // 6.将GET_ITER操作添加到编译器状态
+    compiler_use_next_block(c, start);                   // 7.切回start块
+    ADDOP_JREL(c, FOR_ITER, cleanup);                    // 8.调用compiler_addop_j()使用cleanup块的参数添加FOR_ITER操作
+    VISIT(c, expr, s->v.For.target);                     // 9.访问目标并将特殊代码(如元组解包)添加至start块
+    VISIT_SEQ(c, stmt, s->v.For.body);                   // 10.访问for循环主体中的每条语句
+    ADDOP_JABS(c, JUMP_ABSOLUTE, start);                 // 11.调用compiler_addop_j()添加JUMP_ABSOLUTE操作，为了循环体执行完跳回循环开始的地方
+    compiler_use_next_block(c, cleanup);                 // 12.移至cleanup块
+    compiler_pop_fblock(c, FOR_LOOP, start);             // 13.将FOR_LOOP这个frame block弹出栈
+    VISIT_SEQ(c, stmt, s->v.For.orelse);                 // 14.访问for循环的else中的语句部分
+    compiler_use_next_block(c, end);                     // 15.使用end block
+    return 1;
+}
+{{< /highlight >}}
+
+当这一步执行完，编译器就有了一组frame block，其中的每一个都包含一组指令以及指向下一个block的指针。
 
 ### 终止
 执行完之后，结束之前还要进行一系列的清理操作。
