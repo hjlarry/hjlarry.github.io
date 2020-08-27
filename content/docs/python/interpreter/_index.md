@@ -796,7 +796,17 @@ makecode(struct compiler *c, struct assembler *a)
 
 执行
 -------
+执行的入口是在`Python/pythonrun.c`的[run_eval_code_obj()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1094)函数中，它需要一个code对象，不管是从.pyc文件中来的还是一步步编译来的。然后该函数将globals、locals、PyArena和编译好的PyCodeObject传给[PyEval_EvalCode()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L716)。
 
+PyEval_EvalCode()是执行一个code对象的公共API，它会在执行栈的顶部构建一个执行frame。一个frame对象的结构像这样:
+
+![PyFrameObject](./images/PyFrameObject.png)
+
+### 构建frame
+
+### 执行frame
+
+### 值栈
 
 字节码
 -------
