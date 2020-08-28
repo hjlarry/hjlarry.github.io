@@ -803,6 +803,41 @@ PyEval_EvalCode()是执行一个code对象的公共API，它会在执行栈的�
 ![PyFrameObject](./images/PyFrameObject.png)
 
 ### 构建frame
+构建第一个执行frame需要很多步，都在[_PyEval_EvalCodeWithName()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L4045)方法中。它的3个参数通过PyEval_EvalCode()传入，即:
+
+* _co，PyCodeObject对象
+* globals，PyDict对象，存储变量名及它们的值
+* locals，PyDict对象，存储变量名及它们的值
+
+其他参数都是可选的:
+
+* args，PyTuple对象，顺序存储了位置参数
+* argcount，位置参数的个数
+* kwnames，列表，关键字参数的名称
+* kwargs，列表，关键字参数的值
+* kwcount，关键字参数的个数
+* defs，列表，位置参数的默认值
+* defcount，位置参数的默认值的个数
+* kwdefs，字典，存储关键字参数的默认值
+* closure，闭包，之后合并到code对象的co_freevars字段
+* name，创建生成器、协程时使用
+* qualname，创建生成器、协程时使用
+
+其具体的步骤可分为:
+
+1. 构建线程状态，在执行一个frame之前，首先需要在线程中引用它。CPython可以在一个解释器中随时运行多个线程，这些线程通过链表放在解释器状态中。线程结构称为[PyThreadState](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/pystate.h#L23)，在整个ceval.c中有很多地方引用它。
+2. 构建frames
+3. 将关键字参数转换为一个字典。如果函数的定义中包含`**kwargs`形式的关键字参数，则创建一个新的字典，并将`kwargs`作为变量名指向该字典
+4. 将位置参数转换为变量。如果函数的定义中包含位置参数，需要将它们设为本地局部变量。
+5. 打包位置参数至`*args`，如果函数的定义中包含有`*args`，则创建一个元组，并将`args`作为局部变量名指向它
+6. 载入关键字参数
+7. 添加缺失的位置参数
+8. 添加缺失的关键字参数
+9. 闭包中的变量名称添加到code对象的自由变量列表中
+10. 创建生成器、协程以及异步生成器
+
+最终，该函数调用PyEval_EvalFrameEx()去执行这个新创建的frame。
+
 
 ### 执行frame
 
