@@ -936,6 +936,49 @@ my_list.append(obj)
 {{< /highlight >}}
 其后的PREDICT(JUMP_ABSOLUTE)属于一种预测手段，它会猜下一个opcode可能是JUMP_ABSOLUTE，这样CPU就可以直接跳转过去而不需要重新跑一遍主循环了。
 
+#### 调用追踪
+有一些指令例如CALL_FUNCTION、CALL_METHOD，它们的参数opcode实际上是另一个已经编译好的函数。那么另一个frame就会压入当前线程的执行栈帧中，主循环会先把这个新的函数运行完以后在运行原函数。每次新的frame创建时，它会有一个f_back属性就是指向当前的frame。
+
+例如有这样一段python代码:
+{{< highlight python>}}
+def function2():
+  raise RuntimeError
+def function1():
+  function2()
+if __name__ == '__main__':
+  function1()
+{{< /highlight >}}
+它运行后:
+{{< highlight shell>}}
+$ ./python.exe example_stack.py
+
+Traceback (most recent call last):
+  File "example_stack.py", line 8, in <module>
+    function1()
+  File "example_stack.py", line 5, in function1
+    function2()
+  File "example_stack.py", line 2, in function2
+    raise RuntimeError
+RuntimeError
+{{< /highlight >}}
+这些调用追踪信息，实际上可以通过标准库traceback的walk_stack()函数得到:
+{{< highlight python>}}
+def walk_stack(f):
+    """Walk a stack yielding the frame and line number for each frame.
+    This will follow f.f_back from the given frame. If no frame is given, the
+    current stack is used. Usually used with StackSummary.extract.
+    """
+    if f is None:
+        f = sys._getframe().f_back.f_back
+    while f is not None:
+        yield f, f.f_lineno
+        f = f.f_back
+{{< /highlight >}}
+它先通过Python的API即sys._getframe()得到当前的frame，然后找它的f_back.f_back是为了跳过其本身walk_stack()函数和其父亲print_trace()函数。
+
+用图形来表达这个调用追踪关系就是:
+![](./images/stackframe.png)
+
 
 字节码
 -------
