@@ -877,6 +877,16 @@ eval('"-".join([letter for letter in "hello"])')
 {{< /highlight >}}
 
 ### 值栈
+在核心执行循环逻辑内，一个存储值的栈被创建，它存储了一组指针指向PyObject实例。例如，我们可以压栈:
+{{< highlight c>}}
+PyObject *a = PyLong_FromLong(10);
+PyObject *b = PyLong_FromLong(20);
+PUSH(a);
+PUSH(b);
+{{< /highlight >}}
+运行前后如图:
+![](./images/value_stack.png)
+有很多字节操作码opcode是直接操作栈的，例如PUSH()、POP()、PEEK()、DUP_TOP()、ROT_TWO()等。所有的opcode都会对栈有一个影响，这被定义在[stack_effect()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L878)方法中。
 
 字节码
 -------
