@@ -888,6 +888,55 @@ PUSH(b);
 ![](./images/value_stack.png)
 有很多字节操作码opcode是直接操作栈的，例如PUSH()、POP()、PEEK()、DUP_TOP()、ROT_TWO()等。所有的opcode都会对栈有一个影响，这被定义在[stack_effect()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L878)方法中。
 
+#### 举例:向list中添加一个元素
+在Python中，我们通过append()方法添加元素:
+{{< highlight python>}}
+my_list = []
+my_list.append(obj)
+{{< /highlight >}}
+在CPython中，这个操作对应着两个操作。LOAD_FAST将对象obj从frame的局部变量列表中加载到值栈的顶部，然后LIST_APPEND操作添加这个对象至list中。我们先来看LOAD_FAST:
+{{< highlight c>}}
+ ... 
+    case TARGET(LOAD_FAST): {
+        // 变量的指针都存储在fastlocals区域，它是PyFrame的f_localsplus的拷贝。
+        // oparg是fastlocals数组的索引，也就是查找局部变量是不需要根据变量名称来查找的。
+        PyObject *value = GETLOCAL(oparg);                 
+        if (value == NULL) {
+            format_exc_check_arg(
+                PyExc_UnboundLocalError,
+                UNBOUNDLOCAL_ERROR_MSG,
+                PyTuple_GetItem(co->co_varnames, oparg));
+            // 如果变量不存在，则引发未绑定局部变量的错误
+            goto error;                                    
+        }
+        // 增加value(这里就是obj)的引用计数
+        Py_INCREF(value);  
+        // 把obj的指针压入值栈                               
+        PUSH(value);      
+        // 如果启用了trace，则循环再次遍历(带着所有的tracing)；如果没启用，则跳回循环顶部执行下一条指令                                 
+        FAST_DISPATCH();                                   
+    }
+ ...
+{{< /highlight >}}
+接着，LIST_APPEND是通过POP()获取到元素obj的指针，PEEK(oparg)获取到my_list的指针，然后使用CPython列表的C的API即PyList_Append()将元素添加进去的:
+{{< highlight c>}}
+ ...
+        case TARGET(LIST_APPEND): {
+            PyObject *v = POP();
+            PyObject *list = PEEK(oparg);
+            int err;
+            err = PyList_Append(list, v);
+            Py_DECREF(v);
+            if (err != 0)
+                goto error;
+            PREDICT(JUMP_ABSOLUTE);
+            DISPATCH();
+        }
+ ...
+{{< /highlight >}}
+其后的PREDICT(JUMP_ABSOLUTE)属于一种预测手段，它会猜下一个opcode可能是JUMP_ABSOLUTE，这样CPU就可以直接跳转过去而不需要重新跑一遍主循环了。
+
+
 字节码
 -------
 Python中的字节码并不能被CPU执行，而是由栈式虚拟机执行，每条指令的背后都对应了一大堆C实现的机器指令。
