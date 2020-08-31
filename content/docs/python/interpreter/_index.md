@@ -840,6 +840,41 @@ PyEval_EvalCode()是执行一个code对象的公共API，它会在执行栈的�
 
 
 ### 执行frame
+在之前的编译器和AST小节中，我们知道了code对象包含了一个待执行的二进制编码的字节码，以及变量列表和符号表。局部变量和全局变量都是运行时根据函数、模块或者代码块的调用方式决定的，这些信息通过_PyEval_EvalCodeWithName()添加到frame中。此外，frame还有一些其他用途，例如协程装饰器，它可以动态生成一个frame并把目标作为变量。
+
+frame在[_PyEval_EvalFrameDefault()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L745)内的3000多行代码的主循环中执行。这个函数是整个CPython的核心，它包含了数十年的变化，即使是一行代码的改变也可能对整个CPython的性能产生重大影响。
+
+我们可以在Python3.7以上的版本中通过在当前线程启用追踪来跟踪每一步frame的执行，例如如下代码可以打印每一步反汇编的opcode，调用了哪个code对象，执行至第几行，返回值是什么:
+{{< highlight python>}}
+import sys
+import dis
+import traceback
+import io
+
+def trace(frame, event, args):
+   frame.f_trace_opcodes = True
+   stack = traceback.extract_stack(frame)
+   pad = "   "*len(stack) + "|"
+   if event == 'opcode':
+      with io.StringIO() as out:
+         dis.disco(frame.f_code, frame.f_lasti, file=out)
+         lines = out.getvalue().split('\n')
+         [print(f"{pad}{l}") for l in lines]
+   elif event == 'call':
+      print(f"{pad}Calling {frame.f_code}")
+   elif event == 'return':
+      print(f"{pad}Returning {args}")
+   elif event == 'line':
+      print(f"{pad}Changing line to {frame.f_lineno}")
+   else:
+      print(f"{pad}{frame} ({event} - {args})")
+   print(f"{pad}----------------------------------")
+   return trace
+sys.settrace(trace)
+
+# Run some code for a demo
+eval('"-".join([letter for letter in "hello"])')
+{{< /highlight >}}
 
 ### 值栈
 
