@@ -1016,7 +1016,39 @@ def walk_stack(f):
 
 CPython中的对象
 -------
+在Python里所有的对象继承自`object`，但在C里，由于C没有面向对象的特性，我们看到的都是对`PyObject*`的引用，PyObject实际上是一个Python对象内存起始处的数据结构。
 
+### 基础对象
+一个Python对象可以认为是由两部分组成的:
+1. 核心数据模型，带有指向其已编译的方法的指针
+2. 包含自定义属性和方法的字典
+
+核心数据模型是在PyTypeObject中定义的，而它们的方法是在如下位置定义的:
+
+| 文件名 | 类型 |
+| --- | --- |
+| Objects/object.c | 内置类型 |
+| Objects/boolobject.c | bool |
+| Objects/bytearrayobject.c | byte[] |
+| Objects/bytesobjects.c | bytes |
+| Objects/classobject.c | 元编程的抽象类 |
+| Objects/complexobject.c | 复数 |
+| Objects/iterobject.c | 迭代器 |
+| Objects/listobject.c | 列表 |
+| Objects/longobject.c | 长整数 |
+| Objects/memoryobject.c | 基础内存类型 |
+| Objects/methodobject.c | 类方法 |
+| Objects/moduleobject.c | 模块 |
+| Objects/namespaceobject.c | 名字空间 |
+| Objects/odictobject.c | 有序字典 |
+| Objects/rangeobject.c | range生成器 |
+| Objects/setobject.c | set |
+| Objects/sliceobject.c | 切片 |
+| Objects/structseq.c | struct.Struct二进制 |
+| Objects/tupleobject.c | 元组 |
+| Objects/typeobject.c | type类 |
+| Objects/unicodeobject.c | str |
+| Objects/weakrefobject.c | 弱引用 |
 
 
 GIL
