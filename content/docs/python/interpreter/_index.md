@@ -794,8 +794,42 @@ makecode(struct compiler *c, struct assembler *a)
 {{< /highlight >}}
 变量名称、常量等都是code对象的属性，此外[PyCode_Optimize()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/peephole.c#L230)方法还对字节码进行了一定程度的优化，这个优化器叫窥孔优化器，被放在一个专门的`Python/peephole.c`中，它会仔细检查每条指令，并在合适的情况下将部分指令替换为其他指令。例如其中有一项优化叫常量展开，它能把语句`a = 1 + 5`优化为`a = 6`。
 
+### 字节码
+字节码被存储在代码对象(即`__code__`)的`co_code`中，以一个函数为例:
+{{< highlight python>}}
+>>> def add(x, y):                                                                                          
+...     z = x + y
+...     return z
+
+>>> " ".join(str(b) for b in add.__code__.co_code)
+'124 0 124 1 23 0 125 2 124 2 83 0'
+{{< /highlight >}}
+字节码中每两个数字为一组，第一个为指令，第二个为参数，指令对应的二进制数可以在CPython源码中找到:
+{{< highlight c>}}
+<!-- cpython/Include/opcode.h -->
+#define BINARY_ADD               23
+#define RETURN_VALUE             83
+#define LOAD_FAST               124
+#define STORE_FAST              125
+{{< /highlight >}}
+这就可以和dis的输出结果对应起来:
+{{< highlight python>}}
+>>> dis.dis(add)
+<!-- 源码行    偏移量 指令           参数(目标对象)  -->
+  2           0 LOAD_FAST                0 (x)
+              2 LOAD_FAST                1 (y)
+              4 BINARY_ADD
+              6 STORE_FAST               2 (z)
+
+  3           8 LOAD_FAST                2 (z)
+             10 RETURN_VALUE
+{{< /highlight >}}
+指令所对应的源码行这个信息其实保存在代码对象的两个相关属性中，`co_firstlineno`用来存储该段代码起始的行号，`co_lnotab`由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。每条字节码指令代表的意义可通过官方文档[此处](https://docs.python.org/3/library/dis.html)查询到。
+
+
 执行
 -------
+
 执行的入口是在`Python/pythonrun.c`的[run_eval_code_obj()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1094)函数中，它需要一个code对象，不管是从.pyc文件中来的还是一步步编译来的。然后该函数将globals、locals、PyArena和编译好的PyCodeObject传给[PyEval_EvalCode()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L716)。
 
 PyEval_EvalCode()是执行一个code对象的公共API，它会在执行栈的顶部构建一个执行frame。一个frame对象的结构像这样:
@@ -980,40 +1014,9 @@ def walk_stack(f):
 ![](./images/stackframe.png)
 
 
-字节码
+CPython中的对象
 -------
-Python中的字节码并不能被CPU执行，而是由栈式虚拟机执行，每条指令的背后都对应了一大堆C实现的机器指令。
 
-字节码被存储在代码对象(即`__code__`)的`co_code`中，以一个函数为例:
-{{< highlight python>}}
->>> def add(x, y):                                                                                          
-...     z = x + y
-...     return z
-
->>> " ".join(str(b) for b in add.__code__.co_code)
-'124 0 124 1 23 0 125 2 124 2 83 0'
-{{< /highlight >}}
-字节码中每两个数字为一组，第一个为指令，第二个为参数，指令对应的二进制数可以在CPython源码中找到:
-{{< highlight c>}}
-<!-- cpython/Include/opcode.h -->
-#define BINARY_ADD               23
-#define RETURN_VALUE             83
-#define LOAD_FAST               124
-#define STORE_FAST              125
-{{< /highlight >}}
-这就可以和dis的输出结果对应起来:
-{{< highlight python>}}
->>> dis.dis(add)
-<!-- 源码行    偏移量 指令           参数(目标对象)  -->
-  2           0 LOAD_FAST                0 (x)
-              2 LOAD_FAST                1 (y)
-              4 BINARY_ADD
-              6 STORE_FAST               2 (z)
-
-  3           8 LOAD_FAST                2 (z)
-             10 RETURN_VALUE
-{{< /highlight >}}
-指令所对应的源码行这个信息其实保存在代码对象的两个相关属性中，`co_firstlineno`用来存储该段代码起始的行号，`co_lnotab`由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。每条字节码指令代表的意义可通过官方文档[此处](https://docs.python.org/3/library/dis.html)查询到。
 
 
 GIL
