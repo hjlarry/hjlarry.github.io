@@ -1129,6 +1129,166 @@ PyLong_FromLong(long ival)
 {{< /highlight >}}
 此外，将双精度浮点数转换为Python中的long以及Unicode进行转换都在`longobject.c`中有相应的方法。
 
+### 生成器类型
+Python中的生成器是指使用yield，通过连续的调用以生成更多的值。通常用于较大的数据块中来起到节约内存、提升效率的作用。如:
+{{< highlight python>}}
+>>> def example():
+...   lst = [1,2,3,4]
+...   for i in lst:
+...     yield i
+>>> gen = example()
+>>> gen
+<generator object example at 0x100bcc480>
+{{< /highlight >}}
+我们深入探索生成器对象，发现它有一些gi_开头的属性:
+{{< highlight python>}}
+>>> dir(gen)
+[ ...
+ 'close', 
+ 'gi_code', 
+ 'gi_frame', 
+ 'gi_running', 
+ 'gi_yieldfrom', 
+ 'send', 
+ 'throw']
+{{< /highlight >}}
+在CPython中，生成器类型有三种，定义在`Include/genobject.h`的PyGenObject类型中，即Generator objects、Coroutine objects和Async generator objects。它们共享一些字段并且也有相似的行为逻辑:
+![](./images/generators.png)
+我们以PyGenObject为例看看这些字段的用途:
+* gi_frame，链接至一个PyFrameObject对象，这是生成器如何记住上次执行的本地变量的关键
+* gi_running，设置为0或1来判断当前生成器是否在执行
+* gi_code，链接至一个PyCodeObject对象，它持有编译好的方法便于之后再次调用
+* gi_weakreflist，链接至生成器函数内部的弱引用列表
+* gi_name，生成器的名称
+* gi_qualname，生成器的限定名称
+* gi_exc_state，是一个存储异常的元组，存储生成器调用过程中的异常
+
+当我们每次在Python中调用生成器的__next__方法时，其背后的gi_code字段会在一个新的frame中执行，并将返回值push到值栈中。它本质上调用的是[gen_send_ex()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/genobject.c#L153)方法，这个方法将生成器对象转换为下一个产生结果的函数，它和之前通过代码对象构造frame有很多类似之处:
+{{< highlight c>}}
+static PyObject *
+gen_send_ex(PyGenObject *gen, PyObject *arg, int exc, int closing)
+{
+    // 拿到当前执行线程
+    PyThreadState *tstate = _PyThreadState_GET();       
+    PyFrameObject *f = gen->gi_frame;                   
+    PyObject *result;
+    // 如果生成器正在执行过程中再次调用生成器会报错
+    if (gen->gi_running) {     
+        const char *msg = "generator already executing";
+        if (PyCoro_CheckExact(gen)) {
+            msg = "coroutine already executing";
+        }
+        else if (PyAsyncGen_CheckExact(gen)) {
+            msg = "async generator already executing";
+        }
+        PyErr_SetString(PyExc_ValueError, msg);
+        return NULL;
+    }
+    // 生成器迭代完的情况，对不同的生成器做不同的处理
+    if (f == NULL || f->f_stacktop == NULL) { 
+        if (PyCoro_CheckExact(gen) && !closing) {
+            PyErr_SetString(
+                PyExc_RuntimeError,
+                "cannot reuse already awaited coroutine"); // 4a.
+        }
+        else if (arg && !exc) {
+            if (PyAsyncGen_CheckExact(gen)) {
+                PyErr_SetNone(PyExc_StopAsyncIteration); // 4b.
+            }
+            else {
+                PyErr_SetNone(PyExc_StopIteration);      // 4c.
+            }
+        }
+        return NULL;
+    }
+    // 检查帧的最后一条指令如果是-1
+    if (f->f_lasti == -1) {
+        // 此时不能把非None的值作为参数传入
+        if (arg && arg != Py_None) { 
+            const char *msg = "can't send non-None value to a "
+                              "just-started generator";
+            if (PyCoro_CheckExact(gen)) {
+                msg = NON_INIT_CORO_MSG;
+            }
+            else if (PyAsyncGen_CheckExact(gen)) {
+                msg = "can't send non-None value to a "
+                      "just-started async generator";
+            }
+            PyErr_SetString(PyExc_TypeError, msg);
+            return NULL;
+        }
+    } else { 
+        // 这是第一次被调用，允许使用参数，参数的值被push到值栈中
+        result = arg ? arg : Py_None;
+        Py_INCREF(result);
+        *(f->f_stacktop++) = result;
+    }
+    Py_XINCREF(tstate->frame);
+    assert(f->f_back == NULL);
+    // f_back是用于发送返回值的调用方，在这里把它设置为线程中的当前帧，也就是返回值被发送给调用者而不是生成器的创建者
+    f->f_back = tstate->frame;                          
+    // 把生成器标记为正在运行
+    gen->gi_running = 1;            
+    // 生成器的异常信息中的最后一个异常，从线程状态中的最后一个异常复制                    
+    gen->gi_exc_state.previous_item = tstate->exc_info; 
+    // 线程状态的异常信息设为生成器异常信息的地址，便于调用者在生成器执行过程中的debug
+    tstate->exc_info = &gen->gi_exc_state; 
+    // 生成器内部的那个frame放到CPython的主循环中去执行             
+    result = PyEval_EvalFrameEx(f, exc); 
+    // 把线程状态的最后一个异常重置为调用frame之前的值               
+    tstate->exc_info = gen->gi_exc_state.previous_item; 
+    gen->gi_exc_state.previous_item = NULL;    
+    // 把生成器标记为不在运行         
+    gen->gi_running = 0;                                
+    assert(f->f_back == tstate->frame);
+    Py_CLEAR(f->f_back);
+    //  没有返回值时，对于生成器应该引发StopIteration，异步生成器应该引发StopAsyncIteration
+    if (result && f->f_stacktop == NULL) {  
+        if (result == Py_None) {
+            if (PyAsyncGen_CheckExact(gen)) {
+                PyErr_SetNone(PyExc_StopAsyncIteration);
+            }
+            else {
+                PyErr_SetNone(PyExc_StopIteration);
+            }
+        }
+        else {
+            /* Async generators cannot return anything but None */
+            assert(!PyAsyncGen_CheckExact(gen));
+            _PyGen_SetStopIterationValue(result);
+        }
+        Py_CLEAR(result);
+    }
+    // 如果这是一个协程或异步生成器但引发了StopIteration，则是不允许的，引发RuntimeError
+    else if (!result && PyErr_ExceptionMatches(PyExc_StopIteration)) { 
+        const char *msg = "generator raised StopIteration";
+        if (PyCoro_CheckExact(gen)) {
+            msg = "coroutine raised StopIteration";
+        }
+        else if PyAsyncGen_CheckExact(gen) {
+            msg = "async generator raised StopIteration";
+        }
+        _PyErr_FormatFromCause(PyExc_RuntimeError, "%s", msg);
+    }
+    // 如果这是一个异步生成器但引发了StopAsyncIteration，则也是不允许的，引发RuntimeError
+    else if (!result && PyAsyncGen_CheckExact(gen) &&
+             PyErr_ExceptionMatches(PyExc_StopAsyncIteration))  
+    {
+        /* code in `gen` raised a StopAsyncIteration error:
+           raise a RuntimeError.
+        */
+        const char *msg = "async generator raised StopAsyncIteration";
+        _PyErr_FormatFromCause(PyExc_RuntimeError, "%s", msg);
+    }
+...
+    // 最终，结果返回给调用__next__()方法者
+    return result; 
+}
+{{< /highlight >}}
+
+综上，生成器是一种强大的语法，通过yield关键字触发整个流程，创建唯一对象，将已编译的代码对象复制为其属性，设置frame并为其存储局部变量列表。这一切对用户看起来很神奇，但其底层并不复杂。
+
+
 GIL
 -------
 
