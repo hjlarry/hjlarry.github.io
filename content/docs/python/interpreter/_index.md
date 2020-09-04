@@ -1076,6 +1076,58 @@ static PyObject *bool_and(PyObject *a, PyObject *b)
 }
 {{< /highlight >}}
 
+long类型会复杂一些，因为它需要更大的内存。Python3已经舍弃掉了Python2中对int类型的支持，而是都使用long类型，而long又非常特殊，因为它可以存储的是一个变长整数。它的结构由一个PyObject的头部和一个数字的列表组成，数字列表一开始设置为只有1个数字，但初始化之后会调用 [_PyLong_New()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/longobject.c#L262)方法重新分配内存，并调整为一个更大的长度:
+{{< highlight c>}}
+struct _longobject {
+    PyObject_VAR_HEAD
+    digit ob_digit[1];
+};
+{{< /highlight >}}
+
+要将C语言的long类型转换为Python中的long类型，需要先将C中的long转换为一个数字列表，分配Python中long需要的内存，然后去设置每个数字:
+{{< highlight c>}}
+PyObject *
+PyLong_FromLong(long ival)
+{
+    PyLongObject *v;
+    unsigned long abs_ival;
+    unsigned long t;  /* unsigned so >> doesn't propagate sign bit */
+    int ndigits = 0;
+    int sign;
+    CHECK_SMALL_INT(ival);
+...
+    /* 对于一个位的整数可以快速处理不需分配内存 */
+    if (!(abs_ival >> PyLong_SHIFT)) {
+        v = _PyLong_New(1);
+        if (v) {
+            Py_SIZE(v) = sign;
+            v->ob_digit[0] = Py_SAFE_DOWNCAST(
+                abs_ival, unsigned long, digit);
+        }
+        return (PyObject*)v;
+    }
+...
+    /* 对于大一些的数，先循环确定有多少位 */
+    t = abs_ival;
+    while (t) {
+        ++ndigits;
+        t >>= PyLong_SHIFT;
+    }
+    v = _PyLong_New(ndigits);
+    if (v != NULL) {
+        digit *p = v->ob_digit;
+        Py_SIZE(v) = ndigits*sign;
+        t = abs_ival;
+        while (t) {
+            *p++ = Py_SAFE_DOWNCAST(
+                t & PyLong_MASK, unsigned long, digit);
+            t >>= PyLong_SHIFT;
+        }
+    }
+    return (PyObject *)v;
+}
+{{< /highlight >}}
+此外，将双精度浮点数转换为Python中的long以及Unicode进行转换都在`longobject.c`中有相应的方法。
 
 GIL
 -------
