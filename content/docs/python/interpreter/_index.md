@@ -1050,6 +1050,32 @@ CPython中的对象
 | Objects/unicodeobject.c | str |
 | Objects/weakrefobject.c | 弱引用 |
 
+### 布尔和整数
+布尔类是内置类型中最直接的实现，它继承自long，并在解释器中创建了常量Py_True和Py_False。在Objects/boolobject.c中我们可以看到帮助函数通过数字来创建布尔类型的实例:
+{{< highlight c>}}
+PyObject *PyBool_FromLong(long ok)
+{
+    PyObject *result;
+    if (ok)
+        result = Py_True;
+    else
+        result = Py_False;
+    Py_INCREF(result);
+    return result;
+}
+{{< /highlight >}}
+此外，也实现了一些and、xor、or之类的帮助函数，但加法、减法、除法是没有从继承的long中实现的。
+
+检测`a and b`的结果是先检测a和b是否为布尔值，然后检查它们是否有对Py_True的引用，都不是的话则把它们强制转化为数字进行数字之间的and操作:
+{{< highlight c>}}
+static PyObject *bool_and(PyObject *a, PyObject *b)
+{
+    if (!PyBool_Check(a) || !PyBool_Check(b))
+        return PyLong_Type.tp_as_number->nb_and(a, b);
+    return PyBool_FromLong((a == Py_True) & (b == Py_True));
+}
+{{< /highlight >}}
+
 
 GIL
 -------
