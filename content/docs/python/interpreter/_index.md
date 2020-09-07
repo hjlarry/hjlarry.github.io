@@ -1295,6 +1295,64 @@ Python被称为"内置电池"的语言，主要在于其强大的标准库涵盖
 
 使用纯Python写的模块都放在Lib目录下，当我们安装一个Python的发行版时，标准库模块会从Lib文件夹复制到发行版的文件夹中。这些模块往往没有什么特别的，有的甚至只有几十行，只是为了开发者的方便而设计。
 
+其余的模块要么是用C写的，要么是用Python和C结合起来写的。它们Python的部分仍然在Lib目录下，而C的部分在Modules目录下。但是有两个例外，其一是sys模块在Python/sysmodule.c中，还有是__builtins__模块在Python/bltinmodule.c中。
+
+我们能在Python中直接使用的print()、chr()、format()等方法就是在bltinmodule.c中，因为解释器实例化的时候就通过import * from __builtins__导入了这些方法。sys模块也是因为专用于解释器和CPython内部的，才放在那个位置。
+
+当我们输入`print("hello")`时，在CPython中发生了如下步骤:
+
+1. 参数hello是一个字符串常量被编译器转换为PyUnicodeObject
+2. 内置的builtin_print()使用该参数执行，此例中kwnames为NULL
+3. 变量file被设为PyId_stdout，系统的stdout处理器
+4. 把每一个参数发送给file
+5. 把`\n`发送给file
+
+{{< highlight c>}}
+static PyObject *
+builtin_print(PyObject *self, PyObject *const *args, Py_ssize_t nargs, PyObject *kwnames)
+{
+    ...
+    if (file == NULL || file == Py_None) {
+        file = _PySys_GetObjectId(&PyId_stdout);
+        ...
+    }
+    ...
+    for (i = 0; i < nargs; i++) {
+        if (i > 0) {
+            if (sep == NULL)
+                err = PyFile_WriteString(" ", file);
+            else
+                err = PyFile_WriteObject(sep, file,
+                                         Py_PRINT_RAW);
+            if (err)
+                return NULL;
+        }
+        err = PyFile_WriteObject(args[i], file, Py_PRINT_RAW);
+        if (err)
+            return NULL;
+    }
+    if (end == NULL)
+        err = PyFile_WriteString("\n", file);
+    else
+        err = PyFile_WriteObject(end, file, Py_PRINT_RAW);
+    ...
+    Py_RETURN_NONE;
+}
+{{< /highlight >}}
+
+用C来编写某些标准库是因为需要使用一些操作系统的功能，而不同的操作系统的接口可能是不一样的，CPython需要把它们抽象为统一的API接口供用户使用:
+{{< highlight c>}}
+#ifdef HAVE_SYS_TIMES_H
+#include <sys/times.h>
+#endif
+...
+#ifdef MS_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include "pythread.h"
+#endif /* MS_WINDOWS */
+...
+{{< /highlight >}}
 
 GIL
 -------
