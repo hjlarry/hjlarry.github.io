@@ -4,8 +4,10 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="CPython解释器 字节码 Python中的字节码并不能被CPU执行，而是由栈式虚拟机执行，每条指令的背后都对应了一大堆C实现的机器指令。
-字节码被存储在代码对象(即__code__)的co_code中，以一个函数为例: &gt;&gt;&gt; def add(x, y): ... z = x &#43; y ... return z &gt;&gt;&gt; &#34; &#34;.join(str(b) for b in add.__code__.co_code) &#39;124 0 124 1 23 0 125 2 124 2 83 0&#39; 字节码中每两个数字为一组，第一个为指令，第二个为参数，指令对应的二进制数可以在CPython源码中找到: &lt;!-- cpython/Include/opcode.h --&gt; #define BINARY_ADD 23 #define RETURN_VALUE 83 #define LOAD_FAST 124 #define STORE_FAST 125 这就可以和dis的输出结果对应起来: &gt;&gt;&gt; dis.dis(add) &lt;!-- 源码行 偏移量 指令 参数(目标对象) --&gt; 2 0 LOAD_FAST 0 (x) 2 LOAD_FAST 1 (y) 4 BINARY_ADD 6 STORE_FAST 2 (z) 3 8 LOAD_FAST 2 (z) 10 RETURN_VALUE 指令所对应的源码行这个信息其实保存在代码对象的两个相关属性中，co_firstlineno用来存储该段代码起始的行号，co_lnotab由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。每条字节码指令代表的意义可通过官方文档此处查询到。"><meta property="og:title" content="CPython解释器" />
+<meta name="description" content="CPython解释器 编码规范 像PEP8一样，CPython也有自己的一套编码规范，为PEP7，有一些命名规范可以帮助我们更好的阅读源码:
+ 使用Py前缀的方法为公共方法，但不会用于静态方法。Py_前缀是为Py_FatalError这样的全局服务性函数保留的，对于特殊的类型(比如某类对象的API)会使用更长的前缀，例如PyString_都是字符串类的方法 公共函数和变量使用驼峰加上下划线，例如PyObject_GetAttr, Py_BuildValue, PyExc_TypeError等 偶尔有一些内部的函数，却需要对加载器可见，我们使用_Py前缀，例如_PyObject_Dump 宏使用驼峰前缀加大写，例如PyString_AS_STRING, Py_PRINT_RAW等  执行方式 程序入口 Python的执行方式有五种:
+ 使用python -c执行单条语句 使用python -m执行某个模块 通常使用的运行某个文件 使用shell的管道连接，将stdin的内容作为python的输入 使用交互式命令行环境(REPL)  通过这三个文件，我们能观察到一个整体的执行过程:
+ Programs/python.c，一个简单的最初的程序入口 Modules/main.c，把整个执行过程的抽象打包再一起，包含加载环境信息、执行代码和清理内存 Python/initconfig.c，从系统中加载环境变量等信息，以及命令行中的参数等  &lt;!-- cpython/Programs/python.c --&gt; int main(int argc, char **argv) { // unix平台是_Py_UnixMain，windows平台是Py_Main  return _Py_UnixMain(argc, argv); } 然后是选择执行模式: &lt;!-- cpython/Modules/main.c --&gt; int _Py_UnixMain(int argc, char **argv) { return pymain_main(&amp;pymain); } static int pymain_main(_PyMain *pymain) { pymain_init(pymain); int res = pymain_cmdline(pymain); if (res &lt; 0) { _Py_FatalInitError(pymain-&gt;err); } if (res == 1) { goto done; } pymain_init_stdio(pymain); // 初始化  pymain-&gt;err = _Py_InitializeCore(&amp;pymain-&gt;config); // 执行逻辑  pymain_run_python(pymain); if (Py_FinalizeEx() &lt; 0) { pymain-&gt;status = 120; } done: // 退出清理  pymain_free(pymain); return pymain-&gt;status; } static void pymain_run_python(_PyMain *pymain) { PyCompilerFlags cf = {."><meta property="og:title" content="CPython解释器" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/docs/python/interpreter/" />
@@ -13,7 +15,7 @@
 <title>CPython解释器 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.e2f9991fce850051589d642e11744c0e5b670dd7865582e37742416e531704a5.js" integrity="sha256-4vmZH86FAFFYnWQuEXRMDltnDdeGVYLjd0JBblMXBKU="></script>
+<script defer src="/cn.search.min.e75be23672b7e627ade0fc6f8d82d0dcfae4c090e2980f2e7781cf2728c72998.js" integrity="sha256-51viNnK35iet4PxvjYLQ3PrkwJDimA8ud4HPJyjHKZg="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/python/interpreter/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -138,20 +140,42 @@ https://github.com/alex-shpak/hugo-book
       
   <nav id="TableOfContents">
   <ul>
-    <li><a href="#字节码">字节码</a></li>
-    <li><a href="#gil">GIL</a></li>
-    <li><a href="#执行过程">执行过程</a>
+    <li><a href="#编码规范">编码规范</a></li>
+    <li><a href="#执行方式">执行方式</a>
       <ul>
-        <li><a href="#编码规范">编码规范</a></li>
-        <li><a href="#执行方式">执行方式</a></li>
-        <li><a href="#建立运行时环境">建立运行时环境</a></li>
-        <li><a href="#通过输入运行">通过输入运行</a></li>
-        <li><a href="#语义解析">语义解析</a></li>
-        <li><a href="#ast">AST</a></li>
-        <li><a href="#编译">编译</a></li>
-        <li><a href="#终止">终止</a></li>
+        <li><a href="#程序入口">程序入口</a></li>
+        <li><a href="#运行时环境">运行时环境</a></li>
+        <li><a href="#-c的方式">-c的方式</a></li>
+        <li><a href="#-m的方式">-m的方式</a></li>
+        <li><a href="#file的方式">file的方式</a></li>
       </ul>
     </li>
+    <li><a href="#编译">编译</a>
+      <ul>
+        <li><a href="#语义解析">语义解析</a></li>
+        <li><a href="#ast">AST</a></li>
+        <li><a href="#编译过程">编译过程</a></li>
+        <li><a href="#汇编器">汇编器</a></li>
+        <li><a href="#创建代码对象">创建代码对象</a></li>
+        <li><a href="#字节码">字节码</a></li>
+      </ul>
+    </li>
+    <li><a href="#执行">执行</a>
+      <ul>
+        <li><a href="#构建frame">构建frame</a></li>
+        <li><a href="#执行frame">执行frame</a></li>
+        <li><a href="#值栈">值栈</a></li>
+      </ul>
+    </li>
+    <li><a href="#cpython中的对象">CPython中的对象</a>
+      <ul>
+        <li><a href="#基础对象">基础对象</a></li>
+        <li><a href="#布尔和整数">布尔和整数</a></li>
+        <li><a href="#生成器类型">生成器类型</a></li>
+      </ul>
+    </li>
+    <li><a href="#标准库">标准库</a></li>
+    <li><a href="#gil">GIL</a></li>
   </ul>
 </nav>
 
@@ -164,66 +188,7 @@ https://github.com/alex-shpak/hugo-book
       
       
   <article class="markdown"><h1 id="cpython解释器">CPython解释器</h1>
-<h2 id="字节码">字节码</h2>
-<p>Python中的字节码并不能被CPU执行，而是由栈式虚拟机执行，每条指令的背后都对应了一大堆C实现的机器指令。</p>
-<p>字节码被存储在代码对象(即<code>__code__</code>)的<code>co_code</code>中，以一个函数为例:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">add</span>(x, y):                                                                                          
-<span style="color:#f92672">...</span>     z <span style="color:#f92672">=</span> x <span style="color:#f92672">+</span> y
-<span style="color:#f92672">...</span>     <span style="color:#66d9ef">return</span> z
-
-<span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#e6db74">&#34; &#34;</span><span style="color:#f92672">.</span>join(str(b) <span style="color:#66d9ef">for</span> b <span style="color:#f92672">in</span> add<span style="color:#f92672">.</span>__code__<span style="color:#f92672">.</span>co_code)
-<span style="color:#e6db74">&#39;124 0 124 1 23 0 125 2 124 2 83 0&#39;</span></code></pre></div>
-字节码中每两个数字为一组，第一个为指令，第二个为参数，指令对应的二进制数可以在CPython源码中找到:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Include<span style="color:#f92672">/</span>opcode.h <span style="color:#f92672">--&gt;</span>
-<span style="color:#75715e">#define BINARY_ADD               23
-</span><span style="color:#75715e">#define RETURN_VALUE             83
-</span><span style="color:#75715e">#define LOAD_FAST               124
-</span><span style="color:#75715e">#define STORE_FAST              125</span></code></pre></div>
-这就可以和dis的输出结果对应起来:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> dis<span style="color:#f92672">.</span>dis(add)
-<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">!</span><span style="color:#f92672">--</span> <span style="color:#960050;background-color:#1e0010">源码行</span>    <span style="color:#960050;background-color:#1e0010">偏移量</span> <span style="color:#960050;background-color:#1e0010">指令</span>           <span style="color:#960050;background-color:#1e0010">参数</span>(<span style="color:#960050;background-color:#1e0010">目标对象</span>)  <span style="color:#f92672">--&gt;</span>
-  <span style="color:#ae81ff">2</span>           <span style="color:#ae81ff">0</span> LOAD_FAST                <span style="color:#ae81ff">0</span> (x)
-              <span style="color:#ae81ff">2</span> LOAD_FAST                <span style="color:#ae81ff">1</span> (y)
-              <span style="color:#ae81ff">4</span> BINARY_ADD
-              <span style="color:#ae81ff">6</span> STORE_FAST               <span style="color:#ae81ff">2</span> (z)
-
-  <span style="color:#ae81ff">3</span>           <span style="color:#ae81ff">8</span> LOAD_FAST                <span style="color:#ae81ff">2</span> (z)
-             <span style="color:#ae81ff">10</span> RETURN_VALUE</code></pre></div>
-指令所对应的源码行这个信息其实保存在代码对象的两个相关属性中，<code>co_firstlineno</code>用来存储该段代码起始的行号，<code>co_lnotab</code>由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。每条字节码指令代表的意义可通过官方文档<a href="https://docs.python.org/3/library/dis.html">此处</a>查询到。</p>
-<h2 id="gil">GIL</h2>
-<p>全局解释器锁机制使得解释器在同一时刻仅有一个线程可以被调度执行，某个线程若想要执行，就先要拿到GIL，但在每个Python进程中，只有一个GIL。它的存在使得解释器本身的实现更简单一些，更容易实现对象的安全访问，便于进行内存管理和编写扩展。但在多核环境下无法实现并行，对于以多线程为基础的并发应用就是一个灾难。</p>
-<p>对于IO密集型任务，线程是在发生阻塞时主动释放GIL的，让其他线程得以执行。而对于CPU密集型任务，采取超时策略。</p>
-<p>当GIL被其他线程占用时，等待线程会阻塞一段时间。如果超时（默认为0.005秒）后，依然无法获取锁，则发出请求。这种请求设计的很轻巧，就是一个全局条件变量设置。正在执行的线程在解释循环内会检查该标记，然后释放锁，切换线程执行，其自身进入等待状态。属于典型的协作机制。相关源码:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>ceval.c <span style="color:#f92672">--&gt;</span>
-main_loop:
-    <span style="color:#66d9ef">for</span> (;;) {
-        <span style="color:#66d9ef">if</span> (_Py_atomic_load_relaxed(eval_breaker)) {
-            opcode <span style="color:#f92672">=</span> _Py_OPCODE(<span style="color:#f92672">*</span>next_instr);
-            <span style="color:#66d9ef">if</span> (_Py_atomic_load_relaxed(<span style="color:#f92672">&amp;</span>ceval<span style="color:#f92672">-&gt;</span>gil_drop_request)) {
-                <span style="color:#75715e">/* Give another thread a chance */</span>
-                drop_gil(ceval, tstate);
-
-                <span style="color:#75715e">/* Other threads may run now */</span>
-                take_gil(ceval, tstate);
-
-                <span style="color:#75715e">/* Check if we should make a quick exit. */</span>
-                exit_thread_if_finalizing(tstate);
-
-                <span style="color:#66d9ef">if</span> (_PyThreadState_Swap(<span style="color:#f92672">&amp;</span>runtime<span style="color:#f92672">-&gt;</span>gilstate, tstate) <span style="color:#f92672">!=</span> NULL) {
-                    Py_FatalError(<span style="color:#e6db74">&#34;ceval: orphan tstate&#34;</span>);
-                }
-            }
-        }
-        <span style="color:#66d9ef">switch</span> (opcode) {
-          <span style="color:#66d9ef">case</span> TARGET(NOP)<span style="color:#f92672">:</span>
-          <span style="color:#66d9ef">case</span> TARGET(LOAD_FAST)<span style="color:#f92672">:</span>
-          ...
-        }
-    }</code></pre></div>
-CPython使用系统线程，且没有实现线程调度。所以，具体哪个等待线程被切换执行，由操作系统决定。甚至，发出请求和被切换执行的未必就是同一个线程。</p>
-<p>对于CPU密集型任务，除了使用多进程架构绕开，也可以使用C来编写多线程的扩展也能绕开GIL限制。</p>
-<h2 id="执行过程">执行过程</h2>
-<h3 id="编码规范">编码规范</h3>
+<h2 id="编码规范">编码规范</h2>
 <p>像<code>PEP8</code>一样，CPython也有自己的一套编码规范，为<a href="https://www.python.org/dev/peps/pep-0007/">PEP7</a>，有一些命名规范可以帮助我们更好的阅读源码:</p>
 <ul>
 <li>使用<code>Py</code>前缀的方法为公共方法，但不会用于静态方法。<code>Py_</code>前缀是为<code>Py_FatalError</code>这样的全局服务性函数保留的，对于特殊的类型(比如某类对象的API)会使用更长的前缀，例如<code>PyString_</code>都是字符串类的方法</li>
@@ -231,7 +196,8 @@ CPython使用系统线程，且没有实现线程调度。所以，具体哪个�
 <li>偶尔有一些内部的函数，却需要对加载器可见，我们使用<code>_Py</code>前缀，例如_PyObject_Dump</li>
 <li>宏使用驼峰前缀加大写，例如PyString_AS_STRING, Py_PRINT_RAW等</li>
 </ul>
-<h3 id="执行方式">执行方式</h3>
+<h2 id="执行方式">执行方式</h2>
+<h3 id="程序入口">程序入口</h3>
 <p>Python的执行方式有五种:</p>
 <ul>
 <li>使用<code>python -c</code>执行单条语句</li>
@@ -262,7 +228,6 @@ CPython使用系统线程，且没有实现线程调度。所以，具体哪个�
 <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> pymain_main(_PyMain <span style="color:#f92672">*</span>pymain)
 {
     pymain_init(pymain);
-
     <span style="color:#66d9ef">int</span> res <span style="color:#f92672">=</span> pymain_cmdline(pymain);
     <span style="color:#66d9ef">if</span> (res <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
         _Py_FatalInitError(pymain<span style="color:#f92672">-&gt;</span>err);
@@ -270,32 +235,25 @@ CPython使用系统线程，且没有实现线程调度。所以，具体哪个�
     <span style="color:#66d9ef">if</span> (res <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) {
         <span style="color:#66d9ef">goto</span> done;
     }
-
     pymain_init_stdio(pymain);
     <span style="color:#75715e">// 初始化
 </span><span style="color:#75715e"></span>    pymain<span style="color:#f92672">-&gt;</span>err <span style="color:#f92672">=</span> _Py_InitializeCore(<span style="color:#f92672">&amp;</span>pymain<span style="color:#f92672">-&gt;</span>config);
-
     <span style="color:#75715e">// 执行逻辑
 </span><span style="color:#75715e"></span>    pymain_run_python(pymain);
-
     <span style="color:#66d9ef">if</span> (Py_FinalizeEx() <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
         pymain<span style="color:#f92672">-&gt;</span>status <span style="color:#f92672">=</span> <span style="color:#ae81ff">120</span>;
     }
-
 done:
     <span style="color:#75715e">// 退出清理
 </span><span style="color:#75715e"></span>    pymain_free(pymain);
-
     <span style="color:#66d9ef">return</span> pymain<span style="color:#f92672">-&gt;</span>status;
 }
 
 <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> pymain_run_python(_PyMain <span style="color:#f92672">*</span>pymain)
 {
     PyCompilerFlags cf <span style="color:#f92672">=</span> {.cf_flags <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>};
-
     pymain_header(pymain);
     pymain_import_readline(pymain);
-
     <span style="color:#75715e">// 执行模式选择
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (pymain<span style="color:#f92672">-&gt;</span>command) {
         <span style="color:#75715e">// 命令行模式 -c
@@ -309,12 +267,11 @@ done:
         <span style="color:#75715e">// 入口文件模式
 </span><span style="color:#75715e"></span>        pymain_run_filename(pymain, <span style="color:#f92672">&amp;</span>cf);
     }
-
     pymain_repl(pymain, <span style="color:#f92672">&amp;</span>cf);
 }</code></pre></div></p>
 <p>这个流程图能清晰的表达出上述代码:</p>
 <p><img src="./images/exe_process.png" alt="" /></p>
-<h3 id="建立运行时环境">建立运行时环境</h3>
+<h3 id="运行时环境">运行时环境</h3>
 <p>通过上图，我们可以看到无论执行任何python代码，运行时首先会建立相关环境。这个环境在<code>Include/cpython/initconfig.h</code>中定义为<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/cpython/initconfig.h#L407">PyConfig</a>，该结构体中的数据包括:</p>
 <ul>
 <li>运行模式的标记，比如debug或optimized模式</li>
@@ -329,8 +286,7 @@ done:
 sys<span style="color:#f92672">.</span>flags(debug<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, inspect<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, interactive<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, optimize<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, dont_write_bytecode<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, no_user_site<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, no_site<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, ignore_environment<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, verbose<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, bytes_warning<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, quiet<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, hash_randomization<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, isolated<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
 <span style="color:#f92672">&gt;&gt;&gt;</span> sys<span style="color:#f92672">.</span>_xoptions
 {<span style="color:#e6db74">&#39;dev&#39;</span>: True}</code></pre></div></p>
-<h3 id="通过输入运行">通过输入运行</h3>
-<h4 id="-c的方式">-c的方式</h4>
+<h3 id="-c的方式">-c的方式</h3>
 <p>例如<code>python -c &quot;print('hi')&quot;</code>，它的运行流程如图所示:</p>
 <p><img src="./images/pymain_run_command.png" alt="pymain_run_command" /></p>
 <p><a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Modules/main.c#L240">pymain_run_command()</a>的核心逻辑如下:
@@ -340,16 +296,12 @@ sys<span style="color:#f92672">.</span>flags(debug<span style="color:#f92672">=<
 <span style="color:#a6e22e">pymain_run_command</span>(wchar_t <span style="color:#f92672">*</span>command, PyCompilerFlags <span style="color:#f92672">*</span>cf)
 {
     PyObject <span style="color:#f92672">*</span>unicode, <span style="color:#f92672">*</span>bytes;
-
     <span style="color:#75715e">// 转换为PyUnicode对象
 </span><span style="color:#75715e"></span>    unicode <span style="color:#f92672">=</span> PyUnicode_FromWideChar(command, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>);
-
     <span style="color:#75715e">// 对unicode进行utf8编码得到一个python字节对象
 </span><span style="color:#75715e"></span>    bytes <span style="color:#f92672">=</span> PyUnicode_AsUTF8String(unicode);
-
     <span style="color:#75715e">// 重新解码为字符串丢去执行
 </span><span style="color:#75715e"></span>    ret <span style="color:#f92672">=</span> PyRun_SimpleStringFlags(PyBytes_AsString(bytes), cf);
-
     <span style="color:#66d9ef">return</span> (ret <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>);
 }</code></pre></div></p>
 <p>而<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L453">PyRun_SimpleStringFlags()</a>的目的是创建一个Python模块<code>__main__</code>，和一个字典，再将命令一起打包调用<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1008">PyRun_StringFlags()</a>，这个函数将创建一个假的文件名，接着就是调用Python解析器创建AST并返回模块mod了:
@@ -374,7 +326,7 @@ PyObject <span style="color:#f92672">*</span>
     ret <span style="color:#f92672">=</span> run_mod(mod, filename, globals, locals, flags, arena);
     PyArena_Free(arena);
     <span style="color:#66d9ef">return</span> ret;</code></pre></div></p>
-<h4 id="-m的方式">-m的方式</h4>
+<h3 id="-m的方式">-m的方式</h3>
 <p>另一种执行Python命令的方式是-m选项和模块名称，例如<code>python -m unittest</code>可以运行标准库中的unittest模块。实际上它就是在sys.path中去搜索名为unittest的模块然后去执行。</p>
 <p>CPython是先通过一个C的API函数<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/import.c#L1409">PyImport_ImportModule()</a>来导入标准库<code>runpy</code>，它返回的是一个PyObject核心对象类型，然后需要一些特殊的方法获取它的属性再调用。例如<code>hi.upper()</code>相当于<code>hi.upper.__call__()</code>，在C中<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/object.c#L831">PyObject_GetAttrString()</a>就是用来获得hi的upper属性，然后通过<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/call.c#L214">PyObject_Call()</a>就是去执行__call__()。</p>
 <p><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// modname就是通过-m传递进来的参数
@@ -405,7 +357,7 @@ PyObject <span style="color:#f92672">*</span>
 <li>在<code>__main__</code>的名字空间下执行该模块</li>
 </ul>
 <p>runpy模块同样也可以用来执行某个目录或者zip文件。</p>
-<h4 id="file模式">file模式</h4>
+<h3 id="file的方式">file的方式</h3>
 <p>如果是<code>python test.py</code>这种方式，CPython会打开一个文件句柄，然后传递给<code>Python/pythonrun.c</code>中的<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L372">PyRun_SimpleFileExFlags()</a>方法:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span>
 <span style="color:#a6e22e">PyRun_SimpleFileExFlags</span>(FILE <span style="color:#f92672">*</span>fp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>filename, <span style="color:#66d9ef">int</span> closeit,
@@ -469,6 +421,7 @@ PyObject <span style="color:#f92672">*</span>
     v <span style="color:#f92672">=</span> run_eval_code_obj(co, globals, locals);
     <span style="color:#66d9ef">return</span> v;
 }</code></pre></div></p>
+<h2 id="编译">编译</h2>
 <h3 id="语义解析">语义解析</h3>
 <p>在前文中我们了解到在执行时会先去创建AST，那么这步具体是怎么做的呢:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">mod_ty
@@ -552,7 +505,6 @@ parsetok()返回的是一个node节点类型:
     lexicon <span style="color:#f92672">=</span> {<span style="color:#f92672">**</span>symbols, <span style="color:#f92672">**</span>tokens}
     st <span style="color:#f92672">=</span> parser<span style="color:#f92672">.</span>expr(expression)
     st_list <span style="color:#f92672">=</span> parser<span style="color:#f92672">.</span>st2list(st)
-
     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">replace</span>(l: list):
         r <span style="color:#f92672">=</span> []
         <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> l:
@@ -564,7 +516,6 @@ parsetok()返回的是一个node节点类型:
                 <span style="color:#66d9ef">else</span>:
                     r<span style="color:#f92672">.</span>append(i)
         <span style="color:#66d9ef">return</span> r
-
     <span style="color:#66d9ef">return</span> replace(st_list)
 
 <span style="color:#75715e"># 小写的就是符号，大写的就是token</span>
@@ -613,24 +564,19 @@ parsetok()返回的是一个node节点类型:
             asdl_seq <span style="color:#f92672">*</span>body;
             asdl_seq <span style="color:#f92672">*</span>type_ignores;
         } Module;
-
         <span style="color:#66d9ef">struct</span> {
             asdl_seq <span style="color:#f92672">*</span>body;
         } Interactive;
-
         <span style="color:#66d9ef">struct</span> {
             expr_ty body;
         } Expression;
-
         <span style="color:#66d9ef">struct</span> {
             asdl_seq <span style="color:#f92672">*</span>argtypes;
             expr_ty returns;
         } FunctionType;
-
         <span style="color:#66d9ef">struct</span> {
             asdl_seq <span style="color:#f92672">*</span>body;
         } Suite;
-
     } v;
 };</code></pre></div>
 除了模块类型，其他的AST类型都列在<code>Parser/Python.asdl</code>中，包括statement、expression、operators、comprehensions等等。在该文件中我们能看到类型字段的定义也是用在这里的:
@@ -687,7 +633,7 @@ module Python
     <span style="color:#66d9ef">return</span> res;
 }</code></pre></div></p>
 <p>遍历孩子节点并创建相应的AST语句节点逻辑在<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L4512">ast_for_stmt()</a>中，该函数内还需要再根据不同的语句类型调用不同的函数创建节点，都是类似于ast_for_*()，例如<code>2**4</code>这样的语句最终能找到ast_for_power()这样的方法。</p>
-<h3 id="编译">编译</h3>
+<h3 id="编译过程">编译过程</h3>
 <p>现在解释器有了AST，也就有了每个操作、函数、类和名字空间所需要的属性，下一步就是把AST编译为CPU能够理解的东西，这就是编译。编译可以分为两个部分:一是遍历树并创建一个控制流图(control-flow-graph)，用来表示逻辑执行的顺序；另外就是将控制流图中的节点转换为较小的可执行语句，称为字节码。</p>
 <p><a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L312">PyAST_CompileObject()</a>函数是编译器部分的主要入口，它以Python模块作为主要参数，同解释器进程早期创建过的文件名称、全局变量、局部变量以及PyArena一起打包传入。然后先创建一个全局的编译器状态结构体，用来存储一些属性、编译标识、栈等等:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>compile.c <span style="color:#f92672">--&gt;</span>
@@ -823,12 +769,10 @@ Out[<span style="color:#ae81ff">2</span>]: <span style="color:#e6db74">b</span><
 <span style="color:#a6e22e">compiler_visit_stmt</span>(<span style="color:#66d9ef">struct</span> compiler <span style="color:#f92672">*</span>c, stmt_ty s)
 {
     Py_ssize_t i, n;
-
     <span style="color:#75715e">/* Always assign a lineno to the next instruction for a stmt. */</span>
     c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_lineno <span style="color:#f92672">=</span> s<span style="color:#f92672">-&gt;</span>lineno;
     c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_col_offset <span style="color:#f92672">=</span> s<span style="color:#f92672">-&gt;</span>col_offset;
     c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_lineno_set <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-
     <span style="color:#66d9ef">switch</span> (s<span style="color:#f92672">-&gt;</span>kind) {
     <span style="color:#66d9ef">case</span> FunctionDef_kind:
         <span style="color:#66d9ef">return</span> compiler_function(c, s, <span style="color:#ae81ff">0</span>);
@@ -839,7 +783,6 @@ Out[<span style="color:#ae81ff">2</span>]: <span style="color:#e6db74">b</span><
         <span style="color:#66d9ef">return</span> compiler_for(c, s);
     ...
     }
-
     <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
 }</code></pre></div></p>
 <p>我们以for语句为例:
@@ -847,81 +790,672 @@ Out[<span style="color:#ae81ff">2</span>]: <span style="color:#e6db74">b</span><
     <span style="color:#75715e"># block</span>
 <span style="color:#66d9ef">else</span>:  <span style="color:#75715e"># optional if iterable is False</span>
     <span style="color:#75715e"># block</span></code></pre></div>
-对于一个For类型的语句，它会调用compiler_for()。所有的语句和表达式类型都有相应的compiler_*()函数，大多数类型直接在其中创建字节码，也有些比较复杂的语句类型还会调用其他函数。许多语句都可能会有子句，for循环在赋值和迭代时也可能遇到复杂的表达式。</p>
-<h3 id="终止">终止</h3>
-<p>执行完之后，结束之前还要进行一系列的清理操作。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>pylifecycle.c <span style="color:#f92672">--&gt;</span>
-<span style="color:#66d9ef">int</span> Py_FinalizeEx(<span style="color:#66d9ef">void</span>)
+对于一个For类型的语句，它会调用compiler_for()。所有的语句和表达式类型都有相应的compiler_*()函数，大多数类型直接在其中创建字节码，也有些比较复杂的语句类型还会调用其他函数。许多语句都可能会有子句，for循环在赋值和迭代时也可能遇到复杂的表达式。compiler_for()将blocks发送给编译器状态，这些blocks包含指令(指令对应着opcode)，参数，目标block(如果是跳转指令)，以及行号:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> basicblock_ {
+    <span style="color:#66d9ef">struct</span> basicblock_ <span style="color:#f92672">*</span>b_list; <span style="color:#75715e">//指向编译器状态的block列表
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> b_iused;                <span style="color:#75715e">// 已经使用的指令数组的容量
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> b_ialloc;               <span style="color:#75715e">// 分配给指令数组的容量
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">struct</span> instr <span style="color:#f92672">*</span>b_instr;      <span style="color:#75715e">// 指向指令数组
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">struct</span> basicblock_ <span style="color:#f92672">*</span>b_next; <span style="color:#75715e">// 指向下一个block
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">unsigned</span> b_seen : <span style="color:#ae81ff">1</span>;        <span style="color:#75715e">// 当编译器深度优先遍历时，是否已看到该block
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">unsigned</span> b_return : <span style="color:#ae81ff">1</span>;      <span style="color:#75715e">// 如果该block有返回值
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> b_startdepth;           <span style="color:#75715e">// 该block的栈深度
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> b_offset;               <span style="color:#75715e">// 汇编程序的指令偏移量
+</span><span style="color:#75715e"></span>} basicblock;</code></pre></div>
+对于For类型语句的解析，编译器进行了15步操作:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span>
+<span style="color:#a6e22e">compiler_for</span>(<span style="color:#66d9ef">struct</span> compiler <span style="color:#f92672">*</span>c, stmt_ty s)
 {
-    <span style="color:#75715e">// 等待前台线程结束
-</span><span style="color:#75715e"></span>    wait_for_thread_shutdown();
-
-    <span style="color:#75715e">/* Get current thread state and interpreter pointer */</span>
-    tstate <span style="color:#f92672">=</span> PyThreadState_GET();
-    interp <span style="color:#f92672">=</span> tstate<span style="color:#f92672">-&gt;</span>interp;
-
-    <span style="color:#75715e">// 调用 atexit 注册的退出函数
-</span><span style="color:#75715e"></span>    call_py_exitfuncs(interp);
-
-    <span style="color:#75715e">/* Flush sys.stdout and sys.stderr */</span>
-    <span style="color:#66d9ef">if</span> (flush_std_files() <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
-        status <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
-    }
-
-    <span style="color:#75715e">/* Disable signal handling */</span>
-    PyOS_FiniInterrupts();
-
-    <span style="color:#75715e">// 垃圾回收，执行析构方法
-</span><span style="color:#75715e"></span>    _PyGC_CollectIfEnabled();
-
-    <span style="color:#75715e">// 释放导入的模块
-</span><span style="color:#75715e"></span>    PyImport_Cleanup();
-
-    <span style="color:#75715e">// 执行相关结束函数
-</span><span style="color:#75715e"></span>    _PyTraceMalloc_Fini();
-    _PyImport_Fini();
-    _PyType_Fini();
-    _PyFaulthandler_Fini();
-    _PyExc_Fini();
-
-    <span style="color:#75715e">// 执行内置类型的结束函数
-</span><span style="color:#75715e"></span>    PyMethod_Fini();
-    PyFrame_Fini();
-    PyCFunction_Fini();
-    PyTuple_Fini();
-    PyList_Fini();
-    PySet_Fini();
-    PyBytes_Fini();
-    PyByteArray_Fini();
-    PyLong_Fini();
-    PyFloat_Fini();
-    PyDict_Fini();
-    PySlice_Fini();
-    _PyGC_Fini();
-    _Py_HashRandomization_Fini();
-    _PyArg_Fini();
-    PyAsyncGen_Fini();
-    _PyContext_Fini();
-
-    <span style="color:#75715e">/* Cleanup Unicode implementation */</span>
-    _PyUnicode_Fini();
-
-    PyGrammar_RemoveAccelerators(<span style="color:#f92672">&amp;</span>_PyParser_Grammar);
-
-    <span style="color:#75715e">/* Cleanup auto-thread-state */</span>
-    _PyGILState_Fini();
-
-    <span style="color:#75715e">/* Delete current thread. After this, many C API calls become crashy. */</span>
-    PyThreadState_Swap(NULL);
-    <span style="color:#75715e">// 清理解释器和主线程状态
-</span><span style="color:#75715e"></span>    PyInterpreterState_Delete(interp);
-
-    call_ll_exitfuncs();
-
-    _PyRuntime_Finalize();
-
-    <span style="color:#66d9ef">return</span> status;
+    basicblock <span style="color:#f92672">*</span>start, <span style="color:#f92672">*</span>cleanup, <span style="color:#f92672">*</span>end;
+    start <span style="color:#f92672">=</span> compiler_new_block(c);                       <span style="color:#75715e">// 1.创建start代码块，分配内存并创建一个basicblock指针
+</span><span style="color:#75715e"></span>    cleanup <span style="color:#f92672">=</span> compiler_new_block(c);                     <span style="color:#75715e">// 2.创建cleanup代码块
+</span><span style="color:#75715e"></span>    end <span style="color:#f92672">=</span> compiler_new_block(c);                         <span style="color:#75715e">// 3.创建end代码块
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (start <span style="color:#f92672">==</span> NULL <span style="color:#f92672">||</span> end <span style="color:#f92672">==</span> NULL <span style="color:#f92672">||</span> cleanup <span style="color:#f92672">==</span> NULL)
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>compiler_push_fblock(c, FOR_LOOP, start, end))  <span style="color:#75715e">// 4.将frame block压栈，类型是FOR_LOOP，入口block是start，退出block是end
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    VISIT(c, expr, s<span style="color:#f92672">-&gt;</span>v.For.iter);                       <span style="color:#75715e">// 5.访问迭代器表达式，该表达式对迭代器添加操作
+</span><span style="color:#75715e"></span>    ADDOP(c, GET_ITER);                                  <span style="color:#75715e">// 6.将GET_ITER操作添加到编译器状态
+</span><span style="color:#75715e"></span>    compiler_use_next_block(c, start);                   <span style="color:#75715e">// 7.切回start块
+</span><span style="color:#75715e"></span>    ADDOP_JREL(c, FOR_ITER, cleanup);                    <span style="color:#75715e">// 8.调用compiler_addop_j()使用cleanup块的参数添加FOR_ITER操作
+</span><span style="color:#75715e"></span>    VISIT(c, expr, s<span style="color:#f92672">-&gt;</span>v.For.target);                     <span style="color:#75715e">// 9.访问目标并将特殊代码(如元组解包)添加至start块
+</span><span style="color:#75715e"></span>    VISIT_SEQ(c, stmt, s<span style="color:#f92672">-&gt;</span>v.For.body);                   <span style="color:#75715e">// 10.访问for循环主体中的每条语句
+</span><span style="color:#75715e"></span>    ADDOP_JABS(c, JUMP_ABSOLUTE, start);                 <span style="color:#75715e">// 11.调用compiler_addop_j()添加JUMP_ABSOLUTE操作，为了循环体执行完跳回循环开始的地方
+</span><span style="color:#75715e"></span>    compiler_use_next_block(c, cleanup);                 <span style="color:#75715e">// 12.移至cleanup块
+</span><span style="color:#75715e"></span>    compiler_pop_fblock(c, FOR_LOOP, start);             <span style="color:#75715e">// 13.将FOR_LOOP这个frame block弹出栈
+</span><span style="color:#75715e"></span>    VISIT_SEQ(c, stmt, s<span style="color:#f92672">-&gt;</span>v.For.orelse);                 <span style="color:#75715e">// 14.访问for循环的else中的语句部分
+</span><span style="color:#75715e"></span>    compiler_use_next_block(c, end);                     <span style="color:#75715e">// 15.使用end block
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
 }</code></pre></div></p>
+<p>当这一步执行完，编译器就有了一组frame block，其中的每一个都包含一组指令以及指向下一个block的指针。</p>
+<h3 id="汇编器">汇编器</h3>
+<p>通过编译器状态，汇编器对block进行深度优先搜索，并把它们的指令合并为一个字节码序列。核心方法<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5971">assemble()</a>的主要任务有:</p>
+<ul>
+<li>计算出有多少个block，以便于分配内存</li>
+<li>确保所有最后的block都返回None，这也是每个方法都返回None不管它有没有return语句的原因</li>
+<li>解决所有的标记为相对跳转语句的偏移量</li>
+<li>调用dfs()方法去深度优先搜索执行block</li>
+<li>把所有的指令提交给编译器</li>
+<li>调用makecode()方法并传入编译器状态，用来生成PyCodeObject</li>
+</ul>
+<p><a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5397">dfs()</a>方法是通过每一个block的b_next指针进行深度优先遍历的，遍历过的会标记该block的b_seen，然后按相反的顺序把它们添加至汇编器的**a_postorder列表中。</p>
+<h3 id="创建代码对象">创建代码对象</h3>
+<p><a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5854">makecode()</a>方法通过编译器状态、一些汇编器的属性，然后调用<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/codeobject.c#L246">PyCode_New()</a>把它们放在一个PyCodeObject中:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> PyCodeObject <span style="color:#f92672">*</span>
+<span style="color:#a6e22e">makecode</span>(<span style="color:#66d9ef">struct</span> compiler <span style="color:#f92672">*</span>c, <span style="color:#66d9ef">struct</span> assembler <span style="color:#f92672">*</span>a)
+{
+...
+    consts <span style="color:#f92672">=</span> consts_dict_keys_inorder(c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_consts);
+    names <span style="color:#f92672">=</span> dict_keys_inorder(c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_names, <span style="color:#ae81ff">0</span>);
+    varnames <span style="color:#f92672">=</span> dict_keys_inorder(c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_varnames, <span style="color:#ae81ff">0</span>);
+...
+    cellvars <span style="color:#f92672">=</span> dict_keys_inorder(c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_cellvars, <span style="color:#ae81ff">0</span>);
+...
+    freevars <span style="color:#f92672">=</span> dict_keys_inorder(c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_freevars, PyTuple_GET_SIZE(cellvars));
+...
+    flags <span style="color:#f92672">=</span> compute_code_flags(c);
+    <span style="color:#66d9ef">if</span> (flags <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>)
+        <span style="color:#66d9ef">goto</span> error;
+    bytecode <span style="color:#f92672">=</span> PyCode_Optimize(a<span style="color:#f92672">-&gt;</span>a_bytecode, consts, names, a<span style="color:#f92672">-&gt;</span>a_lnotab);
+...
+    co <span style="color:#f92672">=</span> PyCode_NewWithPosOnlyArgs(posonlyargcount<span style="color:#f92672">+</span>posorkeywordargcount,
+                                   posonlyargcount, kwonlyargcount, nlocals_int, 
+                                   maxdepth, flags, bytecode, consts, names,
+                                   varnames, freevars, cellvars, c<span style="color:#f92672">-&gt;</span>c_filename,
+                                   c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_name, c<span style="color:#f92672">-&gt;</span>u<span style="color:#f92672">-&gt;</span>u_firstlineno, a<span style="color:#f92672">-&gt;</span>a_lnotab);
+...
+    <span style="color:#66d9ef">return</span> co;
+}</code></pre></div>
+变量名称、常量等都是code对象的属性，此外<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/peephole.c#L230">PyCode_Optimize()</a>方法还对字节码进行了一定程度的优化，这个优化器叫窥孔优化器，被放在一个专门的<code>Python/peephole.c</code>中，它会仔细检查每条指令，并在合适的情况下将部分指令替换为其他指令。例如其中有一项优化叫常量展开，它能把语句<code>a = 1 + 5</code>优化为<code>a = 6</code>。</p>
+<h3 id="字节码">字节码</h3>
+<p>字节码被存储在代码对象(即<code>__code__</code>)的<code>co_code</code>中，以一个函数为例:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">add</span>(x, y):                                                                                          
+<span style="color:#f92672">...</span>     z <span style="color:#f92672">=</span> x <span style="color:#f92672">+</span> y
+<span style="color:#f92672">...</span>     <span style="color:#66d9ef">return</span> z
+
+<span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#e6db74">&#34; &#34;</span><span style="color:#f92672">.</span>join(str(b) <span style="color:#66d9ef">for</span> b <span style="color:#f92672">in</span> add<span style="color:#f92672">.</span>__code__<span style="color:#f92672">.</span>co_code)
+<span style="color:#e6db74">&#39;124 0 124 1 23 0 125 2 124 2 83 0&#39;</span></code></pre></div>
+字节码中每两个数字为一组，第一个为指令，第二个为参数，指令对应的二进制数可以在CPython源码中找到:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Include<span style="color:#f92672">/</span>opcode.h <span style="color:#f92672">--&gt;</span>
+<span style="color:#75715e">#define BINARY_ADD               23
+</span><span style="color:#75715e">#define RETURN_VALUE             83
+</span><span style="color:#75715e">#define LOAD_FAST               124
+</span><span style="color:#75715e">#define STORE_FAST              125</span></code></pre></div>
+这就可以和dis的输出结果对应起来:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> dis<span style="color:#f92672">.</span>dis(add)
+<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">!</span><span style="color:#f92672">--</span> <span style="color:#960050;background-color:#1e0010">源码行</span>    <span style="color:#960050;background-color:#1e0010">偏移量</span> <span style="color:#960050;background-color:#1e0010">指令</span>           <span style="color:#960050;background-color:#1e0010">参数</span>(<span style="color:#960050;background-color:#1e0010">目标对象</span>)  <span style="color:#f92672">--&gt;</span>
+  <span style="color:#ae81ff">2</span>           <span style="color:#ae81ff">0</span> LOAD_FAST                <span style="color:#ae81ff">0</span> (x)
+              <span style="color:#ae81ff">2</span> LOAD_FAST                <span style="color:#ae81ff">1</span> (y)
+              <span style="color:#ae81ff">4</span> BINARY_ADD
+              <span style="color:#ae81ff">6</span> STORE_FAST               <span style="color:#ae81ff">2</span> (z)
+
+  <span style="color:#ae81ff">3</span>           <span style="color:#ae81ff">8</span> LOAD_FAST                <span style="color:#ae81ff">2</span> (z)
+             <span style="color:#ae81ff">10</span> RETURN_VALUE</code></pre></div>
+指令所对应的源码行这个信息其实保存在代码对象的两个相关属性中，<code>co_firstlineno</code>用来存储该段代码起始的行号，<code>co_lnotab</code>由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。每条字节码指令代表的意义可通过官方文档<a href="https://docs.python.org/3/library/dis.html">此处</a>查询到。</p>
+<h2 id="执行">执行</h2>
+<p>执行的入口是在<code>Python/pythonrun.c</code>的<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1094">run_eval_code_obj()</a>函数中，它需要一个code对象，不管是从.pyc文件中来的还是一步步编译来的。然后该函数将globals、locals、PyArena和编译好的PyCodeObject传给<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L716">PyEval_EvalCode()</a>。</p>
+<p>PyEval_EvalCode()是执行一个code对象的公共API，它会在执行栈的顶部构建一个执行frame。一个frame对象的结构像这样:</p>
+<p><img src="./images/PyFrameObject.png" alt="PyFrameObject" /></p>
+<h3 id="构建frame">构建frame</h3>
+<p>构建第一个执行frame需要很多步，都在<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L4045">_PyEval_EvalCodeWithName()</a>方法中。它的3个参数通过PyEval_EvalCode()传入，即:</p>
+<ul>
+<li>_co，PyCodeObject对象</li>
+<li>globals，PyDict对象，存储变量名及它们的值</li>
+<li>locals，PyDict对象，存储变量名及它们的值</li>
+</ul>
+<p>其他参数都是可选的:</p>
+<ul>
+<li>args，PyTuple对象，顺序存储了位置参数</li>
+<li>argcount，位置参数的个数</li>
+<li>kwnames，列表，关键字参数的名称</li>
+<li>kwargs，列表，关键字参数的值</li>
+<li>kwcount，关键字参数的个数</li>
+<li>defs，列表，位置参数的默认值</li>
+<li>defcount，位置参数的默认值的个数</li>
+<li>kwdefs，字典，存储关键字参数的默认值</li>
+<li>closure，闭包，之后合并到code对象的co_freevars字段</li>
+<li>name，创建生成器、协程时使用</li>
+<li>qualname，创建生成器、协程时使用</li>
+</ul>
+<p>其具体的步骤可分为:</p>
+<ol>
+<li>构建线程状态，在执行一个frame之前，首先需要在线程中引用它。CPython可以在一个解释器中随时运行多个线程，这些线程通过链表放在解释器状态中。线程结构称为<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/pystate.h#L23">PyThreadState</a>，在整个ceval.c中有很多地方引用它。</li>
+<li>构建frames</li>
+<li>将关键字参数转换为一个字典。如果函数的定义中包含<code>**kwargs</code>形式的关键字参数，则创建一个新的字典，并将<code>kwargs</code>作为变量名指向该字典</li>
+<li>将位置参数转换为变量。如果函数的定义中包含位置参数，需要将它们设为本地局部变量。</li>
+<li>打包位置参数至<code>*args</code>，如果函数的定义中包含有<code>*args</code>，则创建一个元组，并将<code>args</code>作为局部变量名指向它</li>
+<li>载入关键字参数</li>
+<li>添加缺失的位置参数</li>
+<li>添加缺失的关键字参数</li>
+<li>闭包中的变量名称添加到code对象的自由变量列表中</li>
+<li>创建生成器、协程以及异步生成器</li>
+</ol>
+<p>最终，该函数调用PyEval_EvalFrameEx()去执行这个新创建的frame。</p>
+<h3 id="执行frame">执行frame</h3>
+<p>在之前的编译器和AST小节中，我们知道了code对象包含了一个待执行的二进制编码的字节码，以及变量列表和符号表。局部变量和全局变量都是运行时根据函数、模块或者代码块的调用方式决定的，这些信息通过_PyEval_EvalCodeWithName()添加到frame中。此外，frame还有一些其他用途，例如协程装饰器，它可以动态生成一个frame并把目标作为变量。</p>
+<p>frame在<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L745">_PyEval_EvalFrameDefault()</a>内的3000多行代码的主循环中执行。这个函数是整个CPython的核心，它包含了数十年的变化，即使是一行代码的改变也可能对整个CPython的性能产生重大影响。</p>
+<p>我们可以在Python3.7以上的版本中通过在当前线程启用追踪来跟踪每一步frame的执行，例如如下代码可以打印每一步反汇编的opcode，调用了哪个code对象，执行至第几行，返回值是什么:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> sys
+<span style="color:#f92672">import</span> dis
+<span style="color:#f92672">import</span> traceback
+<span style="color:#f92672">import</span> io
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">trace</span>(frame, event, args):
+   frame<span style="color:#f92672">.</span>f_trace_opcodes <span style="color:#f92672">=</span> True
+   stack <span style="color:#f92672">=</span> traceback<span style="color:#f92672">.</span>extract_stack(frame)
+   pad <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;   &#34;</span><span style="color:#f92672">*</span>len(stack) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;|&#34;</span>
+   <span style="color:#66d9ef">if</span> event <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;opcode&#39;</span>:
+      <span style="color:#66d9ef">with</span> io<span style="color:#f92672">.</span>StringIO() <span style="color:#66d9ef">as</span> out:
+         dis<span style="color:#f92672">.</span>disco(frame<span style="color:#f92672">.</span>f_code, frame<span style="color:#f92672">.</span>f_lasti, file<span style="color:#f92672">=</span>out)
+         lines <span style="color:#f92672">=</span> out<span style="color:#f92672">.</span>getvalue()<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>)
+         [<span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#34;{pad}{l}&#34;</span>) <span style="color:#66d9ef">for</span> l <span style="color:#f92672">in</span> lines]
+   <span style="color:#66d9ef">elif</span> event <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;call&#39;</span>:
+      <span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#34;{pad}Calling {frame.f_code}&#34;</span>)
+   <span style="color:#66d9ef">elif</span> event <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;return&#39;</span>:
+      <span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#34;{pad}Returning {args}&#34;</span>)
+   <span style="color:#66d9ef">elif</span> event <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;line&#39;</span>:
+      <span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#34;{pad}Changing line to {frame.f_lineno}&#34;</span>)
+   <span style="color:#66d9ef">else</span>:
+      <span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#34;{pad}{frame} ({event} - {args})&#34;</span>)
+   <span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#34;{pad}----------------------------------&#34;</span>)
+   <span style="color:#66d9ef">return</span> trace
+sys<span style="color:#f92672">.</span>settrace(trace)
+
+<span style="color:#75715e"># Run some code for a demo</span>
+eval(<span style="color:#e6db74">&#39;&#34;-&#34;.join([letter for letter in &#34;hello&#34;])&#39;</span>)</code></pre></div></p>
+<h3 id="值栈">值栈</h3>
+<p>在核心执行循环逻辑内，一个存储值的栈被创建，它存储了一组指针指向PyObject实例。例如，我们可以压栈:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">PyObject <span style="color:#f92672">*</span>a <span style="color:#f92672">=</span> PyLong_FromLong(<span style="color:#ae81ff">10</span>);
+PyObject <span style="color:#f92672">*</span>b <span style="color:#f92672">=</span> PyLong_FromLong(<span style="color:#ae81ff">20</span>);
+PUSH(a);
+PUSH(b);</code></pre></div>
+运行前后如图:
+<img src="./images/value_stack.png" alt="" />
+有很多字节操作码opcode是直接操作栈的，例如PUSH()、POP()、PEEK()、DUP_TOP()、ROT_TWO()等。所有的opcode都会对栈有一个影响，这被定义在<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L878">stack_effect()</a>方法中。</p>
+<h4 id="举例向list中添加一个元素">举例:向list中添加一个元素</h4>
+<p>在Python中，我们通过append()方法添加元素:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">my_list <span style="color:#f92672">=</span> []
+my_list<span style="color:#f92672">.</span>append(obj)</code></pre></div>
+在CPython中，这个操作对应着两个操作。LOAD_FAST将对象obj从frame的局部变量列表中加载到值栈的顶部，然后LIST_APPEND操作添加这个对象至list中。我们先来看LOAD_FAST:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"> ... 
+    <span style="color:#66d9ef">case</span> TARGET(LOAD_FAST)<span style="color:#f92672">:</span> {
+        <span style="color:#75715e">// 变量的指针都存储在fastlocals区域，它是PyFrame的f_localsplus的拷贝。
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// oparg是fastlocals数组的索引，也就是查找局部变量是不需要根据变量名称来查找的。
+</span><span style="color:#75715e"></span>        PyObject <span style="color:#f92672">*</span>value <span style="color:#f92672">=</span> GETLOCAL(oparg);                 
+        <span style="color:#66d9ef">if</span> (value <span style="color:#f92672">==</span> NULL) {
+            format_exc_check_arg(
+                PyExc_UnboundLocalError,
+                UNBOUNDLOCAL_ERROR_MSG,
+                PyTuple_GetItem(co<span style="color:#f92672">-&gt;</span>co_varnames, oparg));
+            <span style="color:#75715e">// 如果变量不存在，则引发未绑定局部变量的错误
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">goto</span> error;                                    
+        }
+        <span style="color:#75715e">// 增加value(这里就是obj)的引用计数
+</span><span style="color:#75715e"></span>        Py_INCREF(value);  
+        <span style="color:#75715e">// 把obj的指针压入值栈                               
+</span><span style="color:#75715e"></span>        PUSH(value);      
+        <span style="color:#75715e">// 如果启用了trace，则循环再次遍历(带着所有的tracing)；如果没启用，则跳回循环顶部执行下一条指令                                 
+</span><span style="color:#75715e"></span>        FAST_DISPATCH();                                   
+    }
+ ...</code></pre></div>
+接着，LIST_APPEND是通过POP()获取到元素obj的指针，PEEK(oparg)获取到my_list的指针，然后使用CPython列表的C的API即PyList_Append()将元素添加进去的:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"> ...
+        <span style="color:#66d9ef">case</span> TARGET(LIST_APPEND)<span style="color:#f92672">:</span> {
+            PyObject <span style="color:#f92672">*</span>v <span style="color:#f92672">=</span> POP();
+            PyObject <span style="color:#f92672">*</span>list <span style="color:#f92672">=</span> PEEK(oparg);
+            <span style="color:#66d9ef">int</span> err;
+            err <span style="color:#f92672">=</span> PyList_Append(list, v);
+            Py_DECREF(v);
+            <span style="color:#66d9ef">if</span> (err <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>)
+                <span style="color:#66d9ef">goto</span> error;
+            PREDICT(JUMP_ABSOLUTE);
+            DISPATCH();
+        }
+ ...</code></pre></div>
+其后的PREDICT(JUMP_ABSOLUTE)属于一种预测手段，它会猜下一个opcode可能是JUMP_ABSOLUTE，这样CPU就可以直接跳转过去而不需要重新跑一遍主循环了。</p>
+<h4 id="调用追踪">调用追踪</h4>
+<p>有一些指令例如CALL_FUNCTION、CALL_METHOD，它们的参数opcode实际上是另一个已经编译好的函数。那么另一个frame就会压入当前线程的执行栈帧中，主循环会先把这个新的函数运行完以后在运行原函数。每次新的frame创建时，它会有一个f_back属性就是指向当前的frame。</p>
+<p>例如有这样一段python代码:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">function2</span>():
+  <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">RuntimeError</span>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">function1</span>():
+  function2()
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+  function1()</code></pre></div>
+它运行后:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ ./python.exe example_stack.py
+
+Traceback <span style="color:#f92672">(</span>most recent call last<span style="color:#f92672">)</span>:
+  File <span style="color:#e6db74">&#34;example_stack.py&#34;</span>, line 8, in &lt;module&gt;
+    function1<span style="color:#f92672">()</span>
+  File <span style="color:#e6db74">&#34;example_stack.py&#34;</span>, line 5, in function1
+    function2<span style="color:#f92672">()</span>
+  File <span style="color:#e6db74">&#34;example_stack.py&#34;</span>, line 2, in function2
+    raise RuntimeError
+RuntimeError</code></pre></div>
+这些调用追踪信息，实际上可以通过标准库traceback的walk_stack()函数得到:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">walk_stack</span>(f):
+    <span style="color:#e6db74">&#34;&#34;&#34;Walk a stack yielding the frame and line number for each frame.
+</span><span style="color:#e6db74">    This will follow f.f_back from the given frame. If no frame is given, the
+</span><span style="color:#e6db74">    current stack is used. Usually used with StackSummary.extract.
+</span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+    <span style="color:#66d9ef">if</span> f <span style="color:#f92672">is</span> None:
+        f <span style="color:#f92672">=</span> sys<span style="color:#f92672">.</span>_getframe()<span style="color:#f92672">.</span>f_back<span style="color:#f92672">.</span>f_back
+    <span style="color:#66d9ef">while</span> f <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> None:
+        <span style="color:#66d9ef">yield</span> f, f<span style="color:#f92672">.</span>f_lineno
+        f <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>f_back</code></pre></div>
+它先通过Python的API即sys._getframe()得到当前的frame，然后找它的f_back.f_back是为了跳过其本身walk_stack()函数和其父亲print_trace()函数。</p>
+<p>用图形来表达这个调用追踪关系就是:
+<img src="./images/stackframe.png" alt="" /></p>
+<h2 id="cpython中的对象">CPython中的对象</h2>
+<p>在Python里所有的对象继承自<code>object</code>，但在C里，由于C没有面向对象的特性，我们看到的都是对<code>PyObject*</code>的引用，PyObject实际上是一个Python对象内存起始处的数据结构。</p>
+<h3 id="基础对象">基础对象</h3>
+<p>一个Python对象可以认为是由两部分组成的:</p>
+<ol>
+<li>核心数据模型，带有指向其已编译的方法的指针</li>
+<li>包含自定义属性和方法的字典</li>
+</ol>
+<p>核心数据模型是在PyTypeObject中定义的，而它们的方法是在如下位置定义的:</p>
+<table>
+<thead>
+<tr>
+<th>文件名</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Objects/object.c</td>
+<td>内置类型</td>
+</tr>
+<tr>
+<td>Objects/boolobject.c</td>
+<td>bool</td>
+</tr>
+<tr>
+<td>Objects/bytearrayobject.c</td>
+<td>byte[]</td>
+</tr>
+<tr>
+<td>Objects/bytesobjects.c</td>
+<td>bytes</td>
+</tr>
+<tr>
+<td>Objects/classobject.c</td>
+<td>元编程的抽象类</td>
+</tr>
+<tr>
+<td>Objects/complexobject.c</td>
+<td>复数</td>
+</tr>
+<tr>
+<td>Objects/iterobject.c</td>
+<td>迭代器</td>
+</tr>
+<tr>
+<td>Objects/listobject.c</td>
+<td>列表</td>
+</tr>
+<tr>
+<td>Objects/longobject.c</td>
+<td>长整数</td>
+</tr>
+<tr>
+<td>Objects/memoryobject.c</td>
+<td>基础内存类型</td>
+</tr>
+<tr>
+<td>Objects/methodobject.c</td>
+<td>类方法</td>
+</tr>
+<tr>
+<td>Objects/moduleobject.c</td>
+<td>模块</td>
+</tr>
+<tr>
+<td>Objects/namespaceobject.c</td>
+<td>名字空间</td>
+</tr>
+<tr>
+<td>Objects/odictobject.c</td>
+<td>有序字典</td>
+</tr>
+<tr>
+<td>Objects/rangeobject.c</td>
+<td>range生成器</td>
+</tr>
+<tr>
+<td>Objects/setobject.c</td>
+<td>set</td>
+</tr>
+<tr>
+<td>Objects/sliceobject.c</td>
+<td>切片</td>
+</tr>
+<tr>
+<td>Objects/structseq.c</td>
+<td>struct.Struct二进制</td>
+</tr>
+<tr>
+<td>Objects/tupleobject.c</td>
+<td>元组</td>
+</tr>
+<tr>
+<td>Objects/typeobject.c</td>
+<td>type类</td>
+</tr>
+<tr>
+<td>Objects/unicodeobject.c</td>
+<td>str</td>
+</tr>
+<tr>
+<td>Objects/weakrefobject.c</td>
+<td>弱引用</td>
+</tr>
+</tbody>
+</table>
+<h3 id="布尔和整数">布尔和整数</h3>
+<p>布尔类是内置类型中最直接的实现，它继承自long，并在解释器中创建了常量Py_True和Py_False。在Objects/boolobject.c中我们可以看到帮助函数通过数字来创建布尔类型的实例:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">PyObject <span style="color:#f92672">*</span><span style="color:#a6e22e">PyBool_FromLong</span>(<span style="color:#66d9ef">long</span> ok)
+{
+    PyObject <span style="color:#f92672">*</span>result;
+    <span style="color:#66d9ef">if</span> (ok)
+        result <span style="color:#f92672">=</span> Py_True;
+    <span style="color:#66d9ef">else</span>
+        result <span style="color:#f92672">=</span> Py_False;
+    Py_INCREF(result);
+    <span style="color:#66d9ef">return</span> result;
+}</code></pre></div>
+此外，也实现了一些and、xor、or之类的帮助函数，但加法、减法、除法是没有从继承的long中实现的。</p>
+<p>检测<code>a and b</code>的结果是先检测a和b是否为布尔值，然后检查它们是否有对Py_True的引用，都不是的话则把它们强制转化为数字进行数字之间的and操作:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> PyObject <span style="color:#f92672">*</span><span style="color:#a6e22e">bool_and</span>(PyObject <span style="color:#f92672">*</span>a, PyObject <span style="color:#f92672">*</span>b)
+{
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>PyBool_Check(a) <span style="color:#f92672">||</span> <span style="color:#f92672">!</span>PyBool_Check(b))
+        <span style="color:#66d9ef">return</span> PyLong_Type.tp_as_number<span style="color:#f92672">-&gt;</span>nb_and(a, b);
+    <span style="color:#66d9ef">return</span> PyBool_FromLong((a <span style="color:#f92672">==</span> Py_True) <span style="color:#f92672">&amp;</span> (b <span style="color:#f92672">==</span> Py_True));
+}</code></pre></div></p>
+<p>long类型会复杂一些，因为它需要更大的内存。Python3已经舍弃掉了Python2中对int类型的支持，而是都使用long类型，而long又非常特殊，因为它可以存储的是一个变长整数。它的结构由一个PyObject的头部和一个数字的列表组成，数字列表一开始设置为只有1个数字，但初始化之后会调用 <a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/longobject.c#L262">_PyLong_New()</a>方法重新分配内存，并调整为一个更大的长度:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">struct</span> _longobject {
+    PyObject_VAR_HEAD
+    digit ob_digit[<span style="color:#ae81ff">1</span>];
+};</code></pre></div></p>
+<p>要将C语言的long类型转换为Python中的long类型，需要先将C中的long转换为一个数字列表，分配Python中long需要的内存，然后去设置每个数字:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">PyObject <span style="color:#f92672">*</span>
+<span style="color:#a6e22e">PyLong_FromLong</span>(<span style="color:#66d9ef">long</span> ival)
+{
+    PyLongObject <span style="color:#f92672">*</span>v;
+    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> abs_ival;
+    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> t;  <span style="color:#75715e">/* unsigned so &gt;&gt; doesn&#39;t propagate sign bit */</span>
+    <span style="color:#66d9ef">int</span> ndigits <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">int</span> sign;
+    CHECK_SMALL_INT(ival);
+...
+    <span style="color:#75715e">/* 对于一个位的整数可以快速处理不需分配内存 */</span>
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>(abs_ival <span style="color:#f92672">&gt;&gt;</span> PyLong_SHIFT)) {
+        v <span style="color:#f92672">=</span> _PyLong_New(<span style="color:#ae81ff">1</span>);
+        <span style="color:#66d9ef">if</span> (v) {
+            Py_SIZE(v) <span style="color:#f92672">=</span> sign;
+            v<span style="color:#f92672">-&gt;</span>ob_digit[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> Py_SAFE_DOWNCAST(
+                abs_ival, <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span>, digit);
+        }
+        <span style="color:#66d9ef">return</span> (PyObject<span style="color:#f92672">*</span>)v;
+    }
+...
+    <span style="color:#75715e">/* 对于大一些的数，先循环确定有多少位 */</span>
+    t <span style="color:#f92672">=</span> abs_ival;
+    <span style="color:#66d9ef">while</span> (t) {
+        <span style="color:#f92672">++</span>ndigits;
+        t <span style="color:#f92672">&gt;&gt;=</span> PyLong_SHIFT;
+    }
+    v <span style="color:#f92672">=</span> _PyLong_New(ndigits);
+    <span style="color:#66d9ef">if</span> (v <span style="color:#f92672">!=</span> NULL) {
+        digit <span style="color:#f92672">*</span>p <span style="color:#f92672">=</span> v<span style="color:#f92672">-&gt;</span>ob_digit;
+        Py_SIZE(v) <span style="color:#f92672">=</span> ndigits<span style="color:#f92672">*</span>sign;
+        t <span style="color:#f92672">=</span> abs_ival;
+        <span style="color:#66d9ef">while</span> (t) {
+            <span style="color:#f92672">*</span>p<span style="color:#f92672">++</span> <span style="color:#f92672">=</span> Py_SAFE_DOWNCAST(
+                t <span style="color:#f92672">&amp;</span> PyLong_MASK, <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span>, digit);
+            t <span style="color:#f92672">&gt;&gt;=</span> PyLong_SHIFT;
+        }
+    }
+    <span style="color:#66d9ef">return</span> (PyObject <span style="color:#f92672">*</span>)v;
+}</code></pre></div>
+此外，将双精度浮点数转换为Python中的long以及Unicode进行转换都在<code>longobject.c</code>中有相应的方法。</p>
+<h3 id="生成器类型">生成器类型</h3>
+<p>Python中的生成器是指使用yield，通过连续的调用以生成更多的值。通常用于较大的数据块中来起到节约内存、提升效率的作用。如:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">example</span>():
+<span style="color:#f92672">...</span>   lst <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">4</span>]
+<span style="color:#f92672">...</span>   <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> lst:
+<span style="color:#f92672">...</span>     <span style="color:#66d9ef">yield</span> i
+<span style="color:#f92672">&gt;&gt;&gt;</span> gen <span style="color:#f92672">=</span> example()
+<span style="color:#f92672">&gt;&gt;&gt;</span> gen
+<span style="color:#f92672">&lt;</span>generator object example at <span style="color:#ae81ff">0x100bcc480</span><span style="color:#f92672">&gt;</span></code></pre></div>
+我们深入探索生成器对象，发现它有一些gi_开头的属性:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> dir(gen)
+[ <span style="color:#f92672">...</span>
+ <span style="color:#e6db74">&#39;close&#39;</span>, 
+ <span style="color:#e6db74">&#39;gi_code&#39;</span>, 
+ <span style="color:#e6db74">&#39;gi_frame&#39;</span>, 
+ <span style="color:#e6db74">&#39;gi_running&#39;</span>, 
+ <span style="color:#e6db74">&#39;gi_yieldfrom&#39;</span>, 
+ <span style="color:#e6db74">&#39;send&#39;</span>, 
+ <span style="color:#e6db74">&#39;throw&#39;</span>]</code></pre></div>
+在CPython中，生成器类型有三种，定义在<code>Include/genobject.h</code>的PyGenObject类型中，即Generator objects、Coroutine objects和Async generator objects。它们共享一些字段并且也有相似的行为逻辑:
+<img src="./images/generators.png" alt="" />
+我们以PyGenObject为例看看这些字段的用途:</p>
+<ul>
+<li>gi_frame，链接至一个PyFrameObject对象，这是生成器如何记住上次执行的本地变量的关键</li>
+<li>gi_running，设置为0或1来判断当前生成器是否在执行</li>
+<li>gi_code，链接至一个PyCodeObject对象，它持有编译好的方法便于之后再次调用</li>
+<li>gi_weakreflist，链接至生成器函数内部的弱引用列表</li>
+<li>gi_name，生成器的名称</li>
+<li>gi_qualname，生成器的限定名称</li>
+<li>gi_exc_state，是一个存储异常的元组，存储生成器调用过程中的异常</li>
+</ul>
+<p>当我们每次在Python中调用生成器的__next__方法时，其背后的gi_code字段会在一个新的frame中执行，并将返回值push到值栈中。它本质上调用的是<a href="https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/genobject.c#L153">gen_send_ex()</a>方法，这个方法将生成器对象转换为下一个产生结果的函数，它和之前通过代码对象构造frame有很多类似之处:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> PyObject <span style="color:#f92672">*</span>
+<span style="color:#a6e22e">gen_send_ex</span>(PyGenObject <span style="color:#f92672">*</span>gen, PyObject <span style="color:#f92672">*</span>arg, <span style="color:#66d9ef">int</span> exc, <span style="color:#66d9ef">int</span> closing)
+{
+    <span style="color:#75715e">// 拿到当前执行线程
+</span><span style="color:#75715e"></span>    PyThreadState <span style="color:#f92672">*</span>tstate <span style="color:#f92672">=</span> _PyThreadState_GET();       
+    PyFrameObject <span style="color:#f92672">*</span>f <span style="color:#f92672">=</span> gen<span style="color:#f92672">-&gt;</span>gi_frame;                   
+    PyObject <span style="color:#f92672">*</span>result;
+    <span style="color:#75715e">// 如果生成器正在执行过程中再次调用生成器会报错
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (gen<span style="color:#f92672">-&gt;</span>gi_running) {     
+        <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;generator already executing&#34;</span>;
+        <span style="color:#66d9ef">if</span> (PyCoro_CheckExact(gen)) {
+            msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;coroutine already executing&#34;</span>;
+        }
+        <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (PyAsyncGen_CheckExact(gen)) {
+            msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;async generator already executing&#34;</span>;
+        }
+        PyErr_SetString(PyExc_ValueError, msg);
+        <span style="color:#66d9ef">return</span> NULL;
+    }
+    <span style="color:#75715e">// 生成器迭代完的情况，对不同的生成器做不同的处理
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (f <span style="color:#f92672">==</span> NULL <span style="color:#f92672">||</span> f<span style="color:#f92672">-&gt;</span>f_stacktop <span style="color:#f92672">==</span> NULL) { 
+        <span style="color:#66d9ef">if</span> (PyCoro_CheckExact(gen) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span>closing) {
+            PyErr_SetString(
+                PyExc_RuntimeError,
+                <span style="color:#e6db74">&#34;cannot reuse already awaited coroutine&#34;</span>); <span style="color:#75715e">// 4a.
+</span><span style="color:#75715e"></span>        }
+        <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (arg <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span>exc) {
+            <span style="color:#66d9ef">if</span> (PyAsyncGen_CheckExact(gen)) {
+                PyErr_SetNone(PyExc_StopAsyncIteration); <span style="color:#75715e">// 4b.
+</span><span style="color:#75715e"></span>            }
+            <span style="color:#66d9ef">else</span> {
+                PyErr_SetNone(PyExc_StopIteration);      <span style="color:#75715e">// 4c.
+</span><span style="color:#75715e"></span>            }
+        }
+        <span style="color:#66d9ef">return</span> NULL;
+    }
+    <span style="color:#75715e">// 检查帧的最后一条指令如果是-1
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (f<span style="color:#f92672">-&gt;</span>f_lasti <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+        <span style="color:#75715e">// 此时不能把非None的值作为参数传入
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (arg <span style="color:#f92672">&amp;&amp;</span> arg <span style="color:#f92672">!=</span> Py_None) { 
+            <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;can&#39;t send non-None value to a &#34;</span>
+                              <span style="color:#e6db74">&#34;just-started generator&#34;</span>;
+            <span style="color:#66d9ef">if</span> (PyCoro_CheckExact(gen)) {
+                msg <span style="color:#f92672">=</span> NON_INIT_CORO_MSG;
+            }
+            <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (PyAsyncGen_CheckExact(gen)) {
+                msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;can&#39;t send non-None value to a &#34;</span>
+                      <span style="color:#e6db74">&#34;just-started async generator&#34;</span>;
+            }
+            PyErr_SetString(PyExc_TypeError, msg);
+            <span style="color:#66d9ef">return</span> NULL;
+        }
+    } <span style="color:#66d9ef">else</span> { 
+        <span style="color:#75715e">// 这是第一次被调用，允许使用参数，参数的值被push到值栈中
+</span><span style="color:#75715e"></span>        result <span style="color:#f92672">=</span> arg <span style="color:#f92672">?</span> arg : Py_None;
+        Py_INCREF(result);
+        <span style="color:#f92672">*</span>(f<span style="color:#f92672">-&gt;</span>f_stacktop<span style="color:#f92672">++</span>) <span style="color:#f92672">=</span> result;
+    }
+    Py_XINCREF(tstate<span style="color:#f92672">-&gt;</span>frame);
+    assert(f<span style="color:#f92672">-&gt;</span>f_back <span style="color:#f92672">==</span> NULL);
+    <span style="color:#75715e">// f_back是用于发送返回值的调用方，在这里把它设置为线程中的当前帧，也就是返回值被发送给调用者而不是生成器的创建者
+</span><span style="color:#75715e"></span>    f<span style="color:#f92672">-&gt;</span>f_back <span style="color:#f92672">=</span> tstate<span style="color:#f92672">-&gt;</span>frame;                          
+    <span style="color:#75715e">// 把生成器标记为正在运行
+</span><span style="color:#75715e"></span>    gen<span style="color:#f92672">-&gt;</span>gi_running <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;            
+    <span style="color:#75715e">// 生成器的异常信息中的最后一个异常，从线程状态中的最后一个异常复制                    
+</span><span style="color:#75715e"></span>    gen<span style="color:#f92672">-&gt;</span>gi_exc_state.previous_item <span style="color:#f92672">=</span> tstate<span style="color:#f92672">-&gt;</span>exc_info; 
+    <span style="color:#75715e">// 线程状态的异常信息设为生成器异常信息的地址，便于调用者在生成器执行过程中的debug
+</span><span style="color:#75715e"></span>    tstate<span style="color:#f92672">-&gt;</span>exc_info <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>gen<span style="color:#f92672">-&gt;</span>gi_exc_state; 
+    <span style="color:#75715e">// 生成器内部的那个frame放到CPython的主循环中去执行             
+</span><span style="color:#75715e"></span>    result <span style="color:#f92672">=</span> PyEval_EvalFrameEx(f, exc); 
+    <span style="color:#75715e">// 把线程状态的最后一个异常重置为调用frame之前的值               
+</span><span style="color:#75715e"></span>    tstate<span style="color:#f92672">-&gt;</span>exc_info <span style="color:#f92672">=</span> gen<span style="color:#f92672">-&gt;</span>gi_exc_state.previous_item; 
+    gen<span style="color:#f92672">-&gt;</span>gi_exc_state.previous_item <span style="color:#f92672">=</span> NULL;    
+    <span style="color:#75715e">// 把生成器标记为不在运行         
+</span><span style="color:#75715e"></span>    gen<span style="color:#f92672">-&gt;</span>gi_running <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;                                
+    assert(f<span style="color:#f92672">-&gt;</span>f_back <span style="color:#f92672">==</span> tstate<span style="color:#f92672">-&gt;</span>frame);
+    Py_CLEAR(f<span style="color:#f92672">-&gt;</span>f_back);
+    <span style="color:#75715e">//  没有返回值时，对于生成器应该引发StopIteration，异步生成器应该引发StopAsyncIteration
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (result <span style="color:#f92672">&amp;&amp;</span> f<span style="color:#f92672">-&gt;</span>f_stacktop <span style="color:#f92672">==</span> NULL) {  
+        <span style="color:#66d9ef">if</span> (result <span style="color:#f92672">==</span> Py_None) {
+            <span style="color:#66d9ef">if</span> (PyAsyncGen_CheckExact(gen)) {
+                PyErr_SetNone(PyExc_StopAsyncIteration);
+            }
+            <span style="color:#66d9ef">else</span> {
+                PyErr_SetNone(PyExc_StopIteration);
+            }
+        }
+        <span style="color:#66d9ef">else</span> {
+            <span style="color:#75715e">/* Async generators cannot return anything but None */</span>
+            assert(<span style="color:#f92672">!</span>PyAsyncGen_CheckExact(gen));
+            _PyGen_SetStopIterationValue(result);
+        }
+        Py_CLEAR(result);
+    }
+    <span style="color:#75715e">// 如果这是一个协程或异步生成器但引发了StopIteration，则是不允许的，引发RuntimeError
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>result <span style="color:#f92672">&amp;&amp;</span> PyErr_ExceptionMatches(PyExc_StopIteration)) { 
+        <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;generator raised StopIteration&#34;</span>;
+        <span style="color:#66d9ef">if</span> (PyCoro_CheckExact(gen)) {
+            msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;coroutine raised StopIteration&#34;</span>;
+        }
+        <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> PyAsyncGen_CheckExact(gen) {
+            msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;async generator raised StopIteration&#34;</span>;
+        }
+        _PyErr_FormatFromCause(PyExc_RuntimeError, <span style="color:#e6db74">&#34;%s&#34;</span>, msg);
+    }
+    <span style="color:#75715e">// 如果这是一个异步生成器但引发了StopAsyncIteration，则也是不允许的，引发RuntimeError
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>result <span style="color:#f92672">&amp;&amp;</span> PyAsyncGen_CheckExact(gen) <span style="color:#f92672">&amp;&amp;</span>
+             PyErr_ExceptionMatches(PyExc_StopAsyncIteration))  
+    {
+        <span style="color:#75715e">/* code in `gen` raised a StopAsyncIteration error:
+</span><span style="color:#75715e">           raise a RuntimeError.
+</span><span style="color:#75715e">        */</span>
+        <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;async generator raised StopAsyncIteration&#34;</span>;
+        _PyErr_FormatFromCause(PyExc_RuntimeError, <span style="color:#e6db74">&#34;%s&#34;</span>, msg);
+    }
+...
+    <span style="color:#75715e">// 最终，结果返回给调用__next__()方法者
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> result; 
+}</code></pre></div></p>
+<p>综上，生成器是一种强大的语法，通过yield关键字触发整个流程，创建唯一对象，将已编译的代码对象复制为其属性，设置frame并为其存储局部变量列表。这一切对用户看起来很神奇，但其底层并不复杂。</p>
+<h2 id="标准库">标准库</h2>
+<p>Python被称为&quot;内置电池&quot;的语言，主要在于其强大的标准库涵盖了各个方面。在CPython中，主要包含两类标准库模块，即用纯Python编写的实用程序，以及使用C写的、Python只是做了一层包装的程序。</p>
+<p>使用纯Python写的模块都放在Lib目录下，当我们安装一个Python的发行版时，标准库模块会从Lib文件夹复制到发行版的文件夹中。这些模块往往没有什么特别的，有的甚至只有几十行，只是为了开发者的方便而设计。</p>
+<p>其余的模块要么是用C写的，要么是用Python和C结合起来写的。它们Python的部分仍然在Lib目录下，而C的部分在Modules目录下。但是有两个例外，其一是sys模块在Python/sysmodule.c中，还有是__builtins__模块在Python/bltinmodule.c中。</p>
+<p>我们能在Python中直接使用的print()、chr()、format()等方法就是在bltinmodule.c中，因为解释器实例化的时候就通过import * from __builtins__导入了这些方法。sys模块也是因为专用于解释器和CPython内部的，才放在那个位置。</p>
+<p>当我们输入<code>print(&quot;hello&quot;)</code>时，在CPython中发生了如下步骤:</p>
+<ol>
+<li>参数hello是一个字符串常量被编译器转换为PyUnicodeObject</li>
+<li>内置的builtin_print()使用该参数执行，此例中kwnames为NULL</li>
+<li>变量file被设为PyId_stdout，系统的stdout处理器</li>
+<li>把每一个参数发送给file</li>
+<li>把<code>\n</code>发送给file</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> PyObject <span style="color:#f92672">*</span>
+<span style="color:#a6e22e">builtin_print</span>(PyObject <span style="color:#f92672">*</span>self, PyObject <span style="color:#f92672">*</span><span style="color:#66d9ef">const</span> <span style="color:#f92672">*</span>args, Py_ssize_t nargs, PyObject <span style="color:#f92672">*</span>kwnames)
+{
+    ...
+    <span style="color:#66d9ef">if</span> (file <span style="color:#f92672">==</span> NULL <span style="color:#f92672">||</span> file <span style="color:#f92672">==</span> Py_None) {
+        file <span style="color:#f92672">=</span> _PySys_GetObjectId(<span style="color:#f92672">&amp;</span>PyId_stdout);
+        ...
+    }
+    ...
+    <span style="color:#66d9ef">for</span> (i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> nargs; i<span style="color:#f92672">++</span>) {
+        <span style="color:#66d9ef">if</span> (i <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+            <span style="color:#66d9ef">if</span> (sep <span style="color:#f92672">==</span> NULL)
+                err <span style="color:#f92672">=</span> PyFile_WriteString(<span style="color:#e6db74">&#34; &#34;</span>, file);
+            <span style="color:#66d9ef">else</span>
+                err <span style="color:#f92672">=</span> PyFile_WriteObject(sep, file,
+                                         Py_PRINT_RAW);
+            <span style="color:#66d9ef">if</span> (err)
+                <span style="color:#66d9ef">return</span> NULL;
+        }
+        err <span style="color:#f92672">=</span> PyFile_WriteObject(args[i], file, Py_PRINT_RAW);
+        <span style="color:#66d9ef">if</span> (err)
+            <span style="color:#66d9ef">return</span> NULL;
+    }
+    <span style="color:#66d9ef">if</span> (end <span style="color:#f92672">==</span> NULL)
+        err <span style="color:#f92672">=</span> PyFile_WriteString(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, file);
+    <span style="color:#66d9ef">else</span>
+        err <span style="color:#f92672">=</span> PyFile_WriteObject(end, file, Py_PRINT_RAW);
+    ...
+    Py_RETURN_NONE;
+}</code></pre></div>
+<p>用C来编写某些标准库是因为需要使用一些操作系统的功能，而不同的操作系统的接口可能是不一样的，CPython需要把它们抽象为统一的API接口供用户使用:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#ifdef HAVE_SYS_TIMES_H
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/times.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#endif
+</span><span style="color:#75715e"></span>...
+<span style="color:#75715e">#ifdef MS_WINDOWS
+</span><span style="color:#75715e">#define WIN32_LEAN_AND_MEAN
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;windows.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;pythread.h&#34;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#endif </span><span style="color:#75715e">/* MS_WINDOWS */</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>...</code></pre></div></p>
+<h2 id="gil">GIL</h2>
+<p>全局解释器锁机制使得解释器在同一时刻仅有一个线程可以被调度执行，某个线程若想要执行，就先要拿到GIL，但在每个Python进程中，只有一个GIL。它的存在使得解释器本身的实现更简单一些，更容易实现对象的安全访问，便于进行内存管理和编写扩展。但在多核环境下无法实现并行，对于以多线程为基础的并发应用就是一个灾难。</p>
+<p>对于IO密集型任务，线程是在发生阻塞时主动释放GIL的，让其他线程得以执行。而对于CPU密集型任务，采取超时策略。</p>
+<p>当GIL被其他线程占用时，等待线程会阻塞一段时间。如果超时（默认为0.005秒）后，依然无法获取锁，则发出请求。这种请求设计的很轻巧，就是一个全局条件变量设置。正在执行的线程在解释循环内会检查该标记，然后释放锁，切换线程执行，其自身进入等待状态。属于典型的协作机制。相关源码:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#f92672">&lt;!--</span> cpython<span style="color:#f92672">/</span>Python<span style="color:#f92672">/</span>ceval.c <span style="color:#f92672">--&gt;</span>
+main_loop:
+    <span style="color:#66d9ef">for</span> (;;) {
+        <span style="color:#66d9ef">if</span> (_Py_atomic_load_relaxed(eval_breaker)) {
+            opcode <span style="color:#f92672">=</span> _Py_OPCODE(<span style="color:#f92672">*</span>next_instr);
+            <span style="color:#66d9ef">if</span> (_Py_atomic_load_relaxed(<span style="color:#f92672">&amp;</span>ceval<span style="color:#f92672">-&gt;</span>gil_drop_request)) {
+                <span style="color:#75715e">/* Give another thread a chance */</span>
+                drop_gil(ceval, tstate);
+                <span style="color:#75715e">/* Other threads may run now */</span>
+                take_gil(ceval, tstate);
+                <span style="color:#75715e">/* Check if we should make a quick exit. */</span>
+                exit_thread_if_finalizing(tstate);
+                <span style="color:#66d9ef">if</span> (_PyThreadState_Swap(<span style="color:#f92672">&amp;</span>runtime<span style="color:#f92672">-&gt;</span>gilstate, tstate) <span style="color:#f92672">!=</span> NULL) {
+                    Py_FatalError(<span style="color:#e6db74">&#34;ceval: orphan tstate&#34;</span>);
+                }
+            }
+        }
+        <span style="color:#66d9ef">switch</span> (opcode) {
+          <span style="color:#66d9ef">case</span> TARGET(NOP)<span style="color:#f92672">:</span>
+          <span style="color:#66d9ef">case</span> TARGET(LOAD_FAST)<span style="color:#f92672">:</span>
+          ...
+        }
+    }</code></pre></div>
+CPython使用系统线程，且没有实现线程调度。所以，具体哪个等待线程被切换执行，由操作系统决定。甚至，发出请求和被切换执行的未必就是同一个线程。</p>
+<p>对于CPU密集型任务，除了使用多进程架构绕开，也可以使用C来编写多线程的扩展也能绕开GIL限制。</p>
 </article>
  
       
@@ -934,9 +1468,9 @@ Out[<span style="color:#ae81ff">2</span>]: <span style="color:#e6db74">b</span><
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/6a8e6f321bed04644121d045a8035261ef90e03e" title='最后修改者 hjlarry | July 7, 2020' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/a9a604fb29c677ce04a08228da6fc8efe89bf44e" title='最后修改者 hjlarry | September 7, 2020' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>July 7, 2020</span>
+      <span>September 7, 2020</span>
     </a>
   </div>
 
@@ -971,20 +1505,42 @@ Out[<span style="color:#ae81ff">2</span>]: <span style="color:#e6db74">b</span><
       
   <nav id="TableOfContents">
   <ul>
-    <li><a href="#字节码">字节码</a></li>
-    <li><a href="#gil">GIL</a></li>
-    <li><a href="#执行过程">执行过程</a>
+    <li><a href="#编码规范">编码规范</a></li>
+    <li><a href="#执行方式">执行方式</a>
       <ul>
-        <li><a href="#编码规范">编码规范</a></li>
-        <li><a href="#执行方式">执行方式</a></li>
-        <li><a href="#建立运行时环境">建立运行时环境</a></li>
-        <li><a href="#通过输入运行">通过输入运行</a></li>
-        <li><a href="#语义解析">语义解析</a></li>
-        <li><a href="#ast">AST</a></li>
-        <li><a href="#编译">编译</a></li>
-        <li><a href="#终止">终止</a></li>
+        <li><a href="#程序入口">程序入口</a></li>
+        <li><a href="#运行时环境">运行时环境</a></li>
+        <li><a href="#-c的方式">-c的方式</a></li>
+        <li><a href="#-m的方式">-m的方式</a></li>
+        <li><a href="#file的方式">file的方式</a></li>
       </ul>
     </li>
+    <li><a href="#编译">编译</a>
+      <ul>
+        <li><a href="#语义解析">语义解析</a></li>
+        <li><a href="#ast">AST</a></li>
+        <li><a href="#编译过程">编译过程</a></li>
+        <li><a href="#汇编器">汇编器</a></li>
+        <li><a href="#创建代码对象">创建代码对象</a></li>
+        <li><a href="#字节码">字节码</a></li>
+      </ul>
+    </li>
+    <li><a href="#执行">执行</a>
+      <ul>
+        <li><a href="#构建frame">构建frame</a></li>
+        <li><a href="#执行frame">执行frame</a></li>
+        <li><a href="#值栈">值栈</a></li>
+      </ul>
+    </li>
+    <li><a href="#cpython中的对象">CPython中的对象</a>
+      <ul>
+        <li><a href="#基础对象">基础对象</a></li>
+        <li><a href="#布尔和整数">布尔和整数</a></li>
+        <li><a href="#生成器类型">生成器类型</a></li>
+      </ul>
+    </li>
+    <li><a href="#标准库">标准库</a></li>
+    <li><a href="#gil">GIL</a></li>
   </ul>
 </nav>
 
