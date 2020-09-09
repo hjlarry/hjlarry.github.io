@@ -410,6 +410,22 @@ _start.hello () at fr.s:14
 2: $eflags = [ PF ZF IF ]
 {{< /highlight >}}
 
+编译过程
+-------
+当我们使用C语言编写了一个输出hello world的小程序，只需要`gcc hello.c`就会得到一个目标文件`a.out`，然后直接打开就可以输出。但是它的背后却没有这么简单:
+
+![](./images/gcc.png)
+
+这个过程大体上分为预处理(Prepressing)、编译(Compilation)、汇编(Assembly)和链接(Linking)。
+
+### 预处理
+
+### 编译
+
+### 汇编
+
+### 链接
+
 
 可执行文件
 -------
