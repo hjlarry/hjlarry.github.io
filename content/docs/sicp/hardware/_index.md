@@ -1,5 +1,5 @@
 ---
-title: "硬件部分"
+title: "硬件"
 draft: false
 ---
 

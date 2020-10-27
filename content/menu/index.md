@@ -6,6 +6,7 @@ bookMenuLevels: 1
 - **计算机基础**
   - [硬件]({{< relref "/docs/sicp/hardware" >}})
   - [软件]({{< relref "/docs/sicp/software" >}})
+  - [程序]({{< relref "/docs/sicp/program" >}})
   - [汇编]({{< relref "/docs/sicp/asm" >}})
 - **GO语言**
   - [字典]({{< relref "/docs/go/map" >}})
