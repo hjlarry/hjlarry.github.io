@@ -14,15 +14,15 @@
 宏内核也叫单一内核，把核心和基础服务放在一个地址空间内均以特权模式运行，好处就是调用一些基础服务的时候相当于函数调用，不需要通讯，性能很高。缺点就是复杂度和耦合度很高，虽然代码是模块化的，但其中某个模块崩溃都可能导致整个系统崩溃，也不方便裁剪和移植。
 现代的操作系统往往是采用混合内核的，并不是泾渭分明的。
 系统调用 系统调用是内核对外的接口，内核态的一些内核函数。应用程序只要和硬件打交道都会涉及到系统调用，向操作系统申请并等待回复，应该尽量避免系统调用或考虑其他方式优化，比如有些场景可以使用在用户空间的带buffer的文件替代操作系统提供的文件读写API。
-典型的系统调用汇编代码: global _start section .data hello : db `hello, world!\n` section .text _start: mov rax, 1 ; system call number should be store in rax  mov rdi, 1 ; argument #1 in rdi: where to write (descriptor)?"><meta property="og:title" content="软件部分" />
+典型的系统调用汇编代码: global _start section .data hello : db `hello, world!\n` section .text _start: mov rax, 1 ; system call number should be store in rax  mov rdi, 1 ; argument #1 in rdi: where to write (descriptor)?"><meta property="og:title" content="软件" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/docs/sicp/software/" />
 
-<title>软件部分 | Home</title>
+<title>软件 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.e75be23672b7e627ade0fc6f8d82d0dcfae4c090e2980f2e7781cf2728c72998.js" integrity="sha256-51viNnK35iet4PxvjYLQ3PrkwJDimA8ud4HPJyjHKZg="></script>
+<script defer src="/cn.search.min.c2c5daf4fd3969c56b6ba45ab64838924672f19908889a323478c5f3a757f746.js" integrity="sha256-wsXa9P05acVra6Ratkg4kkZy8ZkIiJoyNHjF86dX90Y="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/sicp/software/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -65,6 +65,7 @@ https://github.com/alex-shpak/hugo-book
 <ul>
 <li><a href="/docs/sicp/hardware/">硬件</a></li>
 <li><a href="/docs/sicp/software/"class=active>软件</a></li>
+<li><a href="/docs/sicp/program/">程序</a></li>
 <li><a href="/docs/sicp/asm/">汇编</a></li>
 </ul>
 </li>
@@ -133,7 +134,7 @@ https://github.com/alex-shpak/hugo-book
     <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
 
-  <strong>软件部分</strong>
+  <strong>软件</strong>
 
   <label for="toc-control">
     <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
@@ -151,23 +152,25 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#内核">内核</a></li>
     <li><a href="#系统调用">系统调用</a></li>
     <li><a href="#文件系统">文件系统</a></li>
-    <li><a href="#进程">进程</a>
+    <li><a href="#进程和线程">进程和线程</a>
       <ul>
-        <li><a href="#基础概念">基础概念</a></li>
-        <li><a href="#状态">状态</a></li>
-        <li><a href="#调度">调度</a></li>
+        <li><a href="#程序与进程">程序与进程</a></li>
+        <li><a href="#什么是线程">什么是线程</a></li>
+        <li><a href="#线程调度">线程调度</a></li>
+        <li><a href="#linux的多线程">Linux的多线程</a></li>
+        <li><a href="#线程模型">线程模型</a></li>
       </ul>
     </li>
-    <li><a href="#线程">线程</a></li>
     <li><a href="#并发与并行">并发与并行</a>
       <ul>
-        <li><a href="#基础概念-1">基础概念</a></li>
+        <li><a href="#基础概念">基础概念</a></li>
         <li><a href="#并发模型">并发模型</a></li>
       </ul>
     </li>
     <li><a href="#虚拟存储器">虚拟存储器</a>
       <ul>
-        <li><a href="#基础概念-2">基础概念</a></li>
+        <li><a href="#基础概念-1">基础概念</a></li>
+        <li><a href="#分段与分页">分段与分页</a></li>
         <li><a href="#内存分配过程">内存分配过程</a></li>
         <li><a href="#换入换出">换入换出</a></li>
         <li><a href="#性能相关">性能相关</a></li>
@@ -177,20 +180,6 @@ https://github.com/alex-shpak/hugo-book
       <ul>
         <li><a href="#通用寄存器">通用寄存器</a></li>
         <li><a href="#标志寄存器">标志寄存器</a></li>
-      </ul>
-    </li>
-    <li><a href="#可执行文件">可执行文件</a>
-      <ul>
-        <li><a href="#head">Head</a></li>
-        <li><a href="#section">Section</a></li>
-        <li><a href="#segment">Segment</a></li>
-      </ul>
-    </li>
-    <li><a href="#函数调用">函数调用</a>
-      <ul>
-        <li><a href="#调用堆栈">调用堆栈</a></li>
-        <li><a href="#调用约定">调用约定</a></li>
-        <li><a href="#栈和堆">栈和堆</a></li>
       </ul>
     </li>
   </ul>
@@ -275,8 +264,8 @@ C语言、Go语言通过标准库进行系统调用，他们的标准库中的�
 <li>/tmp，临时文件，重启系统后里面的文件都会被删除</li>
 </ul>
 <p>更多的目录结构及用途见<a href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">wiki</a>。</p>
-<h2 id="进程">进程</h2>
-<h3 id="基础概念">基础概念</h3>
+<h2 id="进程和线程">进程和线程</h2>
+<h3 id="程序与进程">程序与进程</h3>
 <p>程序和进程有什么区别？</p>
 <p>某个程序里包含了某个进程所需要的数据，但在某个时间点，进程中的内容未必和程序中的内容是一一对应的。我们开发一个程序，不仅包括可执行的代码，还有周边的素材等等，程序运行的时候，也未必会把全部内容都载入到内存。而<strong>进程</strong>指的是程序运行时，在内存当中受操作系统管理的部分。<strong>程序</strong>就像是蓝图，我们可以是照着同一份蓝图启动多个进程。</p>
 <p>进程不是执行单位，而是一个资源边界。相当于在内存这个世界里面，进程圈了一块地，这块地有很多的属性，比如虚拟地址空间、PID等，而地上的工人、流水线才是执行单位，我们称为<strong>线程</strong>。所以每个进程都有一个主线程。</p>
@@ -288,28 +277,32 @@ C语言、Go语言通过标准库进行系统调用，他们的标准库中的�
 <li>是指令、数据及相关资源的集合</li>
 <li>是程序运行过程的抽象</li>
 </ul>
-<h3 id="状态">状态</h3>
+<h3 id="什么是线程">什么是线程</h3>
+<p>也称<strong>轻量级进程</strong>(LWP)，是进程中的实际执行单位，一个标准的线程由线程ID、当前指令指针(PC)、寄存器集合和堆栈组成。一个进程通常拥有一个或多个线程，这些线程之间共享程序的内存空间(包含代码段、数据段、堆等)以及一些进程级的资源(例如打开的文件、接收的信号等)。</p>
+<p><img src="./images/thread.png" alt="" /></p>
+<p>线程是调度和时间片的分配单位，更多线程理论上会获得更多的CPU资源，同一程序的多个线程是可以在多核处理器上并行执行来提高执行吞吐率的，当然这也要看操作系统的调度策略。</p>
+<h3 id="线程调度">线程调度</h3>
+<p>在单CPU的设备上，并行是模拟出来的，多线程程序轮流执行，每个线程每次仅执行一小段时间，这样不断在处理器上切换不同的线程去执行的行为我们称为<strong>线程调度</strong>(Thread Schedule)。在调度中，线程通常至少有三种状态:</p>
 <ul>
-<li>ready:除分配CPU外，其他准备就绪(按优先级排队调度)</li>
-<li>running:占用处理器资源，正在执行</li>
-<li>waiting:因IO blocking、sync等原因⽆无法继续执⾏</li>
+<li>ready: 线程可以立刻执行，但CPU已经被占用</li>
+<li>running: 占用CPU资源，正在执行</li>
+<li>waiting: 此时线程正在等待某一件事情(通常是IO或同步)发生，无法执行</li>
 </ul>
-<h3 id="调度">调度</h3>
-<p>采用<strong>抢占式调度</strong>，CPU分配时间片，时间片结束则强制性切换并保存上下文。另外一种调度模式叫协作式调度，一般是在用户空间实现的。</p>
-<h2 id="线程">线程</h2>
-<p>也称<strong>轻量级进程</strong>(LWP)，是进程中的实际执行单位，由程序计数器、寄存器、栈内存组成。</p>
-<ul>
-<li>进程拥有一到多个线程</li>
-<li>线程是调度和时间片的分配单位，更多线程理论上会获得更多的CPU资源</li>
-<li>线程共享进程的资源</li>
-<li>同一程序的多个线程是可以在多核处理器上并行执行来提高执行吞吐率的，这个要看操作系统的调度策略</li>
-</ul>
-<p><strong>协程</strong>只是在用户空间的线程里实现的一种策略，本身和线程有很大的区别。</p>
-<p><strong>内核线程和用户线程是有区别的</strong>，我们一般使用的线程都是被包装过的，很少通过系统调用来使用线程。用户线程可能是系统线程的包装体，它们是一对一关系；也可能是多个用户线程对应一个系统线程，多个用户线程分享一个时间片，这是多对一关系；还有一种可能是多对多关系，类似于Go的机制，某个时刻一个用户线程必然对应一个系统线程，但总体来看用户线程可能比系统线程更多或者更少。</p>
-<p>那么为什么要包装内核线程呢？假如我们再做一个文件读操作，它要通过系统调用来完成，实际会分为用户态代码和内核态代码，这就涉及到上下文的切换，内核线程的调度、创建等，如果这种文件读操作很频繁，那么成本是很高的。我们就会考虑，在用户态和内核态的基础上能不能建立类似于Pool的模型来复用。这样一来，内核态的系统线程负责执行，用户态的用户线程负责存储状态，从而避免了频繁创建系统线程，用户态可以创建很多用来存储状态的执行单位，执行时把它绑定到一个内核线程中去，执行完释放内核线程，内核线程把绑定状态删除后放入池中，不需要杀掉内核线程，接下来另一个执行单位重新绑定到该内核线程中去执行。</p>
+<p>它们在如下情况会发生状态变化:</p>
+<p><img src="./images/thread_state.png" alt="" /></p>
+<p>线程的调度随着操作系统的发展已经是各种复杂的方案和算法的结合，但主流的算法都带有<strong>优先级调度</strong>(Priority Schedule)和<strong>轮转法</strong>(Round Robin)的痕迹。轮转法就是让各个线程轮流执行一小段时间，而优先级调度又决定了线程按照什么顺序来轮流执行。此外，我们把线程执行完时间片，而被强制剥夺执行权利的过程称为<strong>抢占</strong>，非抢占式的调度模式也已越来越少。</p>
+<h3 id="linux的多线程">Linux的多线程</h3>
+<p>Windows对进程和线程的实现如同教科书一般标准，但对于Linux，它的内核中并不存在真正意义的线程概念。Linux将所有执行的实体(无论线程还是进程)都称为任务，每个任务类似于一个单线程的进程，它有内存空间、执行实体、文件资源等。但不同的任务之间是可以共享内存空间的，从这个角度，共享了同一个内存空间的多个任务构成了一个进程，这些任务也就成了这个进程里的线程。</p>
+<p>Linux提供的创建新任务的API包括fork、exec、clone。fork通过复制当前进程产生一个新的任务，但并不复制原任务的内存空间，而是和原任务共享一个写时复制的内存空间。所以它产生新任务的速度很快，但它只能产生本任务的镜像，这时就要通过exec配合则可以启动一个别的新的任务。如果要产生的不是任务而是新线程，则可以用clone，它产生新的任务并从指定的位置开始执行，共享当前进程的内存空间(可选的)，从实际效果上来说就产生了一个新的线程。</p>
+<h3 id="线程模型">线程模型</h3>
+<p><strong>内核线程和用户线程是有区别的</strong>，我们一般使用的线程都是被包装过的，很少通过系统调用来使用线程，用户线程往往是内核线程的包装体。</p>
+<p>对于一个用户线程对应一个内核线程，我们称为<strong>一对一模型</strong>。这种模型下线程之间的并发是真正的并发，一个线程阻塞时其他线程的执行不受影响。但它的缺点也很明显，很多操作系统会限制内核线程的数量，用户线程的数量也就被限制了，而且内核线程的调度上下文切换的开销很大，导致用户线程的执行效率也不高。</p>
+<p>多个用户线程映射到一个内核线程即<strong>多对一模型</strong>。线程之间的切换由用户态的代码来进行，相对于一对一线程切换会快很多，但如果一个用户线程阻塞，其他用户线程也无法执行，因为此时内核线程也阻塞了。</p>
+<p>还有一种是<strong>多对多模型</strong>，类似于Go的机制，某个时刻一个用户线程必然对应一个系统线程，但总体来看用户线程可能比系统线程更多或者更少，同时用户线程的数量不受限制，某用户线程的阻塞也不会让所有的用户线程都阻塞掉。</p>
+<p>为什么要包装内核线程呢？假如我们再做一个文件读操作，它要通过系统调用来完成，实际会分为用户态代码和内核态代码，这就涉及到上下文的切换，内核线程的调度、创建等，如果这种文件读操作很频繁，那么成本是很高的。我们就会考虑，在用户态和内核态的基础上能不能建立类似于Pool的模型来复用。这样一来，内核态的系统线程负责执行，用户态的用户线程负责存储状态，从而避免了频繁创建系统线程，用户态可以创建很多用来存储状态的执行单位，执行时把它绑定到一个内核线程中去，执行完释放内核线程，内核线程把绑定状态删除后放入池中，不需要杀掉内核线程，接下来另一个执行单位重新绑定到该内核线程中去执行。</p>
 <p>所以当我们选择一门语言或者一种并发库的时候，是要知道它究竟由内核线程实现还是用户线程实现的，这在性能上是有很大区别的。</p>
 <h2 id="并发与并行">并发与并行</h2>
-<h3 id="基础概念-1">基础概念</h3>
+<h3 id="基础概念">基础概念</h3>
 <p><strong>并发与并行</strong>关注的是程序逻辑的执行。并发是从逻辑角度出发的，指的是多个任务能同时执行，这个同时是相对的概念，比如在一小时内完成。而并行是指物理上的同一时刻执行多个并发任务，这就要求多机器或多核。所以说并发是并行的基础，并行是并发的理想执行模式。</p>
 <p><strong>同步和异步</strong>关注的是消息通信机制。同步就是在调用者发出一个调用时，主动等待该调用的结果。而异步则是发出调用之后就不管了，调用者不会立即得到结果，等待被调用方通过状态、通知等告诉调用者，或是通过回调函数处理该调用。</p>
 <p><strong>阻塞和非阻塞</strong>关注的是程序在等待调用结果(消息或返回值)时的状态。阻塞调用是指调用结果返回之前，当前线程被挂起，只有在得到结果之后才返回。非阻塞调用是指在不能立刻得到结果之前，该调用并不会阻塞当前的线程。</p>
@@ -325,10 +318,16 @@ C语言、Go语言通过标准库进行系统调用，他们的标准库中的�
 <p>正常情况优先使用多线程模型，多线程会尽可能多的获取时间片，操作系统有操作时间片的调度器，该调度器会计算每个线程的时间片使用完以后保存线程的寄存器等状态，进行上下文的切换。</p>
 <p>协程模型是程序通过自己切换的方式实现在单个线程内、单个CPU上执行来提高CPU的利用率，它充分利用了IO等待时浪费的时间片。</p>
 <h2 id="虚拟存储器">虚拟存储器</h2>
-<h3 id="基础概念-2">基础概念</h3>
-<p>操作系统会有一个很大的地址空间，也叫<strong>虚拟地址空间</strong>。这个空间的前面一大段是操作系统用的，之后的每个进程也都会有一个独立的很大的地址空间。这样不同的程序可以使用相同的虚拟地址，当程序在运行时访问某个地址就是访问进程内的虚拟地址，通过<strong>内存管理单元</strong>(MMU)翻译映射到一个物理地址。这样的好处就是无论在程序内的地址空间怎么折腾都不会影响到其他的程序，对编译器也更友好更方便，可以提前分配。</p>
+<h3 id="基础概念-1">基础概念</h3>
+<p>操作系统会有一个很大的地址空间，也叫<strong>虚拟地址空间</strong>。这个空间的前面一大段是操作系统用的，之后的每个进程也都会有一个独立的很大的地址空间。这样不同的程序可以使用相同的虚拟地址，当程序在运行时访问某个地址就是访问进程内的虚拟地址，通过<strong>内存管理单元</strong>(MMU，一般集成在CPU内部)翻译映射到一个物理地址。这样的好处就是无论在程序内的地址空间怎么折腾都不会影响到其他的程序，对编译器也更友好更方便，可以提前分配。</p>
 <p>我们在编译时看到的都是虚拟地址，物理地址在运行期才能看到。虚拟地址空间未必会全部映射到主存中，也会给各个设备保留一段空间。</p>
 <p><strong>虚拟存储器</strong>可以看成硬盘保存的一个字节数组，虚拟地址空间有256TB，而实际的物理内存可能只有8GB，有这么大的虚拟地址空间就不能阻止程序去使用，不够的物理存储体我们就通过硬盘上的交换分区来弥补。也有可能物理内存加上交换分区都不够程序使用，在Linux中就会引发OOM机制。</p>
+<h3 id="分段与分页">分段与分页</h3>
+<p>最开始的时候，压根没有虚拟内存，人们在物理内存上直接为某程序分配内存，这样带来的问题有:地址空间不隔离，恶意的程序可以轻松改写别人的数据；内存使用效率低，比如当前正在运行A和B，这时候需要运行C但内存不够，就需要把整个A或B换出到硬盘再载入C；程序运行的地址不确定，给程序的编写造成了一定的麻烦。</p>
+<p>然后引入了虚拟内存，人们开始使用一种分段(Segmention)的方法，把一段程序需要的内存大小的虚拟地址空间映射到物理地址空间，由操作系统和硬件来完成它们之间的相互转换。这样解决了没有虚拟内存时的地址空间不隔离和程序运行地址不确定的问题，但对于内存效率的问题依然没有解决。</p>
+<p>因此，现在都使用分页(Paging)的方法。把地址空间人为地分成固定大小的页，页的大小由操作系统和硬件决定。当我们把进程的虚拟地址按页分割时，会把常用的数据页和代码页装载到内存中，把不常用的代码和数据保存在硬盘里，需要用到时再从硬盘中取出:</p>
+<p><img src="./images/mmu.png" alt="" /></p>
+<p>如图所示，DP表示磁盘页，VP表示虚拟页，PP表示物理页。虚拟空间中有的页被映射到同一个物理页中，从而实现了内存共享。此外，可以给每个页设置权限属性，做到一个基础的保护。</p>
 <h3 id="内存分配过程">内存分配过程</h3>
 <p>假设某个程序需要内存分配器分配10MB的内存，那么操作系统会怎么做呢？首先会划分出一个虚拟地址范围，然后返回起始地址的指针。它此时没有必要通过MMU分配真实的物理内存，因为有可能这段内存后续根本没有读写发生。接下来若写入数据，也只会以页(8KB)为单位一点点的去写，每次写入的时候操作系统再去补物理内存，采用一种<strong>按需分配的机会主义原则</strong>。具体如何实现呢？当向一个虚拟地址写入数据时，就会去MMU找对应的物理地址，没有找到就说明没有建立映射关系还没有分配物理内存，就会引发一个<strong>缺页异常</strong>(page fault)，操作系统内有专门的程序把这一页补上，来实现按需分配。</p>
 <p>我们通过程序可以模拟这种虚拟内存和物理内存的关系:
@@ -341,10 +340,8 @@ C语言、Go语言通过标准库进行系统调用，他们的标准库中的�
 {
     <span style="color:#66d9ef">const</span> size_t length <span style="color:#f92672">=</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>;
     <span style="color:#66d9ef">const</span> size_t pause <span style="color:#f92672">=</span> length <span style="color:#f92672">/</span> <span style="color:#ae81ff">10</span>;
-
     <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>p <span style="color:#f92672">=</span> malloc(length); <span style="color:#75715e">// 分配100MB内存
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>x <span style="color:#f92672">=</span> p;
-
     <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> (<span style="color:#66d9ef">int</span>)length; i<span style="color:#f92672">++</span>) <span style="color:#75715e">// 循环写入数据
 </span><span style="color:#75715e"></span>    {
         <span style="color:#f92672">*</span>x <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
@@ -506,172 +503,6 @@ _start.hello <span style="color:#f92672">()</span> at fr.s:14
 14	        mov     rax, <span style="color:#ae81ff">1</span>
 1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
 2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> PF ZF IF <span style="color:#f92672">]</span></code></pre></div>
-<h2 id="可执行文件">可执行文件</h2>
-<p><img src="./images/elf.png" alt="ELF" /></p>
-<p>一个<strong>可执行程序</strong>看上去像是单个文件的数据库，我们以ELF格式的可执行文件为例，它包括头部元数据、Section header table、Program header table和各个section段。</p>
-<h3 id="head">Head</h3>
-<p>文件头部包含一些元数据，用于进程加载找入口地址等:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -h hello
-ELF Header:
-  Magic:   7f <span style="color:#ae81ff">45</span> 4c <span style="color:#ae81ff">46</span> <span style="color:#ae81ff">02</span> <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">01</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span> <span style="color:#ae81ff">00</span>      // 魔法数，可以快速读取出来用于预判整个文件是不是一个合法的内容
-  Class:                             ELF64          // ELF文件的格式
-  Data:                              2<span style="color:#960050;background-color:#1e0010">&#39;</span>s complement, little endian  // 大小端情况
-  Version:                           <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>current<span style="color:#f92672">)</span>
-  OS/ABI:                            UNIX - System V    // 哪个平台使用
-  ABI Version:                       <span style="color:#ae81ff">0</span>
-  Type:                              EXEC <span style="color:#f92672">(</span>Executable file<span style="color:#f92672">)</span>     // 哪种类型，可执行的还是需重定位的等
-  Machine:                           Advanced Micro Devices X86-64
-  Version:                           0x1
-  Entry point address:               0x4000b0       //入口地址
-  Start of program headers:          <span style="color:#ae81ff">64</span> <span style="color:#f92672">(</span>bytes into file<span style="color:#f92672">)</span>
-  Start of section headers:          <span style="color:#ae81ff">736</span> <span style="color:#f92672">(</span>bytes into file<span style="color:#f92672">)</span>
-  Flags:                             0x0
-  Size of this header:               <span style="color:#ae81ff">64</span> <span style="color:#f92672">(</span>bytes<span style="color:#f92672">)</span>
-  Size of program headers:           <span style="color:#ae81ff">56</span> <span style="color:#f92672">(</span>bytes<span style="color:#f92672">)</span>
-  Number of program headers:         <span style="color:#ae81ff">2</span>
-  Size of section headers:           <span style="color:#ae81ff">64</span> <span style="color:#f92672">(</span>bytes<span style="color:#f92672">)</span>
-  Number of section headers:         <span style="color:#ae81ff">8</span>
-  Section header string table index: <span style="color:#ae81ff">7</span></code></pre></div>
-<h3 id="section">Section</h3>
-<p>头部之后紧跟着各种各样的表，我们称之为<strong>Section</strong>(段)，各个section被计入可执行文件的Section header table中，我们可以这样查看:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -S hello
-There are <span style="color:#ae81ff">8</span> section headers, starting at offset 0x2e0:
-Section Headers:
-  <span style="color:#f92672">[</span>Nr<span style="color:#f92672">]</span> Name              Type             Address           Offset
-       Size              EntSize          Flags  Link  Info  Align
-  <span style="color:#f92672">[</span> 0<span style="color:#f92672">]</span>                   NULL             <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000000</span>
-       <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>
-  <span style="color:#f92672">[</span> 1<span style="color:#f92672">]</span> .text             PROGBITS         00000000004000b0  000000b0
-       <span style="color:#ae81ff">0000000000000025</span>  <span style="color:#ae81ff">0000000000000000</span>  AX       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">16</span>
-  <span style="color:#f92672">[</span> 2<span style="color:#f92672">]</span> .data             PROGBITS         00000000006000d8  000000d8
-       000000000000000e  <span style="color:#ae81ff">0000000000000000</span>  WA       <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
-  <span style="color:#f92672">[</span> 3<span style="color:#f92672">]</span> .stab             PROGBITS         <span style="color:#ae81ff">0000000000000000</span>  000000e8
-       <span style="color:#ae81ff">0000000000000084</span>  <span style="color:#ae81ff">0000000000000014</span>           <span style="color:#ae81ff">4</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">4</span>
-  <span style="color:#f92672">[</span> 4<span style="color:#f92672">]</span> .stabstr          STRTAB           <span style="color:#ae81ff">0000000000000000</span>  0000016c
-       <span style="color:#ae81ff">0000000000000009</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span> 5<span style="color:#f92672">]</span> .symtab           SYMTAB           <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000178</span>
-       <span style="color:#ae81ff">0000000000000108</span>  <span style="color:#ae81ff">0000000000000018</span>           <span style="color:#ae81ff">6</span>     <span style="color:#ae81ff">7</span>     <span style="color:#ae81ff">8</span>
-  <span style="color:#f92672">[</span> 6<span style="color:#f92672">]</span> .strtab           STRTAB           <span style="color:#ae81ff">0000000000000000</span>  <span style="color:#ae81ff">00000280</span>
-       <span style="color:#ae81ff">0000000000000027</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-  <span style="color:#f92672">[</span> 7<span style="color:#f92672">]</span> .shstrtab         STRTAB           <span style="color:#ae81ff">0000000000000000</span>  000002a7
-       <span style="color:#ae81ff">0000000000000036</span>  <span style="color:#ae81ff">0000000000000000</span>           <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">1</span>
-Key to Flags:
-  W <span style="color:#f92672">(</span>write<span style="color:#f92672">)</span>, A <span style="color:#f92672">(</span>alloc<span style="color:#f92672">)</span>, X <span style="color:#f92672">(</span>execute<span style="color:#f92672">)</span>, M <span style="color:#f92672">(</span>merge<span style="color:#f92672">)</span>, S <span style="color:#f92672">(</span>strings<span style="color:#f92672">)</span>, I <span style="color:#f92672">(</span>info<span style="color:#f92672">)</span>,
-  L <span style="color:#f92672">(</span>link order<span style="color:#f92672">)</span>, O <span style="color:#f92672">(</span>extra OS processing required<span style="color:#f92672">)</span>, G <span style="color:#f92672">(</span>group<span style="color:#f92672">)</span>, T <span style="color:#f92672">(</span>TLS<span style="color:#f92672">)</span>,
-  C <span style="color:#f92672">(</span>compressed<span style="color:#f92672">)</span>, x <span style="color:#f92672">(</span>unknown<span style="color:#f92672">)</span>, o <span style="color:#f92672">(</span>OS specific<span style="color:#f92672">)</span>, E <span style="color:#f92672">(</span>exclude<span style="color:#f92672">)</span>,
-  l <span style="color:#f92672">(</span>large<span style="color:#f92672">)</span>, p <span style="color:#f92672">(</span>processor specific<span style="color:#f92672">)</span></code></pre></div>
-<p>其中，<code>Address</code>表示这个section加载到进程中的虚拟内存地址，<code>Offset</code>表示这个section相对于文件头部的偏移量，有了<code>Offset</code>+<code>Size</code>进程才知道如何安排相应的<code>Address</code>。<code>Flags</code>表示权限标志位，<code>A</code>表示这个section的内容需要在内存中载入，<code>X</code>表示可执行的权限，<code>W</code>表示可写入的权限。</p>
-<p><code>.text</code>用于存放二进制的执行代码(指令)。我们可以看到这个段的地址恰好是文件头中的Entry point address。</p>
-<p><code>.data</code>用于存放所有已经初始化过的全局变量的数据，<code>.bss</code>用于存放未初始化的全局变量数据，虽然它们在内存中都需要相应的起始地址和内存区域，但在可执行文件中没必要用一定区域去记下<code>.bss</code>中的零值。<code>.rodata</code>专门用于保存只读数据，例如字符串的字面量，在很多语言中它都是只读的。</p>
-<p><code>.symtab</code>表示符号表，源码中的字面量、全局变量、函数名、类型名、文件名等会作为符号记录在该表中，会记录它们的类型、作用域和内存地址。对于程序运行来讲，符号表没有什么用，CPU不管什么符号、类型，它只需要内存地址。符号就相当于是内存地址的助记符，主要是便于我们调试和反汇编使用的。</p>
-<h3 id="segment">Segment</h3>
-<p>执行的时候，我们需要告诉操作系统，有哪些section需要载入为内存中的<strong>segment</strong>，这个信息被链接器放在Program header table中，操作系统的载入器以此信息来安排程序在内存中的样子，我们可以这样查看:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -l hello
-Elf file type is EXEC <span style="color:#f92672">(</span>Executable file<span style="color:#f92672">)</span>
-Entry point 0x4000b0
-There are <span style="color:#ae81ff">2</span> program headers, starting at offset <span style="color:#ae81ff">64</span>
-Program Headers:
-  Type           Offset             VirtAddr           PhysAddr
-                 FileSiz            MemSiz              Flags  Align
-  LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
-                 0x00000000000000d5 0x00000000000000d5  R E    0x200000
-  LOAD           0x00000000000000d8 0x00000000006000d8 0x00000000006000d8
-                 0x000000000000000e 0x000000000000000e  RW     0x200000
- Section to Segment mapping:
-  Segment Sections...
-   <span style="color:#ae81ff">00</span>     .text
-   <span style="color:#ae81ff">01</span>     .data</code></pre></div>
-<p>上面的section to segment mapping就表示把section中的<code>.text</code>段的内容放在内存中<code>00</code>号的segment上。在可执行文件中会把section分的很细，但在内存中可能会把一些section合并起来，忽略掉一些section，起到节约内存的目的。</p>
-<h2 id="函数调用">函数调用</h2>
-<p><strong>函数</strong>本身相当于一个图纸，出了设计院它就是只读的，放在<code>.text</code>段中，线程参考图纸来执行。线程通过<code>IP/PC</code>寄存器知道执行到图纸的哪里，下一条指令是什么，主线程通过可执行文件的入口地址找到第一条指令。</p>
-<h3 id="调用堆栈">调用堆栈</h3>
-<p>那么每个CPU核心只有一个IP寄存器，线程却有很多个怎么办？实际上在同一时刻，只有一个线程绑定了一套物理寄存器，若它的时间片用完了则由操作系统保存它对应的寄存器状态在某段内存中，下次轮到它执行时再恢复寄存器的状态。那么我们可以在抽象层面上理解为每个线程都有一套自己的寄存器。同时，这种切换线程需要消耗一定的资源，用于保存和恢复状态，用于内核态和用户态的切换。</p>
-<p>函数执行过程中需要在线程中保存参数、返回值、局部变量等，这块内存叫做<strong>栈</strong>(Stack)。那么如果是嵌套调用，如何保存各函数的状态呢？</p>
-<p><img src="./images/func.jpg" alt="" /></p>
-<p>如左图所示，A函数嵌套了B函数，A要等待B执行完成之后再接着执行自己的逻辑。所以我们一般把栈内存竖着画，由底部的高位向低位分配，函数执行结束则把其对应的内存区域销毁，如右图所示。我们把每一个函数所占的格子叫<strong>栈帧</strong>(Stack Frame)，把整个A、B、C的调用层次称为<strong>调用堆栈</strong>(Call Stack)。程序出错时候我们看到一级级的错误信息就是通过调用堆栈追溯到的。</p>
-<p>调用一个函数，在指令级别上还是有很大的开销的，所以有了<strong>内联</strong>(inline)的优化手段。</p>
-<h3 id="调用约定">调用约定</h3>
-<p>接下来的问题是A调用B的时候，如何给B传递参数，如何接收B的返回值，要么A划定区域，要么B划定区域，要么用寄存器，要么用内存，我们把这种约定称为<strong>调用约定</strong>。以Go语言为例，若A调用B，则A会把自己的栈帧一分为二，下半部分存本地局部变量，上半部分存给B用的参数和B的返回值。若A调用B、C、D等多个函数，则上半部分占用多大空间按哪个函数的参数和返回值最大来算。如此一来，栈帧的大小是在编译期就能确定的，访问栈内某块内存只需根据相对位置，基于栈顶做加法或栈底做减法即可。</p>
-<p>一般会把栈顶的地址放在SP寄存器，把栈底的地址放在BP寄存器。理论上，SP或者BP使用一个就够了，每个语言都有自己的选择。Go早期只用SP，后来也引入了BP，因为很多的调试器、自动化检测工具需要使用BP确定栈底的位置。</p>
-<p>如果SP/BP用来存当前正在执行的B函数的栈帧，B执行完以后如何知道调用它的A函数的栈帧有多大呢？所以在两个栈帧之间还有一段空间用来存储A的BP/SP、IP，A在调用B的时候就把自己的BP/SP写进去，把自己调用完B之后下一条要执行什么指令写进IP，这叫<strong>保存现场</strong>。B执行完以后，通过这段空间恢复现场。接着，我们看看C语言和Go语言的保存现场和恢复现场分别是怎么做的。</p>
-<h4 id="go语言">Go语言</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">add</span>(<span style="color:#a6e22e">x</span>, <span style="color:#a6e22e">y</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
-	<span style="color:#a6e22e">z</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">x</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">y</span>
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">z</span>
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0x11</span>, <span style="color:#ae81ff">0x22</span>
-	<span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">add</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span>)
-	println(<span style="color:#a6e22e">s</span>)
-}</code></pre></div>
-<p>通过<code>go build -gcflags &quot;-N -l&quot; call.go</code>接着进行gdb调试:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> b <span style="color:#ae81ff">4</span>
-Breakpoint <span style="color:#ae81ff">1</span> at 0x452347: file /root/.mac/gocode/call.go, line 4.
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> r
-Thread <span style="color:#ae81ff">1</span> <span style="color:#e6db74">&#34;call&#34;</span> hit Breakpoint 1, main.add <span style="color:#f92672">(</span>x<span style="color:#f92672">=</span>17, y<span style="color:#f92672">=</span>34, ~r2<span style="color:#f92672">=</span>0<span style="color:#f92672">)</span> at /root/.mac/gocode/call.go:4
-4		z :<span style="color:#f92672">=</span> x + y
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> disass
-Dump of assembler code <span style="color:#66d9ef">for</span> <span style="color:#66d9ef">function</span> main.add:
-   0x0000000000452330 &lt;+0&gt;:	sub    rsp,0x10
-   0x0000000000452334 &lt;+4&gt;:	mov    QWORD PTR <span style="color:#f92672">[</span>rsp+0x8<span style="color:#f92672">]</span>,rbp
-   0x0000000000452339 &lt;+9&gt;:	lea    rbp,<span style="color:#f92672">[</span>rsp+0x8<span style="color:#f92672">]</span>
-   0x000000000045233e &lt;+14&gt;:	mov    QWORD PTR <span style="color:#f92672">[</span>rsp+0x28<span style="color:#f92672">]</span>,0x0
-<span style="color:#f92672">=</span>&gt; 0x0000000000452347 &lt;+23&gt;:	mov    rax,QWORD PTR <span style="color:#f92672">[</span>rsp+0x18<span style="color:#f92672">]</span>
-   0x000000000045234c &lt;+28&gt;:	add    rax,QWORD PTR <span style="color:#f92672">[</span>rsp+0x20<span style="color:#f92672">]</span>
-   0x0000000000452351 &lt;+33&gt;:	mov    QWORD PTR <span style="color:#f92672">[</span>rsp<span style="color:#f92672">]</span>,rax
-   0x0000000000452355 &lt;+37&gt;:	mov    QWORD PTR <span style="color:#f92672">[</span>rsp+0x28<span style="color:#f92672">]</span>,rax
-   0x000000000045235a &lt;+42&gt;:	mov    rbp,QWORD PTR <span style="color:#f92672">[</span>rsp+0x8<span style="color:#f92672">]</span>
-   0x000000000045235f &lt;+47&gt;:	add    rsp,0x10
-   0x0000000000452363 &lt;+51&gt;:	ret
-End of assembler dump.</code></pre></div></p>
-<p>我们可以把它的栈帧变化情况画出来:</p>
-<p><img src="./images/go_func.jpg" alt="" /></p>
-<h4 id="c语言">C语言</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">__attribute__</span>((noinline, optimize(<span style="color:#e6db74">&#34;-O0&#34;</span>))) add(<span style="color:#66d9ef">int</span> x, <span style="color:#66d9ef">int</span> y)
-{
-    <span style="color:#66d9ef">int</span> z;
-    z <span style="color:#f92672">=</span> x <span style="color:#f92672">+</span> y;
-    <span style="color:#66d9ef">return</span> z;
-}
-
-<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">__attribute__</span>((noinline)) main(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>argv)
-{
-    <span style="color:#66d9ef">int</span> x, y, a;
-    x <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x11</span>;
-    y <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x22</span>;
-    a <span style="color:#f92672">=</span> add(x, y);
-    printf(<span style="color:#e6db74">&#34;%d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, a);
-}</code></pre></div>
-<p>通过<code>gcc -g -O0 -o frame frame.c</code>接着进行gdb调试:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> b <span style="color:#ae81ff">5</span>
-Breakpoint <span style="color:#ae81ff">1</span> at 0x654: file frame.c, line 5.
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> r
-Breakpoint 1, add <span style="color:#f92672">(</span>x<span style="color:#f92672">=</span>17, y<span style="color:#f92672">=</span>34<span style="color:#f92672">)</span> at frame.c:6
-6	    z <span style="color:#f92672">=</span> x + y;
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> disass
-Dump of assembler code <span style="color:#66d9ef">for</span> <span style="color:#66d9ef">function</span> add:
-   0x000055555555464a &lt;+0&gt;:	push   rbp
-   0x000055555555464b &lt;+1&gt;:	mov    rbp,rsp
-   0x000055555555464e &lt;+4&gt;:	mov    DWORD PTR <span style="color:#f92672">[</span>rbp-0x14<span style="color:#f92672">]</span>,edi
-   0x0000555555554651 &lt;+7&gt;:	mov    DWORD PTR <span style="color:#f92672">[</span>rbp-0x18<span style="color:#f92672">]</span>,esi
-<span style="color:#f92672">=</span>&gt; 0x0000555555554654 &lt;+10&gt;:	mov    edx,DWORD PTR <span style="color:#f92672">[</span>rbp-0x14<span style="color:#f92672">]</span>
-   0x0000555555554657 &lt;+13&gt;:	mov    eax,DWORD PTR <span style="color:#f92672">[</span>rbp-0x18<span style="color:#f92672">]</span>
-   0x000055555555465a &lt;+16&gt;:	add    eax,edx
-   0x000055555555465c &lt;+18&gt;:	mov    DWORD PTR <span style="color:#f92672">[</span>rbp-0x4<span style="color:#f92672">]</span>,eax
-   0x000055555555465f &lt;+21&gt;:	mov    eax,DWORD PTR <span style="color:#f92672">[</span>rbp-0x4<span style="color:#f92672">]</span>
-   0x0000555555554662 &lt;+24&gt;:	pop    rbp
-   0x0000555555554663 &lt;+25&gt;:	ret
-End of assembler dump.</code></pre></div>
-同样可以画出图来:
-<img src="./images/c_func.jpg" alt="" /></p>
-<h4 id="比较">比较</h4>
-<p>相同点是在调用CALL指令的时候，先把main函数中执行完add函数的下一条指令(在IP寄存器中)存在栈里，在调用RET指令的时候，这条指令会被自动恢复入IP寄存器。</p>
-<p>不同点是C语言通过<code>push</code>和<code>pop</code>指令入栈、出栈，让栈顶SP自动随着变化。而Go语言采用了<code>sub</code>、<code>add</code>指令直接计算栈顶地址。</p>
-<p>此外，在C语言中，是优先通过寄存器传递参数和返回值，经常使用SI、DI寄存器传参，使用AX寄存器存储返回值，因为C是性能优先，寄存器肯定是最快的。Go是使用栈内存传参和返回值的，这和它本身Goroutine的运行方式有关。</p>
-<h3 id="栈和堆">栈和堆</h3>
-<p>堆、栈既是两种数据结构，也是函数执行单位，在不同的场景有不同的概念。</p>
-<p>对于栈内存来讲，它是整块的，不需要垃圾回收器参与，访问的时候只需要根据BP、SP按相对位置进行访问，所以它的效率是非常高的。而堆内存是和单个线程无关的，是共享的，就会涉及到很复杂的内存管理方式，分配的时候要找到大小和位置合适的块，释放的时候要尽可能的避免内存碎片化。所以说，编译器有责任尽可能把数据分配在栈上。但是，栈上内存是按栈帧整块释放的，某些情况下如果某个变量要在不同的栈帧中维持，它的生命周期发生了改变，这种情况这个变量的内存就要在堆上分配了，这种现象就叫<strong>逃逸</strong>。逃逸也会带来严重的性能问题。</p>
 </article>
  
       
@@ -684,9 +515,9 @@ End of assembler dump.</code></pre></div>
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/64d011a5be1f943a0b68c76ab4db1e53ff70a0f8" title='最后修改者 hjlarry | July 16, 2020' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/b53749bf05e325426f77e8572b7f2b79f55d6a2c" title='最后修改者 hjlarry | October 27, 2020' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>July 16, 2020</span>
+      <span>October 27, 2020</span>
     </a>
   </div>
 
@@ -725,23 +556,25 @@ End of assembler dump.</code></pre></div>
     <li><a href="#内核">内核</a></li>
     <li><a href="#系统调用">系统调用</a></li>
     <li><a href="#文件系统">文件系统</a></li>
-    <li><a href="#进程">进程</a>
+    <li><a href="#进程和线程">进程和线程</a>
       <ul>
-        <li><a href="#基础概念">基础概念</a></li>
-        <li><a href="#状态">状态</a></li>
-        <li><a href="#调度">调度</a></li>
+        <li><a href="#程序与进程">程序与进程</a></li>
+        <li><a href="#什么是线程">什么是线程</a></li>
+        <li><a href="#线程调度">线程调度</a></li>
+        <li><a href="#linux的多线程">Linux的多线程</a></li>
+        <li><a href="#线程模型">线程模型</a></li>
       </ul>
     </li>
-    <li><a href="#线程">线程</a></li>
     <li><a href="#并发与并行">并发与并行</a>
       <ul>
-        <li><a href="#基础概念-1">基础概念</a></li>
+        <li><a href="#基础概念">基础概念</a></li>
         <li><a href="#并发模型">并发模型</a></li>
       </ul>
     </li>
     <li><a href="#虚拟存储器">虚拟存储器</a>
       <ul>
-        <li><a href="#基础概念-2">基础概念</a></li>
+        <li><a href="#基础概念-1">基础概念</a></li>
+        <li><a href="#分段与分页">分段与分页</a></li>
         <li><a href="#内存分配过程">内存分配过程</a></li>
         <li><a href="#换入换出">换入换出</a></li>
         <li><a href="#性能相关">性能相关</a></li>
@@ -751,20 +584,6 @@ End of assembler dump.</code></pre></div>
       <ul>
         <li><a href="#通用寄存器">通用寄存器</a></li>
         <li><a href="#标志寄存器">标志寄存器</a></li>
-      </ul>
-    </li>
-    <li><a href="#可执行文件">可执行文件</a>
-      <ul>
-        <li><a href="#head">Head</a></li>
-        <li><a href="#section">Section</a></li>
-        <li><a href="#segment">Segment</a></li>
-      </ul>
-    </li>
-    <li><a href="#函数调用">函数调用</a>
-      <ul>
-        <li><a href="#调用堆栈">调用堆栈</a></li>
-        <li><a href="#调用约定">调用约定</a></li>
-        <li><a href="#栈和堆">栈和堆</a></li>
       </ul>
     </li>
   </ul>
