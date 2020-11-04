@@ -29,5 +29,6 @@ bookMenuLevels: 1
   - [docker]({{< relref "/docs/other/docker" >}})
   - [raft]({{< relref "/docs/other/raft" >}})
   - [shell]({{< relref "/docs/other/shell" >}})
+  - [面向对象]({{< relref "/docs/other/oop" >}})
   - [网络协议]({{< relref "/docs/other/protocol" >}})
   - [系统工具]({{< relref "/docs/other/tools" >}})
