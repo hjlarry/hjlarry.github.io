@@ -67,3 +67,76 @@ public class Wallet {
 但是，过度的使用继承也会导致代码的可读性、可维护性变差。过多的代码层级，导致查找一个属性时可能要不断的追查其父类；子类和父类的高度耦合，导致修改父类时可能影响到子类等都是问题。所以也有少用继承、多用组合的说法。
 
 ### 多态
+同一操作作用于不同的对象，可以有不同的解释，产生不同的执行结果，这就是多态性。
+
+而对于多态的实现，有多种方式，常见的有继承加方法重写、接口类、ducking-type三种。
+
+{{< highlight java>}}
+public class Animal {
+    public void eat() {
+        System.out.println("动物吃饭");
+    }
+}
+
+public class Cat extends Animal {
+    public void eat() {
+        System.out.println("猫吃饭");
+    }
+}
+
+public static void main(){
+    Animal am = new Cat();
+    am.eat();
+}
+{{< /highlight >}}
+上面的例子中，父类对象可以引用子类对象，也就是说可以将Cat传递给Animal，然后就会使用子类的eat方法，从而实现了多态。
+
+{{< highlight java>}}
+public interface Iterator {
+    String hasNext();
+    String next();
+}
+public class Array implements Iterator {
+    private String[] data;
+    public String hasNext() { ... } 
+    public String next() { ... } 
+}
+public class LinkedList implements Iterator {
+    private LinkedListNode head;
+    public String hasNext() { ... } 
+    public String next() { ... } 
+}
+public class Demo {
+    private static void print(Iterator iterator) {
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+    }
+    public static void main(String[] args) {
+        Iterator arrayIterator = new Array();
+        print(arrayIterator);
+        Iterator linkedListIterator = new LinkedList();
+        print(linkedListIterator);
+    }
+}
+{{< /highlight >}}
+这个例子中，Iterator是一个接口类，定义了一个可以遍历集合数据的迭代器。Array和LinkedList都实现了它，然后通过传递不同的实现类到print函数中，来支持动态调用不同的next()和hasNext()实现。
+
+{{< highlight python>}}
+class Logger:
+    def record(self):
+        print("I write a log into file.")
+class DB:
+    def record(self):
+        print("I insert data into db.")
+def test(recorder):
+    recorder.record()
+def demo():
+    logger = Logger()
+    db = DB()
+    test(logger)
+    test(db)
+{{< /highlight >}}
+鸭子类型实现多态的方法非常简单，只要他们都定义了record()方法，传入test方法时就可以调用相应的record()方法。
+
+多态特性主要能提升代码的可扩展性和复用性，例如Iterator这个例子，我们可以不改变原有代码的情况下，添加其他的数据结构像HashMap等，也同样能够传入print()函数。如果不使用多态特性，我们可能要定义print(Array array)、print(LinkedList linkedList)等。
