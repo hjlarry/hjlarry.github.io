@@ -147,6 +147,84 @@ SOLID
 随着面向对象编程的发展，人们总结出了很多设计原则，其中最出名的当属SOLID，它代表五条原则。如果遵循这5条设计原则，就更可能写出可扩展、易于修改的代码。相反，如果不断违反其中的一条或多条原则，那么很快你的代码就会变得不可扩展、难以维护。
 
 ### 单一职责
+即Single Responsibility Principle，一个类或者模块只负责完成一个职责(或功能)。这个原则看似不太难用，但在实际情况中，往往很难判断一个类的职责是否是单一的。比如在一个社交产品中，我们用一个UserInfo类来记录用户的信息:
+{{< highlight java>}}
+public class UserInfo{
+    private long userId;
+    private String username;
+    private String email;
+    private String telephone;
+    private String avatarUrl;
+    private String provinceOfAddress; // 省
+    private String cityOfAddress; // 市
+    private String regionOfAddress; // 区
+    private String detailedAddress; // 详细地址
+    // ... 省略其他属性和方法...
+}
+{{< /highlight >}}
+我们发现看上去这个类都是和用户相关的信息，所有的属性和方法都是基于用户这个业务模型的，应该是满足单一职责原则的。但还有一种观点认为，地址信息在UserInfo中所占比重高，可以继续拆分为独立的UserAddress类，拆分之后职责更加单一。哪种观点是对的呢？实际上还是要根据业务来确定，如果地址信息和其他信息一样只是展示用，那放在UserInfo中没有问题，如果地址还要用于后续的收货等场景，就应该独立成一个类。
+
+如果违反单一职责，有什么坏处呢？假设某个类包含了10多个功能点，那意味着维护成本的增高，我们可能经常去因为各种原因修改它，导致不同的功能之间相互影响，此外，也不利于代码的复用。
+
+那是否为了满足单一职责原则，把类拆的越细越好？例如当前有一个Serialization类实现一个协议的序列化和反序列化功能:
+{{< highlight java>}}
+/**
+ * Protocol format: identifier-string;{gson string}
+ * For example: UEUEUE;{"a":"A","b":"B"}
+ */
+public class Serialization {
+    private static final String IDENTIFIER_STRING = "UEUEUE;";
+    private Gson gson;
+    public Serialization() {
+        this.gson = new Gson();
+    }
+    public String serialize(Map<String, String> object) {
+        StringBuilder textBuilder = new StringBuilder();
+        textBuilder.append(IDENTIFIER_STRING);
+        textBuilder.append(gson.toJson(object));
+        return textBuilder.toString();
+    }
+    public Map<String, String> deserialize(String text) {
+        if (!text.startsWith(IDENTIFIER_STRING)) {
+            return Collections.emptyMap();
+        }
+        String gsonStr = text.substring(IDENTIFIER_STRING.length());
+        return gson.fromJson(gsonStr, Map.class);
+    }
+}
+{{< /highlight >}}
+为了让类的职责更加单一，我们对它进一步拆分:
+{{< highlight java>}}
+public class Serializer {
+    private static final String IDENTIFIER_STRING = "UEUEUE;";
+    private Gson gson;
+    public Serializer() { 
+        this.gson = new Gson();
+    }
+    public String serialize(Map<String, String> object) {
+        StringBuilder textBuilder = new StringBuilder();
+        textBuilder.append(IDENTIFIER_STRING);
+        textBuilder.append(gson.toJson(object));
+        return textBuilder.toString();
+    }
+}
+
+public class Deserializer {
+    private static final String IDENTIFIER_STRING = "UEUEUE;";
+    private Gson gson;
+    public Deserializer() {
+        this.gson = new Gson();
+    }
+    public Map<String, String> deserialize(String text) {
+        if (!text.startsWith(IDENTIFIER_STRING)) {
+            return Collections.emptyMap();
+        }
+        String gsonStr = text.substring(IDENTIFIER_STRING.length());
+        return gson.fromJson(gsonStr, Map.class);
+    }
+}
+{{< /highlight >}}
+虽然拆分之后，类的职责更加单一了，但也带来新的问题，比如我们如果修改数据标识"UEUEUE"改为"DFDFDF"，或者序列化方式从JSON改为XML，那么两个类都需要做修改，代码的内聚性没有原来的高了，可维护性变差了。
 
 ### 开闭原则
 
