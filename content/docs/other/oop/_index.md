@@ -304,6 +304,35 @@ def main():
 {{< /highlight >}}
 所以通过抽象出过滤算法，以依赖注入的方式传入实例也能实现开闭原则。
 
+#### 使用数据驱动来修改
+这种方式的核心思想在于，将经常变动的东西，以数据的方式抽离出来，需求变动时只去改动数据。和依赖注入很像，只不过依赖注入传入的是类，这个传入的是数据。
+{{< highlight python>}}
+class HNTopPostsSpider:
+    def __init__(self,
+                 filter_by_link_keywords: Optional[List[str]] = None):
+        self.filter_by_link_keywords = filter_by_link_keywords
+    def fetch(self) -> Generator[Post, None, None]:
+        # <... 已省略 ...>
+        for item in items:
+            # <... 已省略 ...>
+            post = Post( ... ... )
+            if self.filter_by_link_keywords is None:
+                yield post
+            # 当 link 中出现任意一个关键词时，返回结果
+            elif any(keyword in post.link for keyword in self.filter_by_link_keywords):
+                yield post
+
+def main():
+    # link_keywords = None
+    link_keywords = [
+        'github.com',
+        'twitter.com'
+    ]
+    crawler = HNTopPostsSpider(filter_by_link_keywords=link_keywords)
+    crawler.fetch()
+{{< /highlight >}}
+这种方式没有添加其他的类，显得更简洁，但也同样带来了扩展性不强的问题，例如如果需要定义以`.com`结尾的过滤条件，这种方式就无能为力了。
+
 ### 里式替换
 
 ### 接口隔离
