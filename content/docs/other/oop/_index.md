@@ -259,6 +259,7 @@ class HNTopPostsSpider:
                 yield post
     def interested_in_post(self, post: Post) -> bool:
         return True
+
 class GithubOnlyHNTopPostsSpider(HNTopPostsSpider):
     def interested_in_post(self, post: Post) -> bool:
         return 'github' in post.link.lower()
@@ -266,6 +267,42 @@ class GithubOnlyHNTopPostsSpider(HNTopPostsSpider):
 这时，用户如果想要添加其他网站到感兴趣的内容，只需要再写一个继承类并覆盖`interested_in_post`方法中的内容即可，而不需要修改类本身。
 
 #### 利用组合与依赖注入修改
+另一种方法是通过依赖注入，在我们对类实例化的时候，通过参数传入一个帖子过滤的算法到实例中。
+{{< highlight python>}}
+class PostFilter(metaclass=ABCMeta):
+    @abstractmethod
+    def validate(self, post: Post) -> bool:
+        """判断帖子是否应该被保留"""
+
+class DefaultPostFilter(PostFilter):
+    def validate(self, post: Post) -> bool:
+        return True
+
+class HNTopPostsSpider:
+    def __init__(self, post_filter: Optional[PostFilter] = None):
+        self.post_filter = post_filter or DefaultPostFilter()
+    def fetch(self) -> Generator[Post, None, None]:
+        # <... 已省略 ...>
+        for item in items:
+            # <... 已省略 ...>
+            post = Post( ... ... )
+            # 使用测试方法来判断是否返回该帖子
+            if self.post_filter.validate(post):
+                yield post
+{{< /highlight >}}
+默认情况下，会保留所有的结果，当然我们可以根据自己需求定制:
+{{< highlight python>}}
+class GithubTwitterFilter(PostFilter):
+    def validate(self, post: Post) -> bool:
+        if 'github' in post.link.lower() or 'twitter' in post.link.lower():
+            return True
+        return False
+
+def main():
+    crawler = HNTopPostsSpider(post_filter=GithubTwitterFilter())
+    crawler.fetch()
+{{< /highlight >}}
+所以通过抽象出过滤算法，以依赖注入的方式传入实例也能实现开闭原则。
 
 ### 里式替换
 
