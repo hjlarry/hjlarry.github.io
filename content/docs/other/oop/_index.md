@@ -227,6 +227,45 @@ public class Deserializer {
 虽然拆分之后，类的职责更加单一了，但也带来新的问题，比如我们如果修改数据标识"UEUEUE"改为"DFDFDF"，或者序列化方式从JSON改为XML，那么两个类都需要做修改，代码的内聚性没有原来的高了，可维护性变差了。
 
 ### 开闭原则
+即Open Closed Principle，表示对扩展开放、对修改关闭，当我们添加一个功能的时候，应该在已有代码的基础上扩展(新增模块、类、方法等)，而非修改已有代码(修改模块、类、方法等)。
+
+比如我们在写一个爬虫的小程序，用户对爬取结果中关于github的内容感兴趣，因此代码变成了这样:
+{{< highlight python>}}
+class HNTopPostsSpider:
+    # <... 已省略 ...>
+    def fetch(self) -> Generator[Post, None, None]:
+        # <... 已省略 ...>
+        for item in items:
+            # <... 已省略 ...>
+            link = node_title.get('href')
+            # 只关注来自 github.com 的内容
+            if 'github' in link.lower():
+                yield Post(... ...)
+{{< /highlight >}}
+这么做看似完成了功能，但如果用户改变了需求，想关注来自twitter的内容，就必须要修改`if 'github' in link.lower()`这段，这显然是违反开闭原则的。那么如何修改，有这样几种思路:
+
+#### 利用继承修改
+使用这种方法的关键点在于，找到父类中会变动的部分，将其抽象成新的方法或属性，最终允许子类重写来改变这些行为。
+{{< highlight python>}}
+class HNTopPostsSpider:
+    # <... 已省略 ...>
+    def fetch(self) -> Generator[Post, None, None]:
+        # <... 已省略 ...>
+        for item in items:
+            # <... 已省略 ...>
+            post = Post( ... ... )
+            # 使用测试方法来判断是否返回该帖子
+            if self.interested_in_post(post):
+                yield post
+    def interested_in_post(self, post: Post) -> bool:
+        return True
+class GithubOnlyHNTopPostsSpider(HNTopPostsSpider):
+    def interested_in_post(self, post: Post) -> bool:
+        return 'github' in post.link.lower()
+{{< /highlight >}}
+这时，用户如果想要添加其他网站到感兴趣的内容，只需要再写一个继承类并覆盖`interested_in_post`方法中的内容即可，而不需要修改类本身。
+
+#### 利用组合与依赖注入修改
 
 ### 里式替换
 
