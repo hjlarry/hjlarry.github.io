@@ -333,7 +333,57 @@ def main():
 {{< /highlight >}}
 这种方式没有添加其他的类，显得更简洁，但也同样带来了扩展性不强的问题，例如如果需要定义以`.com`结尾的过滤条件，这种方式就无能为力了。
 
-### 里式替换
+### 里氏替换
+里氏替换原则是一条非常具体的、和继承有关的原则，是用它的发明者Liskov命名的，具体指在你使用继承时，子类对象应该能够替代父类对象的使用，还不破坏程序本身的功能。
+
+我们来看一个具体的例子:
+{{< highlight python>}}
+class User(Model):
+    def __init__(self, username: str):
+        self.username = username
+    def deactivate(self):
+        # 停用当前用户
+        self.is_active = False
+        self.save()
+
+class Admin(User):
+    def deactivate(self):
+        # 管理员用户不允许被停用
+        raise RuntimeError('admin can not be deactivated!')
+{{< /highlight >}}
+这个例子中Admin需要的功能大多User已经具备，所以它继承了User，并重写了User的少量行为，这是继承的典型用法。这有什么问题呢？假设我们现在需要一个新的函数来批量停用用户:
+{{< highlight python>}}
+def deactive_users(users:Iterable[User]):
+    for user in users:
+        user.deactive()
+{{< /highlight >}}
+那么我们如果传入一个[User("a")、Admin("b")]这有的对象，程序就会报错，所以在这个函数中，子类无法替代父类的使用，违背了里氏替换原则。
+
+如何去修改呢？如果我们在deactive_users函数中添加`if isinstance(user, Admin)`这样的判断显然是不合适的，未来如果有更多的需要不允许被停用的User子类，例如VIP、公司员工等，又需要修改该函数，这就违反了开闭原则。我们可以这样修改:
+{{< highlight python>}}
+class User(Model):
+    def __init__(self, username: str):
+        self.username = username
+    def allow_deactivate(self) -> bool:
+        # 是否允许被停用
+        return True
+    def deactivate(self):
+        self.is_active = True
+        self.save()
+
+class Admin(User):
+    def allow_deactivate(self) -> bool:
+        # 管理员用户不允许被停用
+        return False
+
+def deactivate_users(users: Iterable[User]):
+    for user in users:
+        if not user.allow_deactivate():
+            logger.info(f'user {user.username} does not allow deactivating, skip.')
+            continue
+        user.deactivate()
+{{< /highlight >}}
+修改后的代码，子类可以替代父类的使用，也符合了开闭原则。总结来说，我们应该让子类重写父类方法的时候，子类方法的参数签名和父类完全一致或者有更宽松，子类方法的返回值类型和父类一致。
 
 ### 接口隔离
 
