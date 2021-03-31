@@ -239,6 +239,12 @@ Symbol table '.symtab' contains 11 entries:
      9: 00000000006000e6     0 NOTYPE  GLOBAL DEFAULT    2 _edata
     10: 00000000006000e8     0 NOTYPE  GLOBAL DEFAULT    2 _end
 {{< /highlight >}}
+
+* ABS 表示无需链接器处理。
+* UND 表示在本地引用的外部全局符号。
+* COM 表示未初始化，比如分配在`.bss`的全局变量。
+* OBJECT 变量。
+
 此外，`-e`代表同时加上`-h -l -S`三个参数。
 
 ### nm
