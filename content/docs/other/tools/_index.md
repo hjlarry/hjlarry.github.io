@@ -247,6 +247,15 @@ Symbol table '.symtab' contains 11 entries:
 
 此外，`-e`代表同时加上`-h -l -S`三个参数。
 
+### size
+使用size可以快捷的查看其`.text`、`.data`、`.bss`段的大小:
+{{< highlight sh>}}
+root@cabd4e519687:~/.mac# size test
+   text	   data	    bss	    dec	    hex	filename
+ 783967	  10904	 121704	 916575	  dfc5f	test
+{{< /highlight >}}
+dec表示这三个段加起来的大小，hex是把dec转换为16进制后的值。
+
 ### nm
 使用nm也可查看其符号表信息:
 
