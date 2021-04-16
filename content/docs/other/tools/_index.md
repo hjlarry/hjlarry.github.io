@@ -386,7 +386,8 @@ GNU通用的调试工具，也叫**gdb**。binutils属于静态的观察，而gd
 ---|---
 info r | 查看寄存器
 info f | 查看栈帧
-info files | 查看文件的各个段的起始地址
+info files | 查看可执行文件的section(静态视图)
+info proc mappings | 查看可执行文件的segment(动态视图)
 info var | 查看全局变量
 info locals | 查看局部变量
 info breakpoints | 查看断点信息
