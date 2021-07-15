@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="cn">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="面向对象编程 面向对象编程的英文全称是Object Oriented Programming，它是一种编程范式或者说编程风格。具体来说，就是以类或对象作为组织代码的基本单元，并将封装、继承、抽象、多态这四种特性作为代码设计和实现的基石。
+四大特性 封装 封装是对信息的隐藏，类通过暴露有限的接口，授权外部只能通过类本身提供的方式来访问或者修改数据。
+例如，我们要做一个钱包系统，它的基础代码可能是这样的: public class Wallet { private String id; private long createTime; private BigDecimal balance; private long balanceLastModifiedTime; public Wallet() { this.id = IdGenerator.getInstance().generate(); this.createTime = System.currentTimeMillis(); this.balance = BigDecimal.ZERO; this.balanceLastModifiedTime = System.currentTimeMillis(); } public String getId() { return this.id; } public long getCreateTime() { return this.createTime; } public BigDecimal getBalance() { return this.balance; } public long getBalanceLastModifiedTime() { return this.balanceLastModifiedTime; } public void increaseBalance(BigDecimal increasedAmount) { if (increasedAmount."><meta property="og:title" content="面向对象编程" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="/docs/other/oop/" />
+
+<title>面向对象编程 | Home</title>
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
+<script defer src="/cn.search.min.8d2462c3b745732864d843e8e2e7782a2ec838ca90fb94676baa461536bdae11.js" integrity="sha256-jSRiw7dFcyhk2EPo4ud4Ki7IOMqQ&#43;5Rna6pGFTa9rhE="></script>
+<link rel="alternate" type="application/rss+xml" href="/docs/other/oop/index.xml" title="Home" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><strong>计算机基础</strong>
+<ul>
+<li><a href="/docs/sicp/hardware/">硬件</a></li>
+<li><a href="/docs/sicp/software/">软件</a></li>
+<li><a href="/docs/sicp/program/">程序</a></li>
+<li><a href="/docs/sicp/asm/">汇编</a></li>
+</ul>
+</li>
+<li><strong>GO语言</strong>
+<ul>
+<li><a href="/docs/go/map/">字典</a></li>
+<li><a href="/docs/go/closure/">闭包</a></li>
+<li><a href="/docs/go/defer/">延迟调用</a></li>
+<li><a href="/docs/go/goroutine/">并发调度</a></li>
+<li><a href="/docs/go/alloc/">内存分配</a></li>
+<li><a href="/docs/go/gc/">垃圾回收</a></li>
+<li><a href="/docs/go/lock/">锁</a></li>
+</ul>
+</li>
+<li><strong>Python语言</strong>
+<ul>
+<li><a href="/docs/python/memory/">内存管理</a></li>
+<li><a href="/docs/python/interpreter/">解释器</a></li>
+<li><a href="/docs/python/tools/">技巧工具</a></li>
+</ul>
+</li>
+<li><strong>Mysql</strong>
+<ul>
+<li><a href="/docs/mysql/query/">查询</a></li>
+<li><a href="/docs/mysql/theory/">原理</a></li>
+</ul>
+</li>
+<li><strong>其他</strong>
+<ul>
+<li><a href="/docs/other/git/">git</a></li>
+<li><a href="/docs/other/docker/">docker</a></li>
+<li><a href="/docs/other/raft/">raft</a></li>
+<li><a href="/docs/other/shell/">shell</a></li>
+<li><a href="/docs/other/oop/"class=active>面向对象</a></li>
+<li><a href="/docs/other/protocol/">网络协议</a></li>
+<li><a href="/docs/other/tools/">系统工具</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>面向对象编程</strong>
+
+  <label for="toc-control">
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#四大特性">四大特性</a>
+      <ul>
+        <li><a href="#封装">封装</a></li>
+        <li><a href="#抽象">抽象</a></li>
+        <li><a href="#继承">继承</a></li>
+        <li><a href="#多态">多态</a></li>
+      </ul>
+    </li>
+    <li><a href="#solid">SOLID</a>
+      <ul>
+        <li><a href="#单一职责">单一职责</a></li>
+        <li><a href="#开闭原则">开闭原则</a></li>
+        <li><a href="#里氏替换">里氏替换</a></li>
+        <li><a href="#接口隔离">接口隔离</a></li>
+        <li><a href="#依赖反转">依赖反转</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="面向对象编程">面向对象编程</h1>
+<p>面向对象编程的英文全称是Object Oriented Programming，它是一种编程范式或者说编程风格。具体来说，就是以类或对象作为组织代码的基本单元，并将封装、继承、抽象、多态这四种特性作为代码设计和实现的基石。</p>
+<h2 id="四大特性">四大特性</h2>
+<h3 id="封装">封装</h3>
+<p>封装是对信息的隐藏，类通过暴露有限的接口，授权外部只能通过类本身提供的方式来访问或者修改数据。</p>
+<p>例如，我们要做一个钱包系统，它的基础代码可能是这样的:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Wallet</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> String id<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">long</span> createTime<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> BigDecimal balance<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">long</span> balanceLastModifiedTime<span style="color:#f92672">;</span> 
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Wallet</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> IdGenerator<span style="color:#f92672">.</span><span style="color:#a6e22e">getInstance</span><span style="color:#f92672">().</span><span style="color:#a6e22e">generate</span><span style="color:#f92672">();</span> 
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">createTime</span> <span style="color:#f92672">=</span> System<span style="color:#f92672">.</span><span style="color:#a6e22e">currentTimeMillis</span><span style="color:#f92672">();</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">balance</span> <span style="color:#f92672">=</span> BigDecimal<span style="color:#f92672">.</span><span style="color:#a6e22e">ZERO</span><span style="color:#f92672">;</span> 
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">balanceLastModifiedTime</span> <span style="color:#f92672">=</span> System<span style="color:#f92672">.</span><span style="color:#a6e22e">currentTimeMillis</span><span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getId</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">id</span><span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">long</span> <span style="color:#a6e22e">getCreateTime</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">createTime</span><span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> BigDecimal <span style="color:#a6e22e">getBalance</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">balance</span><span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">long</span> <span style="color:#a6e22e">getBalanceLastModifiedTime</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">balanceLastModifiedTime</span><span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">increaseBalance</span><span style="color:#f92672">(</span>BigDecimal increasedAmount<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> 
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>increasedAmount<span style="color:#f92672">.</span><span style="color:#a6e22e">compareTo</span><span style="color:#f92672">(</span>BigDecimal<span style="color:#f92672">.</span><span style="color:#a6e22e">ZERO</span><span style="color:#f92672">)</span> <span style="color:#f92672">&lt;</span> 0<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> InvalidAmountException<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;...&#34;</span><span style="color:#f92672">);</span> 
+        <span style="color:#f92672">}</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">balance</span><span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>increasedAmount<span style="color:#f92672">);</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">balanceLastModifiedTime</span> <span style="color:#f92672">=</span> System<span style="color:#f92672">.</span><span style="color:#a6e22e">currentTimeMillis</span><span style="color:#f92672">();</span> 
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">decreaseBalance</span><span style="color:#f92672">(</span>BigDecimal decreasedAmount<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> 
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>decreasedAmount<span style="color:#f92672">.</span><span style="color:#a6e22e">compareTo</span><span style="color:#f92672">(</span>BigDecimal<span style="color:#f92672">.</span><span style="color:#a6e22e">ZERO</span><span style="color:#f92672">)</span> <span style="color:#f92672">&lt;</span> 0<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> InvalidAmountException<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;...&#34;</span><span style="color:#f92672">);</span> 
+        <span style="color:#f92672">}</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>decreasedAmount<span style="color:#f92672">.</span><span style="color:#a6e22e">compareTo</span><span style="color:#f92672">(</span><span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">balance</span><span style="color:#f92672">)</span> <span style="color:#f92672">&gt;</span> 0<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> 
+            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> InsufficientAmountException<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;...&#34;</span><span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">balance</span><span style="color:#f92672">.</span><span style="color:#a6e22e">subtract</span><span style="color:#f92672">(</span>decreasedAmount<span style="color:#f92672">);</span> 
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">balanceLastModifiedTime</span> <span style="color:#f92672">=</span> System<span style="color:#f92672">.</span><span style="color:#a6e22e">currentTimeMillis</span><span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span></code></pre></div></p>
+<p>对于钱包的四个属性，从业务角度讲，id和createTime应该是创建钱包的时候就确定好不会变的，所以只在构造函数中确定下来，且没有相应的方法去修改它们。而对于余额balance属性，只能增或者减，而不会重新设置，所以我们提供了increaseBalance和decreaseBalance方法。对于balanceLastModifiedTime属性，只有在余额增减时，它才会变动，所以也是绑定在余额属性修改的方法中的。</p>
+<p>这段代码用Java实现，能很好的利用语言提供的private、public关键字来达到访问权限控制的目的。而对于Python等语言，就没办法完全意义上的控制访问权限了。</p>
+<p>如果我们对类中的属性不加以访问控制，那么外部的所有代码都可以访问、修改这些属性。这样看起来虽然更灵活，但过度灵活的代价就是代码不可控。属性被随意修改并且隐蔽在各个代码的角落，必然会影响代码的可读性和可维护性。</p>
+<h3 id="抽象">抽象</h3>
+<p>抽象是对方法的具体实现的隐藏，让调用者只需要关心方法做了什么事情，而不需要关心是怎么做的。面向对象语言中，通常使用接口(如java中的interface)或抽象类来实现抽象特性。</p>
+<p>实际上，抽象这个概念是很通用的设计思想，在面对复杂系统的时候，人脑能承受的信息复杂度是有限的，因此我们需要过滤掉一些非关键的实现细节，抽象的设计思想能很好的帮助我们。所以抽象有时也会被排除在面向对象的特性之外，正是因为它几乎应用在所有的编程场景下，函数本身就是一种抽象。</p>
+<h3 id="继承">继承</h3>
+<p>继承用来表示类之间is-a的关系，分为单继承和多继承，它最大的好处就是代码复用。假设两个类有一些相同的属性或方法，我们可以考虑把这些共有的东西提取到父类中，并让这两个类继承父类。</p>
+<p>但是，过度的使用继承也会导致代码的可读性、可维护性变差。过多的代码层级，导致查找一个属性时可能要不断的追查其父类；子类和父类的高度耦合，导致修改父类时可能影响到子类等都是问题。所以也有少用继承、多用组合的说法。</p>
+<h3 id="多态">多态</h3>
+<p>同一操作作用于不同的对象，可以有不同的解释，产生不同的执行结果，这就是多态性。</p>
+<p>而对于多态的实现，有多种方式，常见的有继承加方法重写、接口类、ducking-type三种。</p>
+<p><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Animal</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">eat</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;动物吃饭&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Cat</span> <span style="color:#66d9ef">extends</span> Animal <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">eat</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;猫吃饭&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(){</span>
+    Animal am <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Cat<span style="color:#f92672">();</span>
+    am<span style="color:#f92672">.</span><span style="color:#a6e22e">eat</span><span style="color:#f92672">();</span>
+<span style="color:#f92672">}</span></code></pre></div>
+上面的例子中，父类对象可以引用子类对象，也就是说可以将Cat传递给Animal，然后就会使用子类的eat方法，从而实现了多态。</p>
+<p><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">Iterator</span> <span style="color:#f92672">{</span>
+    String <span style="color:#a6e22e">hasNext</span><span style="color:#f92672">();</span>
+    String <span style="color:#a6e22e">next</span><span style="color:#f92672">();</span>
+<span style="color:#f92672">}</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Array</span> <span style="color:#66d9ef">implements</span> Iterator <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> String<span style="color:#f92672">[]</span> data<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">hasNext</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span> <span style="color:#f92672">...</span> <span style="color:#f92672">}</span> 
+    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">next</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span> <span style="color:#f92672">...</span> <span style="color:#f92672">}</span> 
+<span style="color:#f92672">}</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LinkedList</span> <span style="color:#66d9ef">implements</span> Iterator <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> LinkedListNode head<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">hasNext</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span> <span style="color:#f92672">...</span> <span style="color:#f92672">}</span> 
+    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">next</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span> <span style="color:#f92672">...</span> <span style="color:#f92672">}</span> 
+<span style="color:#f92672">}</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">print</span><span style="color:#f92672">(</span>Iterator iterator<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>iterator<span style="color:#f92672">.</span><span style="color:#a6e22e">hasNext</span><span style="color:#f92672">())</span> <span style="color:#f92672">{</span>
+            System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>iterator<span style="color:#f92672">.</span><span style="color:#a6e22e">next</span><span style="color:#f92672">());</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        Iterator arrayIterator <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Array<span style="color:#f92672">();</span>
+        print<span style="color:#f92672">(</span>arrayIterator<span style="color:#f92672">);</span>
+        Iterator linkedListIterator <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> LinkedList<span style="color:#f92672">();</span>
+        print<span style="color:#f92672">(</span>linkedListIterator<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span></code></pre></div>
+这个例子中，Iterator是一个接口类，定义了一个可以遍历集合数据的迭代器。Array和LinkedList都实现了它，然后通过传递不同的实现类到print函数中，来支持动态调用不同的next()和hasNext()实现。</p>
+<p><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Logger</span>:
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">record</span>(self):
+        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;I write a log into file.&#34;</span>)
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DB</span>:
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">record</span>(self):
+        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;I insert data into db.&#34;</span>)
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test</span>(recorder):
+    recorder<span style="color:#f92672">.</span>record()
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">demo</span>():
+    logger <span style="color:#f92672">=</span> Logger()
+    db <span style="color:#f92672">=</span> DB()
+    test(logger)
+    test(db)</code></pre></div>
+鸭子类型实现多态的方法非常简单，只要他们都定义了record方法，传入test方法时就可以调用相应的record方法。</p>
+<p>多态特性主要能提升代码的可扩展性和复用性，例如Iterator这个例子，我们可以不改变原有代码的情况下，添加其他的数据结构像HashMap等，也同样能够传入print()函数。如果不使用多态特性，我们可能要定义print(Array array)、print(LinkedList linkedList)等。</p>
+<h2 id="solid">SOLID</h2>
+<p>随着面向对象编程的发展，人们总结出了很多设计原则，其中最出名的当属SOLID，它代表五条原则。如果遵循这5条设计原则，就更可能写出可扩展、易于修改的代码。相反，如果不断违反其中的一条或多条原则，那么很快你的代码就会变得不可扩展、难以维护。</p>
+<h3 id="单一职责">单一职责</h3>
+<p>即Single Responsibility Principle，一个类或者模块只负责完成一个职责(或功能)。这个原则看似不太难用，但在实际情况中，往往很难判断一个类的职责是否是单一的。比如在一个社交产品中，我们用一个UserInfo类来记录用户的信息:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UserInfo</span><span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">long</span> userId<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> String username<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> String email<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> String telephone<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> String avatarUrl<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> String provinceOfAddress<span style="color:#f92672">;</span> <span style="color:#75715e">// 省
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> String cityOfAddress<span style="color:#f92672">;</span> <span style="color:#75715e">// 市
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> String regionOfAddress<span style="color:#f92672">;</span> <span style="color:#75715e">// 区
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> String detailedAddress<span style="color:#f92672">;</span> <span style="color:#75715e">// 详细地址
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// ... 省略其他属性和方法...
+</span><span style="color:#75715e"></span><span style="color:#f92672">}</span></code></pre></div>
+我们发现看上去这个类都是和用户相关的信息，所有的属性和方法都是基于用户这个业务模型的，应该是满足单一职责原则的。但还有一种观点认为，地址信息在UserInfo中所占比重高，可以继续拆分为独立的UserAddress类，拆分之后职责更加单一。哪种观点是对的呢？实际上还是要根据业务来确定，如果地址信息和其他信息一样只是展示用，那放在UserInfo中没有问题，如果地址还要用于后续的收货等场景，就应该独立成一个类。</p>
+<p>如果违反单一职责，有什么坏处呢？假设某个类包含了10多个功能点，那意味着维护成本的增高，我们可能经常去因为各种原因修改它，导致不同的功能之间相互影响，此外，也不利于代码的复用。</p>
+<p>那是否为了满足单一职责原则，把类拆的越细越好？例如当前有一个Serialization类实现一个协议的序列化和反序列化功能:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#75715e">/**
+</span><span style="color:#75715e"> * Protocol format: identifier-string;{gson string}
+</span><span style="color:#75715e"> * For example: UEUEUE;{&#34;a&#34;:&#34;A&#34;,&#34;b&#34;:&#34;B&#34;}
+</span><span style="color:#75715e"> */</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Serialization</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> String IDENTIFIER_STRING <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;UEUEUE;&#34;</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> Gson gson<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Serialization</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">gson</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Gson<span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">serialize</span><span style="color:#f92672">(</span>Map<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">,</span> String<span style="color:#f92672">&gt;</span> object<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        StringBuilder textBuilder <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> StringBuilder<span style="color:#f92672">();</span>
+        textBuilder<span style="color:#f92672">.</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span>IDENTIFIER_STRING<span style="color:#f92672">);</span>
+        textBuilder<span style="color:#f92672">.</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span>gson<span style="color:#f92672">.</span><span style="color:#a6e22e">toJson</span><span style="color:#f92672">(</span>object<span style="color:#f92672">));</span>
+        <span style="color:#66d9ef">return</span> textBuilder<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> Map<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">,</span> String<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">deserialize</span><span style="color:#f92672">(</span>String text<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(!</span>text<span style="color:#f92672">.</span><span style="color:#a6e22e">startsWith</span><span style="color:#f92672">(</span>IDENTIFIER_STRING<span style="color:#f92672">))</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">return</span> Collections<span style="color:#f92672">.</span><span style="color:#a6e22e">emptyMap</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span>
+        String gsonStr <span style="color:#f92672">=</span> text<span style="color:#f92672">.</span><span style="color:#a6e22e">substring</span><span style="color:#f92672">(</span>IDENTIFIER_STRING<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">());</span>
+        <span style="color:#66d9ef">return</span> gson<span style="color:#f92672">.</span><span style="color:#a6e22e">fromJson</span><span style="color:#f92672">(</span>gsonStr<span style="color:#f92672">,</span> Map<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span></code></pre></div>
+为了让类的职责更加单一，我们对它进一步拆分:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Serializer</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> String IDENTIFIER_STRING <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;UEUEUE;&#34;</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> Gson gson<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Serializer</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span> 
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">gson</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Gson<span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">serialize</span><span style="color:#f92672">(</span>Map<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">,</span> String<span style="color:#f92672">&gt;</span> object<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        StringBuilder textBuilder <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> StringBuilder<span style="color:#f92672">();</span>
+        textBuilder<span style="color:#f92672">.</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span>IDENTIFIER_STRING<span style="color:#f92672">);</span>
+        textBuilder<span style="color:#f92672">.</span><span style="color:#a6e22e">append</span><span style="color:#f92672">(</span>gson<span style="color:#f92672">.</span><span style="color:#a6e22e">toJson</span><span style="color:#f92672">(</span>object<span style="color:#f92672">));</span>
+        <span style="color:#66d9ef">return</span> textBuilder<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Deserializer</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> String IDENTIFIER_STRING <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;UEUEUE;&#34;</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> Gson gson<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Deserializer</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">gson</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Gson<span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> Map<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">,</span> String<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">deserialize</span><span style="color:#f92672">(</span>String text<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(!</span>text<span style="color:#f92672">.</span><span style="color:#a6e22e">startsWith</span><span style="color:#f92672">(</span>IDENTIFIER_STRING<span style="color:#f92672">))</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">return</span> Collections<span style="color:#f92672">.</span><span style="color:#a6e22e">emptyMap</span><span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span>
+        String gsonStr <span style="color:#f92672">=</span> text<span style="color:#f92672">.</span><span style="color:#a6e22e">substring</span><span style="color:#f92672">(</span>IDENTIFIER_STRING<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">());</span>
+        <span style="color:#66d9ef">return</span> gson<span style="color:#f92672">.</span><span style="color:#a6e22e">fromJson</span><span style="color:#f92672">(</span>gsonStr<span style="color:#f92672">,</span> Map<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span></code></pre></div>
+虽然拆分之后，类的职责更加单一了，但也带来新的问题，比如我们如果修改数据标识&quot;UEUEUE&quot;改为&quot;DFDFDF&rdquo;，或者序列化方式从JSON改为XML，那么两个类都需要做修改，代码的内聚性没有原来的高了，可维护性变差了。</p>
+<h3 id="开闭原则">开闭原则</h3>
+<p>即Open Closed Principle，表示对扩展开放、对修改关闭，当我们添加一个功能的时候，应该在已有代码的基础上扩展(新增模块、类、方法等)，而非修改已有代码(修改模块、类、方法等)。</p>
+<p>比如我们在写一个爬虫的小程序，用户对爬取结果中关于github的内容感兴趣，因此代码变成了这样:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HNTopPostsSpider</span>:
+    <span style="color:#75715e"># &lt;... 已省略 ...&gt;</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fetch</span>(self) <span style="color:#f92672">-&gt;</span> Generator[Post, None, None]:
+        <span style="color:#75715e"># &lt;... 已省略 ...&gt;</span>
+        <span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> items:
+            <span style="color:#75715e"># &lt;... 已省略 ...&gt;</span>
+            link <span style="color:#f92672">=</span> node_title<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;href&#39;</span>)
+            <span style="color:#75715e"># 只关注来自 github.com 的内容</span>
+            <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;github&#39;</span> <span style="color:#f92672">in</span> link<span style="color:#f92672">.</span>lower():
+                <span style="color:#66d9ef">yield</span> Post(<span style="color:#f92672">...</span> <span style="color:#f92672">...</span>)</code></pre></div>
+这么做看似完成了功能，但如果用户改变了需求，想关注来自twitter的内容，就必须要修改<code>if 'github' in link.lower()</code>这段，这显然是违反开闭原则的。那么如何修改，有这样几种思路:</p>
+<h4 id="利用继承修改">利用继承修改</h4>
+<p>使用这种方法的关键点在于，找到父类中会变动的部分，将其抽象成新的方法或属性，最终允许子类重写来改变这些行为。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HNTopPostsSpider</span>:
+    <span style="color:#75715e"># &lt;... 已省略 ...&gt;</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fetch</span>(self) <span style="color:#f92672">-&gt;</span> Generator[Post, None, None]:
+        <span style="color:#75715e"># &lt;... 已省略 ...&gt;</span>
+        <span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> items:
+            <span style="color:#75715e"># &lt;... 已省略 ...&gt;</span>
+            post <span style="color:#f92672">=</span> Post( <span style="color:#f92672">...</span> <span style="color:#f92672">...</span> )
+            <span style="color:#75715e"># 使用测试方法来判断是否返回该帖子</span>
+            <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>interested_in_post(post):
+                <span style="color:#66d9ef">yield</span> post
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">interested_in_post</span>(self, post: Post) <span style="color:#f92672">-&gt;</span> bool:
+        <span style="color:#66d9ef">return</span> True
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GithubOnlyHNTopPostsSpider</span>(HNTopPostsSpider):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">interested_in_post</span>(self, post: Post) <span style="color:#f92672">-&gt;</span> bool:
+        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;github&#39;</span> <span style="color:#f92672">in</span> post<span style="color:#f92672">.</span>link<span style="color:#f92672">.</span>lower()</code></pre></div>
+这时，用户如果想要添加其他网站到感兴趣的内容，只需要再写一个继承类并覆盖<code>interested_in_post</code>方法中的内容即可，而不需要修改类本身。</p>
+<h4 id="利用组合与依赖注入修改">利用组合与依赖注入修改</h4>
+<p>另一种方法是通过依赖注入，在我们对类实例化的时候，通过参数传入一个帖子过滤的算法到实例中。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">PostFilter</span>(metaclass<span style="color:#f92672">=</span>ABCMeta):
+    <span style="color:#a6e22e">@abstractmethod</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">validate</span>(self, post: Post) <span style="color:#f92672">-&gt;</span> bool:
+        <span style="color:#e6db74">&#34;&#34;&#34;判断帖子是否应该被保留&#34;&#34;&#34;</span>
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DefaultPostFilter</span>(PostFilter):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">validate</span>(self, post: Post) <span style="color:#f92672">-&gt;</span> bool:
+        <span style="color:#66d9ef">return</span> True
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HNTopPostsSpider</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, post_filter: Optional[PostFilter] <span style="color:#f92672">=</span> None):
+        self<span style="color:#f92672">.</span>post_filter <span style="color:#f92672">=</span> post_filter <span style="color:#f92672">or</span> DefaultPostFilter()
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fetch</span>(self) <span style="color:#f92672">-&gt;</span> Generator[Post, None, None]:
+        <span style="color:#75715e"># &lt;... 已省略 ...&gt;</span>
+        <span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> items:
+            <span style="color:#75715e"># &lt;... 已省略 ...&gt;</span>
+            post <span style="color:#f92672">=</span> Post( <span style="color:#f92672">...</span> <span style="color:#f92672">...</span> )
+            <span style="color:#75715e"># 使用测试方法来判断是否返回该帖子</span>
+            <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>post_filter<span style="color:#f92672">.</span>validate(post):
+                <span style="color:#66d9ef">yield</span> post</code></pre></div>
+默认情况下，会保留所有的结果，当然我们可以根据自己需求定制:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GithubTwitterFilter</span>(PostFilter):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">validate</span>(self, post: Post) <span style="color:#f92672">-&gt;</span> bool:
+        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;github&#39;</span> <span style="color:#f92672">in</span> post<span style="color:#f92672">.</span>link<span style="color:#f92672">.</span>lower() <span style="color:#f92672">or</span> <span style="color:#e6db74">&#39;twitter&#39;</span> <span style="color:#f92672">in</span> post<span style="color:#f92672">.</span>link<span style="color:#f92672">.</span>lower():
+            <span style="color:#66d9ef">return</span> True
+        <span style="color:#66d9ef">return</span> False
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+    crawler <span style="color:#f92672">=</span> HNTopPostsSpider(post_filter<span style="color:#f92672">=</span>GithubTwitterFilter())
+    crawler<span style="color:#f92672">.</span>fetch()</code></pre></div>
+所以通过抽象出过滤算法，以依赖注入的方式传入实例也能实现开闭原则。</p>
+<h4 id="使用数据驱动来修改">使用数据驱动来修改</h4>
+<p>这种方式的核心思想在于，将经常变动的东西，以数据的方式抽离出来，需求变动时只去改动数据。和依赖注入很像，只不过依赖注入传入的是类，这个传入的是数据。
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HNTopPostsSpider</span>:
+    <span style="color:#66d9ef">def</span> __init__(self,
+                 filter_by_link_keywords: Optional[List[str]] <span style="color:#f92672">=</span> None):
+        self<span style="color:#f92672">.</span>filter_by_link_keywords <span style="color:#f92672">=</span> filter_by_link_keywords
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fetch</span>(self) <span style="color:#f92672">-&gt;</span> Generator[Post, None, None]:
+        <span style="color:#75715e"># &lt;... 已省略 ...&gt;</span>
+        <span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> items:
+            <span style="color:#75715e"># &lt;... 已省略 ...&gt;</span>
+            post <span style="color:#f92672">=</span> Post( <span style="color:#f92672">...</span> <span style="color:#f92672">...</span> )
+            <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>filter_by_link_keywords <span style="color:#f92672">is</span> None:
+                <span style="color:#66d9ef">yield</span> post
+            <span style="color:#75715e"># 当 link 中出现任意一个关键词时，返回结果</span>
+            <span style="color:#66d9ef">elif</span> any(keyword <span style="color:#f92672">in</span> post<span style="color:#f92672">.</span>link <span style="color:#66d9ef">for</span> keyword <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>filter_by_link_keywords):
+                <span style="color:#66d9ef">yield</span> post
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+    <span style="color:#75715e"># link_keywords = None</span>
+    link_keywords <span style="color:#f92672">=</span> [
+        <span style="color:#e6db74">&#39;github.com&#39;</span>,
+        <span style="color:#e6db74">&#39;twitter.com&#39;</span>
+    ]
+    crawler <span style="color:#f92672">=</span> HNTopPostsSpider(filter_by_link_keywords<span style="color:#f92672">=</span>link_keywords)
+    crawler<span style="color:#f92672">.</span>fetch()</code></pre></div>
+这种方式没有添加其他的类，显得更简洁，但也同样带来了扩展性不强的问题，例如如果需要定义以<code>.com</code>结尾的过滤条件，这种方式就无能为力了。</p>
+<h3 id="里氏替换">里氏替换</h3>
+<p>里氏替换原则是一条非常具体的、和继承有关的原则，是用它的发明者Liskov命名的，具体指在你使用继承时，子类对象应该能够替代父类对象的使用，还不破坏程序本身的功能。</p>
+<p>我们来看一个具体的例子:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">User</span>(Model):
+    <span style="color:#66d9ef">def</span> __init__(self, username: str):
+        self<span style="color:#f92672">.</span>username <span style="color:#f92672">=</span> username
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">deactivate</span>(self):
+        <span style="color:#75715e"># 停用当前用户</span>
+        self<span style="color:#f92672">.</span>is_active <span style="color:#f92672">=</span> False
+        self<span style="color:#f92672">.</span>save()
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Admin</span>(User):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">deactivate</span>(self):
+        <span style="color:#75715e"># 管理员用户不允许被停用</span>
+        <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">RuntimeError</span>(<span style="color:#e6db74">&#39;admin can not be deactivated!&#39;</span>)</code></pre></div>
+这个例子中Admin需要的功能大多User已经具备，所以它继承了User，并重写了User的少量行为，这是继承的典型用法。这有什么问题呢？假设我们现在需要一个新的函数来批量停用用户:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">deactive_users</span>(users:Iterable[User]):
+    <span style="color:#66d9ef">for</span> user <span style="color:#f92672">in</span> users:
+        user<span style="color:#f92672">.</span>deactive()</code></pre></div>
+那么我们如果传入一个[User(&ldquo;a&rdquo;)、Admin(&ldquo;b&rdquo;)]这有的对象，程序就会报错，所以在这个函数中，子类无法替代父类的使用，违背了里氏替换原则。</p>
+<p>如何去修改呢？如果我们在deactive_users函数中添加<code>if isinstance(user, Admin)</code>这样的判断显然是不合适的，未来如果有更多的需要不允许被停用的User子类，例如VIP、公司员工等，又需要修改该函数，这就违反了开闭原则。我们可以这样修改:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">User</span>(Model):
+    <span style="color:#66d9ef">def</span> __init__(self, username: str):
+        self<span style="color:#f92672">.</span>username <span style="color:#f92672">=</span> username
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">allow_deactivate</span>(self) <span style="color:#f92672">-&gt;</span> bool:
+        <span style="color:#75715e"># 是否允许被停用</span>
+        <span style="color:#66d9ef">return</span> True
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">deactivate</span>(self):
+        self<span style="color:#f92672">.</span>is_active <span style="color:#f92672">=</span> True
+        self<span style="color:#f92672">.</span>save()
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Admin</span>(User):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">allow_deactivate</span>(self) <span style="color:#f92672">-&gt;</span> bool:
+        <span style="color:#75715e"># 管理员用户不允许被停用</span>
+        <span style="color:#66d9ef">return</span> False
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">deactivate_users</span>(users: Iterable[User]):
+    <span style="color:#66d9ef">for</span> user <span style="color:#f92672">in</span> users:
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> user<span style="color:#f92672">.</span>allow_deactivate():
+            logger<span style="color:#f92672">.</span>info(f<span style="color:#e6db74">&#39;user {user.username} does not allow deactivating, skip.&#39;</span>)
+            <span style="color:#66d9ef">continue</span>
+        user<span style="color:#f92672">.</span>deactivate()</code></pre></div>
+修改后的代码，子类可以替代父类的使用，也符合了开闭原则。总结来说，我们应该让子类重写父类方法的时候，子类方法的参数签名和父类完全一致或者有更宽松，子类方法的返回值类型和父类一致。</p>
+<h3 id="接口隔离">接口隔离</h3>
+<h3 id="依赖反转">依赖反转</h3>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/4180b697db23aa8f32b140677c0d3a1e5ecf6df9" title='最后修改者 hjlarry | December 23, 2020' target="_blank" rel="noopener">
+      <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>December 23, 2020</span>
+    </a>
+  </div>
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/other/oop/_index.md" target="_blank" rel="noopener">
+      <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>编辑本页</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        <br>
+<div style="text-align: center;font-size:xx-small;">
+    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a
+        href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
+</div>
+      </footer>
+
+      
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#四大特性">四大特性</a>
+      <ul>
+        <li><a href="#封装">封装</a></li>
+        <li><a href="#抽象">抽象</a></li>
+        <li><a href="#继承">继承</a></li>
+        <li><a href="#多态">多态</a></li>
+      </ul>
+    </li>
+    <li><a href="#solid">SOLID</a>
+      <ul>
+        <li><a href="#单一职责">单一职责</a></li>
+        <li><a href="#开闭原则">开闭原则</a></li>
+        <li><a href="#里氏替换">里氏替换</a></li>
+        <li><a href="#接口隔离">接口隔离</a></li>
+        <li><a href="#依赖反转">依赖反转</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

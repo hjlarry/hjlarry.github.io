@@ -46,7 +46,7 @@ TCP是有状态的，UDP是无状态的。
 <title>网络协议 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.c2c5daf4fd3969c56b6ba45ab64838924672f19908889a323478c5f3a757f746.js" integrity="sha256-wsXa9P05acVra6Ratkg4kkZy8ZkIiJoyNHjF86dX90Y="></script>
+<script defer src="/cn.search.min.8d2462c3b745732864d843e8e2e7782a2ec838ca90fb94676baa461536bdae11.js" integrity="sha256-jSRiw7dFcyhk2EPo4ud4Ki7IOMqQ&#43;5Rna6pGFTa9rhE="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/other/protocol/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -106,7 +106,6 @@ https://github.com/alex-shpak/hugo-book
 </li>
 <li><strong>Python语言</strong>
 <ul>
-<li><a href="/docs/python/descriptor/">描述符</a></li>
 <li><a href="/docs/python/memory/">内存管理</a></li>
 <li><a href="/docs/python/interpreter/">解释器</a></li>
 <li><a href="/docs/python/tools/">技巧工具</a></li>
@@ -124,6 +123,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/docs/other/docker/">docker</a></li>
 <li><a href="/docs/other/raft/">raft</a></li>
 <li><a href="/docs/other/shell/">shell</a></li>
+<li><a href="/docs/other/oop/">面向对象</a></li>
 <li><a href="/docs/other/protocol/"class=active>网络协议</a></li>
 <li><a href="/docs/other/tools/">系统工具</a></li>
 </ul>
@@ -213,7 +213,13 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#工作过程">工作过程</a></li>
       </ul>
     </li>
-    <li><a href="#rpc">RPC</a></li>
+    <li><a href="#socks5">SOCKS5</a>
+      <ul>
+        <li><a href="#建立连接">建立连接</a></li>
+        <li><a href="#响应连接">响应连接</a></li>
+        <li><a href="#和目标服务建立连接">和目标服务建立连接</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 
@@ -385,7 +391,115 @@ https://github.com/alex-shpak/hugo-book
 <p>现在，客户端和服务端都有了三个随机数字，分别是自己的、对端的以及刚刚生成的Pre-master。通过它们就可以在服务端和客户端之间生成相同的对称密钥了。</p>
 <p>有了对称密钥，客户端会发送Change Cipher Spec意思是之后可以用该密钥来加密通信了，并附带一条Encrypted Handshake Message发送给服务端用于数据与握手验证。服务端也做类似的事情，之后过程就和HTTP一样了。</p>
 <p>以上是大多数的场景，只需单向认证。在一些特殊场合，有更加严格要求时，也可能启动双向认证，双方互相验证证书。</p>
-<h2 id="rpc">RPC</h2>
+<h2 id="socks5">SOCKS5</h2>
+<p>SOCKS5是TCP/IP层面的网络代理协议，ShadowSocks的数据传输就是建立在SOCKS5协议之上的。</p>
+<p>它的本质就是把原本应该再本机直接请求目标服务器的流程，放到了服务端去代理客服端请求。运行流程可以总结为:</p>
+<ol>
+<li>本机和代理服务端协商并建立连接</li>
+<li>本机告诉代理服务端目标服务器的地址</li>
+<li>代理服务端去连接目标服务器，成功后告诉本机</li>
+<li>本机开始发送原本应该发送给目标服务器的数据，由代理服务端完成数据转发</li>
+</ol>
+<h3 id="建立连接">建立连接</h3>
+<p>客户端向代理服务端请求建立连接，其发送的数据包为:</p>
+<table>
+<thead>
+<tr>
+<th>VER</th>
+<th>NMMETHODS</th>
+<th>METHODS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x05</td>
+<td>0x02</td>
+<td>0x0002</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>VER表示SOCKS的版本，SOCKS5应该为0x05，该字段长度固定1字节</li>
+<li>NMMETHODS表示其后的METHODS有多长，该字段长度固定1字节</li>
+<li>METHODS表示客户端支持的验证的方式，可以是多种方式，如0x00表示不需要验证、0x02表示账号密码验证，其长度为1~255字节</li>
+</ul>
+<h3 id="响应连接">响应连接</h3>
+<p>代理服务端收到客户端的请求后，需要返回要求客户端提供哪种验证方式的信息，例如它需要客户端提供账密验证信息就会这样返回:</p>
+<table>
+<thead>
+<tr>
+<th>VER</th>
+<th>METHOD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x05</td>
+<td>0x02</td>
+</tr>
+</tbody>
+</table>
+<h3 id="和目标服务建立连接">和目标服务建立连接</h3>
+<p>由于每种验证方式需要发送的信息不同，为简单起见，假设代理服务端是不需要验证的，那么下一步客户端就要告诉代理服务端目标服务的地址了。也就是说客户端需要把如Google服务的地址google.com:80告诉代理服务端，代理服务端再去请求google.com:80。此时，客户端发送的信息如下:</p>
+<table>
+<thead>
+<tr>
+<th>VER</th>
+<th>CMD</th>
+<th>RSV</th>
+<th>ATYP</th>
+<th>DST.ADDR</th>
+<th>DST.PORT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x05</td>
+<td>0x01</td>
+<td>0x00</td>
+<td>0x03</td>
+<td>google.com</td>
+<td>80</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>CMD代表客户端请求的类型，有三种，0x01即CONNECT，0x02即BIND，0x03即UDP</li>
+<li>RSV为保留字段，固定1字节长度</li>
+<li>ATYP表示目标服务的地址类型，有三种，0x01即IPV4，0x03即域名，0x04即IPV6</li>
+<li>DST.ADDR表示目标服务器的地址，根据ATYP的类型来解析，其长度不确定</li>
+<li>DST.PORT表示要访问目标服务器的哪个端口，固定2个字节</li>
+</ul>
+<p>代理服务端得到客户端要请求的目标服务地址后，就会对目标服务进行请求，无论是否成功都会做如下返回:</p>
+<table>
+<thead>
+<tr>
+<th>VER</th>
+<th>REP</th>
+<th>RSV</th>
+<th>ATYP</th>
+<th>BND.ADDR</th>
+<th>BND.PORT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x05</td>
+<td>0x00</td>
+<td>0x00</td>
+<td>0x03</td>
+<td>google.com</td>
+<td>80</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>REP表示响应状态码，0x00表示成功，0x01~0x09表示各种各样的错误</li>
+<li>RSV、ATYP和之前一样</li>
+<li>BND.ADDR表示绑定的地址</li>
+<li>BND.PORT表示绑定的端口</li>
+</ul>
+<p>如果响应成功，客户端就开始发送真实数据，代理服务端就开始转发这些数据。</p>
 </article>
  
       
@@ -398,9 +512,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/f8150d4d79b0bd5434db9dad6eea68562baf2245" title='最后修改者 hjlarry | April 21, 2020' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/423967f9f2b3b356d4e467f4e8316c55a99308a4" title='最后修改者 hjlarry | December 2, 2020' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>April 21, 2020</span>
+      <span>December 2, 2020</span>
     </a>
   </div>
 
@@ -476,7 +590,13 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#工作过程">工作过程</a></li>
       </ul>
     </li>
-    <li><a href="#rpc">RPC</a></li>
+    <li><a href="#socks5">SOCKS5</a>
+      <ul>
+        <li><a href="#建立连接">建立连接</a></li>
+        <li><a href="#响应连接">响应连接</a></li>
+        <li><a href="#和目标服务建立连接">和目标服务建立连接</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 

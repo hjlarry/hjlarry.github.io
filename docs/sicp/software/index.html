@@ -22,7 +22,7 @@
 <title>软件 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.c2c5daf4fd3969c56b6ba45ab64838924672f19908889a323478c5f3a757f746.js" integrity="sha256-wsXa9P05acVra6Ratkg4kkZy8ZkIiJoyNHjF86dX90Y="></script>
+<script defer src="/cn.search.min.8d2462c3b745732864d843e8e2e7782a2ec838ca90fb94676baa461536bdae11.js" integrity="sha256-jSRiw7dFcyhk2EPo4ud4Ki7IOMqQ&#43;5Rna6pGFTa9rhE="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/sicp/software/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -82,7 +82,6 @@ https://github.com/alex-shpak/hugo-book
 </li>
 <li><strong>Python语言</strong>
 <ul>
-<li><a href="/docs/python/descriptor/">描述符</a></li>
 <li><a href="/docs/python/memory/">内存管理</a></li>
 <li><a href="/docs/python/interpreter/">解释器</a></li>
 <li><a href="/docs/python/tools/">技巧工具</a></li>
@@ -100,6 +99,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/docs/other/docker/">docker</a></li>
 <li><a href="/docs/other/raft/">raft</a></li>
 <li><a href="/docs/other/shell/">shell</a></li>
+<li><a href="/docs/other/oop/">面向对象</a></li>
 <li><a href="/docs/other/protocol/">网络协议</a></li>
 <li><a href="/docs/other/tools/">系统工具</a></li>
 </ul>
@@ -281,6 +281,11 @@ C语言、Go语言通过标准库进行系统调用，他们的标准库中的�
 <p>也称<strong>轻量级进程</strong>(LWP)，是进程中的实际执行单位，一个标准的线程由线程ID、当前指令指针(PC)、寄存器集合和堆栈组成。一个进程通常拥有一个或多个线程，这些线程之间共享程序的内存空间(包含代码段、数据段、堆等)以及一些进程级的资源(例如打开的文件、接收的信号等)。</p>
 <p><img src="./images/thread.png" alt="" /></p>
 <p>线程是调度和时间片的分配单位，更多线程理论上会获得更多的CPU资源，同一程序的多个线程是可以在多核处理器上并行执行来提高执行吞吐率的，当然这也要看操作系统的调度策略。</p>
+<p>从一个线程切换到另一个线程，需要保存当前线程的状态，并且恢复另一线程的状态，这个过程就叫<strong>上下文切换</strong>(context switch)。进程和线程都有上下文切换。区别在于线程切换期间，虚拟内存状态（TLB）保持不变。通过以下方式可以观察到上下文切换的情况:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ watch grep <span style="color:#e6db74">&#34;ctxt&#34;</span> /proc/<span style="color:#f92672">{</span>pid<span style="color:#f92672">}</span>/status  <span style="color:#75715e"># 定时输出</span>
+
+voluntary_ctxt_switches:  <span style="color:#ae81ff">3508</span>          <span style="color:#75715e"># 程序自愿(比如有较多IO等待操作)</span>
+nonvoluntary_ctxt_switches: <span style="color:#ae81ff">64</span>          <span style="color:#75715e"># 系统强制(时间片用完)</span></code></pre></div>
 <h3 id="线程调度">线程调度</h3>
 <p>在单CPU的设备上，并行是模拟出来的，多线程程序轮流执行，每个线程每次仅执行一小段时间，这样不断在处理器上切换不同的线程去执行的行为我们称为<strong>线程调度</strong>(Thread Schedule)。在调度中，线程通常至少有三种状态:</p>
 <ul>
@@ -371,7 +376,25 @@ C语言、Go语言通过标准库进行系统调用，他们的标准库中的�
 │11:10:28        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">52512</span>   2.57  test
 │11:10:29        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">52512</span>   2.57  test
 │11:10:30        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>   2560.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">62544</span>   3.06  test</code></pre></div>
-VSZ表示虚拟内存，RSS表示物理内存，可以看到随用户的控制，数据不断写入，物理内存增加。</p>
+minflt/s表示每秒分配的内存块，majflt/s表示不止分配内存块还要把数据从磁盘上装载回来，VSZ表示虚拟内存，RSS表示物理内存，%MEM表示物理内存占总内存的百分比。可以看到随用户的控制，数据不断写入，物理内存增加。</p>
+<p>此外，还可以这样观察进程的一些信息:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ cat /proc/<span style="color:#f92672">{</span>pid<span style="color:#f92672">}</span>/status
+
+VmPeak:     <span style="color:#ae81ff">4760</span> kB             ; 所使用虚拟内存峰值
+VmSize:     <span style="color:#ae81ff">4760</span> kB             ; 当前使用的虚拟内存
+VmLck:         <span style="color:#ae81ff">0</span> kB             ; 已经锁住物理内存（不能交换到硬盘）
+VmHWM:      <span style="color:#ae81ff">3864</span> kB             ; 所使用物理内存峰值
+VmRSS:       <span style="color:#ae81ff">876</span> kB             ; 当前使用的物理内存
+
+VmData:      <span style="color:#ae81ff">732</span> kB             ; 数据段
+VmStk:       <span style="color:#ae81ff">132</span> kB             ; 栈
+VmExe:       <span style="color:#ae81ff">484</span> kB             ; 代码段
+VmLib:      <span style="color:#ae81ff">2016</span> kB             ; 加载的动态库（可能与其他进程共享）
+VmPTE:        <span style="color:#ae81ff">48</span> kB             ; 页表
+VmSwap:      <span style="color:#ae81ff">112</span> kB             ; 所使用交换区大小
+
+voluntary_ctxt_switches:  <span style="color:#ae81ff">3543</span>  ; 主动上下文切换次数（IO）
+nonvoluntary_ctxt_switches: <span style="color:#ae81ff">64</span>  ; 强制上下文切换次数（time slice）</code></pre></div></p>
 <h3 id="换入换出">换入换出</h3>
 <p>假设这10MB内存已经分配下来，该程序却长时间不用，操作系统就会把这10MB内存的数据保存到硬盘的交换分区上，并对这些内存页的状态做变更，MMU的映射地址做变更，这些内存就可以去给别的程序用，这就叫<strong>换出</strong>(swap out)。下次重新激活该程序时，会把硬盘上交换分区的数据重新放回某些空闲的页并重新建立映射，这就是<strong>换入</strong>(swap in)。我们可以通过监控工具观察到系统内的换入换出情况:
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~ $ dstat
@@ -390,6 +413,12 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
 <p>物理内存分配还采用了<strong>写入时复制</strong>(copy-on-write)的机制，即A若引用一块内存，那么复制A到B的时候并不会复制这块内存，只有当去写入A或B的时候才会去复制这块内存，起到节约内存的目的。</p>
 <p>对于服务器来讲，假设物理内存有8G，当前运行的程序只有4G，操作系统就会拿另外4G当做自己的cache用，比如缓存文件读写等，程序需要使用时再从cache里还回来。但对于桌面端用户来讲，GUI程序居多，占用内存也多，所以往往会有足够的内存来让用户载入一个程序的速度更快。服务器往往运行的程序数量和时间更长更稳定，所以不同操作系统的分配内存策略也不同。</p>
 <p>某种角度上，假设所有数据都交换到硬盘上，我们可以认为所有的数据保存在硬盘上，内存上只保存活跃数据，<strong>内存可以看成是硬盘的缓存</strong>或者说L4，虚拟存储器就可以看成硬盘上一个巨大的数组。</p>
+<p>总结来说，虚拟存储器主要有以下优点:</p>
+<ul>
+<li>将内存对应到磁盘存储器，主存只保留活动区域。（linux下的swap, windows下的pagefile.sys）</li>
+<li>为每个进程提供一致的地址空间，简化内存管理。（链接器可以提前安排地址）</li>
+<li>无法访问物理地址，隔离进程数据确保不被破坏。</li>
+</ul>
 <h2 id="寄存器">寄存器</h2>
 <p>由于寄存器数量很少，我们就给每个寄存器起了个名字，并分为:</p>
 <ul>
@@ -515,9 +544,9 @@ _start.hello <span style="color:#f92672">()</span> at fr.s:14
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/b53749bf05e325426f77e8572b7f2b79f55d6a2c" title='最后修改者 hjlarry | October 27, 2020' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/2a56ef97ce4ee1e76a74e2d70544ba9a333682bb" title='最后修改者 hjlarry | April 19, 2021' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>October 27, 2020</span>
+      <span>April 19, 2021</span>
     </a>
   </div>
 

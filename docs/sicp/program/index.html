@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="计算机科学基础知识之程序部分 程序构建 当我们使用C语言编写了一个输出hello world的小程序，只需要gcc hello.c就会得到一个目标文件a.out，然后直接打开就可以输出。但是它的背后却没有这么简单:
+<meta name="description" content="计算机科学基础知识之程序部分 程序构建 程序构建的过程就是把写给人看的代码翻译成写给机器看的代码。当我们使用C语言编写了一个输出hello world的小程序，只需要gcc hello.c就会得到一个目标文件a.out，然后直接打开就可以输出。但是它的背后却没有这么简单:
 这个过程大体上分为预处理(Prepressing)、编译(Compilation)、汇编(Assembly)和链接(Linking)。
 预处理 也叫预编译，这一步主要进行如下处理:
  将所有的#define删除，并展开所有的宏定义 处理所有的条件预编译指令，如#if、#ifdef等 处理#include，将被包含的文件插入到该位置，这个过程是递归的 删除所有的注释//和/* ... */ 添加行号和文件名标识，便于后续编译时能产生调试信息 保留所有的#pragma指令，它是用来设定编译器状态或特殊动作的  这一步可以用过gcc -E hello.c -o hello.i来完成，预处理后的代码并非二进制所以可以直接打开。
@@ -19,7 +19,7 @@
 <title>程序 | Home</title>
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.c2c5daf4fd3969c56b6ba45ab64838924672f19908889a323478c5f3a757f746.js" integrity="sha256-wsXa9P05acVra6Ratkg4kkZy8ZkIiJoyNHjF86dX90Y="></script>
+<script defer src="/cn.search.min.8d2462c3b745732864d843e8e2e7782a2ec838ca90fb94676baa461536bdae11.js" integrity="sha256-jSRiw7dFcyhk2EPo4ud4Ki7IOMqQ&#43;5Rna6pGFTa9rhE="></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/sicp/program/index.xml" title="Home" />
 <!--
 Made with Book Theme
@@ -79,7 +79,6 @@ https://github.com/alex-shpak/hugo-book
 </li>
 <li><strong>Python语言</strong>
 <ul>
-<li><a href="/docs/python/descriptor/">描述符</a></li>
 <li><a href="/docs/python/memory/">内存管理</a></li>
 <li><a href="/docs/python/interpreter/">解释器</a></li>
 <li><a href="/docs/python/tools/">技巧工具</a></li>
@@ -97,6 +96,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/docs/other/docker/">docker</a></li>
 <li><a href="/docs/other/raft/">raft</a></li>
 <li><a href="/docs/other/shell/">shell</a></li>
+<li><a href="/docs/other/oop/">面向对象</a></li>
 <li><a href="/docs/other/protocol/">网络协议</a></li>
 <li><a href="/docs/other/tools/">系统工具</a></li>
 </ul>
@@ -180,7 +180,7 @@ https://github.com/alex-shpak/hugo-book
       
   <article class="markdown"><h1 id="计算机科学基础知识之程序部分">计算机科学基础知识之程序部分</h1>
 <h2 id="程序构建">程序构建</h2>
-<p>当我们使用C语言编写了一个输出hello world的小程序，只需要<code>gcc hello.c</code>就会得到一个目标文件<code>a.out</code>，然后直接打开就可以输出。但是它的背后却没有这么简单:</p>
+<p>程序构建的过程就是把写给人看的代码翻译成写给机器看的代码。当我们使用C语言编写了一个输出hello world的小程序，只需要<code>gcc hello.c</code>就会得到一个目标文件<code>a.out</code>，然后直接打开就可以输出。但是它的背后却没有这么简单:</p>
 <p><img src="./images/gcc.png" alt="" /></p>
 <p>这个过程大体上分为预处理(Prepressing)、编译(Compilation)、汇编(Assembly)和链接(Linking)。</p>
 <h3 id="预处理">预处理</h3>
@@ -311,6 +311,10 @@ movl %eax, array(,%edx,4)
 <h3 id="链接">链接</h3>
 <p>如果汇编指令当中的符号都是在一个编译单元内的，那么编译器就可以去确定这些符号的地址。然而现代软件往往是由复杂的模块构成的，即使是输出一个简单的hello world也要导入C标准库。那么每个源代码模块就需要单独的编译，然后按照顺序把它们组装起来，这个过程就是链接(Linking)。模块间的函数调用、变量引用等都是需要通过符号来通信的，链接器就是把指令中对于其他符号的引用加以修正，整个过程又包含了地址和空间分配(Address and Storage Allocation)、符号决议(Symbol Resolution,或名称绑定Name Binding)和重定位(Relocation)这些步骤。</p>
 <p><img src="./images/linking.jpg" alt="" /></p>
+<h4 id="静态链接与动态链接">静态链接与动态链接</h4>
+<p>把多个目标模块(.o)打包成一个独立文件(.a)，这种方式称为静态库。我们在写自己的代码引用到静态库的某个函数的时候，实际上链接器是把静态库当做一个目标模块作为其输入。</p>
+<p>相比于静态库内嵌的方式，动态链接库(.so文件或win下的.dll文件)是在运行时由动态链接器执行动态链接，它可被加载到任意位置。</p>
+<p>很多库既提供了动态链接版本，也提供了静态库版本，比如C的标准库libc.so和libc.a。我们在编译的时候可以通过<code>gcc -static</code>来指定使用其静态库版本，这样编译好的目标文件就可以不依赖操作系统的环境去运行。Go语言就采用静态链接的方式，它的可执行程序往往复制在同类操作系统上就能运行。</p>
 <h2 id="可执行文件">可执行文件</h2>
 <p><img src="./images/elf.png" alt="ELF" /></p>
 <p>一个<strong>可执行程序</strong>看上去像是单个文件的数据库，我们以ELF格式的可执行文件为例，它包括头部元数据、Section header table、Program header table和各个section段。</p>
@@ -368,7 +372,13 @@ Key to Flags:
 <p>其中，<code>Address</code>表示这个section加载到进程中的虚拟内存地址，<code>Offset</code>表示这个section相对于文件头部的偏移量，有了<code>Offset</code>+<code>Size</code>进程才知道如何安排相应的<code>Address</code>。<code>Flags</code>表示权限标志位，<code>A</code>表示这个section的内容需要在内存中载入，<code>X</code>表示可执行的权限，<code>W</code>表示可写入的权限。</p>
 <p><code>.text</code>用于存放二进制的执行代码(指令)。我们可以看到这个段的地址恰好是文件头中的Entry point address。</p>
 <p><code>.data</code>用于存放所有已经初始化过的全局变量的数据，<code>.bss</code>用于存放未初始化的全局变量数据，虽然它们在内存中都需要相应的起始地址和内存区域，但在可执行文件中没必要用一定区域去记下<code>.bss</code>中的零值。<code>.rodata</code>专门用于保存只读数据，例如字符串的字面量，在很多语言中它都是只读的。</p>
-<p><code>.symtab</code>表示符号表，源码中的字面量、全局变量、函数名、类型名、文件名等会作为符号记录在该表中，会记录它们的类型、作用域和内存地址。对于程序运行来讲，符号表没有什么用，CPU不管什么符号、类型，它只需要内存地址。符号就相当于是内存地址的助记符，主要是便于我们调试和反汇编使用的。</p>
+<p><code>.symtab</code>表示符号表，存储了程序定义和引用的函数和全局变量信息:</p>
+<ul>
+<li>当前模块内，可被外部引用的全局符号，比如函数和全局变量（非 static）。</li>
+<li>只被当前模块定义和引用的本地符号，比如 static 函数和变量，不能被外部引用。</li>
+<li>其他模块定义，被当前模块所引用的全局符号（external）。</li>
+</ul>
+<p>对于程序运行来讲，符号表没有什么用，CPU不管什么符号、类型，它只需要内存地址。符号就相当于是内存地址的助记符，主要是便于我们调试和反汇编使用的。</p>
 <h3 id="segment">Segment</h3>
 <p>执行的时候，我们需要告诉操作系统，有哪些section需要载入为内存中的<strong>segment</strong>，这个信息被链接器放在Program header table中，操作系统的载入器以此信息来安排程序在内存中的样子，我们可以这样查看:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ readelf -l hello
@@ -489,9 +499,9 @@ End of assembler dump.</code></pre></div>
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/b53749bf05e325426f77e8572b7f2b79f55d6a2c" title='最后修改者 hjlarry | October 27, 2020' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/a7ef6c2b890ed6e4e045562ab7882ae5ff745a93" title='最后修改者 hjlarry | March 31, 2021' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>October 27, 2020</span>
+      <span>March 31, 2021</span>
     </a>
   </div>
 
