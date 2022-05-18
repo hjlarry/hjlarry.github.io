@@ -31,6 +31,31 @@ CREATE TABLE student_score (
 );
 {{< /highlight >}}
 
+{{< highlight python>}}
+class StudentInfo(models.Model):
+    number = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=5)
+    sex = models.CharField(choices=[('男', '男'),('女', '女')], max_length=2)
+    id_number = models.CharField(max_length=18, unique=True)
+    department = models.CharField(max_length=30)
+    major = models.CharField(max_length=30)
+    enrollment_time = models.DateField()
+
+    class Meta:
+        db_table = "student_info"
+        managed = False
+
+
+class StudentScore(models.Model):
+    number = models.IntegerField()
+    subject = models.CharField(max_length=30)
+    score = models.SmallIntegerField()
+
+    class Meta:
+        db_table = "student_score"
+        managed = False
+{{< /highlight >}}
+
 2、填充数据:
 {{< highlight mysql>}}
 INSERT INTO student_info(number, name, sex, id_number, department, major, enrollment_time) VALUES
