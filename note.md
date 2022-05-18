@@ -1,12 +1,16 @@
 ### Step1 
 
+Use the hugo-extension version, not the hugo version!
+
+### Step2 
+
 Must to git clone submodules to checkout the [book theme](https://github.com/alex-shpak/hugo-book)
 
 ```
 git clone https://github.com/hjlarry/hjlarry.github.io.git --recurse-submodules
 ```
 
-### Step2
+### Step3
 
 For layout partials modify, add the code below to `themes/book/layouts/partials/docs/inject/footer.html`
 
