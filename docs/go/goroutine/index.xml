@@ -5,10 +5,6 @@
     <link>/docs/go/goroutine/</link>
     <description>Recent content in Go并发机制 on Home</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    
-	<atom:link href="/docs/go/goroutine/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <language>zh-cn</language><atom:link href="/docs/go/goroutine/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

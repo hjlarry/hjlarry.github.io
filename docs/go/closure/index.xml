@@ -5,10 +5,6 @@
     <link>/docs/go/closure/</link>
     <description>Recent content in 闭包 on Home</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    
-	<atom:link href="/docs/go/closure/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <language>zh-cn</language><atom:link href="/docs/go/closure/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

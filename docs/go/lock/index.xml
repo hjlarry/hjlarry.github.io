@@ -5,10 +5,6 @@
     <link>/docs/go/lock/</link>
     <description>Recent content in 锁的原理 on Home</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    
-	<atom:link href="/docs/go/lock/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <language>zh-cn</language><atom:link href="/docs/go/lock/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

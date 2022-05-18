@@ -1,51 +1,55 @@
 <!DOCTYPE html>
-<html lang="cn">
-
+<html lang="zh-cn" dir="ltr">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Git原理和技巧 Git本质上是一个内容寻址(content-addressable)文件系统，并在此之上提供了一个版本控制系统的用户界面。了解底层原理，可以更好的帮助我们理清思路，知道真正在操作什么，而不会迷失在大量的指令和参数上。
-原理 区域 工作区(Working Directory)，就是我们在电脑里看到的目录，我们对文件进行增、改、删都发生在这个目录中。
+<meta name="description" content="Git原理和技巧#Git本质上是一个内容寻址(content-addressable)文件系统，并在此之上提供了一个版本控制系统的用户界面。了解底层原理，可以更好的帮助我们理清思路，知道真正在操作什么，而不会迷失在大量的指令和参数上。
+原理#区域#工作区(Working Directory)，就是我们在电脑里看到的目录，我们对文件进行增、改、删都发生在这个目录中。
 在这里目录中，有一个隐藏目录.git就是git的版本库(Repository)。
 版本库中存了很多东西，其中还有一片区域，一般为.git/index文件，我们称为stage(或index)暂存区。
-再加上远程仓库，例如github上的repo，我们平时做的大量操作都是把文件在这四个区域之间相互移动。 对象 在git中，除了init、clone等我们常用的高层命令(被称为porcelain)之外，还有一些底层命令(被称为plumbing)。例如git hash-object把一个文件转换为一个git对象，git cat-file可以打印出一个git对象。
+再加上远程仓库，例如github上的repo，我们平时做的大量操作都是把文件在这四个区域之间相互移动。 对象#在git中，除了init、clone等我们常用的高层命令(被称为porcelain)之外，还有一些底层命令(被称为plumbing)。例如git hash-object把一个文件转换为一个git对象，git cat-file可以打印出一个git对象。
 那么git对象到底是什么呢？因为Git的核心是一个内容寻址文件系统，可以理解为一个简单的键值对数据库。当我们向它插入一个任意类型的内容时，它会返回一个键值对，通过键值对能够在任意时刻再次检索到该内容。
-当我们初始化时，.git中会有一个文件夹objects专门存储git对象: ➜ testgit git init Initialized empty Git repository in /home/hejl/testgit/.git/ ➜ testgit git:(master) ls .git HEAD branches config description hooks info objects refs
-当我们添加一项内容的时候，这个objects文件夹就会多出一个文件: ➜ testgit git:(master) echo &#39;abc&#39; &gt; test.txt ➜ testgit git:(master) ✗ git add . ➜ testgit git:(master) ✗ tree .git/objects/ .git/objects/ ├── 8b │ └── aef1b4abc478178b004d62031cf7fe6db6f903 ├── info └── pack 3 directories, 1 file 它的过程实际上是通过sha1算法计算出文件内容也就是abc的hash值，是一个40位的16进制的字符串，字符串的前两位作为一个文件夹名称，后38位作为文件名称。因为大多数的文件系统都讨厌单个目录中包含太多的文件，这会减慢其爬取的速度，Git用这个方法使得第一级目录最多256个。文件本身就是Git object，它的头部定义了类型，紧跟着是一个ASCII的空格(0x20)，然后是对象的大小多少字节，紧跟着一个null(0x00)，最后是对象本身的内容。整个文件通过zlib压缩存储。"><meta property="og:title" content="Git原理和技巧" />
+当我们初始化时，.git中会有一个文件夹objects专门存储git对象: ➜ testgit git init Initialized empty Git repository in /home/hejl/testgit/.git/  ➜ testgit git:(master) ls .git HEAD branches config description hooks info objects refs
+当我们添加一项内容的时候，这个objects文件夹就会多出一个文件: ➜ testgit git:(master) echo &#39;abc&#39; &gt; test.txt ➜ testgit git:(master) ✗ git add . ➜ testgit git:(master) ✗ tree .git/objects/ .git/objects/ ├── 8b │ └── aef1b4abc478178b004d62031cf7fe6db6f903 ├── info └── pack  3 directories, 1 file 它的过程实际上是通过sha1算法计算出文件内容也就是abc的hash值，是一个40位的16进制的字符串，字符串的前两位作为一个文件夹名称，后38位作为文件名称。因为大多数的文件系统都讨厌单个目录中包含太多的文件，这会减慢其爬取的速度，Git用这个方法使得第一级目录最多256个。文件本身就是Git object，它的头部定义了类型，紧跟着是一个ASCII的空格(0x20)，然后是对象的大小多少字节，紧跟着一个null(0x00)，最后是对象本身的内容。整个文件通过zlib压缩存储。">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light dark"><meta property="og:title" content="Git原理和技巧" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/docs/other/git/" />
 
 <title>Git原理和技巧 | Home</title>
+<link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/favicon.png" type="image/x-icon">
-<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.8d2462c3b745732864d843e8e2e7782a2ec838ca90fb94676baa461536bdae11.js" integrity="sha256-jSRiw7dFcyhk2EPo4ud4Ki7IOMqQ&#43;5Rna6pGFTa9rhE="></script>
+<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" >
+  <script defer src="/flexsearch.min.js"></script>
+  <script defer src="/cn.search.min.dcaf7fea7db359f8fd7a4b37bdf1a9f765580260566390cc959292e2dcc5a5d9.js" ></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/other/git/index.xml" title="Home" />
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
 -->
-
   
 </head>
-
-<body>
-  <input type="checkbox" class="hidden" id="menu-control" />
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
   <main class="container flex">
     <aside class="book-menu">
-      
+      <div class="book-menu-content">
+        
   <nav>
 <h2 class="book-brand">
-  <a href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
+  <a class="flex align-center" href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
   </a>
 </h2>
 
 
 <div class="book-search">
   <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" data-hotkeys="s/" />
-  <div class="book-search-spinner spinner hidden"></div>
+  <div class="book-search-spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
+
 
 
 
@@ -117,10 +121,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
 
 
  
+      </div>
     </aside>
 
     <div class="book-page">
@@ -134,16 +139,18 @@ https://github.com/alex-shpak/hugo-book
   <strong>Git原理和技巧</strong>
 
   <label for="toc-control">
+    
     <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
   </label>
 </div>
 
 
   
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
   <ul>
     <li><a href="#原理">原理</a>
       <ul>
@@ -177,45 +184,58 @@ https://github.com/alex-shpak/hugo-book
 </nav>
 
 
-    </aside>
+
+  </aside>
   
  
       </header>
 
       
       
-  <article class="markdown"><h1 id="git原理和技巧">Git原理和技巧</h1>
+  <article class="markdown"><h1 id="git原理和技巧">
+  Git原理和技巧
+  <a class="anchor" href="#git%e5%8e%9f%e7%90%86%e5%92%8c%e6%8a%80%e5%b7%a7">#</a>
+</h1>
 <p>Git本质上是一个内容寻址(content-addressable)文件系统，并在此之上提供了一个版本控制系统的用户界面。了解底层原理，可以更好的帮助我们理清思路，知道真正在操作什么，而不会迷失在大量的指令和参数上。</p>
-<h2 id="原理">原理</h2>
-<h3 id="区域">区域</h3>
+<h2 id="原理">
+  原理
+  <a class="anchor" href="#%e5%8e%9f%e7%90%86">#</a>
+</h2>
+<h3 id="区域">
+  区域
+  <a class="anchor" href="#%e5%8c%ba%e5%9f%9f">#</a>
+</h3>
 <p>工作区(Working Directory)，就是我们在电脑里看到的目录，我们对文件进行增、改、删都发生在这个目录中。</p>
 <p>在这里目录中，有一个隐藏目录<code>.git</code>就是git的版本库(Repository)。</p>
 <p>版本库中存了很多东西，其中还有一片区域，一般为<code>.git/index</code>文件，我们称为stage(或index)暂存区。</p>
 <p>再加上远程仓库，例如github上的repo，我们平时做的大量操作都是把文件在这四个区域之间相互移动。
 <img src="./images/area.jpg" alt="area" /></p>
-<h3 id="对象">对象</h3>
+<h3 id="对象">
+  对象
+  <a class="anchor" href="#%e5%af%b9%e8%b1%a1">#</a>
+</h3>
 <p>在git中，除了<code>init</code>、<code>clone</code>等我们常用的高层命令(被称为porcelain)之外，还有一些底层命令(被称为plumbing)。例如<code>git hash-object</code>把一个文件转换为一个git对象，<code>git cat-file</code>可以打印出一个git对象。</p>
 <p>那么git对象到底是什么呢？因为Git的核心是一个内容寻址文件系统，可以理解为一个简单的键值对数据库。当我们向它插入一个任意类型的内容时，它会返回一个键值对，通过键值对能够在任意时刻再次检索到该内容。</p>
 <p>当我们初始化时，<code>.git</code>中会有一个文件夹<code>objects</code>专门存储git对象:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git init
-Initialized empty Git repository in /home/hejl/testgit/.git/
-
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ls .git
-HEAD  branches  config  description  hooks  info  objects  refs</code></pre></div></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git init
+</span></span><span style="display:flex;"><span>Initialized empty Git repository in /home/hejl/testgit/.git/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ls .git
+</span></span><span style="display:flex;"><span>HEAD  branches  config  description  hooks  info  objects  refs</span></span></code></pre></div></p>
 <p>当我们添加一项内容的时候，这个objects文件夹就会多出一个文件:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> echo <span style="color:#e6db74">&#39;abc&#39;</span> &gt; test.txt
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git add .
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ tree .git/objects/
-.git/objects/
-├── 8b
-│   └── aef1b4abc478178b004d62031cf7fe6db6f903
-├── info
-└── pack
-
-<span style="color:#ae81ff">3</span> directories, <span style="color:#ae81ff">1</span> file</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> echo <span style="color:#e6db74">&#39;abc&#39;</span> &gt; test.txt
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git add .
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ tree .git/objects/
+</span></span><span style="display:flex;"><span>.git/objects/
+</span></span><span style="display:flex;"><span>├── 8b
+</span></span><span style="display:flex;"><span>│   └── aef1b4abc478178b004d62031cf7fe6db6f903
+</span></span><span style="display:flex;"><span>├── info
+</span></span><span style="display:flex;"><span>└── pack
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3</span> directories, <span style="color:#ae81ff">1</span> file</span></span></code></pre></div>
 它的过程实际上是通过<code>sha1</code>算法计算出文件内容也就是<code>abc</code>的hash值，是一个40位的16进制的字符串，字符串的前两位作为一个文件夹名称，后38位作为文件名称。因为大多数的文件系统都讨厌单个目录中包含太多的文件，这会减慢其爬取的速度，Git用这个方法使得第一级目录最多256个。文件本身就是Git object，它的头部定义了类型，紧跟着是一个ASCII的空格(0x20)，然后是对象的大小多少字节，紧跟着一个null(0x00)，最后是对象本身的内容。整个文件通过<code>zlib</code>压缩存储。</p>
 <p>有四种类型的对象，它们分别是<code>blob</code>,<code>commit</code>,<code>tree</code>,<code>tag</code>。对象的寻址我们也可以通过伪码来表达:</p>
-<pre><code>type object = blob | commit | tree | tag
+<pre tabindex="0"><code>type object = blob | commit | tree | tag
 objects = map&lt;string, object&gt;
 
 def store(object):
@@ -225,7 +245,7 @@ def store(object):
 def load(id):
     return objects[id]
 </code></pre><p>而每种对象的数据结果也可以通过伪码表示:</p>
-<pre><code>type blob = array&lt;byte&gt;
+<pre tabindex="0"><code>type blob = array&lt;byte&gt;
 type tree = map&lt;string, tree | file&gt;
 type commit = struct{
     parent: array&lt;commit&gt;
@@ -233,72 +253,87 @@ type commit = struct{
     message: string
     snapshot: tree
 }
-</code></pre><h4 id="blob">blob</h4>
+</code></pre><h4 id="blob">
+  blob
+  <a class="anchor" href="#blob">#</a>
+</h4>
 <p>该种类型的对象存储的原始内容，例如刚才新增的对象就是这种类型:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git cat-file -t 8bae
-blob
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git cat-file -p 8bae
-abc</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git cat-file -t 8bae
+</span></span><span style="display:flex;"><span>blob
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git cat-file -p 8bae
+</span></span><span style="display:flex;"><span>abc</span></span></code></pre></div>
 但它也只存储内容，例如工作区中该文件的路径、文件名称、创建时间等都不存储在这种类型的git对象中。</p>
-<h4 id="commit">commit</h4>
+<h4 id="commit">
+  commit
+  <a class="anchor" href="#commit">#</a>
+</h4>
 <p>当我们进行一次提交操作之后，就会产生两种类型的对象，一个是tree对象稍后再说，另一个就是commit对象。它的内容包括:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git commit -m <span style="color:#e6db74">&#34;first commit&#34;</span>
-<span style="color:#f92672">[</span>master <span style="color:#f92672">(</span>root-commit<span style="color:#f92672">)</span> 37b766f<span style="color:#f92672">]</span> first commit
- <span style="color:#ae81ff">1</span> file changed, <span style="color:#ae81ff">1</span> insertion<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span>
- create mode <span style="color:#ae81ff">100644</span> test.txt
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> tree .git/objects/
-.git/objects/
-├── <span style="color:#ae81ff">37</span>
-│   └── b766ff8084b9ea2e9a159bdb35b286a3406d3e
-├── 8b
-│   └── aef1b4abc478178b004d62031cf7fe6db6f903
-├── <span style="color:#ae81ff">93</span>
-│   └── 4a610d6024005decae12f6ec4c242caa2a4de4
-├── info
-└── pack
-
-<span style="color:#ae81ff">5</span> directories, <span style="color:#ae81ff">3</span> files
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git cat-file -p 37b7
-tree 934a610d6024005decae12f6ec4c242caa2a4de4
-author hjlarry &lt;hjlarry@163.com&gt; <span style="color:#ae81ff">1582182460</span> +0800
-committer hjlarry &lt;hjlarry@163.com&gt; <span style="color:#ae81ff">1582182460</span> +0800
-
-first commit</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git commit -m <span style="color:#e6db74">&#34;first commit&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>master <span style="color:#f92672">(</span>root-commit<span style="color:#f92672">)</span> 37b766f<span style="color:#f92672">]</span> first commit
+</span></span><span style="display:flex;"><span> <span style="color:#ae81ff">1</span> file changed, <span style="color:#ae81ff">1</span> insertion<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span> create mode <span style="color:#ae81ff">100644</span> test.txt
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> tree .git/objects/
+</span></span><span style="display:flex;"><span>.git/objects/
+</span></span><span style="display:flex;"><span>├── <span style="color:#ae81ff">37</span>
+</span></span><span style="display:flex;"><span>│   └── b766ff8084b9ea2e9a159bdb35b286a3406d3e
+</span></span><span style="display:flex;"><span>├── 8b
+</span></span><span style="display:flex;"><span>│   └── aef1b4abc478178b004d62031cf7fe6db6f903
+</span></span><span style="display:flex;"><span>├── <span style="color:#ae81ff">93</span>
+</span></span><span style="display:flex;"><span>│   └── 4a610d6024005decae12f6ec4c242caa2a4de4
+</span></span><span style="display:flex;"><span>├── info
+</span></span><span style="display:flex;"><span>└── pack
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">5</span> directories, <span style="color:#ae81ff">3</span> files
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git cat-file -p 37b7
+</span></span><span style="display:flex;"><span>tree 934a610d6024005decae12f6ec4c242caa2a4de4
+</span></span><span style="display:flex;"><span>author hjlarry &lt;hjlarry@163.com&gt; <span style="color:#ae81ff">1582182460</span> +0800
+</span></span><span style="display:flex;"><span>committer hjlarry &lt;hjlarry@163.com&gt; <span style="color:#ae81ff">1582182460</span> +0800
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>first commit</span></span></code></pre></div>
 tree表示本次提交产生的另一个tree类型git对象的路径地址。author和committer大多数情况相同，但有时比如说我们把别人分支的一个commit通过<code>cherry-pick</code>加入我们的分支，这时committer是我们自己，author仍然是别人。这里author需要包含username、email(所以刚使用git时要求在gitconfig中设置用户名和邮箱)、时间戳。紧跟着是提交的message。</p>
 <p>实际上完整的commit对象的内容正是邮件的一种简单的格式，源于<a href="https://www.ietf.org/rfc/rfc2822.txt">RFC2822</a>。还包括一个parent，指向本次提交的父commit对象的路径地址，因为现在是第一次提交，没有parent。以及一个gpgsig，通过PGP签名了一下这个对象，通过<code>cat-file</code>看不到。</p>
 <p>也就是说我们通过<code>git log</code>查看提交日志的信息，就是一层层的递归查看父对象拿到的。</p>
-<h4 id="tree">tree</h4>
+<h4 id="tree">
+  tree
+  <a class="anchor" href="#tree">#</a>
+</h4>
 <p>树对象解决的是文件名保存的问题，并能够将多个文件组织到一起。我们新建一次提交，添加更多内容为例:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> echo <span style="color:#e6db74">&#39;abcdef&#39;</span> &gt; test.txt
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ mkdir adir
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ echo <span style="color:#e6db74">&#39;123&#39;</span> &gt; adir/tt.txt
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git add .
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git commit -m <span style="color:#e6db74">&#34;third commit&#34;</span>
-<span style="color:#f92672">[</span>master 79380b0<span style="color:#f92672">]</span> third commit
- <span style="color:#ae81ff">2</span> files changed, <span style="color:#ae81ff">2</span> insertions<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span>, <span style="color:#ae81ff">1</span> deletion<span style="color:#f92672">(</span>-<span style="color:#f92672">)</span>
- create mode <span style="color:#ae81ff">100644</span> adir/tt.txt
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git cat-file -p 1bc4
-<span style="color:#ae81ff">040000</span> tree f1af0a5ebfe47de9d2d6db753088462b797b2075    adir
-<span style="color:#ae81ff">100644</span> blob 0373d9336f8c8ee90faff225de842888e884a48b    test.txt
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git cat-file -p f1af
-<span style="color:#ae81ff">100644</span> blob 190a18037c64c43e6b11489df4bf0b9eb6d2c9bf    tt.txt</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> echo <span style="color:#e6db74">&#39;abcdef&#39;</span> &gt; test.txt
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ mkdir adir
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ echo <span style="color:#e6db74">&#39;123&#39;</span> &gt; adir/tt.txt
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git add .
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git commit -m <span style="color:#e6db74">&#34;third commit&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>master 79380b0<span style="color:#f92672">]</span> third commit
+</span></span><span style="display:flex;"><span> <span style="color:#ae81ff">2</span> files changed, <span style="color:#ae81ff">2</span> insertions<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span>, <span style="color:#ae81ff">1</span> deletion<span style="color:#f92672">(</span>-<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span> create mode <span style="color:#ae81ff">100644</span> adir/tt.txt
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git cat-file -p 1bc4
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">040000</span> tree f1af0a5ebfe47de9d2d6db753088462b797b2075    adir
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">100644</span> blob 0373d9336f8c8ee90faff225de842888e884a48b    test.txt
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git cat-file -p f1af
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">100644</span> blob 190a18037c64c43e6b11489df4bf0b9eb6d2c9bf    tt.txt</span></span></code></pre></div>
 它会把当前的目录结构打一个快照，相当于以表格的形式记录该目录下每一个目标的权限、类型(通常是文件blob，或者是文件夹变成一个新的tree对象)、哈希值(也就相当于文件路径)、文件名。</p>
 <p>也就是说，当我们通过<code>git add *</code>时会把工作区文件的文件内容生成一个blob object，并把文件名和blob的sha1等其他信息更新到暂存区的index文件中；当我们通过<code>git commit -m</code>时，git会根据index信息生成一个tree object，并创建一个新的commit object关联到这个tree。commit object的parent指向了上一个commit，当前分支的指针也会移动到新的commit结点。</p>
-<h4 id="tag">tag</h4>
+<h4 id="tag">
+  tag
+  <a class="anchor" href="#tag">#</a>
+</h4>
 <p>git中还有一种对象类型就是tag，它通常和commit差不多。见下文<a href="#%e6%a0%87%e7%ad%be%e5%bc%95%e7%94%a8">标签引用</a>。</p>
-<h3 id="引用">引用</h3>
+<h3 id="引用">
+  引用
+  <a class="anchor" href="#%e5%bc%95%e7%94%a8">#</a>
+</h3>
 <p>引用本质上就是指向某个commit的指针，它被放在<code>.gits/refs</code>目录中。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> tree .git/refs/
-.git/refs/
-├── heads
-│   └── master
-└── tags
-
-<span style="color:#ae81ff">2</span> directories, <span style="color:#ae81ff">1</span> file
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> cat .git/refs/heads/master
-79380b0625150b1b71940cfac0b2a501793eac0c</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> tree .git/refs/
+</span></span><span style="display:flex;"><span>.git/refs/
+</span></span><span style="display:flex;"><span>├── heads
+</span></span><span style="display:flex;"><span>│   └── master
+</span></span><span style="display:flex;"><span>└── tags
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2</span> directories, <span style="color:#ae81ff">1</span> file
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> cat .git/refs/heads/master
+</span></span><span style="display:flex;"><span>79380b0625150b1b71940cfac0b2a501793eac0c</span></span></code></pre></div>
 其可以用伪码来表示:</p>
-<pre><code>references = map&lt;string, string&gt;
+<pre tabindex="0"><code>references = map&lt;string, string&gt;
 def update_ref(name, id):
     references[name] = id
 def read_ref(name):
@@ -308,192 +343,222 @@ def load_ref(name_or_id):
         return load(references[name_or_id])
     else:   # 说明是id
         return load(name_or_id)
-</code></pre><h4 id="分支引用">分支引用</h4>
+</code></pre><h4 id="分支引用">
+  分支引用
+  <a class="anchor" href="#%e5%88%86%e6%94%af%e5%bc%95%e7%94%a8">#</a>
+</h4>
 <p>当我们新建一个分支时，就会在<code>.git/refs/heads</code>文件夹下多一个名称为分支名称的文件，内容就是一个commit的sha。当我们提交一次commit时，当前分支的引用的commit就会自动发生改变。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>6c27f42<span style="color:#f92672">)</span> git branch testbranch
-➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> cat .git/refs/heads/testbranch
-6c27f425aae198e6c1e5098c13d352b3f27edfca</code></pre></div></p>
-<h4 id="head引用">HEAD引用</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>6c27f42<span style="color:#f92672">)</span> git branch testbranch
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> cat .git/refs/heads/testbranch
+</span></span><span style="display:flex;"><span>6c27f425aae198e6c1e5098c13d352b3f27edfca</span></span></code></pre></div></p>
+<h4 id="head引用">
+  HEAD引用
+  <a class="anchor" href="#head%e5%bc%95%e7%94%a8">#</a>
+</h4>
 <p>它是一个符号引用，指向当前所在的分支。它位于<code>.git/HEAD</code>文件。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> cat .git/HEAD
-ref: refs/heads/master
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git checkout 6c27
-Note: checking out <span style="color:#e6db74">&#39;6c27&#39;</span>.
-You are in <span style="color:#e6db74">&#39;detached HEAD&#39;</span> state.
-➜  testgit git:<span style="color:#f92672">(</span>6c27f42<span style="color:#f92672">)</span> cat .git/HEAD
-6c27f425aae198e6c1e5098c13d352b3f27edfca</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> cat .git/HEAD
+</span></span><span style="display:flex;"><span>ref: refs/heads/master
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git checkout 6c27
+</span></span><span style="display:flex;"><span>Note: checking out <span style="color:#e6db74">&#39;6c27&#39;</span>.
+</span></span><span style="display:flex;"><span>You are in <span style="color:#e6db74">&#39;detached HEAD&#39;</span> state.
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>6c27f42<span style="color:#f92672">)</span> cat .git/HEAD
+</span></span><span style="display:flex;"><span>6c27f425aae198e6c1e5098c13d352b3f27edfca</span></span></code></pre></div>
 当我们checkout某个commit时，HEAD会指向commit，这时候称为分离头指针(Detached HEAD)状态。</p>
-<h4 id="标签引用">标签引用</h4>
+<h4 id="标签引用">
+  标签引用
+  <a class="anchor" href="#%e6%a0%87%e7%ad%be%e5%bc%95%e7%94%a8">#</a>
+</h4>
 <p>我们通常创建的都是轻量级标签，它只是一个引用，位于<code>.gits/refs/tags</code>文件夹下。但还可以创建另一种附注标签，它会额外创建一个tag object。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> git tag testmytag
-➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> cat .git/refs/tags/testmytag
-6c27f425aae198e6c1e5098c13d352b3f27edfca
-➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> git tag -a v1.0 -m <span style="color:#e6db74">&#34;test my tag&#34;</span>
-➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> cat .git/refs/tags/v1.0
-0ee17848727b21f3086760c6bbc38cc9a12b5e08
-➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> git cat-file -t 0ee1
-tag
-➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> git cat-file -p 0ee1
-object 6c27f425aae198e6c1e5098c13d352b3f27edfca
-type commit
-tag v1.0
-tagger hjlarry &lt;hjlarry@163.com&gt; <span style="color:#ae81ff">1582267013</span> +0800
-
-test my tag</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> git tag testmytag
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> cat .git/refs/tags/testmytag
+</span></span><span style="display:flex;"><span>6c27f425aae198e6c1e5098c13d352b3f27edfca
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> git tag -a v1.0 -m <span style="color:#e6db74">&#34;test my tag&#34;</span>
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> cat .git/refs/tags/v1.0
+</span></span><span style="display:flex;"><span>0ee17848727b21f3086760c6bbc38cc9a12b5e08
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> git cat-file -t 0ee1
+</span></span><span style="display:flex;"><span>tag
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> git cat-file -p 0ee1
+</span></span><span style="display:flex;"><span>object 6c27f425aae198e6c1e5098c13d352b3f27edfca
+</span></span><span style="display:flex;"><span>type commit
+</span></span><span style="display:flex;"><span>tag v1.0
+</span></span><span style="display:flex;"><span>tagger hjlarry &lt;hjlarry@163.com&gt; <span style="color:#ae81ff">1582267013</span> +0800
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>test my tag</span></span></code></pre></div>
 标签和分支的主要区别是:</p>
 <ul>
 <li>标签可以指向任意object，而分支只能指向commit object。</li>
 <li>分支在每次提交更新时会自动更新，而标签不会。</li>
 </ul>
-<h4 id="远程引用">远程引用</h4>
+<h4 id="远程引用">
+  远程引用
+  <a class="anchor" href="#%e8%bf%9c%e7%a8%8b%e5%bc%95%e7%94%a8">#</a>
+</h4>
 <p>当我们添加一个远程仓库，或者是从远程库clone过来时，就会有远程引用，它位于<code>.git/refs/remotes</code>文件夹下。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> tree ~/my_git/.git/refs/remotes
-/home/hejl/my_git/.git/refs/remotes
-└── origin
-    ├── HEAD
-    └── master
-
-<span style="color:#ae81ff">1</span> directory, <span style="color:#ae81ff">2</span> files
-➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> cat ~/my_git/.git/refs/remotes/origin/HEAD
-ref: refs/remotes/origin/master
-➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> cat ~/my_git/.git/refs/remotes/origin/master
-94985c6535a5493d493ce89631c7e417f5e7ecaa</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> tree ~/my_git/.git/refs/remotes
+</span></span><span style="display:flex;"><span>/home/hejl/my_git/.git/refs/remotes
+</span></span><span style="display:flex;"><span>└── origin
+</span></span><span style="display:flex;"><span>    ├── HEAD
+</span></span><span style="display:flex;"><span>    └── master
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span> directory, <span style="color:#ae81ff">2</span> files
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> cat ~/my_git/.git/refs/remotes/origin/HEAD
+</span></span><span style="display:flex;"><span>ref: refs/remotes/origin/master
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testbranch<span style="color:#f92672">)</span> cat ~/my_git/.git/refs/remotes/origin/master
+</span></span><span style="display:flex;"><span>94985c6535a5493d493ce89631c7e417f5e7ecaa</span></span></code></pre></div>
 远程引用和分支之间最主要的区别在于远程引用是只读的。虽然可以checkout到某个远程引用，但是Git并不会将HEAD引用指向该远程引用，这种情况仍然是分离头指针状态。</p>
-<h2 id="常用操作">常用操作</h2>
-<h3 id="合并">合并</h3>
-<h4 id="fast-forward">FAST-FORWARD</h4>
+<h2 id="常用操作">
+  常用操作
+  <a class="anchor" href="#%e5%b8%b8%e7%94%a8%e6%93%8d%e4%bd%9c">#</a>
+</h2>
+<h3 id="合并">
+  合并
+  <a class="anchor" href="#%e5%90%88%e5%b9%b6">#</a>
+</h3>
+<h4 id="fast-forward">
+  FAST-FORWARD
+  <a class="anchor" href="#fast-forward">#</a>
+</h4>
 <p>当试图合并两个分支时，如果顺着一个分支一路走下去能到达另一个分支，那么Git的合并只是把指针往前推进，所以叫快进模式(即Fast-forward)。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git checkout -b fixbug
-Switched to a new branch <span style="color:#e6db74">&#39;fixbug&#39;</span>
-➜  testgit git:<span style="color:#f92672">(</span>fixbug<span style="color:#f92672">)</span> ✗ echo <span style="color:#e6db74">&#39;123&#39;</span> &gt; test.txt
-➜  testgit git:<span style="color:#f92672">(</span>fixbug<span style="color:#f92672">)</span> ✗ git add .
-➜  testgit git:<span style="color:#f92672">(</span>fixbug<span style="color:#f92672">)</span> ✗ git commit -m <span style="color:#e6db74">&#34;9th commit&#34;</span>
-<span style="color:#f92672">[</span>fixbug 22a449d<span style="color:#f92672">]</span> 9th commit
- <span style="color:#ae81ff">1</span> file changed, <span style="color:#ae81ff">1</span> insertion<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span>
-➜  testgit git:<span style="color:#f92672">(</span>fixbug<span style="color:#f92672">)</span> git checkout master
-Switched to branch <span style="color:#e6db74">&#39;master&#39;</span>
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git merge fixbug
-Updating c658c0b..22a449d
-Fast-forward
- test.txt | <span style="color:#ae81ff">1</span> +
- <span style="color:#ae81ff">1</span> file changed, <span style="color:#ae81ff">1</span> insertion<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> ✗ git checkout -b fixbug
+</span></span><span style="display:flex;"><span>Switched to a new branch <span style="color:#e6db74">&#39;fixbug&#39;</span>
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>fixbug<span style="color:#f92672">)</span> ✗ echo <span style="color:#e6db74">&#39;123&#39;</span> &gt; test.txt
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>fixbug<span style="color:#f92672">)</span> ✗ git add .
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>fixbug<span style="color:#f92672">)</span> ✗ git commit -m <span style="color:#e6db74">&#34;9th commit&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>fixbug 22a449d<span style="color:#f92672">]</span> 9th commit
+</span></span><span style="display:flex;"><span> <span style="color:#ae81ff">1</span> file changed, <span style="color:#ae81ff">1</span> insertion<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>fixbug<span style="color:#f92672">)</span> git checkout master
+</span></span><span style="display:flex;"><span>Switched to branch <span style="color:#e6db74">&#39;master&#39;</span>
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git merge fixbug
+</span></span><span style="display:flex;"><span>Updating c658c0b..22a449d
+</span></span><span style="display:flex;"><span>Fast-forward
+</span></span><span style="display:flex;"><span> test.txt | <span style="color:#ae81ff">1</span> +
+</span></span><span style="display:flex;"><span> <span style="color:#ae81ff">1</span> file changed, <span style="color:#ae81ff">1</span> insertion<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span></span></span></code></pre></div>
 合并时，会提示Fast-forward。</p>
 <p>另外，我们往往会把远程仓库的更新<code>git pull</code>下来，这背后实际上执行了两条指令，先<code>git fetch</code>再<code>git merge</code>，这种情况一般也属于Fast-forward合并。</p>
-<h4 id="三方合并">三方合并</h4>
+<h4 id="三方合并">
+  三方合并
+  <a class="anchor" href="#%e4%b8%89%e6%96%b9%e5%90%88%e5%b9%b6">#</a>
+</h4>
 <p>非FAST-FORWARD情况时，就是一次三方合并。三方指的是当前分支节点、要合并的分支的节点以及它们的共同祖父节点。这种情况会把它们的内容合并起来，如果没有冲突的话会自动形成一个新的commit。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git checkout -b newfeature HEAD~2
-Switched to a new branch <span style="color:#e6db74">&#39;newfeature&#39;</span>
-➜  testgit git:<span style="color:#f92672">(</span>newfeature<span style="color:#f92672">)</span> echo <span style="color:#e6db74">&#39;newfeature&#39;</span> &gt; newfeature.txt
-➜  testgit git:<span style="color:#f92672">(</span>newfeature<span style="color:#f92672">)</span> ✗ git add .
-➜  testgit git:<span style="color:#f92672">(</span>newfeature<span style="color:#f92672">)</span> ✗ git commit -m <span style="color:#e6db74">&#34;add new feature&#34;</span>
-<span style="color:#f92672">[</span>newfeature 68212fe<span style="color:#f92672">]</span> add new feature
- <span style="color:#ae81ff">1</span> file changed, <span style="color:#ae81ff">1</span> insertion<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span>
- create mode <span style="color:#ae81ff">100644</span> newfeature.txt
-➜  testgit git:<span style="color:#f92672">(</span>newfeature<span style="color:#f92672">)</span> git checkout master
-Switched to branch <span style="color:#e6db74">&#39;master&#39;</span>
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git merge newfeature
-Merge made by the <span style="color:#e6db74">&#39;recursive&#39;</span> strategy.
- newfeature.txt | <span style="color:#ae81ff">1</span> +
- <span style="color:#ae81ff">1</span> file changed, <span style="color:#ae81ff">1</span> insertion<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span>
- create mode <span style="color:#ae81ff">100644</span> newfeature.txt</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git checkout -b newfeature HEAD~2
+</span></span><span style="display:flex;"><span>Switched to a new branch <span style="color:#e6db74">&#39;newfeature&#39;</span>
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>newfeature<span style="color:#f92672">)</span> echo <span style="color:#e6db74">&#39;newfeature&#39;</span> &gt; newfeature.txt
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>newfeature<span style="color:#f92672">)</span> ✗ git add .
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>newfeature<span style="color:#f92672">)</span> ✗ git commit -m <span style="color:#e6db74">&#34;add new feature&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>newfeature 68212fe<span style="color:#f92672">]</span> add new feature
+</span></span><span style="display:flex;"><span> <span style="color:#ae81ff">1</span> file changed, <span style="color:#ae81ff">1</span> insertion<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span> create mode <span style="color:#ae81ff">100644</span> newfeature.txt
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>newfeature<span style="color:#f92672">)</span> git checkout master
+</span></span><span style="display:flex;"><span>Switched to branch <span style="color:#e6db74">&#39;master&#39;</span>
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git merge newfeature
+</span></span><span style="display:flex;"><span>Merge made by the <span style="color:#e6db74">&#39;recursive&#39;</span> strategy.
+</span></span><span style="display:flex;"><span> newfeature.txt | <span style="color:#ae81ff">1</span> +
+</span></span><span style="display:flex;"><span> <span style="color:#ae81ff">1</span> file changed, <span style="color:#ae81ff">1</span> insertion<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span> create mode <span style="color:#ae81ff">100644</span> newfeature.txt</span></span></code></pre></div>
 通过<code>git log --graph</code>可以观察到日志:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">*   commit 979309d67d62bd2fb3beeb009c20f750d362e93a <span style="color:#f92672">(</span>HEAD -&gt; master<span style="color:#f92672">)</span>
-|<span style="color:#ae81ff">\ </span> Merge: 22a449d 68212fe
-| | Author: hjlarry &lt;hjlarry@163.com&gt;
-| | Date:   Sun Feb <span style="color:#ae81ff">23</span> 21:46:55 <span style="color:#ae81ff">2020</span> +0800
-| |
-| |     Merge branch <span style="color:#e6db74">&#39;newfeature&#39;</span>
-| |
-| * commit 68212fef9f5e17091bcd14b4d9be713bfc2c763b <span style="color:#f92672">(</span>newfeature<span style="color:#f92672">)</span>
-| | Author: hjlarry &lt;hjlarry@163.com&gt;
-| | Date:   Sun Feb <span style="color:#ae81ff">23</span> 21:46:34 <span style="color:#ae81ff">2020</span> +0800
-| |
-| |     add new feature
-| |
-* | commit 22a449d52fe269ed7c969c179c1788f89013ac2d 
-| | Author: hjlarry &lt;hjlarry@163.com&gt;
-| | Date:   Sun Feb <span style="color:#ae81ff">23</span> 21:39:01 <span style="color:#ae81ff">2020</span> +0800
-| |
-| |     9th commit
-| |
-* | commit c658c0b8070ec1ab7dfe53351b64da79ae939e6d
-|/  Author: hjlarry &lt;hjlarry@163.com&gt;
-|   Date:   Sun Feb <span style="color:#ae81ff">23</span> 16:57:12 <span style="color:#ae81ff">2020</span> +0800
-|
-|       8th commit</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>*   commit 979309d67d62bd2fb3beeb009c20f750d362e93a <span style="color:#f92672">(</span>HEAD -&gt; master<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|<span style="color:#ae81ff">\ </span> Merge: 22a449d 68212fe
+</span></span><span style="display:flex;"><span>| | Author: hjlarry &lt;hjlarry@163.com&gt;
+</span></span><span style="display:flex;"><span>| | Date:   Sun Feb <span style="color:#ae81ff">23</span> 21:46:55 <span style="color:#ae81ff">2020</span> +0800
+</span></span><span style="display:flex;"><span>| |
+</span></span><span style="display:flex;"><span>| |     Merge branch <span style="color:#e6db74">&#39;newfeature&#39;</span>
+</span></span><span style="display:flex;"><span>| |
+</span></span><span style="display:flex;"><span>| * commit 68212fef9f5e17091bcd14b4d9be713bfc2c763b <span style="color:#f92672">(</span>newfeature<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| | Author: hjlarry &lt;hjlarry@163.com&gt;
+</span></span><span style="display:flex;"><span>| | Date:   Sun Feb <span style="color:#ae81ff">23</span> 21:46:34 <span style="color:#ae81ff">2020</span> +0800
+</span></span><span style="display:flex;"><span>| |
+</span></span><span style="display:flex;"><span>| |     add new feature
+</span></span><span style="display:flex;"><span>| |
+</span></span><span style="display:flex;"><span>* | commit 22a449d52fe269ed7c969c179c1788f89013ac2d 
+</span></span><span style="display:flex;"><span>| | Author: hjlarry &lt;hjlarry@163.com&gt;
+</span></span><span style="display:flex;"><span>| | Date:   Sun Feb <span style="color:#ae81ff">23</span> 21:39:01 <span style="color:#ae81ff">2020</span> +0800
+</span></span><span style="display:flex;"><span>| |
+</span></span><span style="display:flex;"><span>| |     9th commit
+</span></span><span style="display:flex;"><span>| |
+</span></span><span style="display:flex;"><span>* | commit c658c0b8070ec1ab7dfe53351b64da79ae939e6d
+</span></span><span style="display:flex;"><span>|/  Author: hjlarry &lt;hjlarry@163.com&gt;
+</span></span><span style="display:flex;"><span>|   Date:   Sun Feb <span style="color:#ae81ff">23</span> 16:57:12 <span style="color:#ae81ff">2020</span> +0800
+</span></span><span style="display:flex;"><span>|
+</span></span><span style="display:flex;"><span>|       8th commit</span></span></code></pre></div>
 我们观察merge时的那个commit object会发现它是有两个parent的:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git cat-file -p <span style="color:#ae81ff">9793</span>
-tree 88cab0838dc7d8ae476592dbd60b4bda86dafbd8
-parent 22a449d52fe269ed7c969c179c1788f89013ac2d
-parent 68212fef9f5e17091bcd14b4d9be713bfc2c763b
-author hjlarry &lt;hjlarry@163.com&gt; <span style="color:#ae81ff">1582465615</span> +0800
-committer hjlarry &lt;hjlarry@163.com&gt; <span style="color:#ae81ff">1582465615</span> +0800
-
-Merge branch <span style="color:#e6db74">&#39;newfeature&#39;</span></code></pre></div></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git cat-file -p <span style="color:#ae81ff">9793</span>
+</span></span><span style="display:flex;"><span>tree 88cab0838dc7d8ae476592dbd60b4bda86dafbd8
+</span></span><span style="display:flex;"><span>parent 22a449d52fe269ed7c969c179c1788f89013ac2d
+</span></span><span style="display:flex;"><span>parent 68212fef9f5e17091bcd14b4d9be713bfc2c763b
+</span></span><span style="display:flex;"><span>author hjlarry &lt;hjlarry@163.com&gt; <span style="color:#ae81ff">1582465615</span> +0800
+</span></span><span style="display:flex;"><span>committer hjlarry &lt;hjlarry@163.com&gt; <span style="color:#ae81ff">1582465615</span> +0800
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Merge branch <span style="color:#e6db74">&#39;newfeature&#39;</span></span></span></code></pre></div></p>
 <p>三方合并时，也经常会遇到发生冲突的情况。这时候git会暂停合并，给出提示，并在冲突的地方做出标记。我们需要手工处理，选择某个分支或者自行再做修改都可以，然后再自行<code>git add</code>和<code>git commit</code>即可。</p>
-<h3 id="变基">变基</h3>
+<h3 id="变基">
+  变基
+  <a class="anchor" href="#%e5%8f%98%e5%9f%ba">#</a>
+</h3>
 <p>基于之前三方合并的示例，还有一种合并分支的方法就是变基。它会在当前分支上重演一遍目标分支的历史，最后形成一个线性的提交历史。当前分支的commit object由于变更了其parent就会发生改变，而目标分支的commit object往往不会改变。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git checkout -b testrebase HEAD~
-Switched to a new branch <span style="color:#e6db74">&#39;testrebase&#39;</span>
-➜  testgit git:<span style="color:#f92672">(</span>testrebase<span style="color:#f92672">)</span> echo <span style="color:#e6db74">&#39;testrebase&#39;</span>&gt;test.txt
-➜  testgit git:<span style="color:#f92672">(</span>testrebase<span style="color:#f92672">)</span> ✗ git add .
-➜  testgit git:<span style="color:#f92672">(</span>testrebase<span style="color:#f92672">)</span> ✗ git commit -m <span style="color:#e6db74">&#34;test rebase&#34;</span>
-<span style="color:#f92672">[</span>testrebase 7f4088a<span style="color:#f92672">]</span> test rebase
- <span style="color:#ae81ff">1</span> file changed, <span style="color:#ae81ff">1</span> insertion<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span>, <span style="color:#ae81ff">3</span> deletions<span style="color:#f92672">(</span>-<span style="color:#f92672">)</span>
-➜  testgit git:<span style="color:#f92672">(</span>testrebase<span style="color:#f92672">)</span> git checkout master
-Switched to branch <span style="color:#e6db74">&#39;master&#39;</span>
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git log --graph
-➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git rebase testrebase
-First, rewinding head to replay your work on top of it...
-Applying: add new feature</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git checkout -b testrebase HEAD~
+</span></span><span style="display:flex;"><span>Switched to a new branch <span style="color:#e6db74">&#39;testrebase&#39;</span>
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testrebase<span style="color:#f92672">)</span> echo <span style="color:#e6db74">&#39;testrebase&#39;</span>&gt;test.txt
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testrebase<span style="color:#f92672">)</span> ✗ git add .
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testrebase<span style="color:#f92672">)</span> ✗ git commit -m <span style="color:#e6db74">&#34;test rebase&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>testrebase 7f4088a<span style="color:#f92672">]</span> test rebase
+</span></span><span style="display:flex;"><span> <span style="color:#ae81ff">1</span> file changed, <span style="color:#ae81ff">1</span> insertion<span style="color:#f92672">(</span>+<span style="color:#f92672">)</span>, <span style="color:#ae81ff">3</span> deletions<span style="color:#f92672">(</span>-<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>testrebase<span style="color:#f92672">)</span> git checkout master
+</span></span><span style="display:flex;"><span>Switched to branch <span style="color:#e6db74">&#39;master&#39;</span>
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git log --graph
+</span></span><span style="display:flex;"><span>➜  testgit git:<span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> git rebase testrebase
+</span></span><span style="display:flex;"><span>First, rewinding head to replay your work on top of it...
+</span></span><span style="display:flex;"><span>Applying: add new feature</span></span></code></pre></div>
 依然观察日志:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">* commit cd2c246f0cfcd2d98717af0a405ac17fd23636bc <span style="color:#f92672">(</span>HEAD -&gt; master<span style="color:#f92672">)</span>
-| Author: hjlarry &lt;hjlarry@163.com&gt;
-| Date:   Sun Feb <span style="color:#ae81ff">23</span> 21:46:34 <span style="color:#ae81ff">2020</span> +0800
-|
-|     add new feature
-|
-* commit 7f4088a0254081c4349a253c2d3a74dd7a7f1234 <span style="color:#f92672">(</span>testrebase<span style="color:#f92672">)</span>
-| Author: hjlarry &lt;hjlarry@163.com&gt;
-| Date:   Sun Feb <span style="color:#ae81ff">23</span> 22:47:17 <span style="color:#ae81ff">2020</span> +0800
-|
-|     test rebase
-|
-* commit 22a449d52fe269ed7c969c179c1788f89013ac2d <span style="color:#f92672">(</span>fixbug<span style="color:#f92672">)</span>
-| Author: hjlarry &lt;hjlarry@163.com&gt;
-| Date:   Sun Feb <span style="color:#ae81ff">23</span> 21:39:01 <span style="color:#ae81ff">2020</span> +0800
-|
-|     9th commit
-|
-* commit c658c0b8070ec1ab7dfe53351b64da79ae939e6d
-| Author: hjlarry &lt;hjlarry@163.com&gt;
-| Date:   Sun Feb <span style="color:#ae81ff">23</span> 16:57:12 <span style="color:#ae81ff">2020</span> +0800
-|
-|     8th commit</code></pre></div></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>* commit cd2c246f0cfcd2d98717af0a405ac17fd23636bc <span style="color:#f92672">(</span>HEAD -&gt; master<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| Author: hjlarry &lt;hjlarry@163.com&gt;
+</span></span><span style="display:flex;"><span>| Date:   Sun Feb <span style="color:#ae81ff">23</span> 21:46:34 <span style="color:#ae81ff">2020</span> +0800
+</span></span><span style="display:flex;"><span>|
+</span></span><span style="display:flex;"><span>|     add new feature
+</span></span><span style="display:flex;"><span>|
+</span></span><span style="display:flex;"><span>* commit 7f4088a0254081c4349a253c2d3a74dd7a7f1234 <span style="color:#f92672">(</span>testrebase<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| Author: hjlarry &lt;hjlarry@163.com&gt;
+</span></span><span style="display:flex;"><span>| Date:   Sun Feb <span style="color:#ae81ff">23</span> 22:47:17 <span style="color:#ae81ff">2020</span> +0800
+</span></span><span style="display:flex;"><span>|
+</span></span><span style="display:flex;"><span>|     test rebase
+</span></span><span style="display:flex;"><span>|
+</span></span><span style="display:flex;"><span>* commit 22a449d52fe269ed7c969c179c1788f89013ac2d <span style="color:#f92672">(</span>fixbug<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| Author: hjlarry &lt;hjlarry@163.com&gt;
+</span></span><span style="display:flex;"><span>| Date:   Sun Feb <span style="color:#ae81ff">23</span> 21:39:01 <span style="color:#ae81ff">2020</span> +0800
+</span></span><span style="display:flex;"><span>|
+</span></span><span style="display:flex;"><span>|     9th commit
+</span></span><span style="display:flex;"><span>|
+</span></span><span style="display:flex;"><span>* commit c658c0b8070ec1ab7dfe53351b64da79ae939e6d
+</span></span><span style="display:flex;"><span>| Author: hjlarry &lt;hjlarry@163.com&gt;
+</span></span><span style="display:flex;"><span>| Date:   Sun Feb <span style="color:#ae81ff">23</span> 16:57:12 <span style="color:#ae81ff">2020</span> +0800
+</span></span><span style="display:flex;"><span>|
+</span></span><span style="display:flex;"><span>|     8th commit</span></span></code></pre></div></p>
 <p>它典型的使用场景，例如团队其他人维护的项目，我们在自己的分支上为其提供feature，然后把我们的分支变基到origin/master上，这样其他人只需要去FAST-FORWARD而无需人工整合。</p>
-<h4 id="交互式变基">交互式变基</h4>
+<h4 id="交互式变基">
+  交互式变基
+  <a class="anchor" href="#%e4%ba%a4%e4%ba%92%e5%bc%8f%e5%8f%98%e5%9f%ba">#</a>
+</h4>
 <p>通过<code>git rebase -i &lt;commit_id&gt;</code>就能进入一个交互式界面:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">pick 2c70e0b second commit a
-pick c351a72 third commit
-
-<span style="color:#75715e"># Rebase 37b766f..c351a72 onto 37b766f (2 commands)</span>
-#
-<span style="color:#75715e"># Commands:</span>
-<span style="color:#75715e"># p, pick = use commit</span>
-<span style="color:#75715e"># r, reword = use commit, but edit the commit message</span>
-<span style="color:#75715e"># e, edit = use commit, but stop for amending</span>
-<span style="color:#75715e"># s, squash = use commit, but meld into previous commit</span>
-<span style="color:#75715e"># f, fixup = like &#34;squash&#34;, but discard this commit&#39;s log message</span>
-<span style="color:#75715e"># x, exec = run command (the rest of the line) using shell</span>
-<span style="color:#75715e"># d, drop = remove commit</span>
-#
-<span style="color:#75715e"># These lines can be re-ordered; they are executed from top to bottom.</span>
-#
-<span style="color:#75715e"># If you remove a line here THAT COMMIT WILL BE LOST.</span>
-#
-<span style="color:#75715e"># However, if you remove everything, the rebase will be aborted.</span>
-#
-<span style="color:#75715e"># Note that empty commits are commented out</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>pick 2c70e0b second commit a
+</span></span><span style="display:flex;"><span>pick c351a72 third commit
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Rebase 37b766f..c351a72 onto 37b766f (2 commands)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Commands:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># p, pick = use commit</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># r, reword = use commit, but edit the commit message</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># e, edit = use commit, but stop for amending</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># s, squash = use commit, but meld into previous commit</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># f, fixup = like &#34;squash&#34;, but discard this commit&#39;s log message</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># x, exec = run command (the rest of the line) using shell</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># d, drop = remove commit</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># These lines can be re-ordered; they are executed from top to bottom.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># If you remove a line here THAT COMMIT WILL BE LOST.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># However, if you remove everything, the rebase will be aborted.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Note that empty commits are commented out</span></span></span></code></pre></div>
 它会列出这个<code>commit_id</code>(可以用commit的hash或者<code>HEAD~3</code>这样的形式)的child一直到当前分支的最后一个commit，我们可以在这个界面中编辑想对每一个commit做的操作：</p>
 <ul>
 <li>p，对这条commit不做任何变更</li>
@@ -506,7 +571,10 @@ pick c351a72 third commit
 </ul>
 <p>我们在一些场景，例如修改老旧commit的msg、把连续或间隔的多个commit整理为1个等使用交互式变基都会比较方便。</p>
 <p>这种方式看起来没有办法修改最祖先的那条commit，实际上有这种场景时我们可以直接把祖先commit添加到头部即可。在交互式界面中也可以手动调整commit的顺序。有些操作例如修改commit msg，就会产生一个新的commit object，当然也会影响到它的所有child object，因为sha值变了，就得一层层的修改下去。</p>
-<h3 id="常用命令">常用命令</h3>
+<h3 id="常用命令">
+  常用命令
+  <a class="anchor" href="#%e5%b8%b8%e7%94%a8%e5%91%bd%e4%bb%a4">#</a>
+</h3>
 <table>
 <thead>
 <tr>
@@ -577,34 +645,55 @@ pick c351a72 third commit
 </tr>
 </tbody>
 </table>
-<h3 id="其他技巧">其他技巧</h3>
-<h4 id="cherry-pick">cherry-pick</h4>
+<h3 id="其他技巧">
+  其他技巧
+  <a class="anchor" href="#%e5%85%b6%e4%bb%96%e6%8a%80%e5%b7%a7">#</a>
+</h3>
+<h4 id="cherry-pick">
+  cherry-pick
+  <a class="anchor" href="#cherry-pick">#</a>
+</h4>
 <p>cherry-pick类似于一个定制化的merge，它可以把其它分支上的commit一个个摘下来，合并到当前分支。</p>
 <p>它的使用方法是<code>git cherry-pick &lt;commid_id1&gt; &lt;commid_id2&gt; ...</code>，就会把每个挑选的commit提交一次生成一个新的commit id。也可以通过<code>git cherry-pick -n &lt;commid_id1&gt; &lt;commid_id2&gt;</code>挑选出相应的commit至暂存区而不提交，后续自己可以再手动提交。</p>
-<h4 id="reflog">reflog</h4>
+<h4 id="reflog">
+  reflog
+  <a class="anchor" href="#reflog">#</a>
+</h4>
 <p>引用日志记录了用户在本地更改的完整历史记录，通过<code>git reflog</code>可以查看到类似这样的信息
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">e1b4a61 <span style="color:#f92672">(</span>HEAD<span style="color:#f92672">)</span> HEAD@<span style="color:#f92672">{</span>0<span style="color:#f92672">}</span>: revert: Revert <span style="color:#e6db74">&#34;8th commit&#34;</span>
-979309d HEAD@<span style="color:#f92672">{</span>1<span style="color:#f92672">}</span>: checkout: moving from master to HEAD@<span style="color:#f92672">{</span>11<span style="color:#f92672">}</span>
-c658c0b <span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> HEAD@<span style="color:#f92672">{</span>2<span style="color:#f92672">}</span>: reset: moving to c658
-<span style="color:#ae81ff">5665150</span> HEAD@<span style="color:#f92672">{</span>3<span style="color:#f92672">}</span>: reset: moving to <span style="color:#ae81ff">5665</span>
-...</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>e1b4a61 <span style="color:#f92672">(</span>HEAD<span style="color:#f92672">)</span> HEAD@<span style="color:#f92672">{</span>0<span style="color:#f92672">}</span>: revert: Revert <span style="color:#e6db74">&#34;8th commit&#34;</span>
+</span></span><span style="display:flex;"><span>979309d HEAD@<span style="color:#f92672">{</span>1<span style="color:#f92672">}</span>: checkout: moving from master to HEAD@<span style="color:#f92672">{</span>11<span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>c658c0b <span style="color:#f92672">(</span>master<span style="color:#f92672">)</span> HEAD@<span style="color:#f92672">{</span>2<span style="color:#f92672">}</span>: reset: moving to c658
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">5665150</span> HEAD@<span style="color:#f92672">{</span>3<span style="color:#f92672">}</span>: reset: moving to <span style="color:#ae81ff">5665</span>
+</span></span><span style="display:flex;"><span>...</span></span></code></pre></div>
 翻译过来就是:</p>
-<pre><code>HEAD@{0} 撤销操作: 撤销的消息
+<pre tabindex="0"><code>HEAD@{0} 撤销操作: 撤销的消息
 HEAD@{1} 切换操作: 从master切换至HEAD@{11}
 HEAD@{2} 重置操作: 重置至c658
 HEAD@{3} 重置操作: 重置至5665
 </code></pre><p>接着我们就可以使用<code>git checkout HEAD@{1}</code>这样的操作恢复到切换操作时的场景。</p>
-<h4 id="submodule">submodule</h4>
+<h4 id="submodule">
+  submodule
+  <a class="anchor" href="#submodule">#</a>
+</h4>
 <p>使用场景，例如开发过程中有一些通用的部分希望抽出作为一个公共的库来维护，或者hugo中的某些皮肤也使用了submodule。</p>
 <p>包含子模块的项目，在clone主项目的时候需要带参数<code>git clone &lt;url&gt; --recurse-submodules</code>或者使用<code>git submodule init &amp;&amp; git submodule update</code>。</p>
 <p>如果子模块的内容我们做了变更，在主模块中使用<code>git add/commit</code>是无效的。如果子模块的远程仓库有更新，我们也需要进入子模块文件夹才能获取到更新。</p>
-<h2 id="工作流">工作流</h2>
+<h2 id="工作流">
+  工作流
+  <a class="anchor" href="#%e5%b7%a5%e4%bd%9c%e6%b5%81">#</a>
+</h2>
 <p>工作流(workflow)是指在多人协作的时候，团队以什么样的工作流程有效的合作。</p>
-<h3 id="git-flow">Git Flow</h3>
+<h3 id="git-flow">
+  Git Flow
+  <a class="anchor" href="#git-flow">#</a>
+</h3>
 <p>该工作流为项目设定了两个长期分支，即主分支master和开发分支develop。master存放了对外发布的版本，任何时候在这个上面拿到的都是稳定的发布版。develop用于日常开发，存放最新的开发版本。</p>
 <p>其次，项目根据不同的目的设定了三个短期分支，包括功能分支(feature branch)、补丁分支(hotfix branch)和预发分支(release branch)。一旦完成相应的开发，短期分支被合并入develop或master，然后删除该短期分支。</p>
 <p>这种工作流程使用起来会比较麻烦，因为维护了两个长期分支，可能需要经常切换。它比较适合软件项目，而不是网站项目，因为大多数网站是持续发布的，一有代码变动可能就会更新一次，这时候往往master和develop分支的区别不大，也就没有必要同时维护两套了。</p>
-<h3 id="github-flow">Github Flow</h3>
+<h3 id="github-flow">
+  Github Flow
+  <a class="anchor" href="#github-flow">#</a>
+</h3>
 <p>这套工作流程在Git Flow上做了简化，只有一个长期分支master，适合于持续发布的场景，是github官方使用的工作流程，它们也做了相关的<a href="https://guides.github.com/introduction/flow/index.html">介绍</a>。其具体流程是这样的:</p>
 <ol>
 <li>你从master中拉出新分支，不区分是功能还是补丁</li>
@@ -613,32 +702,53 @@ HEAD@{3} 重置操作: 重置至5665
 <li>你的PR被接受并入master中，原本你拉出来的分支就会被删除</li>
 </ol>
 <p>这种流程也有一个问题，它假设master分支和产品的发布是一致的。这在一些场景，例如苹果Appstore的发布可能因为审核要延迟，或有些产品是要指定时间发布的，一个master分支就显得不够了。</p>
-<h3 id="gitlab-flow">Gitlab Flow</h3>
+<h3 id="gitlab-flow">
+  Gitlab Flow
+  <a class="anchor" href="#gitlab-flow">#</a>
+</h3>
 <p>Gitlab结合了Git flow和Github flow的优点，既能适应不同开发环境的弹性，又仍然只需维护单一分支，官网也有相关<a href="https://docs.gitlab.com/ee/topics/gitlab_flow.html">介绍</a>。</p>
 <p>它定义了一个原则即上游优先，只存在一个主分支master，它是其他分支的上游。只有上游分支变化了，才能应用到其他的分支。</p>
 <p>对于需要持续发布的项目，它建议在master之外，再根据不同的环境建立分支。例如开发环境定义为master是最上游，预开发环境定义为pre-production是开发环境的下游，生产环境定义为production是最下游。那么当生产环境出了bug，就要新建一个功能分支，先把它合并入master，确认没问题再cherry-pick至预开发环境，最终再进入生产环境。只有紧急情况才允许跳过上游直接并入下游。</p>
 <p>对于需要按版本发布的项目，建议的做法是每一个版本都要从master中拉出一个分支来，如<code>2-3-stable</code>。之后只有修补bug才允许将代码合并入这些分支，更新相应的小版本号。</p>
-<h2 id="faq">FAQ</h2>
-<h4 id="每次commitgit储存的是全新的文件快照还是储存文件的变更部分">每次commit，Git储存的是全新的文件快照还是储存文件的变更部分？</h4>
+<h2 id="faq">
+  FAQ
+  <a class="anchor" href="#faq">#</a>
+</h2>
+<h4 id="每次commitgit储存的是全新的文件快照还是储存文件的变更部分">
+  每次commit，Git储存的是全新的文件快照还是储存文件的变更部分？
+  <a class="anchor" href="#%e6%af%8f%e6%ac%a1commitgit%e5%82%a8%e5%ad%98%e7%9a%84%e6%98%af%e5%85%a8%e6%96%b0%e7%9a%84%e6%96%87%e4%bb%b6%e5%bf%ab%e7%85%a7%e8%bf%98%e6%98%af%e5%82%a8%e5%ad%98%e6%96%87%e4%bb%b6%e7%9a%84%e5%8f%98%e6%9b%b4%e9%83%a8%e5%88%86">#</a>
+</h4>
 <p>Git储存的是全新的文件快照，即使你只修改了文件的一行，也会产生一个新的blob对象。这种储存方式存储的对象格式被称为松散(loose)格式。</p>
 <p>这样势必会造成大量的空间浪费。但是，Git会时不时的把这些松散格式的文件打包成一个称为包文件(packfile)的二进制文件以节省空间和提升效率。手动执行<code>git gc</code>也可以达到这种效果。这也是<code>./git/objects/info</code>和<code>./git/objects/pack</code>两个文件夹的用途。</p>
-<h4 id="为什么要有暂存区的概念不能直接存储么">为什么要有暂存区的概念，不能直接存储么？</h4>
+<h4 id="为什么要有暂存区的概念不能直接存储么">
+  为什么要有暂存区的概念，不能直接存储么？
+  <a class="anchor" href="#%e4%b8%ba%e4%bb%80%e4%b9%88%e8%a6%81%e6%9c%89%e6%9a%82%e5%ad%98%e5%8c%ba%e7%9a%84%e6%a6%82%e5%bf%b5%e4%b8%8d%e8%83%bd%e7%9b%b4%e6%8e%a5%e5%ad%98%e5%82%a8%e4%b9%88">#</a>
+</h4>
 <p>因为提交是需要原子性的，即一次提交下的文件，要么全部成功，要么全部失败。</p>
 <p>但在Git的命令行下，我们很难像SVN那样有一个图形界面，勾选要提交的文件，填入提交信息，点个按钮就能完成提交。需要<code>git add</code>这个命令帮助我们选择要提交的文件。</p>
-<h4 id="使用merge还是rebase合并分支">使用merge还是rebase合并分支？</h4>
+<h4 id="使用merge还是rebase合并分支">
+  使用merge还是rebase合并分支？
+  <a class="anchor" href="#%e4%bd%bf%e7%94%a8merge%e8%bf%98%e6%98%afrebase%e5%90%88%e5%b9%b6%e5%88%86%e6%94%af">#</a>
+</h4>
 <p><code>git merge</code>和<code>git rebase</code>都被设计来将一个分支的更改并入另一个分支，但它们的方式却不太一样。</p>
 <p>merge是一个安全的操作，现有的分支不会被更改。但另一方面，每次合并一个feature分支时都会引入一个外来的合并提交，当同时进行的feature过多时会使得整个树看起来非常杂乱，增加了开发者了解项目历史的成本。</p>
 <p>rebase最大的好处就是使项目的历史非常的整洁、线性，可以从项目的起点开始浏览到终点不需要任何的分叉。但是不合理的rebase会给团队其他人协同开发带来很大的困扰。此外，rebase不能在合并提交时附带message，也就不能像merge那样看到feature分支的并入带来了哪些更改。</p>
 <p>所在，绝不能在公共的分支使用变基，也不能使用<code>git push -f</code>强制推送去修改远程仓库的历史。合理的使用场景应该像下面描述的这样:</p>
 <p>基于上游分支master拉出来一个dev的分支，自行在dev上开发完成后可能master已经有了其他人开发的新的内容，这时应该在dev分支上使用<code>git rebase master</code>把master分支的内容先同步过来，然后在master分支上使用<code>git merge dev</code>把dev分支的内容放回去。</p>
 <p>此外，一般有远程仓库，那么相应的可能是通过<code>git pull --rebase</code>把远程的变更内容拿回来，然后通过PR的方式由远程仓库的管理者决定如何并入远程分支。</p>
-<h4 id="使用revertreset还是checkout回滚代码">使用revert、reset还是checkout回滚代码？</h4>
+<h4 id="使用revertreset还是checkout回滚代码">
+  使用revert、reset还是checkout回滚代码？
+  <a class="anchor" href="#%e4%bd%bf%e7%94%a8revertreset%e8%bf%98%e6%98%afcheckout%e5%9b%9e%e6%bb%9a%e4%bb%a3%e7%a0%81">#</a>
+</h4>
 <p>代码的回滚可以分为回滚某次提交，或者回滚某些文件两个层面。</p>
 <p>对于回滚提交，应该使用reset和revert。</p>
 <p>reset的本质是把HEAD移动到某个commit的位置，那么该分支从新HEAD到末端的这部分就处于悬挂状态，如果上面没有什么tag或branch引用的话，再下次git进行垃圾回收的时候就会被删除。reset本身有参数，<code>--mixed</code>为默认选项，表示暂存区和将要reset的提交同步，而工作区不受影响；使用<code>--hard</code>表示暂存区和工作区都和将要reset的提交同步；使用<code>--soft</code>表示暂存区和工作区都不做改变。</p>
 <p>而revert是不会改变提交的历史的，它会创建一个新的提交，而这个提交的内容是撤回的部分。所以revert往往用于公共的分支上。</p>
 <p>对于文件提交，应该使用reset和checkout。区别在于checkout用于把工作区中的某个文件恢复为某个commit中的该文件，而reset用于把暂存区中的某个文件恢复至某个commit的该文件，<code>--mixed</code>、<code>--soft</code>、<code>--hard</code>对于恢复文件的场景是无效的参数。</p>
-<h2 id="相关链接">相关链接</h2>
+<h2 id="相关链接">
+  相关链接
+  <a class="anchor" href="#%e7%9b%b8%e5%85%b3%e9%93%be%e6%8e%a5">#</a>
+</h2>
 <ul>
 <li><a href="https://marklodato.github.io/visual-git-guide/index-zh-cn.html">图解git</a></li>
 <li><a href="https://git-scm.com/book/zh/v2">Pro git V2</a></li>
@@ -654,13 +764,10 @@ HEAD@{3} 重置操作: 重置至5665
 
       <footer class="book-footer">
         
-  <div class="flex justify-between">
+  <div class="flex flex-wrap justify-between">
 
 
-
-  <div>
-    
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/345048b88cb478f66b2d3a01d37e698b2abd0b1b" title='最后修改者 hjlarry | July 6, 2020' target="_blank" rel="noopener">
+  <div><a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/345048b88cb478f66b2d3a01d37e698b2abd0b1b" title='最后修改者 hjlarry | July 6, 2020' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>July 6, 2020</span>
     </a>
@@ -669,19 +776,24 @@ HEAD@{3} 重置操作: 重置至5665
 
 
   <div>
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/other/git/_index.md" target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/content/docs/other/git/_index.md" target="_blank" rel="noopener">
       <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>编辑本页</span>
     </a>
   </div>
 
+
 </div>
+
+
+
+  <script>(function(){function e(n){const e=window.getSelection(),t=document.createRange();t.selectNodeContents(n),e.removeAllRanges(),e.addRange(t)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
 
  
         <br>
 <div style="text-align: center;font-size:xx-small;">
-    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a
-        href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
+    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
 </div>
       </footer>
 
@@ -694,8 +806,10 @@ HEAD@{3} 重置操作: 重置至5665
 
     
     <aside class="book-toc">
-      
-  <nav id="TableOfContents">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
   <ul>
     <li><a href="#原理">原理</a>
       <ul>
@@ -728,14 +842,15 @@ HEAD@{3} 重置操作: 重置至5665
   </ul>
 </nav>
 
+
  
+      </div>
     </aside>
     
   </main>
 
   
 </body>
-
 </html>
 
 

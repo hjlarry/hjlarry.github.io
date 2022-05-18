@@ -5,10 +5,6 @@
     <link>/docs/other/protocol/</link>
     <description>Recent content in 网络协议 on Home</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    
-	<atom:link href="/docs/other/protocol/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <language>zh-cn</language><atom:link href="/docs/other/protocol/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

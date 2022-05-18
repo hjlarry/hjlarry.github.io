@@ -1,48 +1,52 @@
 <!DOCTYPE html>
-<html lang="cn">
-
+<html lang="zh-cn" dir="ltr">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="闭包 原理 我们先来看这样一个示例: func test() func() { x := 100 return func() { println(x) } } func main() { closure := test() closure() } 声明了一个test函数，它会返回一个匿名函数，这个匿名函数引用了它的局部变量x。那么当执行完closure := test()时，test的栈帧会被销毁，局部变量x应该失效，按照常理，匿名函数应该找不到x而无法打印，但实际上运行之后是能够正常打印的。那么这个x在哪？只有一种可能，它逃逸到堆上去了。既然是在堆上，x就会有一个地址，问题就变为匿名函数是怎么知道x的地址的？
+<meta name="description" content="闭包#原理#我们先来看这样一个示例: func test() func() { 	x := 100 	return func() { 	println(x) 	} } func main() { 	closure := test() 	closure() } 声明了一个test函数，它会返回一个匿名函数，这个匿名函数引用了它的局部变量x。那么当执行完closure := test()时，test的栈帧会被销毁，局部变量x应该失效，按照常理，匿名函数应该找不到x而无法打印，但实际上运行之后是能够正常打印的。那么这个x在哪？只有一种可能，它逃逸到堆上去了。既然是在堆上，x就会有一个地址，问题就变为匿名函数是怎么知道x的地址的？
 我们把这种现象叫做闭包，当一个匿名函数离开了它的宿主时，它依然持有它所引用的环境变量。所以闭包是包含两个部分的，其一是一个指针指向匿名函数的地址，其二是所拥有的环境变量，这两个东西打包合起来才称为一个闭包。
 可以理解为test函数的返回用伪码来表达应该是:
-return closure struct{ f : func(){println(x)} v : malloc(x) } 只不过Go的语法上让我们可以简写为示例代码中的样子，调用的时候编译器也是隐式的使用closure.f(closure.v)这样的方式来调用。
-实现 下面我们观察它的编译过程来证明这件事。使用go build -gcflags &quot;-S&quot; 2&gt;a.txt closure.go把编译过程放到一个文本文件里，从中能找到一些相关线索: &#34;&#34;.test STEXT size=126 args=0x8 locals=0x28 0x0026 00038 (/root/.mac/gocode/closure.go:4)	MOVQ	$100, &#34;&#34;.x&#43;16(SP) 0x002f 00047 (/root/.mac/gocode/closure.go:5)	LEAQ	type.noalg.struct { F uintptr; &#34;&#34;.x int }(SB), AX 	0x003a 00058 (/root/."><meta property="og:title" content="闭包" />
+return closure struct{f : func(){println(x)}v : malloc(x)} 只不过Go的语法上让我们可以简写为示例代码中的样子，调用的时候编译器也是隐式的使用closure.f(closure.v)这样的方式来调用。
+实现#下面我们观察它的编译过程来证明这件事。使用go build -gcflags &quot;-S&quot; 2&gt;a.txt closure.go把编译过程放到一个文本文件里，从中能找到一些相关线索: &#34;&#34;.test STEXT size=126 args=0x8 locals=0x28 	0x0026 00038 (/root/.mac/gocode/closure.go:4)	MOVQ	$100, &#34;&#34;.">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light dark"><meta property="og:title" content="闭包" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/docs/go/closure/" />
 
 <title>闭包 | Home</title>
+<link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/favicon.png" type="image/x-icon">
-<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.8d2462c3b745732864d843e8e2e7782a2ec838ca90fb94676baa461536bdae11.js" integrity="sha256-jSRiw7dFcyhk2EPo4ud4Ki7IOMqQ&#43;5Rna6pGFTa9rhE="></script>
+<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" >
+  <script defer src="/flexsearch.min.js"></script>
+  <script defer src="/cn.search.min.dcaf7fea7db359f8fd7a4b37bdf1a9f765580260566390cc959292e2dcc5a5d9.js" ></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/go/closure/index.xml" title="Home" />
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
 -->
-
   
 </head>
-
-<body>
-  <input type="checkbox" class="hidden" id="menu-control" />
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
   <main class="container flex">
     <aside class="book-menu">
-      
+      <div class="book-menu-content">
+        
   <nav>
 <h2 class="book-brand">
-  <a href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
+  <a class="flex align-center" href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
   </a>
 </h2>
 
 
 <div class="book-search">
   <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" data-hotkeys="s/" />
-  <div class="book-search-spinner spinner hidden"></div>
+  <div class="book-search-spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
+
 
 
 
@@ -114,10 +118,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
 
 
  
+      </div>
     </aside>
 
     <div class="book-page">
@@ -131,7 +136,7 @@ https://github.com/alex-shpak/hugo-book
   <strong>闭包</strong>
 
   <label for="toc-control">
-    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
   </label>
 </div>
 
@@ -142,123 +147,150 @@ https://github.com/alex-shpak/hugo-book
 
       
       
-  <article class="markdown"><h1 id="闭包">闭包</h1>
-<h2 id="原理">原理</h2>
+  <article class="markdown"><h1 id="闭包">
+  闭包
+  <a class="anchor" href="#%e9%97%ad%e5%8c%85">#</a>
+</h1>
+<h2 id="原理">
+  原理
+  <a class="anchor" href="#%e5%8e%9f%e7%90%86">#</a>
+</h2>
 <p>我们先来看这样一个示例:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">test</span>() <span style="color:#66d9ef">func</span>() {
-	<span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">100</span>
-	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">func</span>() {
-		println(<span style="color:#a6e22e">x</span>)
-	}
-}
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">closure</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">test</span>()
-	<span style="color:#a6e22e">closure</span>()
-}</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">test</span>() <span style="color:#66d9ef">func</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">func</span>() {
+</span></span><span style="display:flex;"><span>		println(<span style="color:#a6e22e">x</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">closure</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">test</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">closure</span>()
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 声明了一个test函数，它会返回一个匿名函数，这个匿名函数引用了它的局部变量x。那么当执行完<code>closure := test()</code>时，test的栈帧会被销毁，局部变量x应该失效，按照常理，匿名函数应该找不到x而无法打印，但实际上运行之后是能够正常打印的。那么这个x在哪？只有一种可能，它逃逸到堆上去了。既然是在堆上，x就会有一个地址，问题就变为匿名函数是怎么知道x的地址的？</p>
 <p>我们把这种现象叫做闭包，当一个匿名函数离开了它的宿主时，它依然持有它所引用的环境变量。所以闭包是包含两个部分的，其一是一个指针指向匿名函数的地址，其二是所拥有的环境变量，这两个东西打包合起来才称为一个闭包。</p>
 <p>可以理解为test函数的返回用伪码来表达应该是:</p>
-<pre><code>return closure struct{
+<pre tabindex="0"><code>return closure struct{
     f : func(){println(x)}
     v : malloc(x)
 }
 </code></pre><p>只不过Go的语法上让我们可以简写为示例代码中的样子，调用的时候编译器也是隐式的使用<code>closure.f(closure.v)</code>这样的方式来调用。</p>
-<h2 id="实现">实现</h2>
+<h2 id="实现">
+  实现
+  <a class="anchor" href="#%e5%ae%9e%e7%8e%b0">#</a>
+</h2>
 <p>下面我们观察它的编译过程来证明这件事。使用<code>go build -gcflags &quot;-S&quot; 2&gt;a.txt closure.go</code>把编译过程放到一个文本文件里，从中能找到一些相关线索:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#a6e22e">.test</span> <span style="color:#66d9ef">STEXT</span> <span style="color:#66d9ef">size</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">126</span> <span style="color:#66d9ef">args</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">0x8</span> <span style="color:#66d9ef">locals</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">0x28</span>
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x0026</span> <span style="color:#ae81ff">00038</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">4</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">$100</span>, <span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.x</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">16</span>(<span style="color:#66d9ef">SP</span>)
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x002f</span> <span style="color:#ae81ff">00047</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">LEAQ</span>	<span style="color:#66d9ef">type.noalg.struct</span> <span style="color:#960050;background-color:#1e0010">{</span> <span style="color:#66d9ef">F</span> <span style="color:#66d9ef">uintptr</span><span style="color:#75715e">; &#34;&#34;.x int }(SB), AX
-</span><span style="color:#75715e"></span>	<span style="color:#ae81ff">0x003a</span> <span style="color:#ae81ff">00058</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">CALL</span>	<span style="color:#66d9ef">runtime.newobject</span>(<span style="color:#66d9ef">SB</span>)  
-	<span style="color:#ae81ff">0x0049</span> <span style="color:#ae81ff">00073</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">LEAQ</span>	<span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.test.func1</span>(<span style="color:#66d9ef">SB</span>), <span style="color:#66d9ef">CX</span>  
-	<span style="color:#ae81ff">0x0050</span> <span style="color:#ae81ff">00080</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">CX</span>, (<span style="color:#66d9ef">AX</span>)
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x005a</span> <span style="color:#ae81ff">00090</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.x</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">16</span>(<span style="color:#66d9ef">SP</span>), <span style="color:#66d9ef">CX</span>
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x005f</span> <span style="color:#ae81ff">00095</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">CX</span>, <span style="color:#ae81ff">8</span>(<span style="color:#66d9ef">AX</span>)			   
-	<span style="color:#ae81ff">0x0068</span> <span style="color:#ae81ff">00104</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">AX</span>, <span style="color:#960050;background-color:#1e0010">&#34;&#34;</span>.<span style="color:#960050;background-color:#1e0010">~</span><span style="color:#66d9ef">r0</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">48</span>(<span style="color:#66d9ef">SP</span>)	   
-
-<span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.main</span> <span style="color:#66d9ef">STEXT</span> <span style="color:#66d9ef">size</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">65</span> <span style="color:#66d9ef">args</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">0x0</span> <span style="color:#66d9ef">locals</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">0x18</span>
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x0022</span> <span style="color:#ae81ff">00034</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">11</span>)	<span style="color:#66d9ef">MOVQ</span>	(<span style="color:#66d9ef">SP</span>), <span style="color:#66d9ef">DX</span>               
-	<span style="color:#ae81ff">0x0026</span> <span style="color:#ae81ff">00038</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">11</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">DX</span>, <span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.closure</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">8</span>(<span style="color:#66d9ef">SP</span>)
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x002b</span> <span style="color:#ae81ff">00043</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">12</span>)	<span style="color:#66d9ef">MOVQ</span>	(<span style="color:#66d9ef">DX</span>), <span style="color:#66d9ef">AX</span>
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x002e</span> <span style="color:#ae81ff">00046</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">12</span>)	<span style="color:#66d9ef">CALL</span>	<span style="color:#66d9ef">AX</span>                     
-
-<span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.test.func1</span> <span style="color:#66d9ef">STEXT</span> <span style="color:#66d9ef">size</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">84</span> <span style="color:#66d9ef">args</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">0x0</span> <span style="color:#66d9ef">locals</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">0x18</span>
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x001d</span> <span style="color:#ae81ff">00029</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#ae81ff">8</span>(<span style="color:#66d9ef">DX</span>), <span style="color:#66d9ef">AX</span>
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x0021</span> <span style="color:#ae81ff">00033</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">AX</span>, <span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.x</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">8</span>(<span style="color:#66d9ef">SP</span>)
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x0026</span> <span style="color:#ae81ff">00038</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">6</span>)	<span style="color:#66d9ef">CALL</span>	<span style="color:#66d9ef">runtime.printlock</span>(<span style="color:#66d9ef">SB</span>)
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x002b</span> <span style="color:#ae81ff">00043</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">6</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.x</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">8</span>(<span style="color:#66d9ef">SP</span>), <span style="color:#66d9ef">AX</span>
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x0030</span> <span style="color:#ae81ff">00048</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">6</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">AX</span>, (<span style="color:#66d9ef">SP</span>)
-	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x0034</span> <span style="color:#ae81ff">00052</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">6</span>)	<span style="color:#66d9ef">CALL</span>	<span style="color:#66d9ef">runtime.printint</span>(<span style="color:#66d9ef">SB</span>)</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#a6e22e">.test</span> <span style="color:#66d9ef">STEXT</span> <span style="color:#66d9ef">size</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">126</span> <span style="color:#66d9ef">args</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">0x8</span> <span style="color:#66d9ef">locals</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">0x28</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x0026</span> <span style="color:#ae81ff">00038</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">4</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">$100</span>, <span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.x</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">16</span>(<span style="color:#66d9ef">SP</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x002f</span> <span style="color:#ae81ff">00047</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">LEAQ</span>	<span style="color:#66d9ef">type.noalg.struct</span> <span style="color:#960050;background-color:#1e0010">{</span> <span style="color:#66d9ef">F</span> <span style="color:#66d9ef">uintptr</span><span style="color:#75715e">; &#34;&#34;.x int }(SB), AX
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#ae81ff">0x003a</span> <span style="color:#ae81ff">00058</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">CALL</span>	<span style="color:#66d9ef">runtime.newobject</span>(<span style="color:#66d9ef">SB</span>)  
+</span></span><span style="display:flex;"><span>	<span style="color:#ae81ff">0x0049</span> <span style="color:#ae81ff">00073</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">LEAQ</span>	<span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.test.func1</span>(<span style="color:#66d9ef">SB</span>), <span style="color:#66d9ef">CX</span>  
+</span></span><span style="display:flex;"><span>	<span style="color:#ae81ff">0x0050</span> <span style="color:#ae81ff">00080</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">CX</span>, (<span style="color:#66d9ef">AX</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x005a</span> <span style="color:#ae81ff">00090</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.x</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">16</span>(<span style="color:#66d9ef">SP</span>), <span style="color:#66d9ef">CX</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x005f</span> <span style="color:#ae81ff">00095</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">CX</span>, <span style="color:#ae81ff">8</span>(<span style="color:#66d9ef">AX</span>)			   
+</span></span><span style="display:flex;"><span>	<span style="color:#ae81ff">0x0068</span> <span style="color:#ae81ff">00104</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">AX</span>, <span style="color:#960050;background-color:#1e0010">&#34;&#34;</span>.<span style="color:#960050;background-color:#1e0010">~</span><span style="color:#66d9ef">r0</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">48</span>(<span style="color:#66d9ef">SP</span>)	   
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.main</span> <span style="color:#66d9ef">STEXT</span> <span style="color:#66d9ef">size</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">65</span> <span style="color:#66d9ef">args</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">0x0</span> <span style="color:#66d9ef">locals</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">0x18</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x0022</span> <span style="color:#ae81ff">00034</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">11</span>)	<span style="color:#66d9ef">MOVQ</span>	(<span style="color:#66d9ef">SP</span>), <span style="color:#66d9ef">DX</span>               
+</span></span><span style="display:flex;"><span>	<span style="color:#ae81ff">0x0026</span> <span style="color:#ae81ff">00038</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">11</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">DX</span>, <span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.closure</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">8</span>(<span style="color:#66d9ef">SP</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x002b</span> <span style="color:#ae81ff">00043</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">12</span>)	<span style="color:#66d9ef">MOVQ</span>	(<span style="color:#66d9ef">DX</span>), <span style="color:#66d9ef">AX</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x002e</span> <span style="color:#ae81ff">00046</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">12</span>)	<span style="color:#66d9ef">CALL</span>	<span style="color:#66d9ef">AX</span>                     
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.test.func1</span> <span style="color:#66d9ef">STEXT</span> <span style="color:#66d9ef">size</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">84</span> <span style="color:#66d9ef">args</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">0x0</span> <span style="color:#66d9ef">locals</span><span style="color:#960050;background-color:#1e0010">=</span><span style="color:#ae81ff">0x18</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x001d</span> <span style="color:#ae81ff">00029</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#ae81ff">8</span>(<span style="color:#66d9ef">DX</span>), <span style="color:#66d9ef">AX</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x0021</span> <span style="color:#ae81ff">00033</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">5</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">AX</span>, <span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.x</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">8</span>(<span style="color:#66d9ef">SP</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x0026</span> <span style="color:#ae81ff">00038</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">6</span>)	<span style="color:#66d9ef">CALL</span>	<span style="color:#66d9ef">runtime.printlock</span>(<span style="color:#66d9ef">SB</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x002b</span> <span style="color:#ae81ff">00043</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">6</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#960050;background-color:#1e0010">&#34;&#34;</span><span style="color:#66d9ef">.x</span><span style="color:#960050;background-color:#1e0010">+</span><span style="color:#ae81ff">8</span>(<span style="color:#66d9ef">SP</span>), <span style="color:#66d9ef">AX</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x0030</span> <span style="color:#ae81ff">00048</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">6</span>)	<span style="color:#66d9ef">MOVQ</span>	<span style="color:#66d9ef">AX</span>, (<span style="color:#66d9ef">SP</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">x0034</span> <span style="color:#ae81ff">00052</span> (<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">root</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">.mac</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">gocode</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#66d9ef">closure.go</span>:<span style="color:#ae81ff">6</span>)	<span style="color:#66d9ef">CALL</span>	<span style="color:#66d9ef">runtime.printint</span>(<span style="color:#66d9ef">SB</span>)</span></span></code></pre></div>
 <code>LEAQ	type.noalg.struct { F uintptr; &quot;&quot;.x int }(SB), AX</code>说明编译期就会根据元数据和类型信息创建好一个结构体，这个结构体就代表了一个闭包，现在在运行期只是把这个早已创建好的结构体的内存地址放到了AX寄存器中；接下来通过<code>CALL	runtime.newobject(SB)</code>依照之前的类型信息在堆上创建了一个对象；接着把函数的地址通过CX转到AX存的地址中，之前已经把x的值100放在<code>&quot;&quot;.x+16(SP)</code>的位置现在也转到了AX中存的地址+8的位置，也就是说现在在给之前的结构体填充数据。最终把AX中的内容当做返回值返回，<code>~r0</code>通常表示返回值，伪码表示test函数实际上返回的就是<code>return &amp;struct{F:test.func1, x:100}</code>。</p>
 <p>那么在main函数中也就会接收到这样一个地址的返回值。因为test函数没有参数，SP偏移量为0的地址就是其返回值的地址，<code>MOVQ	(SP), DX</code>就说明把test的返回放在了DX中；接着通过<code>MOVQ	(DX), AX</code>把test返回值的地址也就是<code>test.func1</code>返回给AX寄存器，并<code>CALL	AX</code>调用它。</p>
 <p>在<code>test.func1</code>中，通过<code>MOVQ	8(DX), AX</code>从DX中存的地址偏移量+8也就是x的值100放在了AX寄存器中，接着放到栈上执行print。</p>
 <p>DX寄存器是整个闭包实现的核心，因为结构体是在堆上运行期动态分配的，它的地址在编译期不知道，闭包中的函数也是编译期就被编译为指令的，那么函数执行时如何知道它的本地变量的内存地址就是问题。DX寄存器是一个名字，编译期、运行期都一样，Go把动态的地址写进去，通过这个静态的名字加上偏移量来交互实现闭包。</p>
-<h2 id="应用场景">应用场景</h2>
-<h3 id="计数器">计数器</h3>
+<h2 id="应用场景">
+  应用场景
+  <a class="anchor" href="#%e5%ba%94%e7%94%a8%e5%9c%ba%e6%99%af">#</a>
+</h2>
+<h3 id="计数器">
+  计数器
+  <a class="anchor" href="#%e8%ae%a1%e6%95%b0%e5%99%a8">#</a>
+</h3>
 <p>每次调用返回一个自增的值，以前可能通过类或者全局变量，用函数实现会比较麻烦，有了闭包会比较简单:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getCounter</span>() <span style="color:#66d9ef">func</span>() <span style="color:#66d9ef">int</span> {
-	<span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>
-	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">func</span>() <span style="color:#66d9ef">int</span> {
-		<span style="color:#a6e22e">x</span><span style="color:#f92672">++</span>
-		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>
-	}
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">c</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">getCounter</span>()
-	println(<span style="color:#a6e22e">c</span>())
-	println(<span style="color:#a6e22e">c</span>())
-	println(<span style="color:#a6e22e">c</span>())
-}</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getCounter</span>() <span style="color:#66d9ef">func</span>() <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">func</span>() <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">x</span><span style="color:#f92672">++</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">c</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">getCounter</span>()
+</span></span><span style="display:flex;"><span>	println(<span style="color:#a6e22e">c</span>())
+</span></span><span style="display:flex;"><span>	println(<span style="color:#a6e22e">c</span>())
+</span></span><span style="display:flex;"><span>	println(<span style="color:#a6e22e">c</span>())
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 有点类似于C语言中的静态局部变量，可以把数据绑定到函数身上，也就有点像类了。</p>
-<h3 id="封闭区间">封闭区间</h3>
+<h3 id="封闭区间">
+  封闭区间
+  <a class="anchor" href="#%e5%b0%81%e9%97%ad%e5%8c%ba%e9%97%b4">#</a>
+</h3>
 <p>也可以把一份数据绑定到多个函数中去，如下例:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">test</span>() (<span style="color:#66d9ef">func</span>(), <span style="color:#66d9ef">func</span>(), <span style="color:#66d9ef">func</span>()) {
-	<span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">100</span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">x</span>)
-	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">func</span>() {
-			<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;f1.x:%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">x</span>)
-		}, <span style="color:#66d9ef">func</span>() {
-			<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;f2.x:%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">x</span>)
-		}, <span style="color:#66d9ef">func</span>() {
-			<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;f3.x:%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">x</span>)
-		}
-}
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">f1</span>, <span style="color:#a6e22e">f2</span>, <span style="color:#a6e22e">f3</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">test</span>()
-	<span style="color:#a6e22e">f1</span>()
-	<span style="color:#a6e22e">f2</span>()
-	<span style="color:#a6e22e">f3</span>()
-}</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">test</span>() (<span style="color:#66d9ef">func</span>(), <span style="color:#66d9ef">func</span>(), <span style="color:#66d9ef">func</span>()) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">x</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">func</span>() {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;f1.x:%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">x</span>)
+</span></span><span style="display:flex;"><span>		}, <span style="color:#66d9ef">func</span>() {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;f2.x:%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">x</span>)
+</span></span><span style="display:flex;"><span>		}, <span style="color:#66d9ef">func</span>() {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;f3.x:%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">x</span>)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">f1</span>, <span style="color:#a6e22e">f2</span>, <span style="color:#a6e22e">f3</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">test</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">f1</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">f2</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">f3</span>()
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 x像是把全局变量的作用域缩小到test函数中，使得里面的三个不同逻辑共享它，构成了一个相对封闭的区间。</p>
-<h3 id="绑定数据和逻辑">绑定数据和逻辑</h3>
+<h3 id="绑定数据和逻辑">
+  绑定数据和逻辑
+  <a class="anchor" href="#%e7%bb%91%e5%ae%9a%e6%95%b0%e6%8d%ae%e5%92%8c%e9%80%bb%e8%be%91">#</a>
+</h3>
 <p>有时候需要A把方法和不同数据都传给B，直接传看上去不优雅，把它们打包为一个闭包看上去就像只传了一个方法，B只是接收一套逻辑，这个逻辑具体是怎么运行B不需要知道。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">db</span> <span style="color:#a6e22e">Database</span>) <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
-	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
-		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintln</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">db</span>.<span style="color:#a6e22e">Url</span>)
-	}
-}
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">db</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewDatabase</span>(<span style="color:#e6db74">&#34;localhost:5432&#34;</span>)
-	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/hello&#34;</span>, <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">db</span>))
-	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:3000&#34;</span>, <span style="color:#66d9ef">nil</span>)
-}</code></pre></div></p>
-<h3 id="改变函数签名">改变函数签名</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">db</span> <span style="color:#a6e22e">Database</span>) <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintln</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">db</span>.<span style="color:#a6e22e">Url</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">db</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewDatabase</span>(<span style="color:#e6db74">&#34;localhost:5432&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/hello&#34;</span>, <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">db</span>))
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:3000&#34;</span>, <span style="color:#66d9ef">nil</span>)
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div></p>
+<h3 id="改变函数签名">
+  改变函数签名
+  <a class="anchor" href="#%e6%94%b9%e5%8f%98%e5%87%bd%e6%95%b0%e7%ad%be%e5%90%8d">#</a>
+</h3>
 <p>例如把一个函数变成偏函数(partial)
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">x</span> <span style="color:#66d9ef">int</span>) {
-	println(<span style="color:#a6e22e">x</span>)
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">partial</span>(<span style="color:#a6e22e">f</span> <span style="color:#66d9ef">func</span>(<span style="color:#66d9ef">int</span>), <span style="color:#a6e22e">x</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">func</span>() {
-	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">func</span>() {
-		<span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">x</span>)
-	}
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">f</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">partial</span>(<span style="color:#a6e22e">test</span>, <span style="color:#ae81ff">100</span>)
-	<span style="color:#a6e22e">f</span>()
-}</code></pre></div></p>
-<h2 id="总结">总结</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">x</span> <span style="color:#66d9ef">int</span>) {
+</span></span><span style="display:flex;"><span>	println(<span style="color:#a6e22e">x</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">partial</span>(<span style="color:#a6e22e">f</span> <span style="color:#66d9ef">func</span>(<span style="color:#66d9ef">int</span>), <span style="color:#a6e22e">x</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">func</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">func</span>() {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">x</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">f</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">partial</span>(<span style="color:#a6e22e">test</span>, <span style="color:#ae81ff">100</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">f</span>()
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div></p>
+<h2 id="总结">
+  总结
+  <a class="anchor" href="#%e6%80%bb%e7%bb%93">#</a>
+</h2>
 <p>闭包虽然改善了一些代码上的设计，让代码看上去更干净整洁，可以实现一些设计模式。但它延长了变量的生命周期，必然会导致逃逸行为，其内部的一些交互过程也会使执行性能降低。所以对于闭包也不能滥用。</p>
 </article>
  
@@ -266,13 +298,10 @@ x像是把全局变量的作用域缩小到test函数中，使得里面的三个
 
       <footer class="book-footer">
         
-  <div class="flex justify-between">
+  <div class="flex flex-wrap justify-between">
 
 
-
-  <div>
-    
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/741d106b58cd5e93b2d155514d419298533c8cd8" title='最后修改者 hjlarry | December 31, 2019' target="_blank" rel="noopener">
+  <div><a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/741d106b58cd5e93b2d155514d419298533c8cd8" title='最后修改者 hjlarry | December 31, 2019' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>December 31, 2019</span>
     </a>
@@ -281,19 +310,24 @@ x像是把全局变量的作用域缩小到test函数中，使得里面的三个
 
 
   <div>
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/go/closure/_index.md" target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/content/docs/go/closure/_index.md" target="_blank" rel="noopener">
       <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>编辑本页</span>
     </a>
   </div>
 
+
 </div>
+
+
+
+  <script>(function(){function e(n){const e=window.getSelection(),t=document.createRange();t.selectNodeContents(n),e.removeAllRanges(),e.addRange(t)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
 
  
         <br>
 <div style="text-align: center;font-size:xx-small;">
-    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a
-        href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
+    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
 </div>
       </footer>
 
@@ -309,7 +343,6 @@ x像是把全局变量的作用域缩小到test函数中，使得里面的三个
 
   
 </body>
-
 </html>
 
 

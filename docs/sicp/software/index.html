@@ -1,54 +1,58 @@
 <!DOCTYPE html>
-<html lang="cn">
-
+<html lang="zh-cn" dir="ltr">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="计算机科学基础知识之软件部分 操作系统 操作系统是计算机体系的内核和基石，管理计算机硬件与软件资源。分为:
+<meta name="description" content="计算机科学基础知识之软件部分#操作系统#操作系统是计算机体系的内核和基石，管理计算机硬件与软件资源。分为:
  个人机: Windows, macOS, Linux/BSD 大型机: Linux, Unix 嵌入式: VxWorks 移动端: Android, Windows CE  因为Unix商业版权的原因，必须完全符合UNIX标准才能称为UNIX系统，其他的BSD/Linux只能称为UNIX-like。学术上的操作系统和我们日常口中说的操作系统不太一样，我们一般说的windows严格来说属于一个操作系统产品或者说一个操作系统的发行版，它是系统本身和一些软件(浏览器、扫雷)的打包，而学术上的操作系统指的是内核和一些必要的服务。
 现代操作系统的基本功能包括:
- 内存管理(memory management) 进程管理(process management) 中断处理(interrupt handling) 文件系统(file system) 安全机制(protection and security) 进程通信(inter-process communications) 设备驱动(device driver)  内核 微内核就是把最核心、最基础的部分单独作为内核，其他功能围绕它处理。包括地址空间、线程处理、进程通信等。这类东西它们需要以特权模式运行，其他基础服务当做普通应用程序独立运行。
+ 内存管理(memory management) 进程管理(process management) 中断处理(interrupt handling) 文件系统(file system) 安全机制(protection and security) 进程通信(inter-process communications) 设备驱动(device driver)  内核#微内核就是把最核心、最基础的部分单独作为内核，其他功能围绕它处理。包括地址空间、线程处理、进程通信等。这类东西它们需要以特权模式运行，其他基础服务当做普通应用程序独立运行。
 在内核中运行的程序使用的内存，叫内核空间，也叫内核态。其他程序运行在用户空间，也叫用户态。用户态的代码需要在内核态运行时，并不是直接放在内核态中运行的，这样安全没法保证，首先会做权限检查，通过之后相当于提交了申请，内核运行完成以后返回结果唤醒用户态的程序，这就又涉及到了上下文切换和状态保存。所以用户态和内核态的切换会消耗大量的资源。
 微内核的优点就是内核很小，裁剪起来方便，裁剪不同的基础服务就可以形成不同的版本面向不同的用户，另外就是其中某个服务崩溃的话不会影响到内核，内核可以重启改服务。当然缺点就是由于处于不同的地址空间，基础服务和内核通信时得使用类似于IPC(Inter-Process Communication)的方式通讯，效率相对会差一些。
 微内核的典型代表是学术上的windows和macOS，而不是Linux，早期的Linux为了性能考虑采用了宏内核。
 宏内核也叫单一内核，把核心和基础服务放在一个地址空间内均以特权模式运行，好处就是调用一些基础服务的时候相当于函数调用，不需要通讯，性能很高。缺点就是复杂度和耦合度很高，虽然代码是模块化的，但其中某个模块崩溃都可能导致整个系统崩溃，也不方便裁剪和移植。
 现代的操作系统往往是采用混合内核的，并不是泾渭分明的。
-系统调用 系统调用是内核对外的接口，内核态的一些内核函数。应用程序只要和硬件打交道都会涉及到系统调用，向操作系统申请并等待回复，应该尽量避免系统调用或考虑其他方式优化，比如有些场景可以使用在用户空间的带buffer的文件替代操作系统提供的文件读写API。
-典型的系统调用汇编代码: global _start section .data hello : db `hello, world!\n` section .text _start: mov rax, 1 ; system call number should be store in rax  mov rdi, 1 ; argument #1 in rdi: where to write (descriptor)?"><meta property="og:title" content="软件" />
+系统调用#系统调用是内核对外的接口，内核态的一些内核函数。应用程序只要和硬件打交道都会涉及到系统调用，向操作系统申请并等待回复，应该尽量避免系统调用或考虑其他方式优化，比如有些场景可以使用在用户空间的带buffer的文件替代操作系统提供的文件读写API。
+典型的系统调用汇编代码: global _start  section .data  hello : db `hello, world!\n` section .text  _start:  mov rax, 1 ; system call number should be store in rax  mov rdi, 1 ; argument #1 in rdi: where to write (descriptor)?">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light dark"><meta property="og:title" content="软件" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/docs/sicp/software/" />
 
 <title>软件 | Home</title>
+<link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/favicon.png" type="image/x-icon">
-<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.8d2462c3b745732864d843e8e2e7782a2ec838ca90fb94676baa461536bdae11.js" integrity="sha256-jSRiw7dFcyhk2EPo4ud4Ki7IOMqQ&#43;5Rna6pGFTa9rhE="></script>
+<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" >
+  <script defer src="/flexsearch.min.js"></script>
+  <script defer src="/cn.search.min.dcaf7fea7db359f8fd7a4b37bdf1a9f765580260566390cc959292e2dcc5a5d9.js" ></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/sicp/software/index.xml" title="Home" />
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
 -->
-
   
 </head>
-
-<body>
-  <input type="checkbox" class="hidden" id="menu-control" />
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
   <main class="container flex">
     <aside class="book-menu">
-      
+      <div class="book-menu-content">
+        
   <nav>
 <h2 class="book-brand">
-  <a href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
+  <a class="flex align-center" href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
   </a>
 </h2>
 
 
 <div class="book-search">
   <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" data-hotkeys="s/" />
-  <div class="book-search-spinner spinner hidden"></div>
+  <div class="book-search-spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
+
 
 
 
@@ -120,10 +124,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
 
 
  
+      </div>
     </aside>
 
     <div class="book-page">
@@ -137,16 +142,18 @@ https://github.com/alex-shpak/hugo-book
   <strong>软件</strong>
 
   <label for="toc-control">
+    
     <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
   </label>
 </div>
 
 
   
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
   <ul>
     <li><a href="#操作系统">操作系统</a></li>
     <li><a href="#内核">内核</a></li>
@@ -186,15 +193,22 @@ https://github.com/alex-shpak/hugo-book
 </nav>
 
 
-    </aside>
+
+  </aside>
   
  
       </header>
 
       
       
-  <article class="markdown"><h1 id="计算机科学基础知识之软件部分">计算机科学基础知识之软件部分</h1>
-<h2 id="操作系统">操作系统</h2>
+  <article class="markdown"><h1 id="计算机科学基础知识之软件部分">
+  计算机科学基础知识之软件部分
+  <a class="anchor" href="#%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%a7%91%e5%ad%a6%e5%9f%ba%e7%a1%80%e7%9f%a5%e8%af%86%e4%b9%8b%e8%bd%af%e4%bb%b6%e9%83%a8%e5%88%86">#</a>
+</h1>
+<h2 id="操作系统">
+  操作系统
+  <a class="anchor" href="#%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f">#</a>
+</h2>
 <p><strong>操作系统</strong>是计算机体系的内核和基石，管理计算机硬件与软件资源。分为:</p>
 <ul>
 <li>个人机: Windows, macOS, Linux/BSD</li>
@@ -213,7 +227,10 @@ https://github.com/alex-shpak/hugo-book
 <li>进程通信(inter-process communications)</li>
 <li>设备驱动(device driver)</li>
 </ul>
-<h2 id="内核">内核</h2>
+<h2 id="内核">
+  内核
+  <a class="anchor" href="#%e5%86%85%e6%a0%b8">#</a>
+</h2>
 <p><strong>微内核</strong>就是把最核心、最基础的部分单独作为内核，其他功能围绕它处理。包括地址空间、线程处理、进程通信等。这类东西它们需要以特权模式运行，其他基础服务当做普通应用程序独立运行。</p>
 <p>在内核中运行的程序使用的内存，叫<strong>内核空间</strong>，也叫内核态。其他程序运行在<strong>用户空间</strong>，也叫用户态。用户态的代码需要在内核态运行时，并不是直接放在内核态中运行的，这样安全没法保证，首先会做权限检查，通过之后相当于提交了申请，内核运行完成以后返回结果唤醒用户态的程序，这就又涉及到了上下文切换和状态保存。所以用户态和内核态的切换会消耗大量的资源。</p>
 <p>微内核的优点就是内核很小，裁剪起来方便，裁剪不同的基础服务就可以形成不同的版本面向不同的用户，另外就是其中某个服务崩溃的话不会影响到内核，内核可以重启改服务。当然缺点就是由于处于不同的地址空间，基础服务和内核通信时得使用类似于IPC(Inter-Process Communication)的方式通讯，效率相对会差一些。</p>
@@ -221,27 +238,33 @@ https://github.com/alex-shpak/hugo-book
 <p><strong>宏内核</strong>也叫单一内核，把核心和基础服务放在一个地址空间内均以特权模式运行，好处就是调用一些基础服务的时候相当于函数调用，不需要通讯，性能很高。缺点就是复杂度和耦合度很高，虽然代码是模块化的，但其中某个模块崩溃都可能导致整个系统崩溃，也不方便裁剪和移植。</p>
 <p><img src="./images/kernel.png" alt="kernel" />
 现代的操作系统往往是采用混合内核的，并不是泾渭分明的。</p>
-<h2 id="系统调用">系统调用</h2>
+<h2 id="系统调用">
+  系统调用
+  <a class="anchor" href="#%e7%b3%bb%e7%bb%9f%e8%b0%83%e7%94%a8">#</a>
+</h2>
 <p><strong>系统调用</strong>是内核对外的接口，内核态的一些内核函数。应用程序只要和硬件打交道都会涉及到系统调用，向操作系统申请并等待回复，应该尽量避免系统调用或考虑其他方式优化，比如有些场景可以使用在用户空间的带buffer的文件替代操作系统提供的文件读写API。</p>
 <p>典型的系统调用汇编代码:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">global</span> <span style="color:#66d9ef">_start</span> 
-
-<span style="color:#66d9ef">section</span> <span style="color:#66d9ef">.data</span>
-    <span style="color:#a6e22e">hello</span> : <span style="color:#66d9ef">db</span> <span style="color:#960050;background-color:#1e0010">`</span><span style="color:#66d9ef">hello</span>, <span style="color:#66d9ef">world</span>!<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">n</span><span style="color:#960050;background-color:#1e0010">`</span>
-<span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.text</span> 
-    <span style="color:#66d9ef">_start</span>:
-        <span style="color:#a6e22e">mov</span> <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span>      <span style="color:#75715e">; system call number should be store in rax
-</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rdi</span>, <span style="color:#ae81ff">1</span>      <span style="color:#75715e">; argument #1 in rdi: where to write (descriptor)?
-</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rsi</span>, <span style="color:#66d9ef">hello</span>  <span style="color:#75715e">; argument #2 in rsi: where does the string start?
-</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rdx</span>, <span style="color:#ae81ff">14</span>     <span style="color:#75715e">; argument #3 in rdx: how many bytes to write?
-</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">syscall</span>         <span style="color:#75715e">; this instruction invokes a system call
-</span><span style="color:#75715e"></span>        
-        <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">60</span>     <span style="color:#75715e">; &#39;exit&#39; syscall number
-</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">xor</span> <span style="color:#66d9ef">rdi</span>, <span style="color:#66d9ef">rdi</span>
-        <span style="color:#a6e22e">syscall</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span><span style="color:#a6e22e">global</span> <span style="color:#66d9ef">_start</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">section</span> <span style="color:#66d9ef">.data</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">hello</span> : <span style="color:#66d9ef">db</span> <span style="color:#960050;background-color:#1e0010">`</span><span style="color:#66d9ef">hello</span>, <span style="color:#66d9ef">world</span>!<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">n</span><span style="color:#960050;background-color:#1e0010">`</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.text</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">_start</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">mov</span> <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span>      <span style="color:#75715e">; system call number should be store in rax
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rdi</span>, <span style="color:#ae81ff">1</span>      <span style="color:#75715e">; argument #1 in rdi: where to write (descriptor)?
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rsi</span>, <span style="color:#66d9ef">hello</span>  <span style="color:#75715e">; argument #2 in rsi: where does the string start?
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rdx</span>, <span style="color:#ae81ff">14</span>     <span style="color:#75715e">; argument #3 in rdx: how many bytes to write?
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">syscall</span>         <span style="color:#75715e">; this instruction invokes a system call
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">mov</span> <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">60</span>     <span style="color:#75715e">; &#39;exit&#39; syscall number
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">xor</span> <span style="color:#66d9ef">rdi</span>, <span style="color:#66d9ef">rdi</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">syscall</span></span></span></code></pre></div>
 C语言、Go语言通过标准库进行系统调用，他们的标准库中的函数也只是在汇编之上的一种包装。在汇编语言中通过在不同寄存器中放不同的参数，再执行<code>syscall</code>这条指令就可以进行系统调用。<code>syscall</code>是64位操作系统改进的一条指令，x86下是<code>int 0x80</code>，这种改进效率上也更高一些。</p>
 <p>RAX寄存器存放不同系统调用的序号，相当于函数名称；RDI、RSI、RDX、R10、R8、R9依次存放参数；再用RAX存返回值。这是系统调用的调用约定。可以通过<a href="http://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/">这里</a>查看到系统调用函数有哪些，分别是如何传参的。</p>
-<h2 id="文件系统">文件系统</h2>
+<h2 id="文件系统">
+  文件系统
+  <a class="anchor" href="#%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f">#</a>
+</h2>
 <p>大多数Linux发行版的文件系统都有着非常类似的结构，除了<code>ls</code>，<code>tree</code>也是一个很好的观察其结构的工具。常用的目录及其用途:</p>
 <ul>
 <li>/bin，包含基本的系统级二进制可执行文件，例如<code>ls</code></li>
@@ -264,8 +287,14 @@ C语言、Go语言通过标准库进行系统调用，他们的标准库中的�
 <li>/tmp，临时文件，重启系统后里面的文件都会被删除</li>
 </ul>
 <p>更多的目录结构及用途见<a href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">wiki</a>。</p>
-<h2 id="进程和线程">进程和线程</h2>
-<h3 id="程序与进程">程序与进程</h3>
+<h2 id="进程和线程">
+  进程和线程
+  <a class="anchor" href="#%e8%bf%9b%e7%a8%8b%e5%92%8c%e7%ba%bf%e7%a8%8b">#</a>
+</h2>
+<h3 id="程序与进程">
+  程序与进程
+  <a class="anchor" href="#%e7%a8%8b%e5%ba%8f%e4%b8%8e%e8%bf%9b%e7%a8%8b">#</a>
+</h3>
 <p>程序和进程有什么区别？</p>
 <p>某个程序里包含了某个进程所需要的数据，但在某个时间点，进程中的内容未必和程序中的内容是一一对应的。我们开发一个程序，不仅包括可执行的代码，还有周边的素材等等，程序运行的时候，也未必会把全部内容都载入到内存。而<strong>进程</strong>指的是程序运行时，在内存当中受操作系统管理的部分。<strong>程序</strong>就像是蓝图，我们可以是照着同一份蓝图启动多个进程。</p>
 <p>进程不是执行单位，而是一个资源边界。相当于在内存这个世界里面，进程圈了一块地，这块地有很多的属性，比如虚拟地址空间、PID等，而地上的工人、流水线才是执行单位，我们称为<strong>线程</strong>。所以每个进程都有一个主线程。</p>
@@ -277,16 +306,22 @@ C语言、Go语言通过标准库进行系统调用，他们的标准库中的�
 <li>是指令、数据及相关资源的集合</li>
 <li>是程序运行过程的抽象</li>
 </ul>
-<h3 id="什么是线程">什么是线程</h3>
+<h3 id="什么是线程">
+  什么是线程
+  <a class="anchor" href="#%e4%bb%80%e4%b9%88%e6%98%af%e7%ba%bf%e7%a8%8b">#</a>
+</h3>
 <p>也称<strong>轻量级进程</strong>(LWP)，是进程中的实际执行单位，一个标准的线程由线程ID、当前指令指针(PC)、寄存器集合和堆栈组成。一个进程通常拥有一个或多个线程，这些线程之间共享程序的内存空间(包含代码段、数据段、堆等)以及一些进程级的资源(例如打开的文件、接收的信号等)。</p>
 <p><img src="./images/thread.png" alt="" /></p>
 <p>线程是调度和时间片的分配单位，更多线程理论上会获得更多的CPU资源，同一程序的多个线程是可以在多核处理器上并行执行来提高执行吞吐率的，当然这也要看操作系统的调度策略。</p>
 <p>从一个线程切换到另一个线程，需要保存当前线程的状态，并且恢复另一线程的状态，这个过程就叫<strong>上下文切换</strong>(context switch)。进程和线程都有上下文切换。区别在于线程切换期间，虚拟内存状态（TLB）保持不变。通过以下方式可以观察到上下文切换的情况:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ watch grep <span style="color:#e6db74">&#34;ctxt&#34;</span> /proc/<span style="color:#f92672">{</span>pid<span style="color:#f92672">}</span>/status  <span style="color:#75715e"># 定时输出</span>
-
-voluntary_ctxt_switches:  <span style="color:#ae81ff">3508</span>          <span style="color:#75715e"># 程序自愿(比如有较多IO等待操作)</span>
-nonvoluntary_ctxt_switches: <span style="color:#ae81ff">64</span>          <span style="color:#75715e"># 系统强制(时间片用完)</span></code></pre></div>
-<h3 id="线程调度">线程调度</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ watch grep <span style="color:#e6db74">&#34;ctxt&#34;</span> /proc/<span style="color:#f92672">{</span>pid<span style="color:#f92672">}</span>/status  <span style="color:#75715e"># 定时输出</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>voluntary_ctxt_switches:  <span style="color:#ae81ff">3508</span>          <span style="color:#75715e"># 程序自愿(比如有较多IO等待操作)</span>
+</span></span><span style="display:flex;"><span>nonvoluntary_ctxt_switches: <span style="color:#ae81ff">64</span>          <span style="color:#75715e"># 系统强制(时间片用完)</span></span></span></code></pre></div>
+<h3 id="线程调度">
+  线程调度
+  <a class="anchor" href="#%e7%ba%bf%e7%a8%8b%e8%b0%83%e5%ba%a6">#</a>
+</h3>
 <p>在单CPU的设备上，并行是模拟出来的，多线程程序轮流执行，每个线程每次仅执行一小段时间，这样不断在处理器上切换不同的线程去执行的行为我们称为<strong>线程调度</strong>(Thread Schedule)。在调度中，线程通常至少有三种状态:</p>
 <ul>
 <li>ready: 线程可以立刻执行，但CPU已经被占用</li>
@@ -296,22 +331,37 @@ nonvoluntary_ctxt_switches: <span style="color:#ae81ff">64</span>          <span
 <p>它们在如下情况会发生状态变化:</p>
 <p><img src="./images/thread_state.png" alt="" /></p>
 <p>线程的调度随着操作系统的发展已经是各种复杂的方案和算法的结合，但主流的算法都带有<strong>优先级调度</strong>(Priority Schedule)和<strong>轮转法</strong>(Round Robin)的痕迹。轮转法就是让各个线程轮流执行一小段时间，而优先级调度又决定了线程按照什么顺序来轮流执行。此外，我们把线程执行完时间片，而被强制剥夺执行权利的过程称为<strong>抢占</strong>，非抢占式的调度模式也已越来越少。</p>
-<h3 id="linux的多线程">Linux的多线程</h3>
+<h3 id="linux的多线程">
+  Linux的多线程
+  <a class="anchor" href="#linux%e7%9a%84%e5%a4%9a%e7%ba%bf%e7%a8%8b">#</a>
+</h3>
 <p>Windows对进程和线程的实现如同教科书一般标准，但对于Linux，它的内核中并不存在真正意义的线程概念。Linux将所有执行的实体(无论线程还是进程)都称为任务，每个任务类似于一个单线程的进程，它有内存空间、执行实体、文件资源等。但不同的任务之间是可以共享内存空间的，从这个角度，共享了同一个内存空间的多个任务构成了一个进程，这些任务也就成了这个进程里的线程。</p>
 <p>Linux提供的创建新任务的API包括fork、exec、clone。fork通过复制当前进程产生一个新的任务，但并不复制原任务的内存空间，而是和原任务共享一个写时复制的内存空间。所以它产生新任务的速度很快，但它只能产生本任务的镜像，这时就要通过exec配合则可以启动一个别的新的任务。如果要产生的不是任务而是新线程，则可以用clone，它产生新的任务并从指定的位置开始执行，共享当前进程的内存空间(可选的)，从实际效果上来说就产生了一个新的线程。</p>
-<h3 id="线程模型">线程模型</h3>
+<h3 id="线程模型">
+  线程模型
+  <a class="anchor" href="#%e7%ba%bf%e7%a8%8b%e6%a8%a1%e5%9e%8b">#</a>
+</h3>
 <p><strong>内核线程和用户线程是有区别的</strong>，我们一般使用的线程都是被包装过的，很少通过系统调用来使用线程，用户线程往往是内核线程的包装体。</p>
 <p>对于一个用户线程对应一个内核线程，我们称为<strong>一对一模型</strong>。这种模型下线程之间的并发是真正的并发，一个线程阻塞时其他线程的执行不受影响。但它的缺点也很明显，很多操作系统会限制内核线程的数量，用户线程的数量也就被限制了，而且内核线程的调度上下文切换的开销很大，导致用户线程的执行效率也不高。</p>
 <p>多个用户线程映射到一个内核线程即<strong>多对一模型</strong>。线程之间的切换由用户态的代码来进行，相对于一对一线程切换会快很多，但如果一个用户线程阻塞，其他用户线程也无法执行，因为此时内核线程也阻塞了。</p>
 <p>还有一种是<strong>多对多模型</strong>，类似于Go的机制，某个时刻一个用户线程必然对应一个系统线程，但总体来看用户线程可能比系统线程更多或者更少，同时用户线程的数量不受限制，某用户线程的阻塞也不会让所有的用户线程都阻塞掉。</p>
 <p>为什么要包装内核线程呢？假如我们再做一个文件读操作，它要通过系统调用来完成，实际会分为用户态代码和内核态代码，这就涉及到上下文的切换，内核线程的调度、创建等，如果这种文件读操作很频繁，那么成本是很高的。我们就会考虑，在用户态和内核态的基础上能不能建立类似于Pool的模型来复用。这样一来，内核态的系统线程负责执行，用户态的用户线程负责存储状态，从而避免了频繁创建系统线程，用户态可以创建很多用来存储状态的执行单位，执行时把它绑定到一个内核线程中去，执行完释放内核线程，内核线程把绑定状态删除后放入池中，不需要杀掉内核线程，接下来另一个执行单位重新绑定到该内核线程中去执行。</p>
 <p>所以当我们选择一门语言或者一种并发库的时候，是要知道它究竟由内核线程实现还是用户线程实现的，这在性能上是有很大区别的。</p>
-<h2 id="并发与并行">并发与并行</h2>
-<h3 id="基础概念">基础概念</h3>
+<h2 id="并发与并行">
+  并发与并行
+  <a class="anchor" href="#%e5%b9%b6%e5%8f%91%e4%b8%8e%e5%b9%b6%e8%a1%8c">#</a>
+</h2>
+<h3 id="基础概念">
+  基础概念
+  <a class="anchor" href="#%e5%9f%ba%e7%a1%80%e6%a6%82%e5%bf%b5">#</a>
+</h3>
 <p><strong>并发与并行</strong>关注的是程序逻辑的执行。并发是从逻辑角度出发的，指的是多个任务能同时执行，这个同时是相对的概念，比如在一小时内完成。而并行是指物理上的同一时刻执行多个并发任务，这就要求多机器或多核。所以说并发是并行的基础，并行是并发的理想执行模式。</p>
 <p><strong>同步和异步</strong>关注的是消息通信机制。同步就是在调用者发出一个调用时，主动等待该调用的结果。而异步则是发出调用之后就不管了，调用者不会立即得到结果，等待被调用方通过状态、通知等告诉调用者，或是通过回调函数处理该调用。</p>
 <p><strong>阻塞和非阻塞</strong>关注的是程序在等待调用结果(消息或返回值)时的状态。阻塞调用是指调用结果返回之前，当前线程被挂起，只有在得到结果之后才返回。非阻塞调用是指在不能立刻得到结果之前，该调用并不会阻塞当前的线程。</p>
-<h3 id="并发模型">并发模型</h3>
+<h3 id="并发模型">
+  并发模型
+  <a class="anchor" href="#%e5%b9%b6%e5%8f%91%e6%a8%a1%e5%9e%8b">#</a>
+</h3>
 <p>实现并发通常有三种模型，即多进程、多线程、协程。</p>
 <p>多进程模型把线程a封装到进程1，把线程b封装到进程2，然后用多个进程执行。对于CPU密集型场景，好处有三点:</p>
 <ul>
@@ -322,93 +372,111 @@ nonvoluntary_ctxt_switches: <span style="color:#ae81ff">64</span>          <span
 <p>多进程的缺点就在于数据复制以及创建进程时的开销大了。</p>
 <p>正常情况优先使用多线程模型，多线程会尽可能多的获取时间片，操作系统有操作时间片的调度器，该调度器会计算每个线程的时间片使用完以后保存线程的寄存器等状态，进行上下文的切换。</p>
 <p>协程模型是程序通过自己切换的方式实现在单个线程内、单个CPU上执行来提高CPU的利用率，它充分利用了IO等待时浪费的时间片。</p>
-<h2 id="虚拟存储器">虚拟存储器</h2>
-<h3 id="基础概念-1">基础概念</h3>
+<h2 id="虚拟存储器">
+  虚拟存储器
+  <a class="anchor" href="#%e8%99%9a%e6%8b%9f%e5%ad%98%e5%82%a8%e5%99%a8">#</a>
+</h2>
+<h3 id="基础概念-1">
+  基础概念
+  <a class="anchor" href="#%e5%9f%ba%e7%a1%80%e6%a6%82%e5%bf%b5-1">#</a>
+</h3>
 <p>操作系统会有一个很大的地址空间，也叫<strong>虚拟地址空间</strong>。这个空间的前面一大段是操作系统用的，之后的每个进程也都会有一个独立的很大的地址空间。这样不同的程序可以使用相同的虚拟地址，当程序在运行时访问某个地址就是访问进程内的虚拟地址，通过<strong>内存管理单元</strong>(MMU，一般集成在CPU内部)翻译映射到一个物理地址。这样的好处就是无论在程序内的地址空间怎么折腾都不会影响到其他的程序，对编译器也更友好更方便，可以提前分配。</p>
 <p>我们在编译时看到的都是虚拟地址，物理地址在运行期才能看到。虚拟地址空间未必会全部映射到主存中，也会给各个设备保留一段空间。</p>
 <p><strong>虚拟存储器</strong>可以看成硬盘保存的一个字节数组，虚拟地址空间有256TB，而实际的物理内存可能只有8GB，有这么大的虚拟地址空间就不能阻止程序去使用，不够的物理存储体我们就通过硬盘上的交换分区来弥补。也有可能物理内存加上交换分区都不够程序使用，在Linux中就会引发OOM机制。</p>
-<h3 id="分段与分页">分段与分页</h3>
+<h3 id="分段与分页">
+  分段与分页
+  <a class="anchor" href="#%e5%88%86%e6%ae%b5%e4%b8%8e%e5%88%86%e9%a1%b5">#</a>
+</h3>
 <p>最开始的时候，压根没有虚拟内存，人们在物理内存上直接为某程序分配内存，这样带来的问题有:地址空间不隔离，恶意的程序可以轻松改写别人的数据；内存使用效率低，比如当前正在运行A和B，这时候需要运行C但内存不够，就需要把整个A或B换出到硬盘再载入C；程序运行的地址不确定，给程序的编写造成了一定的麻烦。</p>
 <p>然后引入了虚拟内存，人们开始使用一种分段(Segmention)的方法，把一段程序需要的内存大小的虚拟地址空间映射到物理地址空间，由操作系统和硬件来完成它们之间的相互转换。这样解决了没有虚拟内存时的地址空间不隔离和程序运行地址不确定的问题，但对于内存效率的问题依然没有解决。</p>
 <p>因此，现在都使用分页(Paging)的方法。把地址空间人为地分成固定大小的页，页的大小由操作系统和硬件决定。当我们把进程的虚拟地址按页分割时，会把常用的数据页和代码页装载到内存中，把不常用的代码和数据保存在硬盘里，需要用到时再从硬盘中取出:</p>
 <p><img src="./images/mmu.png" alt="" /></p>
 <p>如图所示，DP表示磁盘页，VP表示虚拟页，PP表示物理页。虚拟空间中有的页被映射到同一个物理页中，从而实现了内存共享。此外，可以给每个页设置权限属性，做到一个基础的保护。</p>
-<h3 id="内存分配过程">内存分配过程</h3>
+<h3 id="内存分配过程">
+  内存分配过程
+  <a class="anchor" href="#%e5%86%85%e5%ad%98%e5%88%86%e9%85%8d%e8%bf%87%e7%a8%8b">#</a>
+</h3>
 <p>假设某个程序需要内存分配器分配10MB的内存，那么操作系统会怎么做呢？首先会划分出一个虚拟地址范围，然后返回起始地址的指针。它此时没有必要通过MMU分配真实的物理内存，因为有可能这段内存后续根本没有读写发生。接下来若写入数据，也只会以页(8KB)为单位一点点的去写，每次写入的时候操作系统再去补物理内存，采用一种<strong>按需分配的机会主义原则</strong>。具体如何实现呢？当向一个虚拟地址写入数据时，就会去MMU找对应的物理地址，没有找到就说明没有建立映射关系还没有分配物理内存，就会引发一个<strong>缺页异常</strong>(page fault)，操作系统内有专门的程序把这一页补上，来实现按需分配。</p>
 <p>我们通过程序可以模拟这种虚拟内存和物理内存的关系:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e">// gcc -g -O0 -o test test.c
-</span><span style="color:#75715e">// ./test
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>()
-{
-    <span style="color:#66d9ef">const</span> size_t length <span style="color:#f92672">=</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>;
-    <span style="color:#66d9ef">const</span> size_t pause <span style="color:#f92672">=</span> length <span style="color:#f92672">/</span> <span style="color:#ae81ff">10</span>;
-    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>p <span style="color:#f92672">=</span> malloc(length); <span style="color:#75715e">// 分配100MB内存
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>x <span style="color:#f92672">=</span> p;
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> (<span style="color:#66d9ef">int</span>)length; i<span style="color:#f92672">++</span>) <span style="color:#75715e">// 循环写入数据
-</span><span style="color:#75715e"></span>    {
-        <span style="color:#f92672">*</span>x <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-        x<span style="color:#f92672">++</span>;
-        <span style="color:#66d9ef">if</span> (i <span style="color:#f92672">%</span> (<span style="color:#66d9ef">int</span>)pause <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) <span style="color:#75715e">// 隔一段时间暂停一下便于观察
-</span><span style="color:#75715e"></span>        {
-            printf(<span style="color:#e6db74">&#34;%d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, i);
-            getchar();          <span style="color:#75715e">// 可以让用户在命令行中随时控制运行进度
-</span><span style="color:#75715e"></span>        }
-    }
-    free(p);
-    <span style="color:#66d9ef">return</span> EXIT_SUCCESS;
-}</code></pre></div></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// gcc -g -O0 -o test test.c
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// ./test
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> size_t length <span style="color:#f92672">=</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> size_t pause <span style="color:#f92672">=</span> length <span style="color:#f92672">/</span> <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>p <span style="color:#f92672">=</span> malloc(length); <span style="color:#75715e">// 分配100MB内存
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>x <span style="color:#f92672">=</span> p;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> (<span style="color:#66d9ef">int</span>)length; i<span style="color:#f92672">++</span>) <span style="color:#75715e">// 循环写入数据
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">*</span>x <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>        x<span style="color:#f92672">++</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (i <span style="color:#f92672">%</span> (<span style="color:#66d9ef">int</span>)pause <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) <span style="color:#75715e">// 隔一段时间暂停一下便于观察
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        {
+</span></span><span style="display:flex;"><span>            printf(<span style="color:#e6db74">&#34;%d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, i);
+</span></span><span style="display:flex;"><span>            getchar();          <span style="color:#75715e">// 可以让用户在命令行中随时控制运行进度
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    free(p);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> EXIT_SUCCESS;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div></p>
 <p>观察运行结果:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ pidstat -r -p <span style="color:#e6db74">`</span>pidof test<span style="color:#e6db74">`</span> <span style="color:#ae81ff">1</span>
-│Linux 4.9.184-linuxkit <span style="color:#f92672">(</span>cabd4e519687<span style="color:#f92672">)</span>   12/06/19        _x86_64_        <span style="color:#f92672">(</span><span style="color:#ae81ff">2</span> CPU<span style="color:#f92672">)</span>│
-│11:10:18      UID       PID  minflt/s  majflt/s     VSZ     RSS   %MEM  Command
-│11:10:19        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">21624</span>   1.06  test
-│11:10:20        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">21624</span>   1.06  test
-│11:10:21        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">21624</span>   1.06  test
-│11:10:22        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>   2560.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">31920</span>   1.56  test
-│11:10:23        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">31920</span>   1.56  test
-│11:10:24        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>   2534.65      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">42216</span>   2.06  test
-│11:10:25        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">42216</span>   2.06  test
-│11:10:26        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>   2560.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">52512</span>   2.57  test
-│11:10:27        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">52512</span>   2.57  test
-│11:10:28        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">52512</span>   2.57  test
-│11:10:29        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">52512</span>   2.57  test
-│11:10:30        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>   2560.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">62544</span>   3.06  test</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac $ pidstat -r -p <span style="color:#e6db74">`</span>pidof test<span style="color:#e6db74">`</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>│Linux 4.9.184-linuxkit <span style="color:#f92672">(</span>cabd4e519687<span style="color:#f92672">)</span>   12/06/19        _x86_64_        <span style="color:#f92672">(</span><span style="color:#ae81ff">2</span> CPU<span style="color:#f92672">)</span>│
+</span></span><span style="display:flex;"><span>│11:10:18      UID       PID  minflt/s  majflt/s     VSZ     RSS   %MEM  Command
+</span></span><span style="display:flex;"><span>│11:10:19        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">21624</span>   1.06  test
+</span></span><span style="display:flex;"><span>│11:10:20        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">21624</span>   1.06  test
+</span></span><span style="display:flex;"><span>│11:10:21        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">21624</span>   1.06  test
+</span></span><span style="display:flex;"><span>│11:10:22        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>   2560.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">31920</span>   1.56  test
+</span></span><span style="display:flex;"><span>│11:10:23        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">31920</span>   1.56  test
+</span></span><span style="display:flex;"><span>│11:10:24        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>   2534.65      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">42216</span>   2.06  test
+</span></span><span style="display:flex;"><span>│11:10:25        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">42216</span>   2.06  test
+</span></span><span style="display:flex;"><span>│11:10:26        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>   2560.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">52512</span>   2.57  test
+</span></span><span style="display:flex;"><span>│11:10:27        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">52512</span>   2.57  test
+</span></span><span style="display:flex;"><span>│11:10:28        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">52512</span>   2.57  test
+</span></span><span style="display:flex;"><span>│11:10:29        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>      0.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">52512</span>   2.57  test
+</span></span><span style="display:flex;"><span>│11:10:30        <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">180</span>   2560.00      0.00  <span style="color:#ae81ff">106908</span>   <span style="color:#ae81ff">62544</span>   3.06  test</span></span></code></pre></div>
 minflt/s表示每秒分配的内存块，majflt/s表示不止分配内存块还要把数据从磁盘上装载回来，VSZ表示虚拟内存，RSS表示物理内存，%MEM表示物理内存占总内存的百分比。可以看到随用户的控制，数据不断写入，物理内存增加。</p>
 <p>此外，还可以这样观察进程的一些信息:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ cat /proc/<span style="color:#f92672">{</span>pid<span style="color:#f92672">}</span>/status
-
-VmPeak:     <span style="color:#ae81ff">4760</span> kB             ; 所使用虚拟内存峰值
-VmSize:     <span style="color:#ae81ff">4760</span> kB             ; 当前使用的虚拟内存
-VmLck:         <span style="color:#ae81ff">0</span> kB             ; 已经锁住物理内存（不能交换到硬盘）
-VmHWM:      <span style="color:#ae81ff">3864</span> kB             ; 所使用物理内存峰值
-VmRSS:       <span style="color:#ae81ff">876</span> kB             ; 当前使用的物理内存
-
-VmData:      <span style="color:#ae81ff">732</span> kB             ; 数据段
-VmStk:       <span style="color:#ae81ff">132</span> kB             ; 栈
-VmExe:       <span style="color:#ae81ff">484</span> kB             ; 代码段
-VmLib:      <span style="color:#ae81ff">2016</span> kB             ; 加载的动态库（可能与其他进程共享）
-VmPTE:        <span style="color:#ae81ff">48</span> kB             ; 页表
-VmSwap:      <span style="color:#ae81ff">112</span> kB             ; 所使用交换区大小
-
-voluntary_ctxt_switches:  <span style="color:#ae81ff">3543</span>  ; 主动上下文切换次数（IO）
-nonvoluntary_ctxt_switches: <span style="color:#ae81ff">64</span>  ; 强制上下文切换次数（time slice）</code></pre></div></p>
-<h3 id="换入换出">换入换出</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ cat /proc/<span style="color:#f92672">{</span>pid<span style="color:#f92672">}</span>/status
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>VmPeak:     <span style="color:#ae81ff">4760</span> kB             ; 所使用虚拟内存峰值
+</span></span><span style="display:flex;"><span>VmSize:     <span style="color:#ae81ff">4760</span> kB             ; 当前使用的虚拟内存
+</span></span><span style="display:flex;"><span>VmLck:         <span style="color:#ae81ff">0</span> kB             ; 已经锁住物理内存（不能交换到硬盘）
+</span></span><span style="display:flex;"><span>VmHWM:      <span style="color:#ae81ff">3864</span> kB             ; 所使用物理内存峰值
+</span></span><span style="display:flex;"><span>VmRSS:       <span style="color:#ae81ff">876</span> kB             ; 当前使用的物理内存
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>VmData:      <span style="color:#ae81ff">732</span> kB             ; 数据段
+</span></span><span style="display:flex;"><span>VmStk:       <span style="color:#ae81ff">132</span> kB             ; 栈
+</span></span><span style="display:flex;"><span>VmExe:       <span style="color:#ae81ff">484</span> kB             ; 代码段
+</span></span><span style="display:flex;"><span>VmLib:      <span style="color:#ae81ff">2016</span> kB             ; 加载的动态库（可能与其他进程共享）
+</span></span><span style="display:flex;"><span>VmPTE:        <span style="color:#ae81ff">48</span> kB             ; 页表
+</span></span><span style="display:flex;"><span>VmSwap:      <span style="color:#ae81ff">112</span> kB             ; 所使用交换区大小
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>voluntary_ctxt_switches:  <span style="color:#ae81ff">3543</span>  ; 主动上下文切换次数（IO）
+</span></span><span style="display:flex;"><span>nonvoluntary_ctxt_switches: <span style="color:#ae81ff">64</span>  ; 强制上下文切换次数（time slice）</span></span></code></pre></div></p>
+<h3 id="换入换出">
+  换入换出
+  <a class="anchor" href="#%e6%8d%a2%e5%85%a5%e6%8d%a2%e5%87%ba">#</a>
+</h3>
 <p>假设这10MB内存已经分配下来，该程序却长时间不用，操作系统就会把这10MB内存的数据保存到硬盘的交换分区上，并对这些内存页的状态做变更，MMU的映射地址做变更，这些内存就可以去给别的程序用，这就叫<strong>换出</strong>(swap out)。下次重新激活该程序时，会把硬盘上交换分区的数据重新放回某些空闲的页并重新建立映射，这就是<strong>换入</strong>(swap in)。我们可以通过监控工具观察到系统内的换入换出情况:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~ $ dstat
-You did not <span style="color:#66d9ef">select</span> any stats, using -cdngy by default.
---total-cpu-usage-- -dsk/total- -net/total- ---paging-- ---system--
-usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
-  <span style="color:#ae81ff">3</span>   <span style="color:#ae81ff">4</span>  <span style="color:#ae81ff">77</span>  <span style="color:#ae81ff">16</span>   0|  12M  101k|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |<span style="color:#ae81ff">1464</span>  <span style="color:#ae81ff">2562</span>
-  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   0|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">175</span>   <span style="color:#ae81ff">408</span>
-  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   0|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">148</span>   <span style="color:#ae81ff">345</span>
-  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   0|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">143</span>   <span style="color:#ae81ff">341</span>
-  
-  // paging的in和out即为当前换入换出大小,int表示当前有多少中断,csw表示当前有多少上下文切换</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~ $ dstat
+</span></span><span style="display:flex;"><span>You did not <span style="color:#66d9ef">select</span> any stats, using -cdngy by default.
+</span></span><span style="display:flex;"><span>--total-cpu-usage-- -dsk/total- -net/total- ---paging-- ---system--
+</span></span><span style="display:flex;"><span>usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
+</span></span><span style="display:flex;"><span>  <span style="color:#ae81ff">3</span>   <span style="color:#ae81ff">4</span>  <span style="color:#ae81ff">77</span>  <span style="color:#ae81ff">16</span>   0|  12M  101k|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |<span style="color:#ae81ff">1464</span>  <span style="color:#ae81ff">2562</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   0|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">175</span>   <span style="color:#ae81ff">408</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   0|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">148</span>   <span style="color:#ae81ff">345</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ae81ff">0</span>   <span style="color:#ae81ff">0</span> <span style="color:#ae81ff">100</span>   <span style="color:#ae81ff">0</span>   0|   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> |   <span style="color:#ae81ff">0</span>     <span style="color:#ae81ff">0</span> | <span style="color:#ae81ff">143</span>   <span style="color:#ae81ff">341</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  // paging的in和out即为当前换入换出大小,int表示当前有多少中断,csw表示当前有多少上下文切换</span></span></code></pre></div>
 当程序运行需要的内存大于机器的物理内存时，就可能造成频繁的换入换出，产生<strong>颠簸效应</strong>(thrashing)。</p>
-<h3 id="性能相关">性能相关</h3>
+<h3 id="性能相关">
+  性能相关
+  <a class="anchor" href="#%e6%80%a7%e8%83%bd%e7%9b%b8%e5%85%b3">#</a>
+</h3>
 <p>如果程序需要性能更高、速度要有保障，就需要向操作系统申请锁死这段内存。同时，缺页异常属于内核级别的，有一定的开销，所以为了追求性能的极致，有的C程序会先进行一个初始化操作，缺页异常仍然会有只是会提前，在执行具体的算法时就会更高效不受缺页异常的影响，而一些高级语言可能会由于编译器的优化使得提前初始化写入被优化忽略掉。</p>
 <p>物理内存分配还采用了<strong>写入时复制</strong>(copy-on-write)的机制，即A若引用一块内存，那么复制A到B的时候并不会复制这块内存，只有当去写入A或B的时候才会去复制这块内存，起到节约内存的目的。</p>
 <p>对于服务器来讲，假设物理内存有8G，当前运行的程序只有4G，操作系统就会拿另外4G当做自己的cache用，比如缓存文件读写等，程序需要使用时再从cache里还回来。但对于桌面端用户来讲，GUI程序居多，占用内存也多，所以往往会有足够的内存来让用户载入一个程序的速度更快。服务器往往运行的程序数量和时间更长更稳定，所以不同操作系统的分配内存策略也不同。</p>
@@ -419,132 +487,138 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
 <li>为每个进程提供一致的地址空间，简化内存管理。（链接器可以提前安排地址）</li>
 <li>无法访问物理地址，隔离进程数据确保不被破坏。</li>
 </ul>
-<h2 id="寄存器">寄存器</h2>
+<h2 id="寄存器">
+  寄存器
+  <a class="anchor" href="#%e5%af%84%e5%ad%98%e5%99%a8">#</a>
+</h2>
 <p>由于寄存器数量很少，我们就给每个寄存器起了个名字，并分为:</p>
 <ul>
 <li>通用寄存器:AX,BX,CX,DX,SI,DI,SP,BP,R8-R15</li>
 <li>指令寄存器:IP(也叫PC)，用于读取程序执行的下一条指令地址</li>
 <li>标志寄存器:FR，用于存放处理器的状态和运算结果</li>
 </ul>
-<h3 id="通用寄存器">通用寄存器</h3>
+<h3 id="通用寄存器">
+  通用寄存器
+  <a class="anchor" href="#%e9%80%9a%e7%94%a8%e5%af%84%e5%ad%98%e5%99%a8">#</a>
+</h3>
 <p>我们在寄存器名称前加个R，表示64位的寄存器；加个E，表示32位的；不加表示16位的；同时AH表示AX的高位；AL表示AX的地位。可以通过gdb观察到这些寄存器的值。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> info registers
-rax            0x66	<span style="color:#ae81ff">102</span>
-rbx            0x0	<span style="color:#ae81ff">0</span>
-rcx            0x22	<span style="color:#ae81ff">34</span>
-rdx            0x33	<span style="color:#ae81ff">51</span>
-rsi            0x22	<span style="color:#ae81ff">34</span>
-rdi            0x11	<span style="color:#ae81ff">17</span>
-rbp            0x7fffffffe580	0x7fffffffe580
-rsp            0x7fffffffe550	0x7fffffffe550
-r8             0x7ffff7dd0d80	<span style="color:#ae81ff">140737351847296</span>
-r9             0x7ffff7dd0d80	<span style="color:#ae81ff">140737351847296</span>
-r10            0x0	<span style="color:#ae81ff">0</span>
-r11            0x0	<span style="color:#ae81ff">0</span>
-r12            0x555555554540	<span style="color:#ae81ff">93824992232768</span>
-r13            0x7fffffffe660	<span style="color:#ae81ff">140737488348768</span>
-r14            0x0	<span style="color:#ae81ff">0</span>
-r15            0x0	<span style="color:#ae81ff">0</span>
-rip            0x5555555546b2	0x5555555546b2 &lt;main+68&gt;
-eflags         0x206	<span style="color:#f92672">[</span> PF IF <span style="color:#f92672">]</span>
-cs             0x33	<span style="color:#ae81ff">51</span>
-ss             0x2b	<span style="color:#ae81ff">43</span>
-ds             0x0	<span style="color:#ae81ff">0</span>
-es             0x0	<span style="color:#ae81ff">0</span>
-fs             0x0	<span style="color:#ae81ff">0</span>
-gs             0x0	<span style="color:#ae81ff">0</span>
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> set $rbx<span style="color:#f92672">=</span>0x8070605040302010
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> p/x $ebx
-$1 <span style="color:#f92672">=</span> 0x40302010
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> p/x $bx
-$2 <span style="color:#f92672">=</span> 0x2010
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> p/x $bh
-$3 <span style="color:#f92672">=</span> 0x20
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> p/x $bl
-$4 <span style="color:#f92672">=</span> 0x10</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> info registers
+</span></span><span style="display:flex;"><span>rax            0x66	<span style="color:#ae81ff">102</span>
+</span></span><span style="display:flex;"><span>rbx            0x0	<span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>rcx            0x22	<span style="color:#ae81ff">34</span>
+</span></span><span style="display:flex;"><span>rdx            0x33	<span style="color:#ae81ff">51</span>
+</span></span><span style="display:flex;"><span>rsi            0x22	<span style="color:#ae81ff">34</span>
+</span></span><span style="display:flex;"><span>rdi            0x11	<span style="color:#ae81ff">17</span>
+</span></span><span style="display:flex;"><span>rbp            0x7fffffffe580	0x7fffffffe580
+</span></span><span style="display:flex;"><span>rsp            0x7fffffffe550	0x7fffffffe550
+</span></span><span style="display:flex;"><span>r8             0x7ffff7dd0d80	<span style="color:#ae81ff">140737351847296</span>
+</span></span><span style="display:flex;"><span>r9             0x7ffff7dd0d80	<span style="color:#ae81ff">140737351847296</span>
+</span></span><span style="display:flex;"><span>r10            0x0	<span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>r11            0x0	<span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>r12            0x555555554540	<span style="color:#ae81ff">93824992232768</span>
+</span></span><span style="display:flex;"><span>r13            0x7fffffffe660	<span style="color:#ae81ff">140737488348768</span>
+</span></span><span style="display:flex;"><span>r14            0x0	<span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>r15            0x0	<span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>rip            0x5555555546b2	0x5555555546b2 &lt;main+68&gt;
+</span></span><span style="display:flex;"><span>eflags         0x206	<span style="color:#f92672">[</span> PF IF <span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>cs             0x33	<span style="color:#ae81ff">51</span>
+</span></span><span style="display:flex;"><span>ss             0x2b	<span style="color:#ae81ff">43</span>
+</span></span><span style="display:flex;"><span>ds             0x0	<span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>es             0x0	<span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>fs             0x0	<span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>gs             0x0	<span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> set $rbx<span style="color:#f92672">=</span>0x8070605040302010
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> p/x $ebx
+</span></span><span style="display:flex;"><span>$1 <span style="color:#f92672">=</span> 0x40302010
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> p/x $bx
+</span></span><span style="display:flex;"><span>$2 <span style="color:#f92672">=</span> 0x2010
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> p/x $bh
+</span></span><span style="display:flex;"><span>$3 <span style="color:#f92672">=</span> 0x20
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> p/x $bl
+</span></span><span style="display:flex;"><span>$4 <span style="color:#f92672">=</span> 0x10</span></span></code></pre></div>
 <p>所以有了这些访问的手段，一个寄存器是可以分割为不同的部分，存储不同内容的。通用寄存器用来存什么都可以，只是由于C语言出现的早，它对各个寄存器的一些用法就成了约定俗成的惯例，例如si、di用来传参，ax保存返回值，bp、sp表示栈底、栈顶，cx用来做循环等都是惯例。</p>
 <p>但指令寄存器是在硬件层面上和其他寄存器有不同，专门用来放程序执行的下一条指令的。</p>
-<h3 id="标志寄存器">标志寄存器</h3>
+<h3 id="标志寄存器">
+  标志寄存器
+  <a class="anchor" href="#%e6%a0%87%e5%bf%97%e5%af%84%e5%ad%98%e5%99%a8">#</a>
+</h3>
 <p>我们通过一个示例代码来观察标志寄存器的用途。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">global</span> <span style="color:#66d9ef">_start</span>
-
-<span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.data</span>
-    <span style="color:#a6e22e">hello</span>   : <span style="color:#66d9ef">db</span> <span style="color:#960050;background-color:#1e0010">`</span><span style="color:#66d9ef">hello</span>,<span style="color:#66d9ef">world</span>!<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">n</span><span style="color:#960050;background-color:#1e0010">`</span>
-
-<span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.text</span>
-
-    _start:
-        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span>
-        <span style="color:#a6e22e">test</span>    <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">rax</span> <span style="color:#75715e">; 如果AX为0，则把ZF设为1，否则把ZF设为0
-</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">jne</span>     <span style="color:#66d9ef">.exit</span>    <span style="color:#75715e">; 如果ZF为0，则跳转至.exit标签
-</span><span style="color:#75715e"></span>
-    .hello:
-        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span>
-        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rdi</span>, <span style="color:#ae81ff">1</span>
-        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rsi</span>, <span style="color:#66d9ef">hello</span>
-        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rdx</span>, <span style="color:#ae81ff">14</span>
-        <span style="color:#a6e22e">syscall</span>
-
-    .exit:
-        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">60</span>
-        <span style="color:#a6e22e">xor</span>     <span style="color:#66d9ef">rdi</span>, <span style="color:#66d9ef">rdi</span>
-        <span style="color:#a6e22e">syscall</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span><span style="color:#a6e22e">global</span> <span style="color:#66d9ef">_start</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.data</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">hello</span>   : <span style="color:#66d9ef">db</span> <span style="color:#960050;background-color:#1e0010">`</span><span style="color:#66d9ef">hello</span>,<span style="color:#66d9ef">world</span>!<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">n</span><span style="color:#960050;background-color:#1e0010">`</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">section</span> <span style="color:#66d9ef">.text</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    _start:
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">test</span>    <span style="color:#66d9ef">rax</span>, <span style="color:#66d9ef">rax</span> <span style="color:#75715e">; 如果AX为0，则把ZF设为1，否则把ZF设为0
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">jne</span>     <span style="color:#66d9ef">.exit</span>    <span style="color:#75715e">; 如果ZF为0，则跳转至.exit标签
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    .hello:
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rdi</span>, <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rsi</span>, <span style="color:#66d9ef">hello</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rdx</span>, <span style="color:#ae81ff">14</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">syscall</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    .exit:
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">mov</span>     <span style="color:#66d9ef">rax</span>, <span style="color:#ae81ff">60</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">xor</span>     <span style="color:#66d9ef">rdi</span>, <span style="color:#66d9ef">rdi</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">syscall</span></span></span></code></pre></div>
 <p>标志寄存器有很多个位，ZF就是其中的一个位。哪个指令对哪个标志位有影响，都有手册可以查到，例如test指令可以通过<a href="https://baike.baidu.com/item/test/10804276#viewPageContent">这里</a>查到，<a href="https://baike.baidu.com/item/jne">jne</a>也是。</p>
 <p>接着，我们在gdb中观察:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ nasm -g -F dwarf -f elf64 -o fr.o fr.s
-<span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ ld -o fr fr.o
-<span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ gdb fr
-...
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> b <span style="color:#ae81ff">9</span>
-Breakpoint <span style="color:#ae81ff">1</span> at 0x4000b0: file fr.s, line 9.
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> r
-Starting program: /root/.mac/assem/fr
-
-Breakpoint 1, _start <span style="color:#f92672">()</span> at fr.s:9
-9	        mov     rax, <span style="color:#ae81ff">1</span>
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> display $rax
-1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> display $eflags
-2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> IF <span style="color:#f92672">]</span>
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
-10	        test    rax, rax ; ZF<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> AX<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span> <span style="color:#66d9ef">else</span> ZF<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
-1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
-2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> IF <span style="color:#f92672">]</span>
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
-11	        jne     .exit    ; jmp <span style="color:#66d9ef">if</span> ZF<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span>
-1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
-2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> IF <span style="color:#f92672">]</span>
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
-_start.exit <span style="color:#f92672">()</span> at fr.s:21
-21	        mov     rax, <span style="color:#ae81ff">60</span></code></pre></div></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ nasm -g -F dwarf -f elf64 -o fr.o fr.s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ ld -o fr fr.o
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>ubuntu<span style="color:#f92672">]</span> ~/.mac/assem $ gdb fr
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> b <span style="color:#ae81ff">9</span>
+</span></span><span style="display:flex;"><span>Breakpoint <span style="color:#ae81ff">1</span> at 0x4000b0: file fr.s, line 9.
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> r
+</span></span><span style="display:flex;"><span>Starting program: /root/.mac/assem/fr
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Breakpoint 1, _start <span style="color:#f92672">()</span> at fr.s:9
+</span></span><span style="display:flex;"><span>9	        mov     rax, <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> display $rax
+</span></span><span style="display:flex;"><span>1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> display $eflags
+</span></span><span style="display:flex;"><span>2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> IF <span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
+</span></span><span style="display:flex;"><span>10	        test    rax, rax ; ZF<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> AX<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span> <span style="color:#66d9ef">else</span> ZF<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> IF <span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
+</span></span><span style="display:flex;"><span>11	        jne     .exit    ; jmp <span style="color:#66d9ef">if</span> ZF<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> IF <span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
+</span></span><span style="display:flex;"><span>_start.exit <span style="color:#f92672">()</span> at fr.s:21
+</span></span><span style="display:flex;"><span>21	        mov     rax, <span style="color:#ae81ff">60</span></span></span></code></pre></div></p>
 <p>标志寄存器中若某位有值则会出现在eflags中，按当前代码逻辑，ZF为0会直接跳转到<code>.exit</code>部分。然后我们在gdb中修改<code>$rax</code>的值，会发现跳转至<code>.hello</code>部分。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
-10	        test    rax, rax ; ZF<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> AX<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span> <span style="color:#66d9ef">else</span> ZF<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
-1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
-2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> IF <span style="color:#f92672">]</span>
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> set $rax<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
-11	        jne     .exit    ; jmp <span style="color:#66d9ef">if</span> ZF<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span>
-1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
-2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> PF ZF IF <span style="color:#f92672">]</span>
-<span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
-_start.hello <span style="color:#f92672">()</span> at fr.s:14
-14	        mov     rax, <span style="color:#ae81ff">1</span>
-1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
-2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> PF ZF IF <span style="color:#f92672">]</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
+</span></span><span style="display:flex;"><span>10	        test    rax, rax ; ZF<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> AX<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span> <span style="color:#66d9ef">else</span> ZF<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> IF <span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> set $rax<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
+</span></span><span style="display:flex;"><span>11	        jne     .exit    ; jmp <span style="color:#66d9ef">if</span> ZF<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> PF ZF IF <span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>gdb<span style="color:#f92672">)</span> n
+</span></span><span style="display:flex;"><span>_start.hello <span style="color:#f92672">()</span> at fr.s:14
+</span></span><span style="display:flex;"><span>14	        mov     rax, <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>1: $rax <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>2: $eflags <span style="color:#f92672">=</span> <span style="color:#f92672">[</span> PF ZF IF <span style="color:#f92672">]</span></span></span></code></pre></div>
 </article>
  
       
 
       <footer class="book-footer">
         
-  <div class="flex justify-between">
+  <div class="flex flex-wrap justify-between">
 
 
-
-  <div>
-    
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/2a56ef97ce4ee1e76a74e2d70544ba9a333682bb" title='最后修改者 hjlarry | April 19, 2021' target="_blank" rel="noopener">
+  <div><a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/2a56ef97ce4ee1e76a74e2d70544ba9a333682bb" title='最后修改者 hjlarry | April 19, 2021' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>April 19, 2021</span>
     </a>
@@ -553,19 +627,24 @@ _start.hello <span style="color:#f92672">()</span> at fr.s:14
 
 
   <div>
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/sicp/software/_index.md" target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/content/docs/sicp/software/_index.md" target="_blank" rel="noopener">
       <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>编辑本页</span>
     </a>
   </div>
 
+
 </div>
+
+
+
+  <script>(function(){function e(n){const e=window.getSelection(),t=document.createRange();t.selectNodeContents(n),e.removeAllRanges(),e.addRange(t)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
 
  
         <br>
 <div style="text-align: center;font-size:xx-small;">
-    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a
-        href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
+    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
 </div>
       </footer>
 
@@ -578,8 +657,10 @@ _start.hello <span style="color:#f92672">()</span> at fr.s:14
 
     
     <aside class="book-toc">
-      
-  <nav id="TableOfContents">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
   <ul>
     <li><a href="#操作系统">操作系统</a></li>
     <li><a href="#内核">内核</a></li>
@@ -618,14 +699,15 @@ _start.hello <span style="color:#f92672">()</span> at fr.s:14
   </ul>
 </nav>
 
+
  
+      </div>
     </aside>
     
   </main>
 
   
 </body>
-
 </html>
 
 

@@ -5,10 +5,6 @@
     <link>/docs/go/defer/</link>
     <description>Recent content in defer实现方式 on Home</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    
-	<atom:link href="/docs/go/defer/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <language>zh-cn</language><atom:link href="/docs/go/defer/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

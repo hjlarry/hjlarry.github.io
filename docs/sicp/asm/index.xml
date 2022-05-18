@@ -5,10 +5,6 @@
     <link>/docs/sicp/asm/</link>
     <description>Recent content in 汇编语言 on Home</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    
-	<atom:link href="/docs/sicp/asm/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <language>zh-cn</language><atom:link href="/docs/sicp/asm/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

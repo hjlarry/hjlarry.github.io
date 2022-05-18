@@ -5,10 +5,6 @@
     <link>/docs/other/docker/</link>
     <description>Recent content in Docker核心概要 on Home</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    
-	<atom:link href="/docs/other/docker/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <language>zh-cn</language><atom:link href="/docs/other/docker/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

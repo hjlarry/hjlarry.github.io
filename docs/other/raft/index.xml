@@ -5,10 +5,6 @@
     <link>/docs/other/raft/</link>
     <description>Recent content in raft on Home</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    
-	<atom:link href="/docs/other/raft/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <language>zh-cn</language><atom:link href="/docs/other/raft/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

@@ -1,44 +1,48 @@
 <!DOCTYPE html>
-<html lang="cn">
-
+<html lang="zh-cn" dir="ltr">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Python常用工具 IPython 通过%quickref可以查看功能导览，通过%lsmagic可以列出ipython中支持的魔法函数: In [9]: %lsmagic Out[9]: Available line magics: %alias %alias_magic %autoawait %autocall %autoindent %automagic %bookmark %cat %cd %clear %colors %conda %config %cp %cpaste %debug %dhist %dirs %doctest_mode %ed %edit %env %gui %hist %history %killbgscripts %ldir %less %lf %lk %ll %load %load_ext %loadpy %logoff %logon %logstart %logstate %logstop %ls %lsmagic %lx %macro %magic %man %matplotlib %mkdir %more %mv %notebook %page %paste %pastebin %pdb %pdef %pdoc %pfile %pinfo %pinfo2 %pip %popd %pprint %precision %prun %psearch %psource %pushd %pwd %pycat %pylab %quickref %recall %rehashx %reload_ext %rep %rerun %reset %reset_selective %rm %rmdir %run %save %sc %set_env %store %sx %system %tb %time %timeit %unalias %unload_ext %who %who_ls %whos %xdel %xmode Available cell magics: %%!"><meta property="og:title" content="Python常用工具" />
+<meta name="description" content="Python常用工具#IPython#通过%quickref可以查看功能导览，通过%lsmagic可以列出ipython中支持的魔法函数: In [9]: %lsmagic Out[9]: Available line magics: %alias %alias_magic %autoawait %autocall %autoindent %automagic %bookmark %cat %cd %clear %colors %conda %config %cp %cpaste %debug %dhist %dirs %doctest_mode %ed %edit %env %gui %hist %history %killbgscripts %ldir %less %lf %lk %ll %load %load_ext %loadpy %logoff %logon %logstart %logstate %logstop %ls %lsmagic %lx %macro %magic %man %matplotlib %mkdir %more %mv %notebook %page %paste %pastebin %pdb %pdef %pdoc %pfile %pinfo %pinfo2 %pip %popd %pprint %precision %prun %psearch %psource %pushd %pwd %pycat %pylab %quickref %recall %rehashx %reload_ext %rep %rerun %reset %reset_selective %rm %rmdir %run %save %sc %set_env %store %sx %system %tb %time %timeit %unalias %unload_ext %who %who_ls %whos %xdel %xmode  Available cell magics: %%!">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light dark"><meta property="og:title" content="Python常用工具" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/docs/python/tools/" />
 
 <title>Python常用工具 | Home</title>
+<link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/favicon.png" type="image/x-icon">
-<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" integrity="sha256-Y&#43;uI2qVFNlQF7NuyEDMoajJcYKNs&#43;m0i0h58O8koaUE=">
-<script defer src="/cn.search.min.8d2462c3b745732864d843e8e2e7782a2ec838ca90fb94676baa461536bdae11.js" integrity="sha256-jSRiw7dFcyhk2EPo4ud4Ki7IOMqQ&#43;5Rna6pGFTa9rhE="></script>
+<link rel="stylesheet" href="/book.min.63eb88daa545365405ecdbb21033286a325c60a36cfa6d22d21e7c3bc9286941.css" >
+  <script defer src="/flexsearch.min.js"></script>
+  <script defer src="/cn.search.min.dcaf7fea7db359f8fd7a4b37bdf1a9f765580260566390cc959292e2dcc5a5d9.js" ></script>
 <link rel="alternate" type="application/rss+xml" href="/docs/python/tools/index.xml" title="Home" />
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
 -->
-
   
 </head>
-
-<body>
-  <input type="checkbox" class="hidden" id="menu-control" />
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
   <main class="container flex">
     <aside class="book-menu">
-      
+      <div class="book-menu-content">
+        
   <nav>
 <h2 class="book-brand">
-  <a href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
+  <a class="flex align-center" href="/"><img src="/logo.png" alt="Logo" /><span>Home</span>
   </a>
 </h2>
 
 
 <div class="book-search">
   <input type="text" id="book-search-input" placeholder="搜索" aria-label="搜索" maxlength="64" data-hotkeys="s/" />
-  <div class="book-search-spinner spinner hidden"></div>
+  <div class="book-search-spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
+
 
 
 
@@ -110,10 +114,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
 
 
  
+      </div>
     </aside>
 
     <div class="book-page">
@@ -127,16 +132,18 @@ https://github.com/alex-shpak/hugo-book
   <strong>Python常用工具</strong>
 
   <label for="toc-control">
+    
     <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
   </label>
 </div>
 
 
   
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
   <ul>
     <li><a href="#ipython">IPython</a>
       <ul>
@@ -161,246 +168,286 @@ https://github.com/alex-shpak/hugo-book
 </nav>
 
 
-    </aside>
+
+  </aside>
   
  
       </header>
 
       
       
-  <article class="markdown"><h1 id="python常用工具">Python常用工具</h1>
-<h2 id="ipython">IPython</h2>
+  <article class="markdown"><h1 id="python常用工具">
+  Python常用工具
+  <a class="anchor" href="#python%e5%b8%b8%e7%94%a8%e5%b7%a5%e5%85%b7">#</a>
+</h1>
+<h2 id="ipython">
+  IPython
+  <a class="anchor" href="#ipython">#</a>
+</h2>
 <p>通过<code>%quickref</code>可以查看功能导览，通过<code>%lsmagic</code>可以列出ipython中支持的魔法函数:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>9<span style="color:#f92672">]</span>: %lsmagic
-Out<span style="color:#f92672">[</span>9<span style="color:#f92672">]</span>:
-Available line magics:
-%alias  %alias_magic  %autoawait  %autocall  %autoindent  %automagic  %bookmark  %cat  %cd  %clear
-%colors  %conda  %config  %cp  %cpaste  %debug  %dhist  %dirs  %doctest_mode  %ed  %edit  %env  %gui  %hist  %history  %killbgscripts  %ldir  %less  %lf  %lk  %ll  %load  %load_ext  %loadpy  %logoff
-%logon  %logstart  %logstate  %logstop  %ls  %lsmagic  %lx  %macro  %magic  %man  %matplotlib  %mkdir  %more  %mv  %notebook  %page  %paste  %pastebin  %pdb  %pdef  %pdoc  %pfile  %pinfo  %pinfo2  %pip  %popd  %pprint  %precision  %prun  %psearch  %psource  %pushd  %pwd  %pycat  %pylab  %quickref  %recall  %rehashx  %reload_ext  %rep  %rerun  %reset  %reset_selective  %rm  %rmdir  %run  %save  %sc  %set_env  %store  %sx  %system  %tb  %time  %timeit  %unalias  %unload_ext  %who  %who_ls  %whos
-%xdel  %xmode
-
-Available cell magics:
-%%!  %%HTML  %%SVG  %%bash  %%capture  %%debug  %%file  %%html  %%javascript  %%js  %%latex  %%markdown  %%perl  %%prun  %%pypy  %%python  %%python2  %%python3  %%ruby  %%script  %%sh  %%svg  %%sx  %%system  %%time  %%timeit  %%writefile</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>In <span style="color:#f92672">[</span>9<span style="color:#f92672">]</span>: %lsmagic
+</span></span><span style="display:flex;"><span>Out<span style="color:#f92672">[</span>9<span style="color:#f92672">]</span>:
+</span></span><span style="display:flex;"><span>Available line magics:
+</span></span><span style="display:flex;"><span>%alias  %alias_magic  %autoawait  %autocall  %autoindent  %automagic  %bookmark  %cat  %cd  %clear
+</span></span><span style="display:flex;"><span>%colors  %conda  %config  %cp  %cpaste  %debug  %dhist  %dirs  %doctest_mode  %ed  %edit  %env  %gui  %hist  %history  %killbgscripts  %ldir  %less  %lf  %lk  %ll  %load  %load_ext  %loadpy  %logoff
+</span></span><span style="display:flex;"><span>%logon  %logstart  %logstate  %logstop  %ls  %lsmagic  %lx  %macro  %magic  %man  %matplotlib  %mkdir  %more  %mv  %notebook  %page  %paste  %pastebin  %pdb  %pdef  %pdoc  %pfile  %pinfo  %pinfo2  %pip  %popd  %pprint  %precision  %prun  %psearch  %psource  %pushd  %pwd  %pycat  %pylab  %quickref  %recall  %rehashx  %reload_ext  %rep  %rerun  %reset  %reset_selective  %rm  %rmdir  %run  %save  %sc  %set_env  %store  %sx  %system  %tb  %time  %timeit  %unalias  %unload_ext  %who  %who_ls  %whos
+</span></span><span style="display:flex;"><span>%xdel  %xmode
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Available cell magics:
+</span></span><span style="display:flex;"><span>%%!  %%HTML  %%SVG  %%bash  %%capture  %%debug  %%file  %%html  %%javascript  %%js  %%latex  %%markdown  %%perl  %%prun  %%pypy  %%python  %%python2  %%python3  %%ruby  %%script  %%sh  %%svg  %%sx  %%system  %%time  %%timeit  %%writefile</span></span></code></pre></div>
 接着可通过给某个魔法函数前加问号的方式例如<code>?alias</code>来查看它的具体使用方法。单个<code>%</code>表示执行当前行的内容，<code>%%</code>用于支持把多行内容作用于该魔法函数。</p>
-<h3 id="自省">自省</h3>
+<h3 id="自省">
+  自省
+  <a class="anchor" href="#%e8%87%aa%e7%9c%81">#</a>
+</h3>
 <p>在ipython中，通常使用<code>?&lt;object&gt;</code>的方式查看一个对象是什么，当输入某个对象后可以按下tab键查看其成员，通过<code>%pdoc</code>可查看其docstring，<code>%psource</code>可查看某个目标对象的源码(如果对象是module，需要用<code>%pfile</code>)，<code>%who</code>和<code>%whos</code>查看当前环境中的对象列表。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>1<span style="color:#f92672">]</span>: import demo
-
-In <span style="color:#f92672">[</span>2<span style="color:#f92672">]</span>: ?demo
-Type:        module
-String form: &lt;module <span style="color:#e6db74">&#39;demo&#39;</span> from <span style="color:#e6db74">&#39;/home/hejl/demo.py&#39;</span>&gt;
-File:        ~/demo.py
-Docstring:   test <span style="color:#66d9ef">for</span> doc module
-
-In <span style="color:#f92672">[</span>3<span style="color:#f92672">]</span>: %pdoc demo
-Class docstring:
-    test <span style="color:#66d9ef">for</span> doc module
-
-In <span style="color:#f92672">[</span>4<span style="color:#f92672">]</span>: %psource demo.b
-def b<span style="color:#f92672">()</span>:
-    print<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;helloworld!&#34;</span><span style="color:#f92672">)</span>
-
-In <span style="color:#f92672">[</span>5<span style="color:#f92672">]</span>: %pfile demo
-<span style="color:#e6db74">&#34;&#34;&#34;
-</span><span style="color:#e6db74">test for doc module
-</span><span style="color:#e6db74">&#34;&#34;&#34;</span>
-
-a <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
-
-def b<span style="color:#f92672">()</span>:
-    print<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;helloworld!&#34;</span><span style="color:#f92672">)</span>
-
-In <span style="color:#f92672">[</span>6<span style="color:#f92672">]</span>: c <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
-
-In <span style="color:#f92672">[</span>7<span style="color:#f92672">]</span>: %who
-c        demo
-
-In <span style="color:#f92672">[</span>8<span style="color:#f92672">]</span>: %whos
-Variable   Type      Data/Info
-------------------------------
-c          int       <span style="color:#ae81ff">2</span>
-demo       module    &lt;module <span style="color:#e6db74">&#39;demo&#39;</span> from <span style="color:#e6db74">&#39;/home/hejl/demo.py&#39;</span>&gt;</code></pre></div></p>
-<h3 id="搜索">搜索</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>In <span style="color:#f92672">[</span>1<span style="color:#f92672">]</span>: import demo
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>2<span style="color:#f92672">]</span>: ?demo
+</span></span><span style="display:flex;"><span>Type:        module
+</span></span><span style="display:flex;"><span>String form: &lt;module <span style="color:#e6db74">&#39;demo&#39;</span> from <span style="color:#e6db74">&#39;/home/hejl/demo.py&#39;</span>&gt;
+</span></span><span style="display:flex;"><span>File:        ~/demo.py
+</span></span><span style="display:flex;"><span>Docstring:   test <span style="color:#66d9ef">for</span> doc module
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>3<span style="color:#f92672">]</span>: %pdoc demo
+</span></span><span style="display:flex;"><span>Class docstring:
+</span></span><span style="display:flex;"><span>    test <span style="color:#66d9ef">for</span> doc module
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>4<span style="color:#f92672">]</span>: %psource demo.b
+</span></span><span style="display:flex;"><span>def b<span style="color:#f92672">()</span>:
+</span></span><span style="display:flex;"><span>    print<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;helloworld!&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>5<span style="color:#f92672">]</span>: %pfile demo
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">test for doc module
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>a <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>def b<span style="color:#f92672">()</span>:
+</span></span><span style="display:flex;"><span>    print<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;helloworld!&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>6<span style="color:#f92672">]</span>: c <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>7<span style="color:#f92672">]</span>: %who
+</span></span><span style="display:flex;"><span>c        demo
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>8<span style="color:#f92672">]</span>: %whos
+</span></span><span style="display:flex;"><span>Variable   Type      Data/Info
+</span></span><span style="display:flex;"><span>------------------------------
+</span></span><span style="display:flex;"><span>c          int       <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>demo       module    &lt;module <span style="color:#e6db74">&#39;demo&#39;</span> from <span style="color:#e6db74">&#39;/home/hejl/demo.py&#39;</span>&gt;</span></span></code></pre></div></p>
+<h3 id="搜索">
+  搜索
+  <a class="anchor" href="#%e6%90%9c%e7%b4%a2">#</a>
+</h3>
 <p>ipython支持搜索可用的函数，以及当前环境下的对象:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>1<span style="color:#f92672">]</span>: import sys
-
-In <span style="color:#f92672">[</span>2<span style="color:#f92672">]</span>: ?sys.get*
-sys.get_asyncgen_hooks
-sys.get_coroutine_wrapper
-sys.getallocatedblocks
-sys.getcheckinterval
-sys.getdefaultencoding
-sys.getdlopenflags
-sys.getfilesystemencodeerrors
-sys.getfilesystemencoding
-sys.getprofile
-sys.getrecursionlimit
-sys.getrefcount
-sys.getsizeof
-sys.getswitchinterval
-sys.gettrace
-
-In <span style="color:#f92672">[</span>3<span style="color:#f92672">]</span>: ?sys.get*of
-sys.getsizeof
-
-In <span style="color:#f92672">[</span>4<span style="color:#f92672">]</span>: ?s*
-set
-setattr
-slice
-sorted
-staticmethod
-str
-sum
-super
-sys</code></pre></div></p>
-<h3 id="历史">历史</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>In <span style="color:#f92672">[</span>1<span style="color:#f92672">]</span>: import sys
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>2<span style="color:#f92672">]</span>: ?sys.get*
+</span></span><span style="display:flex;"><span>sys.get_asyncgen_hooks
+</span></span><span style="display:flex;"><span>sys.get_coroutine_wrapper
+</span></span><span style="display:flex;"><span>sys.getallocatedblocks
+</span></span><span style="display:flex;"><span>sys.getcheckinterval
+</span></span><span style="display:flex;"><span>sys.getdefaultencoding
+</span></span><span style="display:flex;"><span>sys.getdlopenflags
+</span></span><span style="display:flex;"><span>sys.getfilesystemencodeerrors
+</span></span><span style="display:flex;"><span>sys.getfilesystemencoding
+</span></span><span style="display:flex;"><span>sys.getprofile
+</span></span><span style="display:flex;"><span>sys.getrecursionlimit
+</span></span><span style="display:flex;"><span>sys.getrefcount
+</span></span><span style="display:flex;"><span>sys.getsizeof
+</span></span><span style="display:flex;"><span>sys.getswitchinterval
+</span></span><span style="display:flex;"><span>sys.gettrace
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>3<span style="color:#f92672">]</span>: ?sys.get*of
+</span></span><span style="display:flex;"><span>sys.getsizeof
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>4<span style="color:#f92672">]</span>: ?s*
+</span></span><span style="display:flex;"><span>set
+</span></span><span style="display:flex;"><span>setattr
+</span></span><span style="display:flex;"><span>slice
+</span></span><span style="display:flex;"><span>sorted
+</span></span><span style="display:flex;"><span>staticmethod
+</span></span><span style="display:flex;"><span>str
+</span></span><span style="display:flex;"><span>sum
+</span></span><span style="display:flex;"><span>super
+</span></span><span style="display:flex;"><span>sys</span></span></code></pre></div></p>
+<h3 id="历史">
+  历史
+  <a class="anchor" href="#%e5%8e%86%e5%8f%b2">#</a>
+</h3>
 <p>通过<code>%history -n</code>可用查看在ipython中全部输入的历史，也可以通过<code>_i</code>查看上一个，<code>_ii</code>和<code>_iii</code>查看上两个和三个，<code>_i&lt;n&gt;</code>查看上n个:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>6<span style="color:#f92672">]</span>: _i2
-Out<span style="color:#f92672">[</span>6<span style="color:#f92672">]</span>: <span style="color:#e6db74">&#39;?sys.get*&#39;</span>
-
-In <span style="color:#f92672">[</span>7<span style="color:#f92672">]</span>: %history -n
-   1: import sys
-   2: ?sys.get*
-   3: ?sys.get*of
-   4: ?s *
-   5: ?s*
-   6: _i2
-   7: %history -n
-
-In <span style="color:#f92672">[</span>8<span style="color:#f92672">]</span>: _i, _ii, _iii
-Out<span style="color:#f92672">[</span>8<span style="color:#f92672">]</span>: <span style="color:#f92672">(</span><span style="color:#e6db74">&#39;%history -n&#39;</span>, <span style="color:#e6db74">&#39;_i2&#39;</span>, <span style="color:#e6db74">&#39;?s*&#39;</span><span style="color:#f92672">)</span></code></pre></div></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>In <span style="color:#f92672">[</span>6<span style="color:#f92672">]</span>: _i2
+</span></span><span style="display:flex;"><span>Out<span style="color:#f92672">[</span>6<span style="color:#f92672">]</span>: <span style="color:#e6db74">&#39;?sys.get*&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>7<span style="color:#f92672">]</span>: %history -n
+</span></span><span style="display:flex;"><span>   1: import sys
+</span></span><span style="display:flex;"><span>   2: ?sys.get*
+</span></span><span style="display:flex;"><span>   3: ?sys.get*of
+</span></span><span style="display:flex;"><span>   4: ?s *
+</span></span><span style="display:flex;"><span>   5: ?s*
+</span></span><span style="display:flex;"><span>   6: _i2
+</span></span><span style="display:flex;"><span>   7: %history -n
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>8<span style="color:#f92672">]</span>: _i, _ii, _iii
+</span></span><span style="display:flex;"><span>Out<span style="color:#f92672">[</span>8<span style="color:#f92672">]</span>: <span style="color:#f92672">(</span><span style="color:#e6db74">&#39;%history -n&#39;</span>, <span style="color:#e6db74">&#39;_i2&#39;</span>, <span style="color:#e6db74">&#39;?s*&#39;</span><span style="color:#f92672">)</span></span></span></code></pre></div></p>
 <p>还可以把历史命令中的某些行编写为一个宏，通过宏可以重复调用，下例中把第9至第10行、外加第12行编写入了一个宏:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>9<span style="color:#f92672">]</span>: x,y<span style="color:#f92672">=</span>1,2
-
-In <span style="color:#f92672">[</span>10<span style="color:#f92672">]</span>: print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
-<span style="color:#ae81ff">3</span>
-
-In <span style="color:#f92672">[</span>11<span style="color:#f92672">]</span>: y<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
-
-In <span style="color:#f92672">[</span>12<span style="color:#f92672">]</span>: print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
-<span style="color:#ae81ff">11</span>
-
-In <span style="color:#f92672">[</span>13<span style="color:#f92672">]</span>: %macro tes 9-10 <span style="color:#ae81ff">12</span>
-Macro <span style="color:#e6db74">`</span>tes<span style="color:#e6db74">`</span> created. To execute, type its name <span style="color:#f92672">(</span>without quotes<span style="color:#f92672">)</span>.
-<span style="color:#f92672">===</span> Macro contents: <span style="color:#f92672">===</span>
-x,y<span style="color:#f92672">=</span>1,2
-print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
-print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
-
-In <span style="color:#f92672">[</span>14<span style="color:#f92672">]</span>: tes
-<span style="color:#ae81ff">3</span>
-<span style="color:#ae81ff">3</span></code></pre></div></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>In <span style="color:#f92672">[</span>9<span style="color:#f92672">]</span>: x,y<span style="color:#f92672">=</span>1,2
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>10<span style="color:#f92672">]</span>: print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>11<span style="color:#f92672">]</span>: y<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>12<span style="color:#f92672">]</span>: print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">11</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>13<span style="color:#f92672">]</span>: %macro tes 9-10 <span style="color:#ae81ff">12</span>
+</span></span><span style="display:flex;"><span>Macro <span style="color:#e6db74">`</span>tes<span style="color:#e6db74">`</span> created. To execute, type its name <span style="color:#f92672">(</span>without quotes<span style="color:#f92672">)</span>.
+</span></span><span style="display:flex;"><span><span style="color:#f92672">===</span> Macro contents: <span style="color:#f92672">===</span>
+</span></span><span style="display:flex;"><span>x,y<span style="color:#f92672">=</span>1,2
+</span></span><span style="display:flex;"><span>print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>14<span style="color:#f92672">]</span>: tes
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3</span></span></span></code></pre></div></p>
 <p>还可以使用<code>%save</code>把宏或者某些行保存在一个文件中:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>15<span style="color:#f92672">]</span>: %save test.py tes
-The following commands were written to file <span style="color:#e6db74">`</span>test.py<span style="color:#e6db74">`</span>:
-x,y<span style="color:#f92672">=</span>1,2
-print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
-print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
-
-In <span style="color:#f92672">[</span>16<span style="color:#f92672">]</span>: %save test.py 9-10
-File <span style="color:#e6db74">`</span>test.py<span style="color:#e6db74">`</span> exists. Overwrite <span style="color:#f92672">(</span>y/<span style="color:#f92672">[</span>N<span style="color:#f92672">])</span>?  y
-The following commands were written to file <span style="color:#e6db74">`</span>test.py<span style="color:#e6db74">`</span>:
-x,y<span style="color:#f92672">=</span>1,2
-print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span></code></pre></div></p>
-<h3 id="命令">命令</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>In <span style="color:#f92672">[</span>15<span style="color:#f92672">]</span>: %save test.py tes
+</span></span><span style="display:flex;"><span>The following commands were written to file <span style="color:#e6db74">`</span>test.py<span style="color:#e6db74">`</span>:
+</span></span><span style="display:flex;"><span>x,y<span style="color:#f92672">=</span>1,2
+</span></span><span style="display:flex;"><span>print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>16<span style="color:#f92672">]</span>: %save test.py 9-10
+</span></span><span style="display:flex;"><span>File <span style="color:#e6db74">`</span>test.py<span style="color:#e6db74">`</span> exists. Overwrite <span style="color:#f92672">(</span>y/<span style="color:#f92672">[</span>N<span style="color:#f92672">])</span>?  y
+</span></span><span style="display:flex;"><span>The following commands were written to file <span style="color:#e6db74">`</span>test.py<span style="color:#e6db74">`</span>:
+</span></span><span style="display:flex;"><span>x,y<span style="color:#f92672">=</span>1,2
+</span></span><span style="display:flex;"><span>print<span style="color:#f92672">(</span>x+y<span style="color:#f92672">)</span></span></span></code></pre></div></p>
+<h3 id="命令">
+  命令
+  <a class="anchor" href="#%e5%91%bd%e4%bb%a4">#</a>
+</h3>
 <p>可以通过<code>!</code>执行shell中的命令，命令执行结果可以直接赋值给python变量，也可以将python变量传入shell:
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">In <span style="color:#f92672">[</span>26<span style="color:#f92672">]</span>: !ls
-6.824        basic                 dump.rdb         get-pip.py         my_git       test.py
-MIT-6.824    cliu8siteprivate.key  fastapi-vue-cms  helloworld.key     practise-go
-__pycache__  demo.py               flask-shop       hjlarry.github.io  practise-py
-
-In <span style="color:#f92672">[</span>27<span style="color:#f92672">]</span>: a <span style="color:#f92672">=</span> !ls
-
-In <span style="color:#f92672">[</span>28<span style="color:#f92672">]</span>: a
-Out<span style="color:#f92672">[</span>28<span style="color:#f92672">]</span>:
-<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;6.824&#39;</span>,
- <span style="color:#e6db74">&#39;MIT-6.824&#39;</span>,
- <span style="color:#e6db74">&#39;__pycache__&#39;</span>,
- ...<span style="color:#f92672">]</span>
-
-In <span style="color:#f92672">[</span>31<span style="color:#f92672">]</span>: x<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span>
-
-In <span style="color:#f92672">[</span>32<span style="color:#f92672">]</span>: !echo <span style="color:#e6db74">&#34;python.x={x+20}&#34;</span>
-python.x<span style="color:#f92672">=</span><span style="color:#ae81ff">120</span></code></pre></div></p>
-<h2 id="内置模块">内置模块</h2>
-<h3 id="查看包路径">查看包路径</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">~/projects » python3 -m site                                                                         
-sys.path <span style="color:#f92672">=</span> <span style="color:#f92672">[</span>
-    <span style="color:#e6db74">&#39;/Users/hejl/projects&#39;</span>,
-    <span style="color:#e6db74">&#39;/usr/local/Cellar/python@3.8/3.8.4/Frameworks/Python.framework/Versions/3.8/lib/python38.zip&#39;</span>,
-    <span style="color:#e6db74">&#39;/usr/local/Cellar/python@3.8/3.8.4/Frameworks/Python.framework/Versions/3.8/lib/python3.8&#39;</span>,
-    <span style="color:#e6db74">&#39;/usr/local/Cellar/python@3.8/3.8.4/Frameworks/Python.framework/Versions/3.8/lib/python3.8/lib-dynload&#39;</span>,
-    <span style="color:#e6db74">&#39;/usr/local/lib/python3.8/site-packages&#39;</span>,
-    <span style="color:#e6db74">&#39;/usr/local/Cellar/protobuf/3.12.3/libexec/lib/python3.8/site-packages&#39;</span>,
-    <span style="color:#e6db74">&#39;/usr/local/Cellar/python@3.8/3.8.4/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages&#39;</span>,
-<span style="color:#f92672">]</span>
-USER_BASE: <span style="color:#e6db74">&#39;/Users/hejl/Library/Python/3.8&#39;</span> <span style="color:#f92672">(</span>doesn<span style="color:#e6db74">&#39;t exist)
-</span><span style="color:#e6db74">USER_SITE: &#39;</span>/Users/hejl/Library/Python/3.8/lib/python/site-packages<span style="color:#e6db74">&#39; (doesn&#39;</span>t exist<span style="color:#f92672">)</span>
-ENABLE_USER_SITE: True</code></pre></div>
-<h3 id="格式化json">格式化json</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">~/projects » cat test.json                  
-<span style="color:#f92672">{</span><span style="color:#e6db74">&#34;_id&#34;</span>:<span style="color:#e6db74">&#34;5f12d319624e57e27d1291fe&#34;</span>,<span style="color:#e6db74">&#34;index&#34;</span>:0,<span style="color:#e6db74">&#34;name&#34;</span>:<span style="color:#e6db74">&#34;MasseySaunders&#34;</span>,<span style="color:#e6db74">&#34;gender&#34;</span>:<span style="color:#e6db74">&#34;male&#34;</span>,<span style="color:#e6db74">&#34;company&#34;</span>:<span style="color:#e6db74">&#34;TALAE&#34;</span>,<span style="color:#e6db74">&#34;email&#34;</span>:<span style="color:#e6db74">&#34;masseysaunders@talae.com&#34;</span>,<span style="color:#e6db74">&#34;phone&#34;</span>:<span style="color:#e6db74">&#34;+1(853)508-3237&#34;</span>,<span style="color:#e6db74">&#34;address&#34;</span>:<span style="color:#e6db74">&#34;246IndianaPlace,Glenbrook,Iowa,3896&#34;</span>,<span style="color:#e6db74">&#34;registered&#34;</span>:<span style="color:#e6db74">&#34;2017-02-06T06:42:20-08:00&#34;</span>,<span style="color:#e6db74">&#34;latitude&#34;</span>:-10.269827,<span style="color:#e6db74">&#34;longitude&#34;</span>:-103.12419,<span style="color:#e6db74">&#34;friends&#34;</span>:<span style="color:#f92672">[{</span><span style="color:#e6db74">&#34;id&#34;</span>:0,<span style="color:#e6db74">&#34;name&#34;</span>:<span style="color:#e6db74">&#34;DorotheaShields&#34;</span><span style="color:#f92672">}</span>,<span style="color:#f92672">{</span><span style="color:#e6db74">&#34;id&#34;</span>:1,<span style="color:#e6db74">&#34;name&#34;</span>:<span style="color:#e6db74">&#34;AnnaRosales&#34;</span><span style="color:#f92672">}</span>,<span style="color:#f92672">{</span><span style="color:#e6db74">&#34;id&#34;</span>:2,<span style="color:#e6db74">&#34;name&#34;</span>:<span style="color:#e6db74">&#34;GravesBryant&#34;</span><span style="color:#f92672">}]</span>,<span style="color:#e6db74">&#34;greeting&#34;</span>:<span style="color:#e6db74">&#34;Hello,MasseySaunders!Youhave8unreadmessages.&#34;</span>,<span style="color:#e6db74">&#34;favoriteFruit&#34;</span>:<span style="color:#e6db74">&#34;apple&#34;</span><span style="color:#f92672">}</span>
-------------------------------------------------------------
-~/projects » python3 -m json.tool test.json                             
-<span style="color:#f92672">{</span>
-    <span style="color:#e6db74">&#34;_id&#34;</span>: <span style="color:#e6db74">&#34;5f12d319624e57e27d1291fe&#34;</span>,
-    <span style="color:#e6db74">&#34;index&#34;</span>: 0,
-    <span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;MasseySaunders&#34;</span>,
-    <span style="color:#e6db74">&#34;gender&#34;</span>: <span style="color:#e6db74">&#34;male&#34;</span>,
-    <span style="color:#e6db74">&#34;company&#34;</span>: <span style="color:#e6db74">&#34;TALAE&#34;</span>,
-    <span style="color:#e6db74">&#34;email&#34;</span>: <span style="color:#e6db74">&#34;masseysaunders@talae.com&#34;</span>,
-    <span style="color:#e6db74">&#34;phone&#34;</span>: <span style="color:#e6db74">&#34;+1(853)508-3237&#34;</span>,
-    <span style="color:#e6db74">&#34;address&#34;</span>: <span style="color:#e6db74">&#34;246IndianaPlace,Glenbrook,Iowa,3896&#34;</span>,
-    <span style="color:#e6db74">&#34;registered&#34;</span>: <span style="color:#e6db74">&#34;2017-02-06T06:42:20-08:00&#34;</span>,
-    <span style="color:#e6db74">&#34;latitude&#34;</span>: -10.269827,
-    <span style="color:#e6db74">&#34;longitude&#34;</span>: -103.12419,
-    <span style="color:#e6db74">&#34;friends&#34;</span>: <span style="color:#f92672">[</span>
-        <span style="color:#f92672">{</span>
-            <span style="color:#e6db74">&#34;id&#34;</span>: 0,
-            <span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;DorotheaShields&#34;</span>
-        <span style="color:#f92672">}</span>,
-        <span style="color:#f92672">{</span>
-            <span style="color:#e6db74">&#34;id&#34;</span>: 1,
-            <span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;AnnaRosales&#34;</span>
-        <span style="color:#f92672">}</span>,
-        <span style="color:#f92672">{</span>
-            <span style="color:#e6db74">&#34;id&#34;</span>: 2,
-            <span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;GravesBryant&#34;</span>
-        <span style="color:#f92672">}</span>
-    <span style="color:#f92672">]</span>,
-    <span style="color:#e6db74">&#34;greeting&#34;</span>: <span style="color:#e6db74">&#34;Hello,MasseySaunders!Youhave8unreadmessages.&#34;</span>,
-    <span style="color:#e6db74">&#34;favoriteFruit&#34;</span>: <span style="color:#e6db74">&#34;apple&#34;</span>
-<span style="color:#f92672">}</span></code></pre></div>
-<h3 id="搭建http服务器">搭建http服务器</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">~/projects » python3 -m http.server <span style="color:#ae81ff">8002</span>                                                        
-Serving HTTP on :: port <span style="color:#ae81ff">8002</span> <span style="color:#f92672">(</span>http://<span style="color:#f92672">[</span>::<span style="color:#f92672">]</span>:8002/<span style="color:#f92672">)</span> ...</code></pre></div>
-<h3 id="打开py文档">打开py文档</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">~/projects » python3 -m pydoc -p <span style="color:#ae81ff">8002</span>                                                            
-Server ready at http://localhost:8002/
-Server commands: <span style="color:#f92672">[</span>b<span style="color:#f92672">]</span>rowser, <span style="color:#f92672">[</span>q<span style="color:#f92672">]</span>uit
-server&gt;</code></pre></div>
-<h3 id="直接进入pdb">直接进入pdb</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">~/projects » python3 -m pdb test.py                                                            
-&gt; /Users/hejl/projects/test.py<span style="color:#f92672">(</span>1<span style="color:#f92672">)</span>&lt;module&gt;<span style="color:#f92672">()</span>
--&gt; print<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;hello&#34;</span><span style="color:#f92672">)</span>
-<span style="color:#f92672">(</span>Pdb<span style="color:#f92672">)</span> </code></pre></div>
-<h3 id="安装包">安装包</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ python3.8 -m pip install requests</code></pre></div>
-<h3 id="虚拟环境">虚拟环境</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">~/projects » python3 -m venv .venv </code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>In <span style="color:#f92672">[</span>26<span style="color:#f92672">]</span>: !ls
+</span></span><span style="display:flex;"><span>6.824        basic                 dump.rdb         get-pip.py         my_git       test.py
+</span></span><span style="display:flex;"><span>MIT-6.824    cliu8siteprivate.key  fastapi-vue-cms  helloworld.key     practise-go
+</span></span><span style="display:flex;"><span>__pycache__  demo.py               flask-shop       hjlarry.github.io  practise-py
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>27<span style="color:#f92672">]</span>: a <span style="color:#f92672">=</span> !ls
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>28<span style="color:#f92672">]</span>: a
+</span></span><span style="display:flex;"><span>Out<span style="color:#f92672">[</span>28<span style="color:#f92672">]</span>:
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span><span style="color:#e6db74">&#39;6.824&#39;</span>,
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">&#39;MIT-6.824&#39;</span>,
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">&#39;__pycache__&#39;</span>,
+</span></span><span style="display:flex;"><span> ...<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>31<span style="color:#f92672">]</span>: x<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>In <span style="color:#f92672">[</span>32<span style="color:#f92672">]</span>: !echo <span style="color:#e6db74">&#34;python.x={x+20}&#34;</span>
+</span></span><span style="display:flex;"><span>python.x<span style="color:#f92672">=</span><span style="color:#ae81ff">120</span></span></span></code></pre></div></p>
+<h2 id="内置模块">
+  内置模块
+  <a class="anchor" href="#%e5%86%85%e7%bd%ae%e6%a8%a1%e5%9d%97">#</a>
+</h2>
+<h3 id="查看包路径">
+  查看包路径
+  <a class="anchor" href="#%e6%9f%a5%e7%9c%8b%e5%8c%85%e8%b7%af%e5%be%84">#</a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>~/projects » python3 -m site                                                                         
+</span></span><span style="display:flex;"><span>sys.path <span style="color:#f92672">=</span> <span style="color:#f92672">[</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/Users/hejl/projects&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/usr/local/Cellar/python@3.8/3.8.4/Frameworks/Python.framework/Versions/3.8/lib/python38.zip&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/usr/local/Cellar/python@3.8/3.8.4/Frameworks/Python.framework/Versions/3.8/lib/python3.8&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/usr/local/Cellar/python@3.8/3.8.4/Frameworks/Python.framework/Versions/3.8/lib/python3.8/lib-dynload&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/usr/local/lib/python3.8/site-packages&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/usr/local/Cellar/protobuf/3.12.3/libexec/lib/python3.8/site-packages&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/usr/local/Cellar/python@3.8/3.8.4/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages&#39;</span>,
+</span></span><span style="display:flex;"><span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>USER_BASE: <span style="color:#e6db74">&#39;/Users/hejl/Library/Python/3.8&#39;</span> <span style="color:#f92672">(</span>doesn<span style="color:#e6db74">&#39;t exist)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">USER_SITE: &#39;</span>/Users/hejl/Library/Python/3.8/lib/python/site-packages<span style="color:#e6db74">&#39; (doesn&#39;</span>t exist<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>ENABLE_USER_SITE: True</span></span></code></pre></div>
+<h3 id="格式化json">
+  格式化json
+  <a class="anchor" href="#%e6%a0%bc%e5%bc%8f%e5%8c%96json">#</a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>~/projects » cat test.json                  
+</span></span><span style="display:flex;"><span><span style="color:#f92672">{</span><span style="color:#e6db74">&#34;_id&#34;</span>:<span style="color:#e6db74">&#34;5f12d319624e57e27d1291fe&#34;</span>,<span style="color:#e6db74">&#34;index&#34;</span>:0,<span style="color:#e6db74">&#34;name&#34;</span>:<span style="color:#e6db74">&#34;MasseySaunders&#34;</span>,<span style="color:#e6db74">&#34;gender&#34;</span>:<span style="color:#e6db74">&#34;male&#34;</span>,<span style="color:#e6db74">&#34;company&#34;</span>:<span style="color:#e6db74">&#34;TALAE&#34;</span>,<span style="color:#e6db74">&#34;email&#34;</span>:<span style="color:#e6db74">&#34;masseysaunders@talae.com&#34;</span>,<span style="color:#e6db74">&#34;phone&#34;</span>:<span style="color:#e6db74">&#34;+1(853)508-3237&#34;</span>,<span style="color:#e6db74">&#34;address&#34;</span>:<span style="color:#e6db74">&#34;246IndianaPlace,Glenbrook,Iowa,3896&#34;</span>,<span style="color:#e6db74">&#34;registered&#34;</span>:<span style="color:#e6db74">&#34;2017-02-06T06:42:20-08:00&#34;</span>,<span style="color:#e6db74">&#34;latitude&#34;</span>:-10.269827,<span style="color:#e6db74">&#34;longitude&#34;</span>:-103.12419,<span style="color:#e6db74">&#34;friends&#34;</span>:<span style="color:#f92672">[{</span><span style="color:#e6db74">&#34;id&#34;</span>:0,<span style="color:#e6db74">&#34;name&#34;</span>:<span style="color:#e6db74">&#34;DorotheaShields&#34;</span><span style="color:#f92672">}</span>,<span style="color:#f92672">{</span><span style="color:#e6db74">&#34;id&#34;</span>:1,<span style="color:#e6db74">&#34;name&#34;</span>:<span style="color:#e6db74">&#34;AnnaRosales&#34;</span><span style="color:#f92672">}</span>,<span style="color:#f92672">{</span><span style="color:#e6db74">&#34;id&#34;</span>:2,<span style="color:#e6db74">&#34;name&#34;</span>:<span style="color:#e6db74">&#34;GravesBryant&#34;</span><span style="color:#f92672">}]</span>,<span style="color:#e6db74">&#34;greeting&#34;</span>:<span style="color:#e6db74">&#34;Hello,MasseySaunders!Youhave8unreadmessages.&#34;</span>,<span style="color:#e6db74">&#34;favoriteFruit&#34;</span>:<span style="color:#e6db74">&#34;apple&#34;</span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>------------------------------------------------------------
+</span></span><span style="display:flex;"><span>~/projects » python3 -m json.tool test.json                             
+</span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;_id&#34;</span>: <span style="color:#e6db74">&#34;5f12d319624e57e27d1291fe&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;index&#34;</span>: 0,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;MasseySaunders&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;gender&#34;</span>: <span style="color:#e6db74">&#34;male&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;company&#34;</span>: <span style="color:#e6db74">&#34;TALAE&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;email&#34;</span>: <span style="color:#e6db74">&#34;masseysaunders@talae.com&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;phone&#34;</span>: <span style="color:#e6db74">&#34;+1(853)508-3237&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;address&#34;</span>: <span style="color:#e6db74">&#34;246IndianaPlace,Glenbrook,Iowa,3896&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;registered&#34;</span>: <span style="color:#e6db74">&#34;2017-02-06T06:42:20-08:00&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;latitude&#34;</span>: -10.269827,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;longitude&#34;</span>: -103.12419,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;friends&#34;</span>: <span style="color:#f92672">[</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;id&#34;</span>: 0,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;DorotheaShields&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;id&#34;</span>: 1,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;AnnaRosales&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;id&#34;</span>: 2,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;GravesBryant&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">]</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;greeting&#34;</span>: <span style="color:#e6db74">&#34;Hello,MasseySaunders!Youhave8unreadmessages.&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;favoriteFruit&#34;</span>: <span style="color:#e6db74">&#34;apple&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span></span></span></code></pre></div>
+<h3 id="搭建http服务器">
+  搭建http服务器
+  <a class="anchor" href="#%e6%90%ad%e5%bb%bahttp%e6%9c%8d%e5%8a%a1%e5%99%a8">#</a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>~/projects » python3 -m http.server <span style="color:#ae81ff">8002</span>                                                        
+</span></span><span style="display:flex;"><span>Serving HTTP on :: port <span style="color:#ae81ff">8002</span> <span style="color:#f92672">(</span>http://<span style="color:#f92672">[</span>::<span style="color:#f92672">]</span>:8002/<span style="color:#f92672">)</span> ...</span></span></code></pre></div>
+<h3 id="打开py文档">
+  打开py文档
+  <a class="anchor" href="#%e6%89%93%e5%bc%80py%e6%96%87%e6%a1%a3">#</a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>~/projects » python3 -m pydoc -p <span style="color:#ae81ff">8002</span>                                                            
+</span></span><span style="display:flex;"><span>Server ready at http://localhost:8002/
+</span></span><span style="display:flex;"><span>Server commands: <span style="color:#f92672">[</span>b<span style="color:#f92672">]</span>rowser, <span style="color:#f92672">[</span>q<span style="color:#f92672">]</span>uit
+</span></span><span style="display:flex;"><span>server&gt;</span></span></code></pre></div>
+<h3 id="直接进入pdb">
+  直接进入pdb
+  <a class="anchor" href="#%e7%9b%b4%e6%8e%a5%e8%bf%9b%e5%85%a5pdb">#</a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>~/projects » python3 -m pdb test.py                                                            
+</span></span><span style="display:flex;"><span>&gt; /Users/hejl/projects/test.py<span style="color:#f92672">(</span>1<span style="color:#f92672">)</span>&lt;module&gt;<span style="color:#f92672">()</span>
+</span></span><span style="display:flex;"><span>-&gt; print<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;hello&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>Pdb<span style="color:#f92672">)</span> </span></span></code></pre></div>
+<h3 id="安装包">
+  安装包
+  <a class="anchor" href="#%e5%ae%89%e8%a3%85%e5%8c%85">#</a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ python3.8 -m pip install requests</span></span></code></pre></div>
+<h3 id="虚拟环境">
+  虚拟环境
+  <a class="anchor" href="#%e8%99%9a%e6%8b%9f%e7%8e%af%e5%a2%83">#</a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>~/projects » python3 -m venv .venv </span></span></code></pre></div>
 </article>
  
       
 
       <footer class="book-footer">
         
-  <div class="flex justify-between">
+  <div class="flex flex-wrap justify-between">
 
 
-
-  <div>
-    
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/cb67da94dd3fade8adc8896217c933e03884d828" title='最后修改者 hjlarry | August 5, 2020' target="_blank" rel="noopener">
+  <div><a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/commit/cb67da94dd3fade8adc8896217c933e03884d828" title='最后修改者 hjlarry | August 5, 2020' target="_blank" rel="noopener">
       <img src="/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>August 5, 2020</span>
     </a>
@@ -409,19 +456,24 @@ server&gt;</code></pre></div>
 
 
   <div>
-    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/docs/python/tools/_index.md" target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hjlarry/hjlarry.github.io/edit/master/content/content/docs/python/tools/_index.md" target="_blank" rel="noopener">
       <img src="/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>编辑本页</span>
     </a>
   </div>
 
+
 </div>
+
+
+
+  <script>(function(){function e(n){const e=window.getSelection(),t=document.createRange();t.selectNodeContents(n),e.removeAllRanges(),e.addRange(t)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
 
  
         <br>
 <div style="text-align: center;font-size:xx-small;">
-    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a
-        href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
+    Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> | Theme by <a href="https://github.com/alex-shpak/hugo-book" target="_blank">hugo-book</a>
 </div>
       </footer>
 
@@ -434,8 +486,10 @@ server&gt;</code></pre></div>
 
     
     <aside class="book-toc">
-      
-  <nav id="TableOfContents">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
   <ul>
     <li><a href="#ipython">IPython</a>
       <ul>
@@ -459,14 +513,15 @@ server&gt;</code></pre></div>
   </ul>
 </nav>
 
+
  
+      </div>
     </aside>
     
   </main>
 
   
 </body>
-
 </html>
 
 

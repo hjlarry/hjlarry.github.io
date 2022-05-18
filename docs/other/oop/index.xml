@@ -5,10 +5,6 @@
     <link>/docs/other/oop/</link>
     <description>Recent content in 面向对象编程 on Home</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    
-	<atom:link href="/docs/other/oop/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <language>zh-cn</language><atom:link href="/docs/other/oop/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

@@ -5,10 +5,6 @@
     <link>/docs/sicp/program/</link>
     <description>Recent content in 程序 on Home</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    
-	<atom:link href="/docs/sicp/program/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <language>zh-cn</language><atom:link href="/docs/sicp/program/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

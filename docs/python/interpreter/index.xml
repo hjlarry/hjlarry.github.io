@@ -5,10 +5,6 @@
     <link>/docs/python/interpreter/</link>
     <description>Recent content in CPython解释器 on Home</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    
-	<atom:link href="/docs/python/interpreter/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <language>zh-cn</language><atom:link href="/docs/python/interpreter/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
