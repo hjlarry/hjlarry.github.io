@@ -1,2 +1,4 @@
 yulib.config
 yulib.resource/
+hugo.exe
+.hugo_build.lock
