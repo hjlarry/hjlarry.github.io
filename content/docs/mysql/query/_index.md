@@ -385,6 +385,10 @@ mysql> select * from student_score where score%3=0;
 +----------+-----------------------+-------+
 1 row in set (0.00 sec)
 {{< /highlight >}}
+{{< highlight python>}}
+StudentScore.objects.annotate(myscore=F('score')+100).values('number', 'subject', 'myscore')
+StudentScore.objects.annotate(myscore=Mod('score',3)).filter(myscore=0)
+{{< /highlight >}}
 
 ### 文本处理
 
@@ -420,6 +424,10 @@ mysql> select substring(number, 4, 5) as 学号尾号 from student_info;
 | 80106        |
 +--------------+
 6 rows in set (0.00 sec)
+{{< /highlight >}}
+{{< highlight python>}}
+StudentScore.objects.annotate(mytest=Concat(Value('学号为'), 'number',Value('的学生在['), 'subject', Value(']的成绩为'), 'score', output_field=CharField()))
+StudentScore.objects.annotate(num=Substr('number', 4,5)).values('num')
 {{< /highlight >}}
 
 ### 时间处理函数
