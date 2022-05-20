@@ -144,6 +144,12 @@ mysql> select number 学号, name 姓名 from student_info;
 +----------+-----------+
 6 rows in set (0.00 sec)
 {{< /highlight >}}
+{{< highlight python>}}
+# 方式一
+StudentInfo.objects.annotate(学号=F('number'),姓名=F('name')).values('学号','姓名')
+# 方式二
+StudentInfo.objects.extra(select={'学号':'number', '姓名':'name'}).values('姓名','学号')
+{{< /highlight >}}
 
 ### 去重
 
@@ -172,22 +178,29 @@ mysql> select distinct department,major from student_info;
 +-----------------+--------------------------+
 4 rows in set (0.00 sec)
 {{< /highlight >}}
+{{< highlight python>}}
+StudentInfo.objects.values('department').distinct()
+StudentInfo.objects.values('department','major').distinct()
+{{< /highlight >}}
 
 ### 限制查询结果条数
 
 使用`limit 从哪开始，多少条`，`从哪开始`可以省略，省略代表第0行。
 
 {{< highlight mysql>}}
-mysql> select * from student_info limit 3,8;
+mysql> select * from student_info limit 3,2;
 +----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
 | number   | name      | sex  | id_number          | department      | major           | enrollment_time |
 +----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
 | 20180104 | 史珍香    | 女   | 141992199701078600 | 计算机学院      | 软件工程        | 2018-09-01      |
 | 20180105 | 范剑      | 男   | 181048199308156368 | 航天学院        | 飞行器设计      | 2018-09-01      |
-| 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息        | 2018-09-01      |
 +----------+-----------+------+--------------------+-----------------+-----------------+-----------------+
-3 rows in set (0.00 sec)
+2 rows in set (0.00 sec)
 {{< /highlight >}}
+{{< highlight python>}}
+StudentInfo.objects.all()[3:5]
+{{< /highlight >}}
+
 
 ### 排序
 
@@ -219,6 +232,9 @@ mysql> select * from student_info order by name desc, number desc;
 +----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
 6 rows in set (0.00 sec)
 {{< /highlight >}}
+{{< highlight python>}}
+StudentInfo.objects.order_by('-name', '-number')
+{{< /highlight >}}
 
 带条件查询
 -------
@@ -235,6 +251,9 @@ mysql> select * from student_info where department <> '计算机学院';
 | 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院     | 电子信息        | 2018-09-01      |
 +----------+-----------+------+--------------------+--------------+-----------------+-----------------+
 2 rows in set (0.00 sec)
+{{< /highlight >}}
+{{< highlight python>}}
+StudentInfo.objects.filter(~Q(department='计算机学院'))
 {{< /highlight >}}
 
 区间内使用`between...and...`，不在某区间使用`not between...and...`:
@@ -259,6 +278,10 @@ mysql> select * from student_info where number not between 20180103 and 20180105
 +----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
 3 rows in set (0.00 sec)
 {{< /highlight >}}
+{{< highlight python>}}
+StudentInfo.objects.filter(number__range=(20180103, 20180105))
+StudentInfo.objects.filter(~Q(number__range=(20180103, 20180105)))
+{{< /highlight >}}
 
 ### 匹配列表中的元素
 
@@ -273,6 +296,9 @@ mysql> select * from student_info where major in ('软件工程',  '电子信息
 | 20180106 | 朱逸群    | 男   | 197995199501078445 | 航天学院        | 电子信息     | 2018-09-01      |
 +----------+-----------+------+--------------------+-----------------+--------------+-----------------+
 3 rows in set (0.00 sec)
+{{< /highlight >}}
+{{< highlight python>}}
+StudentInfo.objects.filter(major__in=('软件工程', '电子信息'))
 {{< /highlight >}}
 
 使用`is null` 和 `is not null`可筛选出某列是NULL的记录，而不能使用普通的操作符例如等号来进行比较，NULL代表没有值。
@@ -290,6 +316,9 @@ mysql> SELECT * FROM student_score WHERE score > 95 OR score < 55 AND subject = 
 | 20180104 | 论萨达姆的战争准备          |    46 |
 +----------+-----------------------------+-------+
 3 rows in set (0.00 sec)
+{{< /highlight >}}
+{{< highlight python>}}
+StudentScore.objects.filter(Q(score__gt=95) | Q(score__lt=55) & Q(subject='论萨达姆的战争准备'))
 {{< /highlight >}}
 
 ### 模糊查询
@@ -316,6 +345,11 @@ mysql> select * from student_info where name like '%杜%';
 | 20180102 | 杜琦燕    | 女   | 151008199801178529 | 计算机学院      | 计算机科学与工程         | 2018-09-01      |
 +----------+-----------+------+--------------------+-----------------+--------------------------+-----------------+
 2 rows in set (0.00 sec)
+{{< /highlight >}}
+{{< highlight python>}}
+StudentInfo.objects.extra(where=["name LIKE '杜_'"]) # django不支持_字符
+StudentInfo.objects.extra(where=["name LIKE '范_'"])
+StudentInfo.objects.filter(name__contains='杜')
 {{< /highlight >}}
 
 函数和表达式
