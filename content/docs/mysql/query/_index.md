@@ -47,7 +47,7 @@ class StudentInfo(models.Model):
 
 
 class StudentScore(models.Model):
-    number = models.IntegerField()
+    number = models.ForeignKey(StudentInfo, db_column='number', on_delete=models.DO_NOTHING)
     subject = models.CharField(max_length=30)
     score = models.SmallIntegerField()
 
@@ -827,6 +827,9 @@ mysql> select student_info.number,name,sex,subject,score from student_info, stud
 +----------+-----------+------+-----------------------------+-------+
 8 rows in set (0.00 sec)
 {{< /highlight >}}
+{{< highlight python>}}
+StudentScore.objects.values('number__name','number__name','number__sex','subject','score')
+{{< /highlight >}}
 
 这时候我们发现有两个人没有成绩，所以他们没有显示在查询结果中。为了有办法让其显示出，就有了内连接和外连接的概念:
 
@@ -857,6 +860,9 @@ mysql> select student_info.number,name,sex,subject,score from student_info left 
 | 20180106 | 朱逸群    | 男   | NULL                        |  NULL |
 +----------+-----------+------+-----------------------------+-------+
 10 rows in set (0.00 sec)
+{{< /highlight >}}
+{{< highlight python>}}
+StudentInfo.objects.values('number', 'name','sex','studentscore__subject','studentscore__score')
 {{< /highlight >}}
 
 内连接以下的写法是等价的:
@@ -997,4 +1003,8 @@ mysql> select s2.* from student_score as s2, student_info as s1 where s1.number=
 | 20180104 | 论萨达姆的战争准备          |    46 |
 +----------+-----------------------------+-------+
 4 rows in set (0.00 sec)
+{{< /highlight >}}
+{{< highlight python>}}
+StudentScore.objects.filter(number__in=Subquery(StudentInfo.objects.filter(major='软件工程').values('number')))
+StudentScore.objects.select_related('number').filter(number__major='软件工程')
 {{< /highlight >}}
