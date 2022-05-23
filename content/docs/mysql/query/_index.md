@@ -566,6 +566,9 @@ mysql> select subject, sum(score) from student_score group by subject;
 +-----------------------------+------------+
 2 rows in set (0.00 sec)
 {{< /highlight >}}
+{{< highlight python>}}
+StudentScore.objects.values('subject').annotate(myscore=Sum('score'))
+{{< /highlight >}}
 
 把非分组列放入查询列表中会引起争议，导致结果不确定:
 {{< highlight mysql>}}
@@ -597,6 +600,10 @@ mysql> select subject, sum(score) from student_score group by subject having max
 +-----------------------+------------+
 1 row in set (0.00 sec)
 {{< /highlight >}}
+{{< highlight python>}}
+StudentScore.objects.filter(score__gt=70).values('subject').annotate(myscore=Sum('score'))
+StudentScore.objects.values('subject').annotate(sumscore=Sum('score'), mscore=Max('score')).filter(mscore__gt=98)
+{{< /highlight >}}
 
 ### 分组和排序
 
@@ -609,6 +616,9 @@ mysql> select subject, sum(score) as sum_s from student_score group by subject o
 | 母猪的产后护理              |   292 |
 +-----------------------------+-------+
 2 rows in set (0.00 sec)
+{{< /highlight >}}
+{{< highlight python>}}
+StudentScore.objects.values('subject').annotate(sum_s=Sum('score')).order_by('-sum_s')
 {{< /highlight >}}
 
 ### 嵌套分组
@@ -625,6 +635,9 @@ mysql> select department, major, count(*) from student_info group by department,
 | 计算机学院      | 软件工程                 |        2 |
 +-----------------+--------------------------+----------+
 4 rows in set (0.00 sec)
+{{< /highlight >}}
+{{< highlight python>}}
+StudentInfo.objects.values('department','major').annotate(sum_c=Count('*'))
 {{< /highlight >}}
 
 ### 注意事项
