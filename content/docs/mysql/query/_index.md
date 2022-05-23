@@ -477,6 +477,10 @@ mysql> select count(distinct subject) from student_score;
 +-------------------------+
 1 row in set (0.00 sec)
 {{< /highlight >}}
+{{< highlight python>}}
+StudentInfo.objects.count()
+StudentScore.objects.values('subject').distinct().count()
+{{< /highlight >}}
 
 SUM和AVG:
 {{< highlight mysql>}}
@@ -506,6 +510,11 @@ mysql> select count(*) as 成绩记录总数, max(score) as 最高分, min(score
 |                  8 |       100 |        46 |   73.1250 |
 +--------------------+-----------+-----------+-----------+
 1 row in set (0.00 sec)
+{{< /highlight >}}
+{{< highlight python>}}
+StudentScore.objects.aggregate(Sum('score'))
+StudentScore.objects.filter(subject='论萨达姆的战争准备').aggregate(Avg('score'))
+StudentScore.objects.aggregate(Max('score'), Min('score'),Avg('score'), nsum=Count('*'))
 {{< /highlight >}}
 
 ### 隐式类型转换
