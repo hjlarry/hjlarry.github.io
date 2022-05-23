@@ -674,6 +674,9 @@ mysql> select * from student_score where number=(select number from student_info
 +----------+-----------------------------+-------+
 2 rows in set (0.00 sec)
 {{< /highlight >}}
+{{< highlight python>}}
+StudentScore.objects.filter(number=Subquery(StudentInfo.objects.filter(name='范统').values('number')))
+{{< /highlight >}}
 
 ### 列子查询
 
@@ -692,6 +695,9 @@ mysql> select * from student_score where number in (select number from student_i
 | 20180103 | 论萨达姆的战争准备          |    61 |
 +----------+-----------------------------+-------+
 4 rows in set (0.00 sec)
+{{< /highlight >}}
+{{< highlight python>}}
+StudentScore.objects.filter(number__in=Subquery(StudentInfo.objects.filter(sex='男').values('number')))
 {{< /highlight >}}
 
 而行子查询、表子查询不常用，省略。
