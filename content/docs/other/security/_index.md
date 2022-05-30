@@ -26,12 +26,20 @@ But they can embed static resources from another origin, like Images,Scripts,Sty
 Sometimes policy is too narrow, it's difficult to get `login.stanford.edu` and `axess.stanford.edu` to exchange data; but sometimes it's too broad, there is no way to isolate `https://web.stanford.edu/class/cs106a/` and `https://web.stanford.edu/class/cs253/`. We need a way around Same Origin Policy to allow two different origins to communicate.
 
 ### Cookie
-If two sites have a top-level domain, different sub domain, e.g.`login.stanford.edu` and `axess.stanford.edu`, then login site can define:
+If two sites have a top-level domain, different sub domain, e.g.`login.stanford.edu` and `axess.stanford.edu`, then they can define:
 ```
 document.domain = 'stanford.edu';
 document.cookie = "userid=test1";
 ```
-and the axess site can read the cookie.Another way to do this is to use server response:
+and the axess site can read the cookie. More example:
+|Originating URL|document.domain|Accessed URL|document.domain|Allowed|
+|----|----|----|----|----|
+|http://www.a.com/|a.com|http://pay.a.com/|a.com|YES|
+|http://www.a.com/|a.com|https://pay.a.com/|a.com|NO|
+|http://pay.a.com/|a.com|http://a.com/|(not set)|NO|
+|http://www.a.com/|(not set)|http://www.a.com/|a.com|NO|
+
+Another way to do this is to use server response:
 ```
 Set-Cookie: userid=test1; domain=.stanford.edu; path=/
 ```
