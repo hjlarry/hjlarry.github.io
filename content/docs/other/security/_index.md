@@ -31,7 +31,7 @@ If two sites have a top-level domain, different sub domain, e.g.`login.stanford.
 document.domain = 'stanford.edu';
 document.cookie = "userid=test1";
 ```
-and the axess site can read the cookie. More example:
+and the axess site can read the cookie. More examples:
 |Originating URL|document.domain|Accessed URL|document.domain|Allowed|
 |----|----|----|----|----|
 |http://www.a.com/|a.com|http://pay.a.com/|a.com|YES|
@@ -45,6 +45,34 @@ Set-Cookie: userid=test1; domain=.stanford.edu; path=/
 ```
 Both resolution can't resolve the `attack.stanford.edu` access content from `axess.stanford.edu`, so it's bad!
 
-### Iframe
+### iframe
+If two sites not match Same Origin Policy, they can't get each other's DOM. For example, when you use `iframe` or `window.open` to open a new child window, they can not communicate with the parent window. 
+```
+document.getElementById("myIFrame").contentWindow.document
+// Uncaught DOMException: Blocked a frame from accessing a cross-origin frame.
+```
+There are 3 ways to resolve this situation.
+
+#### fragment identifier
+For a url `http://example.com/x.html#fragment`, the content after `#` is fragment, when you change the fragment, the page does not refresh.
+
+So the parent window can write data to child window's fragment like this:
+```
+var src = originURL + '#' + data;
+document.getElementById('myIFrame').src = src;
+```
+Then the child window can monitor an event named `hashchange` to get the notice:
+```
+window.onhashchange = checkMessage;
+function checkMessage() {
+  var message = window.location.hash;
+  // ...
+}
+```
+The child window also can change parent window's fragment:
+```
+parent.location.href= target + "#" + hash;
+```
+
 
 ### AJAX
