@@ -74,5 +74,13 @@ The child window also can change parent window's fragment:
 parent.location.href= target + "#" + hash;
 ```
 
+#### window.name
+Each browser window has a `window.name` property, this property has a quality, even if the page jump to a new location, the `window.name` will still be retained.
+
+For example, the `http://parent.com/a.html` has a iframe src to `http://child.com`. When the child page loaded it can set it's `window.name=data`, and then use `location.href='http://parent.com/empty'`to redirect the same origin page as parent. Now the parent can get the data simple use `$('iframe').contentWindow.name`.
+
+This property can exchange serveral MB data once, but monitor the child window name change is a performance loss.
+
+
 
 ### AJAX
