@@ -114,4 +114,25 @@ function receiveMessage(event) {
   }
 }
 {{< /highlight >}}
+
 ### AJAX
+
+## Session Attack
+
+### Session and Cookie
+The Http protocol is statusless, we need the server keeps a set of data related to a user's current browsing session, like Logins,Shopping carts,User tracking etc.The most common way is Cookies. Session desired these properties:
+
+ - Browser remember user(so user doesn't need to repeatedly log in)
+ - User cannot modify session cookie to login as another user
+ - Session cookies are not valid forever
+ - Session can be deleted on the server-side
+ - Session should expire after some time, e.g. 30 days
+
+When the server Set-Cookie, cookie have some basic attributes:
+
+ - Expires, Specifies expiration date. If no date, then lasts for "browser session". If set to `Thu, 01 Jan 1970 00:00:00 GMT` will delete this cookie name and its value
+ - Path, Scope the "Cookie" header to a particular request path prefix, e.g. `Path=/docs` will match `/docs` and `/docs/web`
+ - Domain, Allows the cookie to be scoped to a "broader domain"(within the same registrable domain), e.g. `sub.a.com` can set cookies for `a.com`
+
+The Cookies setting don't obey Same Origin Policy, because cookies were created before Same Origin Policy, they have different security model. Sometimes Cookies are more restrictive than Same Origin Policy, like `Path` partions cookies by path, but is ineffective, because pages on same origin can access each other's DOMs, run code in each other's contexts;The other time Cookies are less restrictive than Same Origin Policy, like Pages with same hostname can share the cookies, the protocol and port are ignored, and different origins(e.g. subdomain) can mess with each others cookies.
+
