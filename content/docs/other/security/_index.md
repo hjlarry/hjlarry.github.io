@@ -148,3 +148,28 @@ XSS is Cross Site Scripting. What if attacker can insert their code into the web
 
 The `HttpOnly` cookie attribute can prevent cookie from being read from JavaScript, use `Set-Cookie: key=value; Secure; HttpOnly`.
 
+### CSRF
+Consider this HTML embedded in attacker.com:
+{{< highlight html>}}
+<h1>Welcome to your account!</h1>
+<img src='https://bank.com/avatar.png' />
+{{< /highlight >}}
+The browser helpfully includes bank.com cookies in all requests to bank.com, even though the request originated from attacker.com, attacker.com can embed user's real avatar from bank.com. What if the embedded HTML is `<img src='https://bank.com/withdraw?from=bob&to=mallory&amount=1000'>`. Attack which forces an end user to execute unwanted actions on a web app in which they're currently authenticated, effective even when attacker can't read the HTTP response. This kind of hijacking is called Cross-Site Request Forgery(CSRF).
+
+How to mitigate CSRF?
+
+The answer is use SameSite cookie attributes, this will prevent cookie from being sent with requests initiated by other sites.
+ - SameSite=None - default, always send cookies
+ - SameSite=Lax - withhold cookies on subresource requests originating from other sites, allow them on top-level requests
+ - SameSite=Strict - only send cookies if the request originates from the website that set the cookie
+
+This table discribe when the request send to another site, different SameSite attribute send cookie or not:
+|Request type|Request example|None|Lax|Strict|
+|----|----|----|----|----|
+|Link|`<a href="..."></a>`|Send|Send|Not|
+|Preload|`<link rel="prerender" href="..."/>`|Send|Send|Not|
+|Form Get|`<form method="GET" action="...">`|Send|Send|Not|
+|Form Post|`<form method="POST" action="...">`|Send|Not|Not|
+|iframe|`<iframe src="..."></iframe>`|Send|Not|Not|
+|AJAX|`$.get("...")`|Send|Not|Not|
+|Image|`<img src="...">`|Send|Not|Not|
