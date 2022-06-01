@@ -173,3 +173,14 @@ This table discribe when the request send to another site, different SameSite at
 |iframe|`<iframe src="..."></iframe>`|Send|Not|Not|
 |AJAX|`$.get("...")`|Send|Not|Not|
 |Image|`<img src="...">`|Send|Not|Not|
+
+### Summary
+ - Never trust data from the client
+ - Don't use broken cookie Path attribute for security
+ - Use SameSite=Lax to protect against CSRF attacks
+ - If you remember one thing: set your cookie like this:
+```
+Set-Cookie: key=value; Secure; HttpOnly; Path=/;
+SameSite=Lax; Expires=Fri, 1 Nov 2021 00:00:00 GMT
+(Expires should be set to 30days later)
+```
