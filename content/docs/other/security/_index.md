@@ -184,3 +184,26 @@ Set-Cookie: key=value; Secure; HttpOnly; Path=/;
 SameSite=Lax; Expires=Fri, 1 Nov 2021 00:00:00 GMT
 (Expires should be set to 30days later)
 ```
+
+## XSS
+
+XSS(cross site scripting) is a code injection vulnerablity, it's caused when untrusted user data unexpected becomes code. The unexpected code is JavaScript in an HTML document. If successful, attacker gains the ablility to do anything the target can do through their browser, like view/exfiltrate their cookies, send any HTTP request to the site with the user's cookies!
+
+### Reflected XSS attack
+In reflected XSS, the attack code is placed into the HTTP request itself, the attacker goal is to find a URL that can make target visit, URL includes attack code. So the limitation is attack code must be added to the URL path or query parameters.
+
+If the server code is:
+{{< highlight js>}}
+app.get('/', (req, res) => {
+  const { source } = req.query
+  res.send(`
+    <h1>
+    ${source ? `Hi ${source} reader!` : ''}
+    Login to your bank account:
+    </h1>
+  `)
+})
+{{< /highlight >}}
+
+The attack url can be:  
+`http://localhost:4000/?source=%3Cscript%3Ealert(%27hey%20there!%27)%3C/script%3E`
