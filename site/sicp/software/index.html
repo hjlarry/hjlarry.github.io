@@ -1,0 +1,1650 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="非法操作">
+      
+      
+        <link rel="canonical" href="https://hjlarry.github.io/sicp/software/">
+      
+      <link rel="icon" href="../../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.2">
+    
+    
+      
+        <title>软件 - 非法操作的笔记</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.5d38496d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="非法操作的笔记" class="md-header__button md-logo" aria-label="非法操作的笔记" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            非法操作的笔记
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              软件
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="清空当前内容" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/hjlarry/hjlarry.github.io" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hjlarry/hjlarry.github.io
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="非法操作的笔记" class="md-nav__button md-logo" aria-label="非法操作的笔记" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    非法操作的笔记
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/hjlarry/hjlarry.github.io" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hjlarry/hjlarry.github.io
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        主页
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          计算机基础
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="计算机基础" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          计算机基础
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hardware/" class="md-nav__link">
+        硬件
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          软件
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        软件
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    操作系统
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    内核
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    系统调用
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    文件系统
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    进程和线程
+  </a>
+  
+    <nav class="md-nav" aria-label="进程和线程">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    程序与进程
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    什么是线程
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    线程调度
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linux" class="md-nav__link">
+    Linux的多线程
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    线程模型
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    并发与并行
+  </a>
+  
+    <nav class="md-nav" aria-label="并发与并行">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    基础概念
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    并发模型
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    虚拟存储器
+  </a>
+  
+    <nav class="md-nav" aria-label="虚拟存储器">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    基础概念
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    分段与分页
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    内存分配过程
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../program/" class="md-nav__link">
+        程序
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../asm/" class="md-nav__link">
+        汇编
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          GO语言
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="GO语言" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          GO语言
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/map/" class="md-nav__link">
+        字典
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/closure/" class="md-nav__link">
+        闭包
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/defer/" class="md-nav__link">
+        延迟调用
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/goroutine/" class="md-nav__link">
+        并发调度
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/alloc/" class="md-nav__link">
+        内存分配
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/gc/" class="md-nav__link">
+        垃圾回收
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/lock/" class="md-nav__link">
+        锁
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Python语言
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Python语言" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Python语言
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/memory/" class="md-nav__link">
+        内存管理
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/interpreter/" class="md-nav__link">
+        解释器
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/tools/" class="md-nav__link">
+        技巧工具
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          Mysql
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Mysql" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Mysql
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mysql/query/" class="md-nav__link">
+        查询
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mysql/theory/" class="md-nav__link">
+        原理
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_6">
+          其他
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="其他" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          其他
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/git/" class="md-nav__link">
+        git
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/docker/" class="md-nav__link">
+        docker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/raft/" class="md-nav__link">
+        raft
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/shell/" class="md-nav__link">
+        shell
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/security/" class="md-nav__link">
+        security
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/oop/" class="md-nav__link">
+        面向对象
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/protocol/" class="md-nav__link">
+        网络协议
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/tools/" class="md-nav__link">
+        系统工具
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    操作系统
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    内核
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    系统调用
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    文件系统
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    进程和线程
+  </a>
+  
+    <nav class="md-nav" aria-label="进程和线程">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    程序与进程
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    什么是线程
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    线程调度
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linux" class="md-nav__link">
+    Linux的多线程
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    线程模型
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    并发与并行
+  </a>
+  
+    <nav class="md-nav" aria-label="并发与并行">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    基础概念
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    并发模型
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    虚拟存储器
+  </a>
+  
+    <nav class="md-nav" aria-label="虚拟存储器">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    基础概念
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    分段与分页
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    内存分配过程
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+  <a href="https://github.com/hjlarry/hjlarry.github.io/edit/master/docs/sicp/software.md" title="编辑此页" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+<h1 id="_1">计算机科学基础知识之软件部分<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<h2 id="_2">操作系统<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>**操作系统**是计算机体系的内核和基石，管理计算机硬件与软件资源。分为:</p>
+<ul>
+<li>个人机: Windows, macOS, Linux/BSD</li>
+<li>大型机: Linux, Unix</li>
+<li>嵌入式: VxWorks</li>
+<li>移动端: Android, Windows CE</li>
+</ul>
+<p>因为Unix商业版权的原因，必须完全符合UNIX标准才能称为UNIX系统，其他的BSD/Linux只能称为UNIX-like。学术上的操作系统和我们日常口中说的操作系统不太一样，我们一般说的windows严格来说属于一个操作系统产品或者说一个操作系统的发行版，它是系统本身和一些软件(浏览器、扫雷)的打包，而学术上的操作系统指的是内核和一些必要的服务。</p>
+<p>现代操作系统的基本功能包括:</p>
+<ul>
+<li>内存管理(memory management)</li>
+<li>进程管理(process management)</li>
+<li>中断处理(interrupt handling)</li>
+<li>文件系统(file system)</li>
+<li>安全机制(protection and security)</li>
+<li>进程通信(inter-process communications)</li>
+<li>设备驱动(device driver)</li>
+</ul>
+<h2 id="_3">内核<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>**微内核**就是把最核心、最基础的部分单独作为内核，其他功能围绕它处理。包括地址空间、线程处理、进程通信等。这类东西它们需要以特权模式运行，其他基础服务当做普通应用程序独立运行。</p>
+<p>在内核中运行的程序使用的内存，叫**内核空间**，也叫内核态。其他程序运行在**用户空间**，也叫用户态。用户态的代码需要在内核态运行时，并不是直接放在内核态中运行的，这样安全没法保证，首先会做权限检查，通过之后相当于提交了申请，内核运行完成以后返回结果唤醒用户态的程序，这就又涉及到了上下文切换和状态保存。所以用户态和内核态的切换会消耗大量的资源。</p>
+<p>微内核的优点就是内核很小，裁剪起来方便，裁剪不同的基础服务就可以形成不同的版本面向不同的用户，另外就是其中某个服务崩溃的话不会影响到内核，内核可以重启改服务。当然缺点就是由于处于不同的地址空间，基础服务和内核通信时得使用类似于IPC(Inter-Process Communication)的方式通讯，效率相对会差一些。</p>
+<p>微内核的典型代表是学术上的windows和macOS，而不是Linux，早期的Linux为了性能考虑采用了宏内核。</p>
+<p>**宏内核**也叫单一内核，把核心和基础服务放在一个地址空间内均以特权模式运行，好处就是调用一些基础服务的时候相当于函数调用，不需要通讯，性能很高。缺点就是复杂度和耦合度很高，虽然代码是模块化的，但其中某个模块崩溃都可能导致整个系统崩溃，也不方便裁剪和移植。</p>
+<p><img alt="kernel" src="../images/kernel.png" />
+现代的操作系统往往是采用混合内核的，并不是泾渭分明的。</p>
+<h2 id="_4">系统调用<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>**系统调用**是内核对外的接口，内核态的一些内核函数。应用程序只要和硬件打交道都会涉及到系统调用，向操作系统申请并等待回复，应该尽量避免系统调用或考虑其他方式优化，比如有些场景可以使用在用户空间的带buffer的文件替代操作系统提供的文件读写API。</p>
+<p>典型的系统调用汇编代码:
+{{&lt; highlight asm&gt;}}
+global _start </p>
+<p>section .data
+    hello : db <code>hello, world!\n</code>
+section .text 
+    _start:
+        mov rax, 1      ; system call number should be store in rax
+        mov rdi, 1      ; argument <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/1" title="GitHub Issue: squidfunk/mkdocs-material #1">#1</a> in rdi: where to write (descriptor)?
+        mov rsi, hello  ; argument <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/2" title="GitHub Issue: squidfunk/mkdocs-material #2">#2</a> in rsi: where does the string start?
+        mov rdx, 14     ; argument <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/3" title="GitHub Issue: squidfunk/mkdocs-material #3">#3</a> in rdx: how many bytes to write?
+        syscall         ; this instruction invokes a system call</p>
+<div class="highlight"><pre><span></span><code>    mov rax, 60     ; &#39;exit&#39; syscall number
+    xor rdi, rdi
+    syscall
+</code></pre></div>
+<p>{{&lt; /highlight &gt;}}
+C语言、Go语言通过标准库进行系统调用，他们的标准库中的函数也只是在汇编之上的一种包装。在汇编语言中通过在不同寄存器中放不同的参数，再执行<code>syscall</code>这条指令就可以进行系统调用。<code>syscall</code>是64位操作系统改进的一条指令，x86下是<code>int 0x80</code>，这种改进效率上也更高一些。</p>
+<p>RAX寄存器存放不同系统调用的序号，相当于函数名称；RDI、RSI、RDX、R10、R8、R9依次存放参数；再用RAX存返回值。这是系统调用的调用约定。可以通过<a href="http://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/">这里</a>查看到系统调用函数有哪些，分别是如何传参的。</p>
+<h2 id="_5">文件系统<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>大多数Linux发行版的文件系统都有着非常类似的结构，除了<code>ls</code>，<code>tree</code>也是一个很好的观察其结构的工具。常用的目录及其用途:</p>
+<ul>
+<li>/bin，包含基本的系统级二进制可执行文件，例如<code>ls</code></li>
+<li>/sbin，包含需要root权限才能执行的可执行文件</li>
+<li>/usr，只读的用户数据<ul>
+<li>/usr/bin，非必须的或者是用户自己安装的可执行文件</li>
+<li>/usr/sbin，非必须的二进制文件，但需root执行</li>
+<li>/usr/local/bin，用户自行编译后的文件</li>
+</ul>
+</li>
+<li>/home，用户的个人目录</li>
+<li>/root，root用户的目录，root是特殊用户所以不会放在/home中</li>
+<li>/dev，设备文件，通常是硬件设备的接口文件</li>
+<li>/etc，包含了大部分的系统配置文件，例如系统名称、硬盘上的安装位置等</li>
+<li>/lib，库文件以及显卡、声卡等硬件工作的驱动文件</li>
+<li>/opt，用户安装一些大型程序，或者是一些服务程序的安装目录</li>
+<li>/sys，包含系统的信息，和连接到计算机的设备的信息</li>
+<li>/var，最初这样命名是因为它经常变化，存储日志等内容</li>
+<li>/tmp，临时文件，重启系统后里面的文件都会被删除</li>
+</ul>
+<p>更多的目录结构及用途见<a href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">wiki</a>。</p>
+<h2 id="_6">进程和线程<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h3 id="_7">程序与进程<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p>程序和进程有什么区别？</p>
+<p>某个程序里包含了某个进程所需要的数据，但在某个时间点，进程中的内容未必和程序中的内容是一一对应的。我们开发一个程序，不仅包括可执行的代码，还有周边的素材等等，程序运行的时候，也未必会把全部内容都载入到内存。而**进程**指的是程序运行时，在内存当中受操作系统管理的部分。**程序**就像是蓝图，我们可以是照着同一份蓝图启动多个进程。</p>
+<p>进程不是执行单位，而是一个资源边界。相当于在内存这个世界里面，进程圈了一块地，这块地有很多的属性，比如虚拟地址空间、PID等，而地上的工人、流水线才是执行单位，我们称为**线程**。所以每个进程都有一个主线程。</p>
+<ul>
+<li>进程是程序的运行期实例(但不同操作系统对进程定义可能不同)</li>
+<li>是系统动态执行基本单元</li>
+<li>是系统资源分配单位</li>
+<li>是线程的容器</li>
+<li>是指令、数据及相关资源的集合</li>
+<li>是程序运行过程的抽象</li>
+</ul>
+<h3 id="_8">什么是线程<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<p>也称**轻量级进程**(LWP)，是进程中的实际执行单位，一个标准的线程由线程ID、当前指令指针(PC)、寄存器集合和堆栈组成。一个进程通常拥有一个或多个线程，这些线程之间共享程序的内存空间(包含代码段、数据段、堆等)以及一些进程级的资源(例如打开的文件、接收的信号等)。</p>
+<p><img alt="" src="../images/thread.png" /></p>
+<p>线程是调度和时间片的分配单位，更多线程理论上会获得更多的CPU资源，同一程序的多个线程是可以在多核处理器上并行执行来提高执行吞吐率的，当然这也要看操作系统的调度策略。</p>
+<p>从一个线程切换到另一个线程，需要保存当前线程的状态，并且恢复另一线程的状态，这个过程就叫**上下文切换**(context switch)。进程和线程都有上下文切换。区别在于线程切换期间，虚拟内存状态（TLB）保持不变。通过以下方式可以观察到上下文切换的情况:</p>
+<p>{{&lt; highlight sh&gt;}}
+$ watch grep "ctxt" /proc/{pid}/status  # 定时输出</p>
+<p>voluntary_ctxt_switches:  3508          # 程序自愿(比如有较多IO等待操作)
+nonvoluntary_ctxt_switches: 64          # 系统强制(时间片用完)
+{{&lt; /highlight &gt;}}</p>
+<h3 id="_9">线程调度<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<p>在单CPU的设备上，并行是模拟出来的，多线程程序轮流执行，每个线程每次仅执行一小段时间，这样不断在处理器上切换不同的线程去执行的行为我们称为**线程调度**(Thread Schedule)。在调度中，线程通常至少有三种状态:</p>
+<ul>
+<li>ready: 线程可以立刻执行，但CPU已经被占用</li>
+<li>running: 占用CPU资源，正在执行</li>
+<li>waiting: 此时线程正在等待某一件事情(通常是IO或同步)发生，无法执行</li>
+</ul>
+<p>它们在如下情况会发生状态变化:</p>
+<p><img alt="" src="../images/thread_state.png" /></p>
+<p>线程的调度随着操作系统的发展已经是各种复杂的方案和算法的结合，但主流的算法都带有**优先级调度**(Priority Schedule)和**轮转法**(Round Robin)的痕迹。轮转法就是让各个线程轮流执行一小段时间，而优先级调度又决定了线程按照什么顺序来轮流执行。此外，我们把线程执行完时间片，而被强制剥夺执行权利的过程称为**抢占**，非抢占式的调度模式也已越来越少。</p>
+<h3 id="linux">Linux的多线程<a class="headerlink" href="#linux" title="Permanent link">&para;</a></h3>
+<p>Windows对进程和线程的实现如同教科书一般标准，但对于Linux，它的内核中并不存在真正意义的线程概念。Linux将所有执行的实体(无论线程还是进程)都称为任务，每个任务类似于一个单线程的进程，它有内存空间、执行实体、文件资源等。但不同的任务之间是可以共享内存空间的，从这个角度，共享了同一个内存空间的多个任务构成了一个进程，这些任务也就成了这个进程里的线程。</p>
+<p>Linux提供的创建新任务的API包括fork、exec、clone。fork通过复制当前进程产生一个新的任务，但并不复制原任务的内存空间，而是和原任务共享一个写时复制的内存空间。所以它产生新任务的速度很快，但它只能产生本任务的镜像，这时就要通过exec配合则可以启动一个别的新的任务。如果要产生的不是任务而是新线程，则可以用clone，它产生新的任务并从指定的位置开始执行，共享当前进程的内存空间(可选的)，从实际效果上来说就产生了一个新的线程。</p>
+<h3 id="_10">线程模型<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<p><strong>内核线程和用户线程是有区别的</strong>，我们一般使用的线程都是被包装过的，很少通过系统调用来使用线程，用户线程往往是内核线程的包装体。</p>
+<p>对于一个用户线程对应一个内核线程，我们称为**一对一模型**。这种模型下线程之间的并发是真正的并发，一个线程阻塞时其他线程的执行不受影响。但它的缺点也很明显，很多操作系统会限制内核线程的数量，用户线程的数量也就被限制了，而且内核线程的调度上下文切换的开销很大，导致用户线程的执行效率也不高。</p>
+<p>多个用户线程映射到一个内核线程即**多对一模型**。线程之间的切换由用户态的代码来进行，相对于一对一线程切换会快很多，但如果一个用户线程阻塞，其他用户线程也无法执行，因为此时内核线程也阻塞了。</p>
+<p>还有一种是**多对多模型**，类似于Go的机制，某个时刻一个用户线程必然对应一个系统线程，但总体来看用户线程可能比系统线程更多或者更少，同时用户线程的数量不受限制，某用户线程的阻塞也不会让所有的用户线程都阻塞掉。</p>
+<p>为什么要包装内核线程呢？假如我们再做一个文件读操作，它要通过系统调用来完成，实际会分为用户态代码和内核态代码，这就涉及到上下文的切换，内核线程的调度、创建等，如果这种文件读操作很频繁，那么成本是很高的。我们就会考虑，在用户态和内核态的基础上能不能建立类似于Pool的模型来复用。这样一来，内核态的系统线程负责执行，用户态的用户线程负责存储状态，从而避免了频繁创建系统线程，用户态可以创建很多用来存储状态的执行单位，执行时把它绑定到一个内核线程中去，执行完释放内核线程，内核线程把绑定状态删除后放入池中，不需要杀掉内核线程，接下来另一个执行单位重新绑定到该内核线程中去执行。</p>
+<p>所以当我们选择一门语言或者一种并发库的时候，是要知道它究竟由内核线程实现还是用户线程实现的，这在性能上是有很大区别的。</p>
+<h2 id="_11">并发与并行<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<h3 id="_12">基础概念<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<p>**并发与并行**关注的是程序逻辑的执行。并发是从逻辑角度出发的，指的是多个任务能同时执行，这个同时是相对的概念，比如在一小时内完成。而并行是指物理上的同一时刻执行多个并发任务，这就要求多机器或多核。所以说并发是并行的基础，并行是并发的理想执行模式。</p>
+<p>**同步和异步**关注的是消息通信机制。同步就是在调用者发出一个调用时，主动等待该调用的结果。而异步则是发出调用之后就不管了，调用者不会立即得到结果，等待被调用方通过状态、通知等告诉调用者，或是通过回调函数处理该调用。</p>
+<p>**阻塞和非阻塞**关注的是程序在等待调用结果(消息或返回值)时的状态。阻塞调用是指调用结果返回之前，当前线程被挂起，只有在得到结果之后才返回。非阻塞调用是指在不能立刻得到结果之前，该调用并不会阻塞当前的线程。</p>
+<h3 id="_13">并发模型<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
+<p>实现并发通常有三种模型，即多进程、多线程、协程。</p>
+<p>多进程模型把线程a封装到进程1，把线程b封装到进程2，然后用多个进程执行。对于CPU密集型场景，好处有三点:</p>
+<ul>
+<li>对于操作系统来说，这个进程的优先级好控制，分配的时间片和接收任务的时间片是分离的</li>
+<li>容易部署迁移至其他机器。两个进程相互通信最简单的方式是RPC或Socket、MQ、数据库等</li>
+<li>数量更有弹性。在一个进程里创建多个线程对于操作系统来说都是被监管的，并没有多个进程处理起来更流畅</li>
+</ul>
+<p>多进程的缺点就在于数据复制以及创建进程时的开销大了。</p>
+<p>正常情况优先使用多线程模型，多线程会尽可能多的获取时间片，操作系统有操作时间片的调度器，该调度器会计算每个线程的时间片使用完以后保存线程的寄存器等状态，进行上下文的切换。</p>
+<p>协程模型是程序通过自己切换的方式实现在单个线程内、单个CPU上执行来提高CPU的利用率，它充分利用了IO等待时浪费的时间片。</p>
+<h2 id="_14">虚拟存储器<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h2>
+<h3 id="_15">基础概念<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
+<p>操作系统会有一个很大的地址空间，也叫**虚拟地址空间**。这个空间的前面一大段是操作系统用的，之后的每个进程也都会有一个独立的很大的地址空间。这样不同的程序可以使用相同的虚拟地址，当程序在运行时访问某个地址就是访问进程内的虚拟地址，通过**内存管理单元**(MMU，一般集成在CPU内部)翻译映射到一个物理地址。这样的好处就是无论在程序内的地址空间怎么折腾都不会影响到其他的程序，对编译器也更友好更方便，可以提前分配。</p>
+<p>我们在编译时看到的都是虚拟地址，物理地址在运行期才能看到。虚拟地址空间未必会全部映射到主存中，也会给各个设备保留一段空间。</p>
+<p>**虚拟存储器**可以看成硬盘保存的一个字节数组，虚拟地址空间有256TB，而实际的物理内存可能只有8GB，有这么大的虚拟地址空间就不能阻止程序去使用，不够的物理存储体我们就通过硬盘上的交换分区来弥补。也有可能物理内存加上交换分区都不够程序使用，在Linux中就会引发OOM机制。</p>
+<h3 id="_16">分段与分页<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h3>
+<p>最开始的时候，压根没有虚拟内存，人们在物理内存上直接为某程序分配内存，这样带来的问题有:地址空间不隔离，恶意的程序可以轻松改写别人的数据；内存使用效率低，比如当前正在运行A和B，这时候需要运行C但内存不够，就需要把整个A或B换出到硬盘再载入C；程序运行的地址不确定，给程序的编写造成了一定的麻烦。  </p>
+<p>然后引入了虚拟内存，人们开始使用一种分段(Segmention)的方法，把一段程序需要的内存大小的虚拟地址空间映射到物理地址空间，由操作系统和硬件来完成它们之间的相互转换。这样解决了没有虚拟内存时的地址空间不隔离和程序运行地址不确定的问题，但对于内存效率的问题依然没有解决。</p>
+<p>因此，现在都使用分页(Paging)的方法。把地址空间人为地分成固定大小的页，页的大小由操作系统和硬件决定。当我们把进程的虚拟地址按页分割时，会把常用的数据页和代码页装载到内存中，把不常用的代码和数据保存在硬盘里，需要用到时再从硬盘中取出:</p>
+<p><img alt="" src="../images/mmu.png" /></p>
+<p>如图所示，DP表示磁盘页，VP表示虚拟页，PP表示物理页。虚拟空间中有的页被映射到同一个物理页中，从而实现了内存共享。此外，可以给每个页设置权限属性，做到一个基础的保护。</p>
+<h3 id="_17">内存分配过程<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h3>
+<p>假设某个程序需要内存分配器分配10MB的内存，那么操作系统会怎么做呢？首先会划分出一个虚拟地址范围，然后返回起始地址的指针。它此时没有必要通过MMU分配真实的物理内存，因为有可能这段内存后续根本没有读写发生。接下来若写入数据，也只会以页(8KB)为单位一点点的去写，每次写入的时候操作系统再去补物理内存，采用一种**按需分配的机会主义原则**。具体如何实现呢？当向一个虚拟地址写入数据时，就会去MMU找对应的物理地址，没有找到就说明没有建立映射关系还没有分配物理内存，就会引发一个**缺页异常**(page fault)，操作系统内有专门的程序把这一页补上，来实现按需分配。</p>
+<p>我们通过程序可以模拟这种虚拟内存和物理内存的关系:
+{{&lt; highlight c&gt;}}</p>
+<h1 id="include">include <stdio.h><a class="headerlink" href="#include" title="Permanent link">&para;</a></h1>
+<h1 id="include_1">include <stdlib.h><a class="headerlink" href="#include_1" title="Permanent link">&para;</a></h1>
+<p>// gcc -g -O0 -o test test.c
+// ./test
+int main()
+{
+    const size_t length = 1024 * 1024 * 100;
+    const size_t pause = length / 10;
+    unsigned char *p = malloc(length); // 分配100MB内存
+    unsigned char *x = p;
+    for (int i = 0; i &lt; (int)length; i++) // 循环写入数据
+    {
+        *x = 1;
+        x++;
+        if (i % (int)pause == 0) // 隔一段时间暂停一下便于观察
+        {
+            printf("%d\n", i);
+            getchar();          // 可以让用户在命令行中随时控制运行进度
+        }
+    }
+    free(p);
+    return EXIT_SUCCESS;
+}
+{{&lt; /highlight &gt;}}</p>
+<p>观察运行结果:
+{{&lt; highlight sh&gt;}}
+[ubuntu] ~/.mac $ pidstat -r -p <code>pidof test</code> 1
+│Linux 4.9.184-linuxkit (cabd4e519687)   12/06/19        <em>x86_64</em>        (2 CPU)│
+│11:10:18      UID       PID  minflt/s  majflt/s     VSZ     RSS   %MEM  Command
+│11:10:19        0       180      0.00      0.00  106908   21624   1.06  test
+│11:10:20        0       180      0.00      0.00  106908   21624   1.06  test
+│11:10:21        0       180      0.00      0.00  106908   21624   1.06  test
+│11:10:22        0       180   2560.00      0.00  106908   31920   1.56  test
+│11:10:23        0       180      0.00      0.00  106908   31920   1.56  test
+│11:10:24        0       180   2534.65      0.00  106908   42216   2.06  test
+│11:10:25        0       180      0.00      0.00  106908   42216   2.06  test
+│11:10:26        0       180   2560.00      0.00  106908   52512   2.57  test
+│11:10:27        0       180      0.00      0.00  106908   52512   2.57  test
+│11:10:28        0       180      0.00      0.00  106908   52512   2.57  test
+│11:10:29        0       180      0.00      0.00  106908   52512   2.57  test
+│11:10:30        0       180   2560.00      0.00  106908   62544   3.06  test
+{{&lt; /highlight &gt;}}
+minflt/s表示每秒分配的内存块，majflt/s表示不止分配内存块还要把数据从磁盘上装载回来，VSZ表示虚拟内存，RSS表示物理内存，%MEM表示物理内存占总内存的百分比。可以看到随用户的控制，数据不断写入，物理内存增加。</p>
+<p>此外，还可以这样观察进程的一些信息:
+{{&lt; highlight sh&gt;}}
+$ cat /proc/{pid}/status</p>
+<p>VmPeak:     4760 kB             ; 所使用虚拟内存峰值
+VmSize:     4760 kB             ; 当前使用的虚拟内存
+VmLck:         0 kB             ; 已经锁住物理内存（不能交换到硬盘）
+VmHWM:      3864 kB             ; 所使用物理内存峰值
+VmRSS:       876 kB             ; 当前使用的物理内存</p>
+<p>VmData:      732 kB             ; 数据段
+VmStk:       132 kB             ; 栈
+VmExe:       484 kB             ; 代码段
+VmLib:      2016 kB             ; 加载的动态库（可能与其他进程共享）
+VmPTE:        48 kB             ; 页表
+VmSwap:      112 kB             ; 所使用交换区大小</p>
+<p>voluntary_ctxt_switches:  3543  ; 主动上下文切换次数（IO）
+nonvoluntary_ctxt_switches: 64  ; 强制上下文切换次数（time slice）
+{{&lt; /highlight &gt;}}</p>
+<h3 id="_18">换入换出<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h3>
+<p>假设这10MB内存已经分配下来，该程序却长时间不用，操作系统就会把这10MB内存的数据保存到硬盘的交换分区上，并对这些内存页的状态做变更，MMU的映射地址做变更，这些内存就可以去给别的程序用，这就叫**换出**(swap out)。下次重新激活该程序时，会把硬盘上交换分区的数据重新放回某些空闲的页并重新建立映射，这就是**换入**(swap in)。我们可以通过监控工具观察到系统内的换入换出情况:
+{{&lt; highlight sh&gt;}}
+[ubuntu] ~ $ dstat
+You did not select any stats, using -cdngy by default.
+--total-cpu-usage-- -dsk/total- -net/total- ---paging-- ---system--
+usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
+  3   4  77  16   0|  12M  101k|   0     0 |   0     0 |1464  2562
+  0   0 100   0   0|   0     0 |   0     0 |   0     0 | 175   408
+  0   0 100   0   0|   0     0 |   0     0 |   0     0 | 148   345
+  0   0 100   0   0|   0     0 |   0     0 |   0     0 | 143   341</p>
+<p>// paging的in和out即为当前换入换出大小,int表示当前有多少中断,csw表示当前有多少上下文切换
+{{&lt; /highlight &gt;}}
+当程序运行需要的内存大于机器的物理内存时，就可能造成频繁的换入换出，产生**颠簸效应**(thrashing)。</p>
+<h3 id="_19">性能相关<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h3>
+<p>如果程序需要性能更高、速度要有保障，就需要向操作系统申请锁死这段内存。同时，缺页异常属于内核级别的，有一定的开销，所以为了追求性能的极致，有的C程序会先进行一个初始化操作，缺页异常仍然会有只是会提前，在执行具体的算法时就会更高效不受缺页异常的影响，而一些高级语言可能会由于编译器的优化使得提前初始化写入被优化忽略掉。</p>
+<p>物理内存分配还采用了**写入时复制**(copy-on-write)的机制，即A若引用一块内存，那么复制A到B的时候并不会复制这块内存，只有当去写入A或B的时候才会去复制这块内存，起到节约内存的目的。</p>
+<p>对于服务器来讲，假设物理内存有8G，当前运行的程序只有4G，操作系统就会拿另外4G当做自己的cache用，比如缓存文件读写等，程序需要使用时再从cache里还回来。但对于桌面端用户来讲，GUI程序居多，占用内存也多，所以往往会有足够的内存来让用户载入一个程序的速度更快。服务器往往运行的程序数量和时间更长更稳定，所以不同操作系统的分配内存策略也不同。</p>
+<p>某种角度上，假设所有数据都交换到硬盘上，我们可以认为所有的数据保存在硬盘上，内存上只保存活跃数据，**内存可以看成是硬盘的缓存**或者说L4，虚拟存储器就可以看成硬盘上一个巨大的数组。</p>
+<p>总结来说，虚拟存储器主要有以下优点:</p>
+<ul>
+<li>将内存对应到磁盘存储器，主存只保留活动区域。（linux下的swap, windows下的pagefile.sys）</li>
+<li>为每个进程提供一致的地址空间，简化内存管理。（链接器可以提前安排地址）</li>
+<li>无法访问物理地址，隔离进程数据确保不被破坏。</li>
+</ul>
+<h2 id="_20">寄存器<a class="headerlink" href="#_20" title="Permanent link">&para;</a></h2>
+<p>由于寄存器数量很少，我们就给每个寄存器起了个名字，并分为:</p>
+<ul>
+<li>通用寄存器:AX,BX,CX,DX,SI,DI,SP,BP,R8-R15</li>
+<li>指令寄存器:IP(也叫PC)，用于读取程序执行的下一条指令地址</li>
+<li>标志寄存器:FR，用于存放处理器的状态和运算结果</li>
+</ul>
+<h3 id="_21">通用寄存器<a class="headerlink" href="#_21" title="Permanent link">&para;</a></h3>
+<p>我们在寄存器名称前加个R，表示64位的寄存器；加个E，表示32位的；不加表示16位的；同时AH表示AX的高位；AL表示AX的地位。可以通过gdb观察到这些寄存器的值。</p>
+<p>{{&lt; highlight sh&gt;}}
+(gdb) info registers
+rax            0x66 102
+rbx            0x0  0
+rcx            0x22 34
+rdx            0x33 51
+rsi            0x22 34
+rdi            0x11 17
+rbp            0x7fffffffe580   0x7fffffffe580
+rsp            0x7fffffffe550   0x7fffffffe550
+r8             0x7ffff7dd0d80   140737351847296
+r9             0x7ffff7dd0d80   140737351847296
+r10            0x0  0
+r11            0x0  0
+r12            0x555555554540   93824992232768
+r13            0x7fffffffe660   140737488348768
+r14            0x0  0
+r15            0x0  0
+rip            0x5555555546b2   0x5555555546b2 <main+68>
+eflags         0x206    [ PF IF ]
+cs             0x33 51
+ss             0x2b 43
+ds             0x0  0
+es             0x0  0
+fs             0x0  0
+gs             0x0  0
+(gdb) set $rbx=0x8070605040302010
+(gdb) p/x $ebx
+$1 = 0x40302010
+(gdb) p/x $bx
+$2 = 0x2010
+(gdb) p/x $bh
+$3 = 0x20
+(gdb) p/x $bl
+$4 = 0x10
+{{&lt; /highlight &gt;}}</p>
+<p>所以有了这些访问的手段，一个寄存器是可以分割为不同的部分，存储不同内容的。通用寄存器用来存什么都可以，只是由于C语言出现的早，它对各个寄存器的一些用法就成了约定俗成的惯例，例如si、di用来传参，ax保存返回值，bp、sp表示栈底、栈顶，cx用来做循环等都是惯例。</p>
+<p>但指令寄存器是在硬件层面上和其他寄存器有不同，专门用来放程序执行的下一条指令的。</p>
+<h3 id="_22">标志寄存器<a class="headerlink" href="#_22" title="Permanent link">&para;</a></h3>
+<p>我们通过一个示例代码来观察标志寄存器的用途。</p>
+<p>{{&lt; highlight asm&gt;}}
+global _start</p>
+<p>section .data
+    hello   : db <code>hello,world!\n</code></p>
+<p>section .text</p>
+<div class="highlight"><pre><span></span><code>_start:
+    mov     rax, 1
+    test    rax, rax ; 如果AX为0，则把ZF设为1，否则把ZF设为0
+    jne     .exit    ; 如果ZF为0，则跳转至.exit标签
+
+.hello:
+    mov     rax, 1
+    mov     rdi, 1
+    mov     rsi, hello
+    mov     rdx, 14
+    syscall
+
+.exit:
+    mov     rax, 60
+    xor     rdi, rdi
+    syscall
+</code></pre></div>
+<p>{{&lt; /highlight &gt;}}</p>
+<p>标志寄存器有很多个位，ZF就是其中的一个位。哪个指令对哪个标志位有影响，都有手册可以查到，例如test指令可以通过<a href="https://baike.baidu.com/item/test/10804276#viewPageContent">这里</a>查到，<a href="https://baike.baidu.com/item/jne">jne</a>也是。</p>
+<p>接着，我们在gdb中观察:
+{{&lt; highlight sh&gt;}}
+[ubuntu] ~/.mac/assem $ nasm -g -F dwarf -f elf64 -o fr.o fr.s
+[ubuntu] ~/.mac/assem $ ld -o fr fr.o
+[ubuntu] ~/.mac/assem $ gdb fr
+...
+(gdb) b 9
+Breakpoint 1 at 0x4000b0: file fr.s, line 9.
+(gdb) r
+Starting program: /root/.mac/assem/fr</p>
+<p>Breakpoint 1, _start () at fr.s:9
+9           mov     rax, 1
+(gdb) display $rax
+1: $rax = 0
+(gdb) display $eflags
+2: $eflags = [ IF ]
+(gdb) n
+10          test    rax, rax ; ZF=1 if AX==0 else ZF=0
+1: $rax = 1
+2: $eflags = [ IF ]
+(gdb) n
+11          jne     .exit    ; jmp if ZF==0
+1: $rax = 1
+2: $eflags = [ IF ]
+(gdb) n
+_start.exit () at fr.s:21
+21          mov     rax, 60
+{{&lt; /highlight &gt;}}</p>
+<p>标志寄存器中若某位有值则会出现在eflags中，按当前代码逻辑，ZF为0会直接跳转到<code>.exit</code>部分。然后我们在gdb中修改<code>$rax</code>的值，会发现跳转至<code>.hello</code>部分。</p>
+<p>{{&lt; highlight sh&gt;}}
+(gdb) n
+10          test    rax, rax ; ZF=1 if AX==0 else ZF=0
+1: $rax = 1
+2: $eflags = [ IF ]
+(gdb) set $rax=0
+(gdb) n
+11          jne     .exit    ; jmp if ZF==0
+1: $rax = 0
+2: $eflags = [ PF ZF IF ]
+(gdb) n
+_start.hello () at fr.s:14
+14          mov     rax, 1
+1: $rax = 0
+2: $eflags = [ PF ZF IF ]
+{{&lt; /highlight &gt;}}</p>
+
+              
+            </article>
+            
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-top--hidden md-icon" data-md-component="top">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            回到页面顶部
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="页脚" >
+      
+        
+        <a href="../hardware/" class="md-footer__link md-footer__link--prev" aria-label="上一页: 硬件" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                上一页
+              </span>
+              硬件
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../program/" class="md-footer__link md-footer__link--next" aria-label="下一页: 程序" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                下一页
+              </span>
+              程序
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+      
+    
+    <a href="https://github.com/hjlarry" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    <a href="mailto:ultrahe@gmail.com" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M0 128c0-35.35 28.65-64 64-64h384c35.3 0 64 28.65 64 64v256c0 35.3-28.7 64-64 64H64c-35.35 0-64-28.7-64-64V128zm48 0v22.1l172.5 141.6c20.6 17 50.4 17 71 0L464 150.1v-23c0-7.9-7.2-16-16-16H64c-8.84 0-16 8.1-16 16v.9zm0 84.2V384c0 8.8 7.16 16 16 16h384c8.8 0 16-7.2 16-16V212.2L322 328.8c-38.4 31.5-93.6 31.5-132.9 0L48 212.2z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/hjlarry" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://t.me/hjlarry" target="_blank" rel="noopener" title="t.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M248 8C111.033 8 0 119.033 0 256s111.033 248 248 248 248-111.033 248-248S384.967 8 248 8Zm114.952 168.66c-3.732 39.215-19.881 134.378-28.1 178.3-3.476 18.584-10.322 24.816-16.948 25.425-14.4 1.326-25.338-9.517-39.287-18.661-21.827-14.308-34.158-23.215-55.346-37.177-24.485-16.135-8.612-25 5.342-39.5 3.652-3.793 67.107-61.51 68.335-66.746.153-.655.3-3.1-1.154-4.384s-3.59-.849-5.135-.5q-3.283.746-104.608 69.142-14.845 10.194-26.894 9.934c-8.855-.191-25.888-5.006-38.551-9.123-15.531-5.048-27.875-7.717-26.8-16.291q.84-6.7 18.45-13.7 108.446-47.248 144.628-62.3c68.872-28.647 83.183-33.623 92.511-33.789 2.052-.034 6.639.474 9.61 2.885a10.452 10.452 0 0 1 3.53 6.716 43.765 43.765 0 0 1 .417 9.769Z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://paypal.me/hjlarry" target="_blank" rel="noopener" title="paypal.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M111.4 295.9c-3.5 19.2-17.4 108.7-21.5 134-.3 1.8-1 2.5-3 2.5H12.3c-7.6 0-13.1-6.6-12.1-13.9L58.8 46.6c1.5-9.6 10.1-16.9 20-16.9 152.3 0 165.1-3.7 204 11.4 60.1 23.3 65.6 79.5 44 140.3-21.5 62.6-72.5 89.5-140.1 90.3-43.4.7-69.5-7-75.3 24.2zM357.1 152c-1.8-1.3-2.5-1.8-3 1.3-2 11.4-5.1 22.5-8.8 33.6-39.9 113.8-150.5 103.9-204.5 103.9-6.1 0-10.1 3.3-10.9 9.4-22.6 140.4-27.1 169.7-27.1 169.7-1 7.1 3.5 12.9 10.6 12.9h63.5c8.6 0 15.7-6.3 17.4-14.9.7-5.4-1.1 6.1 14.4-91.3 4.6-22 14.3-19.7 29.3-19.7 71 0 126.4-28.8 142.9-112.3 6.5-34.8 4.6-71.4-23.8-92.6z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.annotate", "content.tabs.link", "content.tooltips", "navigation.indexes", "navigation.sections", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.b028fd86.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\s\\-\uff0c\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version.title": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.7f366e99.min.js"></script>
+      
+    
+  </body>
+</html>
