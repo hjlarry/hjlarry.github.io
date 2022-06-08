@@ -1,8 +1,3 @@
----
-title: "Go并发机制"
-draft: false
----
-
 # Go并发调度
 
 背景知识
@@ -12,12 +7,12 @@ GO和其他语言不同的就是我们很少在GO中听到多线程的概念，�
 
 ### 并发与并行
 
-**并发**是指多个逻辑可以同时执行，把CPU时间分成不同的时间片段，这些时间片段分配给不同的逻辑，构成一个完整的CPU执行时间序列。
-而**并行**是一种特殊的并发，不同逻辑由于CPU的多核，分配在不同的核上可以在物理时间上同时执行。这种状态其实很难实现，因为往往任一操作系统，它本身跑的程序非常多，远大于CPU核数。
+**并发**​是指多个逻辑可以同时执行，把CPU时间分成不同的时间片段，这些时间片段分配给不同的逻辑，构成一个完整的CPU执行时间序列。
+而​**并行**​​是一种特殊的并发，不同逻辑由于CPU的多核，分配在不同的核上可以在物理时间上同时执行。这种状态其实很难实现，因为往往任一操作系统，它本身跑的程序非常多，远大于CPU核数。
 
 ### 线程与协程
 
-**线程**是执行单位，相当于工厂里的生产线。操作系统是按线程分配时间片，所以程序的线程越多获得的执行时间也就越长。线程是在系统空间实现的，而**协程**是在用户空间实现的，操作系统根本不知道协程。
+**线程**​是执行单位，相当于工厂里的生产线。操作系统是按线程分配时间片，所以程序的线程越多获得的执行时间也就越长。线程是在系统空间实现的，而​**协程**​是在用户空间实现的，操作系统根本不知道协程。
 
 比如某个线程上有A、B两个任务，若A有死循环或者A等待网络响应等就会发生B被饿死的情况，为了避免这种情况，A就会主动让给B或者调度器去执行。这就是协程的工作方式，任务之间相互协商，属于协作式多任务系统，通常是在用户空间实现一个框架。而多线程是抢占式调度，不管某个程序会不会主动让出，当前时间片执行完就会被操作系统强迫分给其他线程。
 
@@ -26,7 +21,7 @@ GO和其他语言不同的就是我们很少在GO中听到多线程的概念，�
 运行时
 -------
 
-现代的编程语言创建一个线程往往是使用一个标准库或者第三方库提供API的，分配内存也往往会向操作系统提前申请一大块内存，通过这样一层抽象来减少用户态和内核态的切换来提升效率，我们把这层抽象叫做**runtime**(运行时)。它就像一个弱化版的操作系统，可以针对用户空间内的代码，结合当前语言的特性做大量的优化。
+现代的编程语言创建一个线程往往是使用一个标准库或者第三方库提供API的，分配内存也往往会向操作系统提前申请一大块内存，通过这样一层抽象来减少用户态和内核态的切换来提升效率，我们把这层抽象叫做​**runtime**(运行时)。它就像一个弱化版的操作系统，可以针对用户空间内的代码，结合当前语言的特性做大量的优化。
 
 Go运行时第一个抽象出的概念就是P(Processor)，相当于处理器。物理上有多少个CPU、有多少个核，runtime并不关心，它是在OS上的一层抽象，os才是在硬件的上一层抽象。runtime认为在当前的环境内只有一个程序，所以我们可以通过P来设定并发的数量，同时能执行这个程序内的多少个并发任务。
 
@@ -51,7 +46,7 @@ Go运行时第一个抽象出的概念就是P(Processor)，相当于处理器。
 
 这样的平衡方式也就决定了我们没有办法确定哪个方法先执行，哪个后执行，除非我们自己写逻辑去判断先后。我们再来看一个关于执行顺序的示例:
 
-{{< highlight go>}}
+```go
 func main() {
     runtime.GOMAXPROCS(1) // 设置P为1
     for i := 0; i < 10; i++ {
@@ -62,11 +57,11 @@ func main() {
     }
     time.Sleep(time.Second * 2)
 }
-{{< /highlight >}}
+```
 
 执行结果:
 
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/gocode $ go run goroutine.go
 9
 0
@@ -78,7 +73,7 @@ func main() {
 6
 7
 8
-{{< /highlight >}}
+```
 
 > 为什么当P为1的时候，它不是顺序输出的，9总是在第一个？  
 
@@ -126,7 +121,7 @@ func main() {
 
 这就可能导致一个问题，创建出大量的空闲的M，不会被回收。M是会在操作系统内核中创建一个线程，尽管这种休眠状态下的M不会被CPU分配时间片，但仍然会占用管理资源，另外每个M上都带着G0内存，相当于资源泄漏了。我们通过如下代码来模拟这种情况：
 
-{{< highlight go>}}
+```go
 func main(){
     for i :=0;i<1000;i++{
         go func(){
@@ -137,11 +132,11 @@ func main(){
     }
     time.Sleep(time.Minute)
 }
-{{< /highlight >}}
+```
 
 通过`go build test.go && GODEBUG=schedtrace=1000 ./test`运行：
 
-{{< highlight sh>}}
+```sh
 SCHED 0ms: gomaxprocs=4 idleprocs=2 threads=5 spinningthreads=1 idlethreads=2 runqueue=0 [0 0 0 0]
 SCHED 1002ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
 SCHED 2008ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
@@ -153,11 +148,11 @@ SCHED 7025ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethread
 SCHED 8027ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=1007 runqueue=0 [0 0 0 0]
 SCHED 9029ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=1007 runqueue=0 [0 0 0 0]
 SCHED 10031ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=1007 runqueue=0 [0 0 0 0]
-{{< /highlight >}}
+```
 
 我们发现任务开始的时候共创建了1010个线程，任务执行完以后，仍然有1007个休眠的线程。当我们把`runtime.LockOSThread()`注释掉，重新运行：
 
-{{< highlight sh>}}
+```sh
 SCHED 0ms: gomaxprocs=4 idleprocs=1 threads=5 spinningthreads=1 idlethreads=1 runqueue=0 [48 49 133 0]
 SCHED 1004ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
 SCHED 2008ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
@@ -165,11 +160,11 @@ SCHED 3010ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=4
 SCHED 4015ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
 SCHED 5026ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=7 runqueue=0 [0 0 0 0]
 SCHED 6031ms: gomaxprocs=4 idleprocs=4 threads=9 spinningthreads=0 idlethreads=7 runqueue=0 [0 0 0 0]
-{{< /highlight >}}
+```
 
 发现没有系统调用，那就根本不会有那么多线程。我们再把`runtime.LockOSThread()`保留，`defer runtime.UnlockOSThread()`去掉，运行结果如下：
 
-{{< highlight sh>}}
+```sh
 SCHED 0ms: gomaxprocs=4 idleprocs=2 threads=5 spinningthreads=1 idlethreads=2 runqueue=0 [0 0 152 0]
 SCHED 1000ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
 SCHED 2001ms: gomaxprocs=4 idleprocs=4 threads=1010 spinningthreads=0 idlethreads=4 runqueue=0 [0 0 0 0]
@@ -181,7 +176,7 @@ SCHED 7037ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=
 SCHED 8042ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=10 runqueue=0 [0 0 0 0]
 SCHED 9044ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=10 runqueue=0 [0 0 0 0]
 cSCHED 10047ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethreads=10 runqueue=0 [0 0 0 0]
-{{< /highlight >}}
+```
 
 我们发现那些创建的线程是会被回收的，线程没有被解锁意味着线程的状态没有被解除而陷入了死锁状态，线程不能再去接收新的任务没有存在的意义自然会被杀掉。
 
@@ -191,7 +186,7 @@ cSCHED 10047ms: gomaxprocs=4 idleprocs=4 threads=13 spinningthreads=0 idlethread
 
 假设当前的P/M正在执行一个G，这时候G里面创建了一个G1，G1会被放到当前P的runnext中，但它可能迟迟得不到执行被饿死，因为G中可能还有大量的逻辑代码执行完才轮到runnext，这显然是不合理的。怎么解决这个问题呢？是否可以让当前这个P/M交替的执行G和G1？P不是真正的CPU，没法实现基于时间片的抢占式调度，只能实现类似于协程那样的协作式调度。很多语言里都使用类似于Gosched()这样的函数来主动交出执行权，但Go中却很少见；还有一种形式是runtime带一个计数器，每执行一个任务后累加计数，当到达一个指定的计数就会被认为是使用完了时间片，向当前执行的P/M发出一个抢占式的信号，然后G主动让出执行权限。Go到底是怎样做的？我们来看如下示例：
 
-{{< highlight go>}}
+```go
 // GODEBUG=schedtrace=1000,scheddetail=1 ./test  可查看运行期GMP状态
 func main(){
     runtime.GOMAXPROCS(1)
@@ -207,13 +202,13 @@ func main(){
     }
     time.Sleep(time.Second)
 }
-{{< /highlight >}}
+```
 
 我们模拟了只有一个P/M，这时候创建了3个G，让第一个G执行的过程中进入死循环，运行结果就是只打印出了任务0，其他G被饿死了。但当我们在死循环内x++后面加入一个函数，则任务0、1、2都会被打印出。问题就出在这个函数上。
 
 我们先使用一个简单的函数来观察：
 
-{{< highlight go>}}
+```go
 //go:noinline
 func test(){
     println()
@@ -222,11 +217,11 @@ func test(){
 func main(){
     test()
 }
-{{< /highlight >}}
+```
 
 使用`go build && go tool objdump -s "main\.test" test`反汇编：
 
-{{< highlight sh>}}
+```sh
 TEXT main.test(SB) /mnt/hgfs/disk/test.go
   test.go:5		0x4525b0		64488b0c25f8ffffff	MOVQ FS:0xfffffff8, CX			
   test.go:5		0x4525b9		483b6110		CMPQ 0x10(CX), SP			
@@ -242,6 +237,6 @@ TEXT main.test(SB) /mnt/hgfs/disk/test.go
   test.go:7		0x4525e2		c3			RET					
   test.go:5		0x4525e3		e8187bffff		CALL runtime.morestack_noctxt(SB)	
   test.go:5		0x4525e8		ebc6			JMP main.test(SB)	
-{{< /highlight >}}
+```
 
 我们发现头部的三条指令和尾部的两条指令都是编译器插入的。`runtime.morestack_noctxt`会做两件事情，一是检查当前栈帧空间是否足够，如果不够可以帮助扩容；二是检查是否有人发出了抢占式调度信号，如果发现了信号，它就让出执行权限。函数前使用`go:nosplit`可以禁止编译器插入这样的指令。

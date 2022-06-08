@@ -1,7 +1,6 @@
 ---
-title: "defer实现方式"
-draft: false
-bookToc: false
+hide:
+  - toc
 ---
 
 # Defer延迟调用
@@ -9,7 +8,7 @@ bookToc: false
 defer是GO语言中独有的特性，在其他语言中可能采用`try...finally`这样的方式来实现，两者还是有很大区别的。finally是立即执行的，而defer会延迟执行，且defer可以分割很多的逻辑。延迟调用最大的优势是即便函数执行出错，依然能保证回收资源等操作得以执行。
 
 我们看到很多的文章中是这样描述defer执行方式的，参数首先会被复制进`defer func`中，然后执行原函数，然后执行`defer func`，最后再执行return。那么真的是这样么？这似乎解释不了如下示例:
-{{< highlight go>}}
+```go title="test.go"
 func test1() int {
 	x := 100
 	defer func() {
@@ -30,17 +29,17 @@ func main() {
 	println("test1:", test1())
 	println("test2:", test2())
 }
-{{< /highlight >}}
-{{< highlight sh>}}
+```
+```sh
 [ubuntu] ~/.mac $ go run test.go
 test1: 100
 test2: 101
-{{< /highlight >}}
+```
 
 按照这个观点，似乎test1()的执行过程应该是x等于100，然后x++，然后返回x=101；test2()应该是x等于100，然后x++，然后返回100。但执行结果却都和我们预想的不一样，带着这样的疑问，我们来深入了解defer的执行机制。
 
 我们先来看一个简单的例子:
-{{< highlight go>}}
+```go
 func test(a, b int) {
 	println("test: ", a, b)
 }
@@ -51,10 +50,10 @@ func main() {
 	b++
 	println("main: ", a, b)
 }
-{{< /highlight >}}
+```
 
 然后反汇编看看它的执行过程:
-{{< highlight sh "hl_lines=17 33 38">}}
+```sh hl_lines="17 33 38"
 [ubuntu] ~/.mac $ go build test.go
 [ubuntu] ~/.mac $ go tool objdump -s "main\.main" test
 TEXT main.main(SB) /root/.mac/test.go
@@ -98,14 +97,12 @@ TEXT main.main(SB) /root/.mac/test.go
   test.go:8		0x45246f		c3			RET
   test.go:6		0x452470		e82b7affff		CALL runtime.morestack_noctxt(SB)
   test.go:6		0x452475		e936ffffff		JMP main.main(SB)
-{{< /highlight >}}
+```
 
 我们发现`defer test(a, b)`实际上会被转化为`CALL runtime.deferproc(SB)`(Go1.13才使用deferprocStack，这里先以deferproc为例)，之后进行的`a++`已经不会影响到它，而在main函数执行完之后，才会去通过`CALL runtime.deferreturn(SB)`调用它。
 
 我们再来看看`runtime.deferproc`干了些什么，我在这里也把源码中重要的注释翻译了过来:
-
-{{< highlight go "hl_lines=14 18-20">}}
-// go/src/runtime/panic.go
+```go hl_lines="14 18-20" title="go/src/runtime/panic.go"
 // siz表示fn方法中参数需要占用多少个字节，使用siz创建了一个deferred的方法fn
 // 编译器将一个defer语句转化为一个对此方法的调用
 func deferproc(siz int32, fn *funcval) {  // fn之后紧跟着fn的参数
@@ -135,11 +132,10 @@ func deferproc(siz int32, fn *funcval) {  // fn之后紧跟着fn的参数
 	}
 	return0()
 }
-{{< /highlight >}}
+```
 
 我们发现newdefer函数返回的是一个这样的结构体:
-{{< highlight go>}}
-// go/src/runtime/runtime2.go
+```go title="go/src/runtime/runtime2.go"
 type _defer struct {
 	siz     int32 // includes both arguments and results
 	started bool
@@ -156,13 +152,13 @@ type _defer struct {
 
 	framepc uintptr
 }
-{{< /highlight >}}
+```
 
 鉴于篇幅，我删除了其注释，但可根据这些注释得出结论，`defer func()`这个语句会被保存在当前Goroutine中，把它的参数、所需要的栈大小等保存为一个_defer对象，把多个_defer形成一个链表，也就是一个FILO的队列。
 
 但是Goroutine和函数执行没什么直接的关系，如果是A嵌套B，B嵌套C，A、B、C都有各自的defer语句，那么它们都会被保存在这个Goroutine的_defer链表中，它怎么保证执行C的时候不把B的defer执行掉，这个秘密藏在`CALL runtime.deferreturn(SB)`中:
 
-{{< highlight go "hl_lines=8">}}
+```go hl_lines="8"
 func deferreturn(arg0 uintptr) {
 	gp := getg()
 	d := gp._defer
@@ -197,7 +193,7 @@ func deferreturn(arg0 uintptr) {
 	freedefer(d)
 	jmpdefer(fn, uintptr(unsafe.Pointer(&arg0)))
 }
-{{< /highlight >}}
+```
 
 函数执行调用这个指令的时候，它先拿到当前Goroutine的_defer链表，然后依次检查它的SP就行了，这个SP是执行deferproc时存进去的当前这个函数的栈顶，只要不一致那肯定是父函数的栈了。
 
