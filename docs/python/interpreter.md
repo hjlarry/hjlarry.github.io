@@ -1,8 +1,3 @@
----
-title: "CPython解释器"
-draft: false
----
-
 # CPython解释器
 
 
@@ -35,18 +30,16 @@ Python的执行方式有五种:
 2. Modules/main.c，把整个执行过程的抽象打包再一起，包含加载环境信息、执行代码和清理内存
 3. Python/initconfig.c，从系统中加载环境变量等信息，以及命令行中的参数等
 
-{{< highlight c>}}
-<!-- cpython/Programs/python.c -->
+```c title="cpython/Programs/python.c"
 int main(int argc, char **argv)
 {
     // unix平台是_Py_UnixMain，windows平台是Py_Main
     return _Py_UnixMain(argc, argv);
 }
-{{< /highlight >}}
+```
 
 然后是选择执行模式:
-{{< highlight c>}}
-<!-- cpython/Modules/main.c -->
+```c title="cpython/Modules/main.c"
 int _Py_UnixMain(int argc, char **argv)
 {
     return pymain_main(&pymain);
@@ -96,7 +89,7 @@ static void pymain_run_python(_PyMain *pymain)
     }
     pymain_repl(pymain, &cf);
 }
-{{< /highlight >}}
+```
 
 这个流程图能清晰的表达出上述代码:
 
@@ -111,14 +104,14 @@ static void pymain_run_python(_PyMain *pymain)
 * 运行时设置的环境变量
 
 这些值，我们也可以在运行时中查看到:
-{{< highlight python>}}
+```python
 [ubuntu] /tmp/missing/tt $ python3 -X dev -q -v
 >>> import sys
 >>> sys.flags
 sys.flags(debug=0, inspect=0, interactive=0, optimize=0, dont_write_bytecode=0, no_user_site=0, no_site=0, ignore_environment=0, verbose=1, bytes_warning=0, quiet=1, hash_randomization=1, isolated=0)
 >>> sys._xoptions
 {'dev': True}
-{{< /highlight >}}
+```
 
 ### -c的方式
 例如`python -c "print('hi')"`，它的运行流程如图所示:
@@ -126,7 +119,7 @@ sys.flags(debug=0, inspect=0, interactive=0, optimize=0, dont_write_bytecode=0, 
 ![pymain_run_command](./images/pymain_run_command.png)
 
 [pymain_run_command()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Modules/main.c#L240)的核心逻辑如下:
-{{< highlight c>}}
+```c
 // 首个参数就是-c传递的指令
 // wchar_t*类型通常是CPython中用于存储Unicode数据的低级存储类型，因为该类型的大小也可以存储UTF8字符
 static int
@@ -141,10 +134,10 @@ pymain_run_command(wchar_t *command, PyCompilerFlags *cf)
     ret = PyRun_SimpleStringFlags(PyBytes_AsString(bytes), cf);
     return (ret != 0);
 }
-{{< /highlight >}}
+```
 
 而[PyRun_SimpleStringFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L453)的目的是创建一个Python模块`__main__`，和一个字典，再将命令一起打包调用[PyRun_StringFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1008)，这个函数将创建一个假的文件名，接着就是调用Python解析器创建AST并返回模块mod了:
-{{< highlight c>}}
+```c
 int
 PyRun_SimpleStringFlags(const char *command, PyCompilerFlags *flags)
 {
@@ -166,14 +159,14 @@ PyRun_StringFlags(const char *str, int start, PyObject *globals,
     ret = run_mod(mod, filename, globals, locals, flags, arena);
     PyArena_Free(arena);
     return ret;
-{{< /highlight >}}
+```
 
 ### -m的方式
 另一种执行Python命令的方式是-m选项和模块名称，例如`python -m unittest`可以运行标准库中的unittest模块。实际上它就是在sys.path中去搜索名为unittest的模块然后去执行。
 
 CPython是先通过一个C的API函数[PyImport_ImportModule()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/import.c#L1409)来导入标准库`runpy`，它返回的是一个PyObject核心对象类型，然后需要一些特殊的方法获取它的属性再调用。例如`hi.upper()`相当于`hi.upper.__call__()`，在C中[PyObject_GetAttrString()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/object.c#L831)就是用来获得hi的upper属性，然后通过[PyObject_Call()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/call.c#L214)就是去执行__call__()。
 
-{{< highlight c>}}
+```c
 // modname就是通过-m传递进来的参数
 static int
 pymain_run_module(const wchar_t *modname, int set_argv0)
@@ -195,7 +188,7 @@ pymain_run_module(const wchar_t *modname, int set_argv0)
     Py_DECREF(result);
     return 0;
 }
-{{< /highlight >}}
+```
 这段代码说明`python -m <module>`本质上是`python -m runpy <module>`，module只是参数，runpy对其进行了一层包装。runpy是用纯python写的位于`Lib/runpy.py`，它的目的是抽象在不同操作系统上定位和执行模块的过程，具体干这些事:
 
 * 调用用户提供的模块的`__import__()`方法
@@ -206,7 +199,7 @@ runpy模块同样也可以用来执行某个目录或者zip文件。
 
 ### file的方式
 如果是`python test.py`这种方式，CPython会打开一个文件句柄，然后传递给`Python/pythonrun.c`中的[PyRun_SimpleFileExFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L372)方法:
-{{< highlight c>}}
+```c
 int
 PyRun_SimpleFileExFlags(FILE *fp, const char *filename, int closeit,
                         PyCompilerFlags *flags)
@@ -232,10 +225,10 @@ PyRun_SimpleFileExFlags(FILE *fp, const char *filename, int closeit,
  ...
     return ret;
 }
-{{< /highlight >}}
+```
 
 而[PyRun_FileExFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1032)和前文介绍的通过-c输入的PyRun_SimpleStringFlags()作用类似，都是去创建AST返回mod然后运行mod:
-{{< highlight c>}}
+```c
 PyObject *
 PyRun_FileExFlags(FILE *fp, const char *filename_str, int start, PyObject *globals,
                   PyObject *locals, int closeit, PyCompilerFlags *flags)
@@ -246,10 +239,10 @@ PyRun_FileExFlags(FILE *fp, const char *filename_str, int start, PyObject *globa
  ...
     ret = run_mod(mod, filename, globals, locals, flags, arena);
 }
-{{< /highlight >}}
+```
 
 [run_mod()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1125)负责把模块发送给AST编译为一个代码对象，即文章开头提到过的存储字节码以及保存在.pyc文件中的对象:
-{{< highlight c>}}
+```c
 static PyObject *
 run_mod(mod_ty mod, PyObject *filename, PyObject *globals, PyObject *locals,
             PyCompilerFlags *flags, PyArena *arena)
@@ -260,11 +253,11 @@ run_mod(mod_ty mod, PyObject *filename, PyObject *globals, PyObject *locals,
     v = run_eval_code_obj(co, globals, locals);
     return v;
 }
-{{< /highlight >}}
+```
 之后的run_eval_code_obj()就属于执行逻辑了，后文中再描述。
 
 [run_pyc_file()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1145)可以理解为省略了创建AST的过程，而是通过marshal把pyc文件中的内容复制到内存并将其转换为特定的数据结构。硬盘上的pyc文件就是CPython编译器缓存已编译代码的方式，因此无需每次调用脚本时再编译一次:
-{{< highlight c>}}
+```c
 static PyObject *
 run_pyc_file(FILE *fp, const char *filename, PyObject *globals,
              PyObject *locals, PyCompilerFlags *flags)
@@ -278,7 +271,7 @@ run_pyc_file(FILE *fp, const char *filename, PyObject *globals,
     v = run_eval_code_obj(co, globals, locals);
     return v;
 }
-{{< /highlight >}}
+```
 
 
 编译
@@ -286,7 +279,7 @@ run_pyc_file(FILE *fp, const char *filename, PyObject *globals,
 
 ### 语义解析
 在前文中我们了解到在执行时会先去创建AST，那么这步具体是怎么做的呢:
-{{< highlight c>}}
+```c
 mod_ty
 PyParser_ASTFromFileObject(FILE *fp, PyObject *filename, const char* enc,
                            int start, const char *ps1,
@@ -305,9 +298,9 @@ PyParser_ASTFromFileObject(FILE *fp, PyObject *filename, const char* enc,
     ...
     return mod;
 }
-{{< /highlight >}}
+```
 在[PyParser_ASTFromFileObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L772)方法中，会将文件句柄、编译器标志、以及内存块对象打包给[PyParser_ParseFileObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/parsetok.c#L163)转换为一个node对象:
-{{< highlight c>}}
+```c
 node *
 PyParser_ParseFileObject(FILE *fp, PyObject *filename,
                          const char *enc, grammar *g, int start,
@@ -323,11 +316,11 @@ PyParser_ParseFileObject(FILE *fp, PyObject *filename,
 ...
     return parsetok(tok, g, start, err_ret, flags);
 }
-{{< /highlight >}}
+```
 该方法把两项重要的任务组合了起来，一是使用[PyTokenizer_FromFile()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/tokenizer.h#L78)实例化一个tok_state，tok_state也只是一个数据结构(容器)，存储由tokenizer生成的临时数据；二是使用[parsetok()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/parsetok.c#L232)将token转换为一个具体的解析树(节点列表)。
 
 在parsetok()中，将循环调用[tok_get()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/tokenizer.c#L1110)方法，该方法像是一个迭代器，不断获取解析树的下一个token，parsetok()在根据不同token设置tok_state中相关的值。它也是CPython中最复杂的方法之一，因为要兼容各种各样的边缘情况、数十年的历史原因、新的语言特性等等原因。我们来看其中一种简单的解析，如何把每行结尾变为token`NEWLINE`的:
-{{< highlight c>}}
+```c
 static int
 tok_get(struct tok_state *tok, char **p_start, char **p_end)
 {
@@ -350,9 +343,9 @@ tok_get(struct tok_state *tok, char **p_start, char **p_end)
     }
 ...
 }
-{{< /highlight >}}
+```
 parsetok()返回的是一个node节点类型:
-{{< highlight c>}}
+```c
 typedef struct _node {
     short               n_type;
     char                *n_str;
@@ -363,9 +356,9 @@ typedef struct _node {
     int                 n_end_lineno;
     int                 n_end_col_offset;
 } node;
-{{< /highlight >}}
+```
 这些个节点组成的树我们叫CST，每个节点包含了语法、tokenID、符号，但这个树不能用于编译器做出快速决策，编译器需要更高一级抽象即AST，我们可以通过内部的API观察到CST的输出结果:
-{{< highlight python>}}
+```python
 import symbol
 import token
 import parser
@@ -412,18 +405,18 @@ def lex(expression):
               ['power', ['atom_expr', ['atom', ['NUMBER', '1']]]]]]]]]]]]]]]]],
  ['NEWLINE', ''],
  ['ENDMARKER', '']]
-{{< /highlight >}}
+```
 
 ### AST
 CPython的下一个阶段就是将CST转换为能够执行的、更有逻辑的东西，也就是AST(Abstract Syntax Trees，抽象语法树)。虽然这一步是解释器内联生成，我们也有其他办法能方便的观察到，例如使用`instaviz`库，它能在一个网页中展示AST以及每个节点的属性:
-{{< highlight python>}}
+```python
 >>> import instaviz
 >>> def example():
        a = 1
        b = a + 1
        return b
 >>> instaviz.show(example)
-{{< /highlight >}}
+```
 我们能看到这样的界面:
 ![instaviz_web](./images/instaviz_web.png)
 
@@ -434,7 +427,7 @@ CPython的下一个阶段就是将CST转换为能够执行的、更有逻辑的�
 用C语言编译AST并不是一件容易的事，所以实际上真正的编译模块有5000行代码，在`Python/ast.c`中。
 
 具体到核心代码流程来说，之前通过PyParser_ParseFileObject()得到的CST对象node，接着传入[PyAST_FromNodeObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L772)，并附带文件名、编译flag和PyArena。得到函数返回的mod_ty，是一个容器结构，属于Python5种模块类型之一:Module、Interactive、Expression、FunctionType、Suite。在`Include/Python-ast.h`中能看到每种类型需要的字段:
-{{< highlight c>}}
+```c
 enum _mod_kind {Module_kind=1, Interactive_kind=2, Expression_kind=3,
                  FunctionType_kind=4, Suite_kind=5};
 struct _mod {
@@ -459,9 +452,9 @@ struct _mod {
         } Suite;
     } v;
 };
-{{< /highlight >}}
+```
 除了模块类型，其他的AST类型都列在`Parser/Python.asdl`中，包括statement、expression、operators、comprehensions等等。在该文件中我们能看到类型字段的定义也是用在这里的:
-{{< highlight c>}}
+```c
 -- ASDL's 5 builtin types are:
 -- identifier, int, string, object, constant
 
@@ -471,10 +464,10 @@ module Python
         | Interactive(stmt* body)
         | Expression(expr body)
         | FunctionType(expr* argtypes, expr returns)
-{{< /highlight >}}
+```
 
 接着，PyAST_FromNodeObject()使用TYPE(n)确定首个CST节点的类型来执行不同的逻辑，如果是文件输入，返回的结果就是Module，eval_input就是Expression，总之是Module, Interactive, Expression, FunctionType中的一种:
-{{< highlight c>}}
+```c
 mod_ty
 PyAST_FromNodeObject(const node *n, PyCompilerFlags *flags,
                      PyObject *filename, PyArena *arena)
@@ -517,7 +510,7 @@ PyAST_FromNodeObject(const node *n, PyCompilerFlags *flags,
         ...
     return res;
 }
-{{< /highlight >}}
+```
 
 遍历孩子节点并创建相应的AST语句节点逻辑在[ast_for_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L4512)中，该函数内还需要再根据不同的语句类型调用不同的函数创建节点，都是类似于ast_for_*()，例如`2**4`这样的语句最终能找到ast_for_power()这样的方法。
 
@@ -525,8 +518,7 @@ PyAST_FromNodeObject(const node *n, PyCompilerFlags *flags,
 现在解释器有了AST，也就有了每个操作、函数、类和名字空间所需要的属性，下一步就是把AST编译为CPU能够理解的东西，这就是编译。编译可以分为两个部分:一是遍历树并创建一个控制流图(control-flow-graph)，用来表示逻辑执行的顺序；另外就是将控制流图中的节点转换为较小的可执行语句，称为字节码。
 
 [PyAST_CompileObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L312)函数是编译器部分的主要入口，它以Python模块作为主要参数，同解释器进程早期创建过的文件名称、全局变量、局部变量以及PyArena一起打包传入。然后先创建一个全局的编译器状态结构体，用来存储一些属性、编译标识、栈等等:
-{{< highlight c>}}
-<!-- cpython/Python/compile.c -->
+```c title="cpython/Python/compile.c"
 struct compiler {
     PyObject *c_filename;
     struct symtable *c_st;
@@ -541,7 +533,7 @@ struct compiler {
     PyObject *c_stack;           /* Python list holding compiler_unit ptrs */
     PyArena *c_arena;            /* pointer to memory allocation arena */
 };
-{{< /highlight >}}
+```
 接着有11个主要步骤:
 
 1. 如果模块不存在`__doc__`则创建一个新的
@@ -557,7 +549,7 @@ struct compiler {
 11. 编译器释放编译过程中所分配的所有内存
 
 核心代码:
-{{< highlight c>}}
+```c
 PyCodeObject *
 PyAST_CompileObject(mod_ty mod, PyObject *filename, PyCompilerFlags *flags,
                    int optimize, PyArena *arena)
@@ -585,7 +577,7 @@ PyAST_CompileObject(mod_ty mod, PyObject *filename, PyCompilerFlags *flags,
     compiler_free(&c);
     return co;
 }
-{{< /highlight >}}
+```
 
 #### Future标识和编译标识
 编译器运行前，有两种标识可以切换编译器内部的功能。
@@ -596,7 +588,7 @@ PyAST_CompileObject(mod_ty mod, PyObject *filename, PyCompilerFlags *flags,
 
 #### 符号表
 符号表为编译器提供了一个查找引用全局变量、局部变量等的作用域，它的结构是这样的:
-{{< highlight c>}}
+```c
 struct symtable {
     PyObject *st_filename;          /* name of file being compiled, decoded from the filesystem encoding */
     struct _symtable_entry *st_cur; /* current symbol table entry */
@@ -610,29 +602,29 @@ struct symtable {
     int recursion_depth;            /* current recursion depth */
     int recursion_limit;            /* recursion limit */
 };
-{{< /highlight >}}
+```
 其中的一些API通过Python的标准库symtable模块可以调用:
-{{< highlight python>}}
+```python
 >>> import symtable
 >>> s = symtable.symtable('b + 1', filename='test.py', compile_type='eval')
 >>> [symbol.__dict__ for symbol in s.get_symbols()]
 [{'_Symbol__name': 'b', '_Symbol__flags': 6160, '_Symbol__scope': 3, '_Symbol__namespaces': ()}]
-{{< /highlight >}}
+```
 核心的C代码在[PySymtable_BuildObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/symtable.c#L262)函数中，它也是依据传入的mod_ty类型的不同使用不同的访问函数，有[symtable_visit_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/symtable.c#L1176)、symtable_visit_expr()等，这些访问函数里面也是一个巨长的switch语句对应着定义在Parser/Python.asdl中的每种语句类型以及各自的逻辑。例如对于一个函数定义，它需要做的特殊处理有:检测递归深度超过限制则引发异常、将函数名称加入到局部变量中、解析顺序参数和关键字参数的默认值、解析参数和返回值的类型注释、解析函数的装饰器等等。
 
 #### 核心编译过程
 现在PyAST_CompileObject()有了一个编译器状态、一个符号表、一个模块形式的AST，真正的编译才开始。这个阶段的目标是将state、symtable、AST转化为CFG，以及捕获逻辑和代码异常并抛出。
 
 我们可以通过Python提供的内置函数compile()完成编译过程，传入的是表达式则mode选择eval，传入类、方法、模块等mode要选择exec，它返回的是一个代码对象:
-{{< highlight python>}}
+```python
 In [1]: compile("a+1", "a.py", mode="eval")                     
 Out[1]: <code object <module> at 0x1120e58a0, file "a.py", line 1>
 In [2]: _.co_code                      
 Out[2]: b'e\x00d\x00\x17\x00S\x00'
-{{< /highlight >}}
+```
 
 怎样得到这个代码对象的，实际就是[compiler_mod()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L1782):
-{{< highlight c>}}
+```c
 static PyCodeObject *
 compiler_mod(struct compiler *c, mod_ty mod)
 {
@@ -654,10 +646,10 @@ compiler_mod(struct compiler *c, mod_ty mod)
     co = assemble(c, addNone);
     return co;
 }
-{{< /highlight >}}
+```
 
 [compiler_body()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L1743)循环访问模块中的每条语句，和symtable的工作方式类似:
-{{< highlight c>}}
+```c
 static int
 compiler_body(struct compiler *c, asdl_seq *stmts)
 {
@@ -669,16 +661,16 @@ compiler_body(struct compiler *c, asdl_seq *stmts)
         VISIT(c, stmt, (stmt_ty)asdl_seq_GET(stmts, i));
     return 1;
 }
-{{< /highlight >}}
+```
 [asdl_seq_GET()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/asdl.h#L32)查看每个AST节点的类型得到语句的类型，然后通过宏，VISIT调用compiler_visit_*函数:
-{{< highlight c>}}
+```c
 #define VISIT(C, TYPE, V) {\
     if (!compiler_visit_ ## TYPE((C), (V))) \
         return 0; \
 }
-{{< /highlight >}}
+```
 对于语句类型来说，就是到[compiler_visit_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L3310)函数，然后具体每条语句也有自己的编译函数:
-{{< highlight c>}}
+```c
 static int
 compiler_visit_stmt(struct compiler *c, stmt_ty s)
 {
@@ -699,17 +691,17 @@ compiler_visit_stmt(struct compiler *c, stmt_ty s)
     }
     return 1;
 }
-{{< /highlight >}}
+```
 
 我们以for语句为例:
-{{< highlight python>}}
+```python
 for i in iterable:
     # block
 else:  # optional if iterable is False
     # block
-{{< /highlight >}}
+```
 对于一个For类型的语句，它会调用compiler_for()。所有的语句和表达式类型都有相应的compiler_*()函数，大多数类型直接在其中创建字节码，也有些比较复杂的语句类型还会调用其他函数。许多语句都可能会有子句，for循环在赋值和迭代时也可能遇到复杂的表达式。compiler_for()将blocks发送给编译器状态，这些blocks包含指令(指令对应着opcode)，参数，目标block(如果是跳转指令)，以及行号:
-{{< highlight c>}}
+```c
 typedef struct basicblock_ {
     struct basicblock_ *b_list; //指向编译器状态的block列表
     int b_iused;                // 已经使用的指令数组的容量
@@ -721,9 +713,9 @@ typedef struct basicblock_ {
     int b_startdepth;           // 该block的栈深度
     int b_offset;               // 汇编程序的指令偏移量
 } basicblock;
-{{< /highlight >}}
+```
 对于For类型语句的解析，编译器进行了15步操作:
-{{< highlight c>}}
+```c
 static int
 compiler_for(struct compiler *c, stmt_ty s)
 {
@@ -748,7 +740,7 @@ compiler_for(struct compiler *c, stmt_ty s)
     compiler_use_next_block(c, end);                     // 15.使用end block
     return 1;
 }
-{{< /highlight >}}
+```
 
 当这一步执行完，编译器就有了一组frame block，其中的每一个都包含一组指令以及指向下一个block的指针。
 
@@ -765,7 +757,7 @@ compiler_for(struct compiler *c, stmt_ty s)
 
 ### 创建代码对象
 [makecode()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5854)方法通过编译器状态、一些汇编器的属性，然后调用[PyCode_New()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/codeobject.c#L246)把它们放在一个PyCodeObject中:
-{{< highlight c>}}
+```c
 static PyCodeObject *
 makecode(struct compiler *c, struct assembler *a)
 {
@@ -791,29 +783,28 @@ makecode(struct compiler *c, struct assembler *a)
 ...
     return co;
 }
-{{< /highlight >}}
+```
 变量名称、常量等都是code对象的属性，此外[PyCode_Optimize()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/peephole.c#L230)方法还对字节码进行了一定程度的优化，这个优化器叫窥孔优化器，被放在一个专门的`Python/peephole.c`中，它会仔细检查每条指令，并在合适的情况下将部分指令替换为其他指令。例如其中有一项优化叫常量展开，它能把语句`a = 1 + 5`优化为`a = 6`。
 
 ### 字节码
 字节码被存储在代码对象(即`__code__`)的`co_code`中，以一个函数为例:
-{{< highlight python>}}
+```python
 >>> def add(x, y):                                                                                          
 ...     z = x + y
 ...     return z
 
 >>> " ".join(str(b) for b in add.__code__.co_code)
 '124 0 124 1 23 0 125 2 124 2 83 0'
-{{< /highlight >}}
+```
 字节码中每两个数字为一组，第一个为指令，第二个为参数，指令对应的二进制数可以在CPython源码中找到:
-{{< highlight c>}}
-<!-- cpython/Include/opcode.h -->
+```c title="cpython/Include/opcode.h"
 #define BINARY_ADD               23
 #define RETURN_VALUE             83
 #define LOAD_FAST               124
 #define STORE_FAST              125
-{{< /highlight >}}
+```
 这就可以和dis的输出结果对应起来:
-{{< highlight python>}}
+```python
 >>> dis.dis(add)
 <!-- 源码行    偏移量 指令           参数(目标对象)  -->
   2           0 LOAD_FAST                0 (x)
@@ -823,7 +814,7 @@ makecode(struct compiler *c, struct assembler *a)
 
   3           8 LOAD_FAST                2 (z)
              10 RETURN_VALUE
-{{< /highlight >}}
+```
 指令所对应的源码行这个信息其实保存在代码对象的两个相关属性中，`co_firstlineno`用来存储该段代码起始的行号，`co_lnotab`由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。每条字节码指令代表的意义可通过官方文档[此处](https://docs.python.org/3/library/dis.html)查询到。
 
 
@@ -879,7 +870,7 @@ PyEval_EvalCode()是执行一个code对象的公共API，它会在执行栈的�
 frame在[_PyEval_EvalFrameDefault()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L745)内的3000多行代码的主循环中执行。这个函数是整个CPython的核心，它包含了数十年的变化，即使是一行代码的改变也可能对整个CPython的性能产生重大影响。
 
 我们可以在Python3.7以上的版本中通过在当前线程启用追踪来跟踪每一步frame的执行，例如如下代码可以打印每一步反汇编的opcode，调用了哪个code对象，执行至第几行，返回值是什么:
-{{< highlight python>}}
+```python
 import sys
 import dis
 import traceback
@@ -908,28 +899,28 @@ sys.settrace(trace)
 
 # Run some code for a demo
 eval('"-".join([letter for letter in "hello"])')
-{{< /highlight >}}
+```
 
 ### 值栈
 在核心执行循环逻辑内，一个存储值的栈被创建，它存储了一组指针指向PyObject实例。例如，我们可以压栈:
-{{< highlight c>}}
+```c
 PyObject *a = PyLong_FromLong(10);
 PyObject *b = PyLong_FromLong(20);
 PUSH(a);
 PUSH(b);
-{{< /highlight >}}
+```
 运行前后如图:
 ![](./images/value_stack.png)
 有很多字节操作码opcode是直接操作栈的，例如PUSH()、POP()、PEEK()、DUP_TOP()、ROT_TWO()等。所有的opcode都会对栈有一个影响，这被定义在[stack_effect()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L878)方法中。
 
 #### 举例:向list中添加一个元素
 在Python中，我们通过append()方法添加元素:
-{{< highlight python>}}
+```python
 my_list = []
 my_list.append(obj)
-{{< /highlight >}}
+```
 在CPython中，这个操作对应着两个操作。LOAD_FAST将对象obj从frame的局部变量列表中加载到值栈的顶部，然后LIST_APPEND操作添加这个对象至list中。我们先来看LOAD_FAST:
-{{< highlight c>}}
+```c
  ... 
     case TARGET(LOAD_FAST): {
         // 变量的指针都存储在fastlocals区域，它是PyFrame的f_localsplus的拷贝。
@@ -951,9 +942,9 @@ my_list.append(obj)
         FAST_DISPATCH();                                   
     }
  ...
-{{< /highlight >}}
+```
 接着，LIST_APPEND是通过POP()获取到元素obj的指针，PEEK(oparg)获取到my_list的指针，然后使用CPython列表的C的API即PyList_Append()将元素添加进去的:
-{{< highlight c>}}
+```c
  ...
         case TARGET(LIST_APPEND): {
             PyObject *v = POP();
@@ -967,23 +958,23 @@ my_list.append(obj)
             DISPATCH();
         }
  ...
-{{< /highlight >}}
+```
 其后的PREDICT(JUMP_ABSOLUTE)属于一种预测手段，它会猜下一个opcode可能是JUMP_ABSOLUTE，这样CPU就可以直接跳转过去而不需要重新跑一遍主循环了。
 
 #### 调用追踪
 有一些指令例如CALL_FUNCTION、CALL_METHOD，它们的参数opcode实际上是另一个已经编译好的函数。那么另一个frame就会压入当前线程的执行栈帧中，主循环会先把这个新的函数运行完以后在运行原函数。每次新的frame创建时，它会有一个f_back属性就是指向当前的frame。
 
 例如有这样一段python代码:
-{{< highlight python>}}
+```python title="example_stack.py"
 def function2():
   raise RuntimeError
 def function1():
   function2()
 if __name__ == '__main__':
   function1()
-{{< /highlight >}}
+```
 它运行后:
-{{< highlight shell>}}
+```sh
 $ ./python.exe example_stack.py
 
 Traceback (most recent call last):
@@ -994,9 +985,9 @@ Traceback (most recent call last):
   File "example_stack.py", line 2, in function2
     raise RuntimeError
 RuntimeError
-{{< /highlight >}}
+```
 这些调用追踪信息，实际上可以通过标准库traceback的walk_stack()函数得到:
-{{< highlight python>}}
+```python
 def walk_stack(f):
     """Walk a stack yielding the frame and line number for each frame.
     This will follow f.f_back from the given frame. If no frame is given, the
@@ -1007,7 +998,7 @@ def walk_stack(f):
     while f is not None:
         yield f, f.f_lineno
         f = f.f_back
-{{< /highlight >}}
+```
 它先通过Python的API即sys._getframe()得到当前的frame，然后找它的f_back.f_back是为了跳过其本身walk_stack()函数和其父亲print_trace()函数。
 
 用图形来表达这个调用追踪关系就是:
@@ -1026,7 +1017,7 @@ CPython中的对象
 核心数据模型是在PyTypeObject中定义的，而它们的方法是在如下位置定义的:
 
 | 文件名 | 类型 |
-| --- | --- |
+| --- | :---: |
 | Objects/object.c | 内置类型 |
 | Objects/boolobject.c | bool |
 | Objects/bytearrayobject.c | byte[] |
@@ -1052,7 +1043,7 @@ CPython中的对象
 
 ### 布尔和整数
 布尔类是内置类型中最直接的实现，它继承自long，并在解释器中创建了常量Py_True和Py_False。在Objects/boolobject.c中我们可以看到帮助函数通过数字来创建布尔类型的实例:
-{{< highlight c>}}
+```c
 PyObject *PyBool_FromLong(long ok)
 {
     PyObject *result;
@@ -1063,29 +1054,29 @@ PyObject *PyBool_FromLong(long ok)
     Py_INCREF(result);
     return result;
 }
-{{< /highlight >}}
+```
 此外，也实现了一些and、xor、or之类的帮助函数，但加法、减法、除法是没有从继承的long中实现的。
 
 检测`a and b`的结果是先检测a和b是否为布尔值，然后检查它们是否有对Py_True的引用，都不是的话则把它们强制转化为数字进行数字之间的and操作:
-{{< highlight c>}}
+```c
 static PyObject *bool_and(PyObject *a, PyObject *b)
 {
     if (!PyBool_Check(a) || !PyBool_Check(b))
         return PyLong_Type.tp_as_number->nb_and(a, b);
     return PyBool_FromLong((a == Py_True) & (b == Py_True));
 }
-{{< /highlight >}}
+```
 
 long类型会复杂一些，因为它需要更大的内存。Python3已经舍弃掉了Python2中对int类型的支持，而是都使用long类型，而long又非常特殊，因为它可以存储的是一个变长整数。它的结构由一个PyObject的头部和一个数字的列表组成，数字列表一开始设置为只有1个数字，但初始化之后会调用 [_PyLong_New()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/longobject.c#L262)方法重新分配内存，并调整为一个更大的长度:
-{{< highlight c>}}
+```c
 struct _longobject {
     PyObject_VAR_HEAD
     digit ob_digit[1];
 };
-{{< /highlight >}}
+```
 
 要将C语言的long类型转换为Python中的long类型，需要先将C中的long转换为一个数字列表，分配Python中long需要的内存，然后去设置每个数字:
-{{< highlight c>}}
+```c
 PyObject *
 PyLong_FromLong(long ival)
 {
@@ -1126,12 +1117,12 @@ PyLong_FromLong(long ival)
     }
     return (PyObject *)v;
 }
-{{< /highlight >}}
+```
 此外，将双精度浮点数转换为Python中的long以及Unicode进行转换都在`longobject.c`中有相应的方法。
 
 ### 生成器类型
 Python中的生成器是指使用yield，通过连续的调用以生成更多的值。通常用于较大的数据块中来起到节约内存、提升效率的作用。如:
-{{< highlight python>}}
+```python
 >>> def example():
 ...   lst = [1,2,3,4]
 ...   for i in lst:
@@ -1139,9 +1130,9 @@ Python中的生成器是指使用yield，通过连续的调用以生成更多的
 >>> gen = example()
 >>> gen
 <generator object example at 0x100bcc480>
-{{< /highlight >}}
+```
 我们深入探索生成器对象，发现它有一些gi_开头的属性:
-{{< highlight python>}}
+```python
 >>> dir(gen)
 [ ...
  'close', 
@@ -1151,7 +1142,7 @@ Python中的生成器是指使用yield，通过连续的调用以生成更多的
  'gi_yieldfrom', 
  'send', 
  'throw']
-{{< /highlight >}}
+```
 在CPython中，生成器类型有三种，定义在`Include/genobject.h`的PyGenObject类型中，即Generator objects、Coroutine objects和Async generator objects。它们共享一些字段并且也有相似的行为逻辑:
 ![](./images/generators.png)
 我们以PyGenObject为例看看这些字段的用途:
@@ -1164,7 +1155,7 @@ Python中的生成器是指使用yield，通过连续的调用以生成更多的
 * gi_exc_state，是一个存储异常的元组，存储生成器调用过程中的异常
 
 当我们每次在Python中调用生成器的__next__方法时，其背后的gi_code字段会在一个新的frame中执行，并将返回值push到值栈中。它本质上调用的是[gen_send_ex()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/genobject.c#L153)方法，这个方法将生成器对象转换为下一个产生结果的函数，它和之前通过代码对象构造frame有很多类似之处:
-{{< highlight c>}}
+```c
 static PyObject *
 gen_send_ex(PyGenObject *gen, PyObject *arg, int exc, int closing)
 {
@@ -1284,7 +1275,7 @@ gen_send_ex(PyGenObject *gen, PyObject *arg, int exc, int closing)
     // 最终，结果返回给调用__next__()方法者
     return result; 
 }
-{{< /highlight >}}
+```
 
 综上，生成器是一种强大的语法，通过yield关键字触发整个流程，创建唯一对象，将已编译的代码对象复制为其属性，设置frame并为其存储局部变量列表。这一切对用户看起来很神奇，但其底层并不复杂。
 
@@ -1307,7 +1298,7 @@ Python被称为"内置电池"的语言，主要在于其强大的标准库涵盖
 4. 把每一个参数发送给file
 5. 把`\n`发送给file
 
-{{< highlight c>}}
+```c
 static PyObject *
 builtin_print(PyObject *self, PyObject *const *args, Py_ssize_t nargs, PyObject *kwnames)
 {
@@ -1338,10 +1329,10 @@ builtin_print(PyObject *self, PyObject *const *args, Py_ssize_t nargs, PyObject 
     ...
     Py_RETURN_NONE;
 }
-{{< /highlight >}}
+```
 
 用C来编写某些标准库是因为需要使用一些操作系统的功能，而不同的操作系统的接口可能是不一样的，CPython需要把它们抽象为统一的API接口供用户使用:
-{{< highlight c>}}
+```c
 #ifdef HAVE_SYS_TIMES_H
 #include <sys/times.h>
 #endif
@@ -1352,7 +1343,7 @@ builtin_print(PyObject *self, PyObject *const *args, Py_ssize_t nargs, PyObject 
 #include "pythread.h"
 #endif /* MS_WINDOWS */
 ...
-{{< /highlight >}}
+```
 
 GIL
 -------
@@ -1362,8 +1353,7 @@ GIL
 对于IO密集型任务，线程是在发生阻塞时主动释放GIL的，让其他线程得以执行。而对于CPU密集型任务，采取超时策略。
 
 当GIL被其他线程占用时，等待线程会阻塞一段时间。如果超时（默认为0.005秒）后，依然无法获取锁，则发出请求。这种请求设计的很轻巧，就是一个全局条件变量设置。正在执行的线程在解释循环内会检查该标记，然后释放锁，切换线程执行，其自身进入等待状态。属于典型的协作机制。相关源码:
-{{< highlight c>}}
-<!-- cpython/Python/ceval.c -->
+```c title="cpython/Python/ceval.c"
 main_loop:
     for (;;) {
         if (_Py_atomic_load_relaxed(eval_breaker)) {
@@ -1386,7 +1376,7 @@ main_loop:
           ...
         }
     }
-{{< /highlight >}}
+```
 CPython使用系统线程，且没有实现线程调度。所以，具体哪个等待线程被切换执行，由操作系统决定。甚至，发出请求和被切换执行的未必就是同一个线程。
 
 对于CPU密集型任务，除了使用多进程架构绕开，也可以使用C来编写多线程的扩展也能绕开GIL限制。
