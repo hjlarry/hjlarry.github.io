@@ -1,10 +1,3 @@
----
-title: "常用工具整理"
-draft: false
-bookcomments: true
----
-
-
 # 常用工具整理
 
 
@@ -25,7 +18,7 @@ bookcomments: true
 * 系统基本信息(中断的次数、上下文切换的次数)
 
 如下所示:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac $ dstat
 You did not select any stats, using -cdngy by default.
 --total-cpu-usage-- -dsk/total- -net/total- ---paging-- ---system--
@@ -34,14 +27,14 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
   0   0 100   0   0|   0     0 |   0     0 |   0     0 | 140   323
   0   0 100   0   0|   0     0 |   0     0 |   0     0 | 163   376
   0   1 100   0   0|   0     0 |   0     0 |   0     0 | 169   391
-{{< /highlight >}}
+```
 
 生产环境下我们程序出错的时候，应该先从大的方面入手定位到具体是哪个方面的问题，看看当前的系统环境有没有问题，是不是我们的程序在当前的系统环境下水土不服。比如程序是IO密集型的，系统中有另一个程序在和它抢磁盘资源等。可以通过`dstat --list`查看它能对哪些细分项目查看其情况。[查看更多使用示例](http://dag.wiee.rs/home-made/dstat/)
 
 
 ### sysstat
 通过定位了系统中哪个方面的问题之后，接着我们应该去定位我们自己程序哪个方面有问题。sysstat可以根据单个进程去检查它的各个方面，比如说我们定位到是内存方面的问题，接着去看自己程序中内存的问题:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac $ pidstat -r -p `pidof tmux` 2
 Linux 4.9.184-linuxkit (cabd4e519687) 	12/09/19 	_x86_64_	(2 CPU)
 
@@ -50,23 +43,23 @@ Linux 4.9.184-linuxkit (cabd4e519687) 	12/09/19 	_x86_64_	(2 CPU)
 10:02:42        0        35      0.00      0.00   27424    4000   0.20  tmux: server
 10:02:44        0        35      0.00      0.00   27424    4000   0.20  tmux: server
 10:02:46        0        35      0.00      0.00   27424    4000   0.20  tmux: server
-{{< /highlight >}}
+```
 我们把tmux当做是自己写的某个程序，每2秒输出一次信息。minflt/s就代表一些小范围的缺页异常，可能是一些数据不需要了只要补上相应的物理内存即可。而majflt/s代表了需要从硬盘换入内存，这可能就意味着我们程序是不是有的任务优先级太低被操作系统换出到硬盘上了，我们可能需要通过系统调用告诉操作系统把某段内存锁死。
 
 更详细的使用方法，请参考[官方文档](http://sebastien.godard.pagesperso-orange.fr/documentation.html)。
 
 ### strace
 接着我们可以深入到自己程序的逻辑中去，比如使用strace检查我们程序的系统调用。可能只是一个简单的程序:
-{{< highlight go>}}
+```go
 package main
 
 func main() {
 	println("hello world!")
 }
-{{< /highlight >}}
+```
 
 却涉及到大量的系统调用:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac $ go build test.go
 [ubuntu] ~/.mac $ strace ~/.mac/test
 execve("/root/.mac/test", ["/root/.mac/test"], 0x7ffec1a0b740 /* 14 vars */) = 0
@@ -92,12 +85,12 @@ rt_sigaction(SIGINT, {sa_handler=0x44d8f0, sa_mask=~[], sa_flags=SA_RESTORER|SA_
 
 ......
 
-{{< /highlight >}}
+```
 
 打印输入输出必然会涉及系统调用，但如果我们使用一些第三方库时发现系统调用仍然很多，就可以去查找有没有优化替代的方案。
 
 一般，我们查看一些摘要信息即可:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac $ strace -c ~/.mac/test
 hello world!
 % time     seconds  usecs/call     calls    errors syscall
@@ -116,13 +109,13 @@ hello world!
   0.00    0.000000           0         1         1 openat
 ------ ----------- ----------- --------- --------- ----------------
 100.00    0.000000                   140         1 total
-{{< /highlight >}}
+```
 
 
 开发工具
 -------
 
-GNU通用的开发工具，也叫**binutils**，是一个标准，属于随身带的瑞士军刀，任何语言编写的程序都适用，但可能与语言自带的工具链细节上有些出入。[官方网站](https://www.gnu.org/software/binutils/)
+GNU通用的开发工具，也叫​**binutils**，是一个标准，属于随身带的瑞士军刀，任何语言编写的程序都适用，但可能与语言自带的工具链细节上有些出入。[官方网站](https://www.gnu.org/software/binutils/)
 
 它主要包括:
 
@@ -140,7 +133,7 @@ GNU通用的开发工具，也叫**binutils**，是一个标准，属于随身�
 
 ### readelf
 查看elf文件的头部信息:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ readelf -h hello
 ELF Header:
   Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00      // 魔法数，可以快速读取出来用于预判整个文件是不是一个合法的内容
@@ -162,10 +155,10 @@ ELF Header:
   Size of section headers:           64 (bytes)
   Number of section headers:         8
   Section header string table index: 7
-{{< /highlight >}}
+```
 
 查看其执行时需要向内存(进程)中载入哪些信息:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ readelf -l hello
 Elf file type is EXEC (Executable file)
 Entry point 0x4000b0
@@ -181,10 +174,10 @@ Program Headers:
   Segment Sections...
    00     .text
    01     .data
-{{< /highlight >}}
+```
 
 查看其本身的section信息:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ readelf -S hello
 There are 8 section headers, starting at offset 0x2e0:
 Section Headers:
@@ -211,20 +204,20 @@ Key to Flags:
   L (link order), O (extra OS processing required), G (group), T (TLS),
   C (compressed), x (unknown), o (OS specific), E (exclude),
   l (large), p (processor specific)
-{{< /highlight >}}
+```
 
 查看其section的内容，例如我们想看其`.data`段的，它是第2个段，可以使用16进制和字符串的方式:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ readelf -x 2 hello
 Hex dump of section '.data':
   0x006000d8 68656c6c 6f2c2077 6f726c64 210a     hello, world!.
 [ubuntu] ~/.mac/assem $ readelf -p 2 hello
 String dump of section '.data':
   [     0]  hello, world!
-{{< /highlight >}}
+```
 
 查看其符号表信息:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ readelf -s hello
 Symbol table '.symtab' contains 11 entries:
    Num:    Value          Size Type    Bind   Vis      Ndx Name
@@ -239,7 +232,7 @@ Symbol table '.symtab' contains 11 entries:
      8: 00000000006000e6     0 NOTYPE  GLOBAL DEFAULT    2 __bss_start
      9: 00000000006000e6     0 NOTYPE  GLOBAL DEFAULT    2 _edata
     10: 00000000006000e8     0 NOTYPE  GLOBAL DEFAULT    2 _end
-{{< /highlight >}}
+```
 
 * ABS 表示无需链接器处理。
 * UND 表示在本地引用的外部全局符号。
@@ -250,30 +243,30 @@ Symbol table '.symtab' contains 11 entries:
 
 ### size
 使用size可以快捷的查看其`.text`、`.data`、`.bss`段的大小:
-{{< highlight sh>}}
+```sh
 root@cabd4e519687:~/.mac# size test
    text	   data	    bss	    dec	    hex	filename
  783967	  10904	 121704	 916575	  dfc5f	test
-{{< /highlight >}}
+```
 dec表示这三个段加起来的大小，hex是把dec转换为16进制后的值。
 
 ### nm
 使用nm也可查看其符号表信息:
 
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ nm hello
 00000000006000e6 D __bss_start
 00000000006000e6 D _edata
 00000000006000e8 D _end
 00000000004000b0 T _start
 00000000006000d8 d hello
-{{< /highlight >}}
+```
 
 其中，`00000000006000e6`表示链接器安排给这个符号的虚拟内存地址；`D`表示它的类型，大写是全局的、可以跨文件访问到的，小写表示本地的。
 
 ### strip
 使用strip可以剔除其符号表，减少文件本身的大小。默认为`-s`剔除的符号，也可以`-S`仅剔除掉调试用的符号。
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ strip -S hello
 [ubuntu] ~/.mac/assem $ readelf -s hello
 Symbol table '.symtab' contains 8 entries:
@@ -290,12 +283,12 @@ Symbol table '.symtab' contains 8 entries:
 [ubuntu] ~/.mac/assem $ readelf -s hello
 [ubuntu] ~/.mac/assem $ nm hello
 nm: hello: no symbols
-{{< /highlight >}}
+```
 
 ### objcopy
 可以在可执行文件中自己创建section，藏一些东西，比如背景mp3文件等。我们就可以用到objcopy工具:
 
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ objcopy --add-section .abc=addr.c --set-section-flags .abc=noload,readonly hello hello2
 [ubuntu] ~/.mac/assem $ readelf -S hello2
 There are 5 section headers, starting at offset 0x190:
@@ -315,18 +308,18 @@ Section Headers:
 [ubuntu] ~/.mac/assem $ readelf -p .abc hello2
 String dump of section '.abc':
   [     0]  // 查看基址变址的寻址方式^J#include <stdio.h>^J^Jint main(){^J    int x[3];^J    for(int i=0;i<3;i++){^J        x[i]= 0x22;^J
-{{< /highlight >}}
+```
 
 我们为可执行文件hello新增了一个`.abc`的段，它的内容读取自`addr.c`文件，它的权限是只读的且无需载入的，并且把它另存为了hello2。此外，我们也可以使用别的文件的内容来更新某个section，或者对section进行重命名、删除等操作:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ objcopy --rename-section .abc=.demo hello2
 [ubuntu] ~/.mac/assem $ objcopy --update-section .demo=makefile hello2
 [ubuntu] ~/.mac/assem $ objcopy --remove-section .demo hello2
-{{< /highlight >}}
+```
 
 ### objdump
 主要用来查看反汇编代码，使用`objdump -d <file>`反汇编某文件`.text`段的内容，默认为att格式，可使用`-M`指定其他格式。
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ objdump -M intel -d fr
 
 fr:     file format elf64-x86-64
@@ -351,17 +344,17 @@ Disassembly of section .text:
   4000d5:	b8 3c 00 00 00       	mov    eax,0x3c
   4000da:	48 31 ff             	xor    rdi,rdi
   4000dd:	0f 05                	syscall
-{{< /highlight >}}
+```
 
 ### ldd
 用来查看可执行文件依赖的动态链接库信息:
-{{< highlight sh>}}
+```sh
 $ ldd ./test
 
   linux-vdso.so.1 (0x00007ffcf79ec000)
   libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fa010663000)  # 运行库
   /lib64/ld-linux-x86-64.so.2 (0x00007fa01085b000)                   # 动态链接器
-{{< /highlight >}}
+```
 
 ### vim
 vim提供了多种操作模式，它的设计基于大多数时间都花在阅读、浏览和少量编辑:
@@ -387,7 +380,7 @@ vim提供了多种操作模式，它的设计基于大多数时间都花在阅�
 调试工具
 -------
 
-GNU通用的调试工具，也叫**gdb**。binutils属于静态的观察，而gdb就可以动态的观察到每一个汇编指令的执行。[官方网站](https://www.gnu.org/software/gdb/)
+GNU通用的调试工具，也叫​**gdb**。binutils属于静态的观察，而gdb就可以动态的观察到每一个汇编指令的执行。[官方网站](https://www.gnu.org/software/gdb/)
 
 也可以使用一些带图形界面的类似工具，例如[gdbgui](https://www.gdbgui.com/)。还有些[cheatsheet](https://kapeli.com/cheat_sheets/GDB.docset/Contents/Resources/Documents/index)很好用。
 
@@ -417,9 +410,9 @@ x/10xb [addr]| 查看内存地址addr开始的10组数据，16进制的，单位
 -------
 
 ### 构建工具
-GNU的自动构建工具为**make**，有些像脚本语言，把一堆命令放一起批量执行。使用它做编译属于增量编译，即通过对比修改时间来判断是否需要重新执行。[官方网站](https://www.gnu.org/software/make/)
+GNU的自动构建工具为​**make**，有些像脚本语言，把一堆命令放一起批量执行。使用它做编译属于增量编译，即通过对比修改时间来判断是否需要重新执行。[官方网站](https://www.gnu.org/software/make/)
 
-{{< highlight make>}}
+```make
 hello: hello.s
     nasm -g -f elf64 -o hello.o hello.s
     ld -o $@ hello.o
@@ -432,7 +425,7 @@ clean:
     -rm hello
     
 .PHONY: phonytest
-{{< /highlight >}}
+```
 
 对于这段构建代码，`hello:`后的部分就是告诉它要去检查哪些文件的修改时间；`$@`就表示当前这段的目标`hello`，`$<`表示这段的第一个依赖项，`$^`表示这段的所有依赖项；命令前加`-`表示该命令如有错误则忽略；`PHONY`是一个伪标签，上例中`make hello`会先检查文件是不是最新的再去执行命令，而`make phonytest`直接就执行命令了。另外，由于历史原因makefile只能使用tab来缩进，不能使用空格。
 

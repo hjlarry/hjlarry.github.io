@@ -1,8 +1,3 @@
----
-title: "Docker核心概要"
-draft: false
----
-
 # Docker概要
 
 镜像
@@ -21,7 +16,7 @@ docker pull [选项] [镜像仓库的地址[:端口号]/]仓库名[:标签]
 
 ### 列出镜像
 我们可以这样列出全部的镜像:
-{{< highlight sh>}}
+```powershell
 PS C:\Users\hejl> docker image ls
 REPOSITORY                                       TAG                 IMAGE ID            CREATED             SIZE
 hjlarry/cheers2019                               latest              f0c36061dc59        3 hours ago         4.01MB
@@ -30,7 +25,7 @@ ubuntu                                           18.04               ccc6e87d482
 ubuntu                                           latest              ccc6e87d482b        4 days ago          64.2MB
 golang                                           1.11-alpine         e116d2efa2ab        5 months ago        312MB
 gcr.azk8s.cn/google_containers/hyperkube-amd64   v1.9.2              583687acb4de        2 years ago         618MB
-{{< /highlight >}}
+```
 我们可以看到镜像ID是镜像的唯一标识，但标签可以有多个，例如ubuntu的18.04和latest是同一个镜像。
 
 镜像的体积可能会比Docker Hub中显示的要大一些，因为Docker Hub进行了一定的压缩。实际这些镜像占用的总空间也不是把他们加起来就能算出来，因为共同的层可以复用。镜像占用的总大小可以通过`docker system df`看到。
@@ -56,7 +51,7 @@ gcr.azk8s.cn/google_containers/hyperkube-amd64   v1.9.2              583687acb4d
 
 #### RUN
 用来执行命令行命令的，可以像shell脚本一样使用，但我们不应该把每个命令都去对应一个RUN，例如:
-{{< highlight dockerfile>}}
+```dockerfile
 FROM debian:stretch
 
 RUN apt-get update
@@ -66,9 +61,9 @@ RUN mkdir -p /usr/src/redis
 RUN tar -xzf redis.tar.gz -C /usr/src/redis --strip-components=1
 RUN make -C /usr/src/redis
 RUN make -C /usr/src/redis install
-{{< /highlight >}}
+```
 这样构建的镜像非常臃肿，添加了很多运行时不需要的东西，增加了构建部署的时间，也容易出错。应该这样写:
-{{< highlight dockerfile>}}
+```dockerfile
 FROM debian:stretch
 
 RUN buildDeps='gcc libc6-dev make wget' \
@@ -83,7 +78,7 @@ RUN buildDeps='gcc libc6-dev make wget' \
     && rm redis.tar.gz \
     && rm -r /usr/src/redis \
     && apt-get purge -y --auto-remove $buildDeps
-{{< /highlight >}}
+```
 所有的命令都是一个目的，即编译、安装redis可执行文件，没必要多层。此外，这组命令的最后添加了清理工作的命令，删除为了编译构建所需的文件，清理了所有下载、展开的文件，还清理了apt的缓存文件。镜像构建时，一定要确保每一层只添加真正需要添加的东西，任何无关的东西都应该清理掉。
 
 #### COPY
@@ -112,10 +107,10 @@ COPY --chown=bin files* /mydir/
 * ENV <key1>=<value1> <key2>=<value2> ...
 
 例如:
-{{< highlight dockerfile>}}
+```dockerfile
 ENV VERSION=1.0 DEBUG=on NAME="Happy Feet"
 RUN curl -SLO "https://nodejs.org/dist/v$VERSION/node-v$NAME-linux-x64.tar.xz"
-{{< /highlight >}}
+```
 
 #### ARG
 和ENV类似，也是设置环境变量，只是它在容器运行时不会存在这些环境变量。
@@ -132,10 +127,10 @@ RUN curl -SLO "https://nodejs.org/dist/v$VERSION/node-v$NAME-linux-x64.tar.xz"
 使用该指令可以指定当前目录(或者称为工作目录)，以后各层的当前目录就被设置为它，如该目录不存在则会自动创建该目录。
 
 比如我们可能会这样写:
-{{< highlight dockerfile>}}
+```dockerfile
 RUN cd /app
 RUN echo "hello" > world.txt
-{{< /highlight >}}
+```
 
 这样构建运行后，会发现找不到/app/world.txt这个文件，因为两个RUN代表两层，它们的执行环境不同，运行到第二层时启动的是一个全新的容器。这个时候就应该用`WORKDIR`指令进行设置。
 
@@ -154,14 +149,14 @@ dockerfile一般放在一个空目录或项目的根目录下，如果有东西�
 
 #### 其他构建方式
 还可以直接使用git repo的方式构建:
-{{< highlight sh>}}
+```powershell
 PS C:\Users\hejl>  docker build https://github.com/twang2218/gitlab-ce-zh.git#:11.1
 Sending build context to Docker daemon  6.144kB
 Step 1/23 : FROM gitlab/gitlab-ce:11.1.4-ce.0 as builder
 11.1.4-ce.0: Pulling from gitlab/gitlab-ce
 8ee29e426c26: Pull complete                                                                    6e83b260b73b: Pull complete                                                                    e26b65fd1143: Pull complete      
 ...
-{{< /highlight >}}
+```
 该命令指定了构建所需的git repo，指定了默认的master分支，构建目录为`/11.1/`，然后docker会自己去clone项目切换到指定分支，并进入指定目录进行构建。
 
 也可以通过tar压缩包构建，例如`docker build http://url/context.tar.gz`，会去下载tar压缩包并自动解压缩，以其为上下文，开始构建。
@@ -177,17 +172,17 @@ Step 1/23 : FROM gitlab/gitlab-ce:11.1.4-ce.0 as builder
 
 ### 创建容器
 使用`docker create <image>`可以基于镜像创建一个容器，创建后其处于停止状态，需要用启动命令启动。
-{{< highlight sh>}}
+```powershell
 PS C:\Windows\system32> docker create -it ubuntu:latest
 1179ee64f25b6ddbe95e916c4b888ff4d05878ebabd77c94658c9cbc8686b360
 PS C:\Windows\system32> docker start -i 117
 root@1179ee64f25b:/# ls
 bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
-{{< /highlight >}}
+```
 
 ### 启动容器
 使用`docker start <container_id/container_name>`可以将一个终止状态的容器启动运行。
-{{< highlight sh>}}
+```powershell
 PS C:\Windows\system32> docker container start -i f8b
 root@f8be09e399ae:/# ps
   PID TTY          TIME CMD
@@ -195,16 +190,16 @@ root@f8be09e399ae:/# ps
    10 pts/0    00:00:00 ps
 root@f8be09e399ae:/# exit
 exit
-{{< /highlight >}}
+```
 使用`ps`或`top`可以查看进程信息，说明容器中仅运行了默认的bash应用。
 
 ### 新建并启动
 使用`docker run`命令，相当于`docker create`+`docker start`，例如:
-{{< highlight sh>}}
+```powershell
 PS C:\Users\hejl> docker run -i -t ubuntu:latest
 root@f8be09e399ae:/# ls
 bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
-{{< /highlight >}}
+```
 
 `-t`选项让docker分配一个伪终端来绑定到容器的标准输入上，`-i`选项让容器的标准输入保持打开。
 
@@ -222,7 +217,7 @@ bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  s
 很多时候，需要让Docker在后台运行而不是直接把执行命令的结果输出在当前宿主机上，此时可以通过添加`-d`参数来实现。`docker run`和`docker create`命令都可以使用该参数。
 
 但容器是否会长久运行，只取决于`docker run`到底跑了什么进程，和`-d`参数无关。如:
-{{< highlight sh>}}
+```powershell
 PS C:\Users\hejl> docker run -d ubuntu:18.04 /bin/sh -c "while true; do echo hello world; sleep 1; done"
 6ec4042f4d06f94a46aadebe8d05f33d9916985b19bae6d8d63ed867d89b3714
 PS C:\Users\hejl> docker logs 6ec
@@ -230,7 +225,7 @@ hello world
 hello world
 hello world
 ...
-{{< /highlight >}}
+```
 使用`docker logs`可以看到某后台运行的容器的输出信息。
 
 ### 查看所有容器
@@ -238,7 +233,7 @@ hello world
 
 ### 进入容器
 对于后台运行的容器，有时需要进入容器进行操作，可以使用`docker exec`或`docker attach`命令，但attach进入后如果输入`exit`退出容器会导致容器状态停止，所以更推荐`exec`的方式。
-{{< highlight sh>}}
+```powershell
 PS C:\Users\hejl> docker exec -it 6f8 bash
 root@6f8a756d46fe:/# ls
 bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
@@ -246,7 +241,7 @@ root@6f8a756d46fe:/# exit
 exit
 PS C:\Users\hejl> docker attach 6f8
 root@6f8a756d46fe:/#    
-{{< /highlight >}}
+```
 
 ### 终止和删除
 使用`docker stop <container_id/container_name>`可停止运行中的容器。
@@ -345,16 +340,16 @@ Compose的定位是定义和运行多个Docker容器的应用，其中有两个�
 
 #### build
 指定Dockerfile所在文件夹的路径，可以是绝对路径或是相对于`docker-compose.yml`文件的相对路径。如:
-{{< highlight yml>}}
+```yml
 version: '3'
 services:
 
   webapp:
     build: ./dir
-{{< /highlight >}}
+```
 
 也可以使用context指令指定Dockerfile所在的文件夹路径，使用dockerfile指令指定Dockerfile的文件名，使用arg指令指定构建镜像时的变量。如：
-{{< highlight yml>}}
+```yml
 version: '3'
 services:
 
@@ -364,11 +359,11 @@ services:
       dockerfile: Dockerfile-alternate
       args:
         buildno: 1
-{{< /highlight >}}
+```
 
 #### command
 会覆盖掉容器启动后默认执行的命令。例如:
-{{< highlight yml>}}
+```yml
 version: "3"
 services:
 
@@ -376,7 +371,7 @@ services:
      image: mysql:8.0
      command:
       - --character-set-server=utf8mb4
-{{< /highlight >}}
+```
 没有command时只启动`mysqld`，加上以后变为`mysqld --character-set-server=utf8mb4`
 
 #### depends_on
@@ -384,7 +379,7 @@ services:
 
 #### environment
 设置环境变量，可以使用如下两种格式:
-{{< highlight yml>}}
+```yml
 environment:
   RACK_ENV: development
   SESSION_SECRET:
@@ -392,7 +387,7 @@ environment:
 environment:
   - RACK_ENV=development
   - SESSION_SECRET
-{{< /highlight >}}
+```
 在这里设置的环境变量，不能用于容器的构建过程中，只能在容器运行以后才能获取到。例如若dockerfie中有一层是`RUN flask db migrate`，则它无法获取到`docker-compose.yml`中设置的数据库连接的环境变量。正确的方法是dockerfile中没有这一层，而是通过`docker-compose run --rm web flask db migrate`来达到目的。
 
 #### expose

@@ -1,8 +1,3 @@
----
-title: "Git原理和技巧"
-draft: false
----
-
 # Git原理和技巧
 
 Git本质上是一个内容寻址(content-addressable)文件系统，并在此之上提供了一个版本控制系统的用户界面。了解底层原理，可以更好的帮助我们理清思路，知道真正在操作什么，而不会迷失在大量的指令和参数上。
@@ -26,16 +21,16 @@ Git本质上是一个内容寻址(content-addressable)文件系统，并在此�
 那么git对象到底是什么呢？因为Git的核心是一个内容寻址文件系统，可以理解为一个简单的键值对数据库。当我们向它插入一个任意类型的内容时，它会返回一个键值对，通过键值对能够在任意时刻再次检索到该内容。
 
 当我们初始化时，`.git`中会有一个文件夹`objects`专门存储git对象:
-{{< highlight sh>}}
+```sh
 ➜  testgit git init
 Initialized empty Git repository in /home/hejl/testgit/.git/
 
 ➜  testgit git:(master) ls .git
 HEAD  branches  config  description  hooks  info  objects  refs
-{{< /highlight >}}
+```
 
 当我们添加一项内容的时候，这个objects文件夹就会多出一个文件:
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(master) echo 'abc' > test.txt
 ➜  testgit git:(master) ✗ git add .
 ➜  testgit git:(master) ✗ tree .git/objects/
@@ -46,7 +41,7 @@ HEAD  branches  config  description  hooks  info  objects  refs
 └── pack
 
 3 directories, 1 file
-{{< /highlight >}}
+```
 它的过程实际上是通过`sha1`算法计算出文件内容也就是`abc`的hash值，是一个40位的16进制的字符串，字符串的前两位作为一个文件夹名称，后38位作为文件名称。因为大多数的文件系统都讨厌单个目录中包含太多的文件，这会减慢其爬取的速度，Git用这个方法使得第一级目录最多256个。文件本身就是Git object，它的头部定义了类型，紧跟着是一个ASCII的空格(0x20)，然后是对象的大小多少字节，紧跟着一个null(0x00)，最后是对象本身的内容。整个文件通过`zlib`压缩存储。
 
 有四种类型的对象，它们分别是`blob`,`commit`,`tree`,`tag`。对象的寻址我们也可以通过伪码来表达:
@@ -75,17 +70,17 @@ type commit = struct{
 
 #### blob
 该种类型的对象存储的原始内容，例如刚才新增的对象就是这种类型:
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(master) ✗ git cat-file -t 8bae
 blob
 ➜  testgit git:(master) ✗ git cat-file -p 8bae
 abc
-{{< /highlight >}}
+```
 但它也只存储内容，例如工作区中该文件的路径、文件名称、创建时间等都不存储在这种类型的git对象中。
 
 #### commit
 当我们进行一次提交操作之后，就会产生两种类型的对象，一个是tree对象稍后再说，另一个就是commit对象。它的内容包括:
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(master) ✗ git commit -m "first commit"
 [master (root-commit) 37b766f] first commit
  1 file changed, 1 insertion(+)
@@ -108,7 +103,7 @@ author hjlarry <hjlarry@163.com> 1582182460 +0800
 committer hjlarry <hjlarry@163.com> 1582182460 +0800
 
 first commit
-{{< /highlight >}}
+```
 tree表示本次提交产生的另一个tree类型git对象的路径地址。author和committer大多数情况相同，但有时比如说我们把别人分支的一个commit通过`cherry-pick`加入我们的分支，这时committer是我们自己，author仍然是别人。这里author需要包含username、email(所以刚使用git时要求在gitconfig中设置用户名和邮箱)、时间戳。紧跟着是提交的message。
 
 实际上完整的commit对象的内容正是邮件的一种简单的格式，源于[RFC2822](https://www.ietf.org/rfc/rfc2822.txt)。还包括一个parent，指向本次提交的父commit对象的路径地址，因为现在是第一次提交，没有parent。以及一个gpgsig，通过PGP签名了一下这个对象，通过`cat-file`看不到。
@@ -117,7 +112,7 @@ tree表示本次提交产生的另一个tree类型git对象的路径地址。aut
 
 #### tree
 树对象解决的是文件名保存的问题，并能够将多个文件组织到一起。我们新建一次提交，添加更多内容为例:
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(master) echo 'abcdef' > test.txt
 ➜  testgit git:(master) ✗ mkdir adir
 ➜  testgit git:(master) ✗ echo '123' > adir/tt.txt
@@ -131,17 +126,17 @@ tree表示本次提交产生的另一个tree类型git对象的路径地址。aut
 100644 blob 0373d9336f8c8ee90faff225de842888e884a48b    test.txt
 ➜  testgit git:(master) git cat-file -p f1af
 100644 blob 190a18037c64c43e6b11489df4bf0b9eb6d2c9bf    tt.txt
-{{< /highlight >}}
+```
 它会把当前的目录结构打一个快照，相当于以表格的形式记录该目录下每一个目标的权限、类型(通常是文件blob，或者是文件夹变成一个新的tree对象)、哈希值(也就相当于文件路径)、文件名。
 
 也就是说，当我们通过`git add *`时会把工作区文件的文件内容生成一个blob object，并把文件名和blob的sha1等其他信息更新到暂存区的index文件中；当我们通过`git commit -m`时，git会根据index信息生成一个tree object，并创建一个新的commit object关联到这个tree。commit object的parent指向了上一个commit，当前分支的指针也会移动到新的commit结点。
 
 #### tag
-git中还有一种对象类型就是tag，它通常和commit差不多。见下文[标签引用](#标签引用)。
+git中还有一种对象类型就是tag，它通常和commit差不多。见下文[标签引用](#_6)。
 
 ### 引用
 引用本质上就是指向某个commit的指针，它被放在`.gits/refs`目录中。
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(master) tree .git/refs/
 .git/refs/
 ├── heads
@@ -151,7 +146,7 @@ git中还有一种对象类型就是tag，它通常和commit差不多。见下�
 2 directories, 1 file
 ➜  testgit git:(master) cat .git/refs/heads/master
 79380b0625150b1b71940cfac0b2a501793eac0c
-{{< /highlight >}}
+```
 其可以用伪码来表示:
 ```
 references = map<string, string>
@@ -168,15 +163,15 @@ def load_ref(name_or_id):
 
 #### 分支引用
 当我们新建一个分支时，就会在`.git/refs/heads`文件夹下多一个名称为分支名称的文件，内容就是一个commit的sha。当我们提交一次commit时，当前分支的引用的commit就会自动发生改变。
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(6c27f42) git branch testbranch
 ➜  testgit git:(testbranch) cat .git/refs/heads/testbranch
 6c27f425aae198e6c1e5098c13d352b3f27edfca
-{{< /highlight >}}
+```
 
 #### HEAD引用
 它是一个符号引用，指向当前所在的分支。它位于`.git/HEAD`文件。
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(master) cat .git/HEAD
 ref: refs/heads/master
 ➜  testgit git:(master) git checkout 6c27
@@ -184,12 +179,12 @@ Note: checking out '6c27'.
 You are in 'detached HEAD' state.
 ➜  testgit git:(6c27f42) cat .git/HEAD
 6c27f425aae198e6c1e5098c13d352b3f27edfca
-{{< /highlight >}}
+```
 当我们checkout某个commit时，HEAD会指向commit，这时候称为分离头指针(Detached HEAD)状态。
 
 #### 标签引用
 我们通常创建的都是轻量级标签，它只是一个引用，位于`.gits/refs/tags`文件夹下。但还可以创建另一种附注标签，它会额外创建一个tag object。
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(testbranch) git tag testmytag
 ➜  testgit git:(testbranch) cat .git/refs/tags/testmytag
 6c27f425aae198e6c1e5098c13d352b3f27edfca
@@ -205,7 +200,7 @@ tag v1.0
 tagger hjlarry <hjlarry@163.com> 1582267013 +0800
 
 test my tag
-{{< /highlight >}}
+```
 标签和分支的主要区别是:
 
 * 标签可以指向任意object，而分支只能指向commit object。
@@ -213,7 +208,7 @@ test my tag
 
 #### 远程引用
 当我们添加一个远程仓库，或者是从远程库clone过来时，就会有远程引用，它位于`.git/refs/remotes`文件夹下。
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(testbranch) tree ~/my_git/.git/refs/remotes
 /home/hejl/my_git/.git/refs/remotes
 └── origin
@@ -225,7 +220,7 @@ test my tag
 ref: refs/remotes/origin/master
 ➜  testgit git:(testbranch) cat ~/my_git/.git/refs/remotes/origin/master
 94985c6535a5493d493ce89631c7e417f5e7ecaa
-{{< /highlight >}}
+```
 远程引用和分支之间最主要的区别在于远程引用是只读的。虽然可以checkout到某个远程引用，但是Git并不会将HEAD引用指向该远程引用，这种情况仍然是分离头指针状态。 
 
 常用操作
@@ -235,7 +230,7 @@ ref: refs/remotes/origin/master
 
 #### FAST-FORWARD
 当试图合并两个分支时，如果顺着一个分支一路走下去能到达另一个分支，那么Git的合并只是把指针往前推进，所以叫快进模式(即Fast-forward)。
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(master) ✗ git checkout -b fixbug
 Switched to a new branch 'fixbug'
 ➜  testgit git:(fixbug) ✗ echo '123' > test.txt
@@ -250,14 +245,14 @@ Updating c658c0b..22a449d
 Fast-forward
  test.txt | 1 +
  1 file changed, 1 insertion(+)
-{{< /highlight >}}
+```
 合并时，会提示Fast-forward。
 
 另外，我们往往会把远程仓库的更新`git pull`下来，这背后实际上执行了两条指令，先`git fetch`再`git merge`，这种情况一般也属于Fast-forward合并。
 
 #### 三方合并
 非FAST-FORWARD情况时，就是一次三方合并。三方指的是当前分支节点、要合并的分支的节点以及它们的共同祖父节点。这种情况会把它们的内容合并起来，如果没有冲突的话会自动形成一个新的commit。
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(master) git checkout -b newfeature HEAD~2
 Switched to a new branch 'newfeature'
 ➜  testgit git:(newfeature) echo 'newfeature' > newfeature.txt
@@ -273,9 +268,9 @@ Merge made by the 'recursive' strategy.
  newfeature.txt | 1 +
  1 file changed, 1 insertion(+)
  create mode 100644 newfeature.txt
-{{< /highlight >}}
+```
 通过`git log --graph`可以观察到日志:
-{{< highlight sh>}}
+```sh
 *   commit 979309d67d62bd2fb3beeb009c20f750d362e93a (HEAD -> master)
 |\  Merge: 22a449d 68212fe
 | | Author: hjlarry <hjlarry@163.com>
@@ -300,9 +295,9 @@ Merge made by the 'recursive' strategy.
 |   Date:   Sun Feb 23 16:57:12 2020 +0800
 |
 |       8th commit
-{{< /highlight >}}
+```
 我们观察merge时的那个commit object会发现它是有两个parent的:
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(master) git cat-file -p 9793
 tree 88cab0838dc7d8ae476592dbd60b4bda86dafbd8
 parent 22a449d52fe269ed7c969c179c1788f89013ac2d
@@ -311,14 +306,14 @@ author hjlarry <hjlarry@163.com> 1582465615 +0800
 committer hjlarry <hjlarry@163.com> 1582465615 +0800
 
 Merge branch 'newfeature'
-{{< /highlight >}}
+```
 
 三方合并时，也经常会遇到发生冲突的情况。这时候git会暂停合并，给出提示，并在冲突的地方做出标记。我们需要手工处理，选择某个分支或者自行再做修改都可以，然后再自行`git add`和`git commit`即可。
 
 ### 变基
 
 基于之前三方合并的示例，还有一种合并分支的方法就是变基。它会在当前分支上重演一遍目标分支的历史，最后形成一个线性的提交历史。当前分支的commit object由于变更了其parent就会发生改变，而目标分支的commit object往往不会改变。
-{{< highlight sh>}}
+```sh
 ➜  testgit git:(master) git checkout -b testrebase HEAD~
 Switched to a new branch 'testrebase'
 ➜  testgit git:(testrebase) echo 'testrebase'>test.txt
@@ -332,9 +327,9 @@ Switched to branch 'master'
 ➜  testgit git:(master) git rebase testrebase
 First, rewinding head to replay your work on top of it...
 Applying: add new feature
-{{< /highlight >}}
+```
 依然观察日志:
-{{< highlight sh>}}
+```sh
 * commit cd2c246f0cfcd2d98717af0a405ac17fd23636bc (HEAD -> master)
 | Author: hjlarry <hjlarry@163.com>
 | Date:   Sun Feb 23 21:46:34 2020 +0800
@@ -358,14 +353,14 @@ Applying: add new feature
 | Date:   Sun Feb 23 16:57:12 2020 +0800
 |
 |     8th commit
-{{< /highlight >}}
+```
 
 它典型的使用场景，例如团队其他人维护的项目，我们在自己的分支上为其提供feature，然后把我们的分支变基到origin/master上，这样其他人只需要去FAST-FORWARD而无需人工整合。
 
 
 #### 交互式变基
 通过`git rebase -i <commit_id>`就能进入一个交互式界面:
-{{< highlight sh>}}
+```sh
 pick 2c70e0b second commit a
 pick c351a72 third commit
 
@@ -387,7 +382,7 @@ pick c351a72 third commit
 # However, if you remove everything, the rebase will be aborted.
 #
 # Note that empty commits are commented out
-{{< /highlight >}}
+```
 它会列出这个`commit_id`(可以用commit的hash或者`HEAD~3`这样的形式)的child一直到当前分支的最后一个commit，我们可以在这个界面中编辑想对每一个commit做的操作：
 
 * p，对这条commit不做任何变更
@@ -431,13 +426,13 @@ cherry-pick类似于一个定制化的merge，它可以把其它分支上的comm
 
 #### reflog
 引用日志记录了用户在本地更改的完整历史记录，通过`git reflog`可以查看到类似这样的信息
-{{< highlight sh>}}
+```sh
 e1b4a61 (HEAD) HEAD@{0}: revert: Revert "8th commit"
 979309d HEAD@{1}: checkout: moving from master to HEAD@{11}
 c658c0b (master) HEAD@{2}: reset: moving to c658
 5665150 HEAD@{3}: reset: moving to 5665
 ...
-{{< /highlight >}}
+```
 翻译过来就是:
 ```
 HEAD@{0} 撤销操作: 撤销的消息

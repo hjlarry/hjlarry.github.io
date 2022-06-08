@@ -1,15 +1,9 @@
----
-title: "Shell"
-draft: false
----
-
-
 # Shell
 
 什么是shell
 -------
 
-现代计算机有越来越多的GUI程序、语音输入程序、甚至VR、AR程序，这些交互方式能解决我们80%的使用场景，但它们还是从根本上限制了我们使用计算机的方式，你没法点击一个不存在的按钮。为了充分利用计算机的能力，我们不得不回到最根本的方式，即**shell**。
+现代计算机有越来越多的GUI程序、语音输入程序、甚至VR、AR程序，这些交互方式能解决我们80%的使用场景，但它们还是从根本上限制了我们使用计算机的方式，你没法点击一个不存在的按钮。为了充分利用计算机的能力，我们不得不回到最根本的方式，即​**shell**。
 
 所以，shell也是一种交互方式，有很多种类型的shell，例如系统自带的Windows的powershell、Linux的bash(Bourne-Again SHell)，还有开发者编写的zsh(Z Shell)、fish等都比较常见。
 
@@ -21,46 +15,46 @@ draft: false
 `$`表示当前不是root用户，`#`表示当前是root用户。
 
 除了内置的函数，shell通过递归`$PATH`中的目录找到合适的执行程序:
-{{< highlight sh>}}
+```sh
 [ubuntu] / $ echo $PATH
 /usr/local/go/bin:/root/go/bin:/usr/local/go/bin:/root/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 [ubuntu] / $ which echo
 /bin/echo
 [ubuntu] / $ /bin/echo $PATH
 /usr/local/go/bin:/root/go/bin:/usr/local/go/bin:/root/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-{{< /highlight >}}
+```
 
 当传递的参数包含空格时，应该使用单引号或双引号将其包起来，或者使用`\`转义一下，否则会被认为是两个参数:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~ $ mkdir My Photo
 [ubuntu] ~ $ ls
 My  Photo  go1.13.linux-amd64.tar.gz
 [ubuntu] ~ $ mkdir My\ Photo
 [ubuntu] ~ $ ls
  My  'My Photo'   Photo   go1.13.linux-amd64.tar.gz
-{{< /highlight >}}
+```
 
 `/`表示根目录，`~`表示home目录，`.`表示当前目录，`..`表示上级目录，还可以使用`-`来切换目录:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~ $ cd /tmp
 [ubuntu] /tmp $ cd -
 /root
 [ubuntu] ~ $ cd -
 /tmp
-{{< /highlight >}}
+```
 
 ### 程序间的连接
 在shell中，程序都有两个主要的流，即输入流和输出流。当程序需要读取数据时就是从输入流读取，这通常是你的键盘；当程序需要打印信息时，它会将信息放在输出流中，这通常是你的屏幕。然而我们也可以修改默认的输入输出流。
 
 例如，通过`> file`我们可以把输出流的内容放在一个文件中，通过`< file`我们可以从一个文件中读取内容作为输入流:
-{{< highlight sh>}}
+```sh
 [ubuntu] /tmp $ echo 'hello world' > hello.txt
 [ubuntu] /tmp $ cat < hello.txt > hello2.txt
 [ubuntu] /tmp $ cat hello2.txt
 hello world
-{{< /highlight >}}
+```
 也可以通过`>> file`把输出流的内容追加到文件的尾部，通过`|`把前面一个程序的输出作为后一个程序的输入:
-{{< highlight sh>}}
+```sh
 [ubuntu] /tmp $ echo 1234 >> hello2.txt
 [ubuntu] /tmp $ cat hello2.txt
 hello world
@@ -71,22 +65,22 @@ drwx------  2 root root    4096 Dec  6  2019 tmux-0
 -rw-r--r--  1 root root       1 Jun 15 10:13 hello3.txt
 -rwxr-xr-x  1 root root 1148709 Dec  9  2019 test
 drwx------  2 root root    4096 Dec  6  2019 tmux-0
-{{< /highlight >}}
+```
 
 ### root
 在大多数类Unix系统中，`root`用户都是很特殊的用户，它几乎可以不受限制的创建、读取、修改和删除系统中的任意文件。所以我们为避免对系统造成一定的破坏，通常不会使用root用户去登录，取而代之的是在需要的时候使用`sudo`命令。
 
 例如，Linux系统的笔记本的屏幕亮度是写在`/sys/class/backlight`文件中，我们通过修改它可以修改屏幕亮度，这就需要`sudo`，我们可能做这样的尝试:
-{{< highlight sh>}}
+```sh
 $ cd /sys/class/backlight/thinkpad_screen
 $ sudo echo 3 > brightness
 An error occurred while redirecting file 'brightness'
 open: Permission denied
-{{< /highlight >}}
+```
 我们依然会得到错误的没有权限的提示，这是因为shell中`|`,`>`,`<`，各个具体的程序是不知道他们的存在的，echo只知道把内容写入到某个输入流中，具体哪个它不知道，所以我们应该使用:
-{{< highlight sh>}}
+```sh
 $ echo 3 | sudo tee brightness
-{{< /highlight >}}
+```
 这样打开brightness的是tee这个程序，且这个程序是有root权限的，才能正确的修改。
 
 
@@ -97,7 +91,7 @@ $ echo 3 | sudo tee brightness
 
 ### 变量
 可以使用`foo=bar`来定义变量foo，但要注意空格。输出变量值时，单引号和双引号也有区别:
-{{< highlight sh>}}
+```sh
 [ubuntu] /tmp/missing $ foo = bar
 bash: foo: command not found
 [ubuntu] /tmp/missing $ foo=bar
@@ -105,7 +99,7 @@ bash: foo: command not found
 this is $foo
 [ubuntu] /tmp/missing $ echo "this is $foo"
 this is bar
-{{< /highlight >}}
+```
 
 同时，bash中也提供了一些特殊的变量:
 * `$0`，脚本名
@@ -121,23 +115,23 @@ this is bar
 
 ### 函数
 可以在一个脚本中编写函数:
-{{< highlight sh>}}
+```sh
 mcd () {
     mkdir -p "$1"
     cd "$1"
 }
-{{< /highlight >}}
+```
 
 然后使用source导入就可以使用该函数:
-{{< highlight sh>}}
+```sh
 [ubuntu] /tmp/missing $ source ./test.sh
 [ubuntu] /tmp/missing $ mcd tt
 [ubuntu] /tmp/missing/tt $
-{{< /highlight >}}
+```
 
 ### 命令替换
 可以通过`$(CMD)`的方式先来执行CMD，执行得到的结果替换掉$(CMD)。例如，`for file in $(ls)`使shell首先调用ls，然后遍历得到的这些返回值。此外，还可以通过`<(CMD)`去先执行CMD，然后将结果输出到一个临时文件中，并将<(CMD)替换成临时文件名。
-{{< highlight sh>}}
+```sh
 [ubuntu] /tmp $ echo "Starting program at $(date)"
 Starting program at Wed Jun 17 16:13:34 CST 2020
 [ubuntu] /tmp $ diff <(ls go) <(ls missing)
@@ -150,11 +144,11 @@ Starting program at Wed Jun 17 16:13:34 CST 2020
 > semester
 > test.sh
 > tt
-{{< /highlight >}}
+```
 
 ### 控制流
 我们先来看一个例子:
-{{< highlight sh>}}
+```sh
 #!/bin/bash
 
 echo "Starting program at $(date)" # Date will be substituted
@@ -170,7 +164,7 @@ for file in "$@"; do
         echo "# foobar" >> "$file"
     fi
 done
-{{< /highlight >}}
+```
 例如，运行`./test.sh a b c`，则遍历a、b、c三个文件，分别去寻找`foobar`字符串，如果没找到，错误返回值就是1。接着使用`-ne`来做比较`$?`不等于0，则把`# foobar`追加到这个文件中。
 
 注意，做比较时尽量使用双方括号`[[]]`，而非单方括号，可以降低犯错的几率。具体的原因和其他比较条件可参考[此文章](http://mywiki.wooledge.org/BashFAQ/031)。
@@ -179,7 +173,7 @@ done
 在shell中，可能经常需要输入一批类似的参数，例如`mkdir foo1 foo2 foo3`等等，如果挨个输入会很不方便，因此有了通配符。
 
 可以分别使用`?`和`*`来匹配一个或任意个字符，花括号`{}`中可以包含一系列的指令。
-{{< highlight sh>}}
+```sh
 [ubuntu] /tmp/missing/tt $ touch foo{1..20}.txt
 [ubuntu] /tmp/missing/tt $ ls
 foo1.txt   foo11.txt  foo13.txt  foo15.txt  foo17.txt  foo19.txt  foo20.txt  foo4.txt  foo6.txt  foo8.txt
@@ -197,19 +191,19 @@ bar123  foo123
 [ubuntu] /tmp/missing/tt $ touch {foo,bar}123/{a..h}
 [ubuntu] /tmp/missing/tt $ ls bar123
 a  b  c  d  e  f  g  h
-{{< /highlight >}}
+```
 
 ### 脚本
 脚本也可以使用其他语言编写，只要标记好`shebang`，例如:
-{{< highlight python>}}
+```python
 #!/usr/local/bin/python
 import sys
 for arg in reversed(sys.argv[1:]):
     print(arg)
-{{< /highlight >}}
+```
 
 写完以后要赋予它权限，才能正确执行:
-{{< highlight sh>}}
+```sh
 [ubuntu] /tmp/missing/tt $ ./test.py
 bash: ./test.py: Permission denied
 [ubuntu] /tmp/missing/tt $ chmod a+x test.py
@@ -217,7 +211,7 @@ bash: ./test.py: Permission denied
 cs
 n
 a
-{{< /highlight >}}
+```
 
 但是其他电脑的python程序并不一定位于`/usr/local/bin/python`，如何让这个脚本通用呢？我们可以利用环境变量中的程序来解析该脚本，将shebang信息改为`#!/usr/bin/env python`即可。
 
@@ -236,7 +230,7 @@ a
 shell使用UNIX提供的信号机制来执行进程间的通信。当一个进程接收到信号时，它会停止执行、处理该信号并基于信号传递的信息来改变其执行，所以信号相当于是软件中断。
 
 例如当我们在键盘上输入`Ctrl-C`时，shell会发送一个`SIGINT`信号到进程，来终止这个程序。当然，进程中是可以捕获信号去做别的处理的，例如:
-{{< highlight python>}}
+```python title="sigint.py"
 #!/usr/bin/env python
 import signal, time
 
@@ -249,22 +243,22 @@ while True:
     time.sleep(.1)
     print("\r{}".format(i), end="")
     i += 1
-{{< /highlight >}}
+```
 此时，我们通过`Ctrl-C`就已经无法终止该程序了:
-{{< highlight sh>}}
+```sh
 $ python sigint.py
 24^C
 I got a SIGINT, but I am not stopping
 26^C
 I got a SIGINT, but I am not stopping
 30^\[1]    39913 quit       python sigint.py
-{{< /highlight >}}
+```
 我们可以通过发送其他中断信号来停止该程序，例如`SIGQUIT`或`SIGTERM`等。那么如果一个程序捕获了所有的信号，是不是它就无法被外部停止了？实际上有一个特殊的信号`SIGKILL`是无法被捕获的，也就是我们经常使用的`kill -9 <pid>`发出的信号。
 
 通过`man signal`能查看到信号的更多详细信息，`kill -l`显示出信号列表，然后`kill -<信号名称> <pid>`发送某个信号。
 
 我们可以使用命令加一个后缀`&`来让该命令在后台运行，然后通过`jobs`命令能列出当前shell会话中未完成的全部任务。但后台进程仍然是当前终端会话进程的子进程，一旦关闭终端就会发送一个信号`SIGHUP`导致这些后台的进程被终止掉，命令前加`nohup`就是用来防止这种情况的。
-{{< highlight sh>}}
+```sh
 $ sleep 1000
 ^Z      # 使用ctrl+Z发送了一个SIGTSTP信号从而暂停了任务
 [1]  + 18653 suspended  sleep 1000
@@ -289,7 +283,7 @@ $ kill -SIGHUP %1   # 也可以使用%任务编号的形式，不一定要用PID
 
 $ jobs
 [2]  + running    nohup sleep 2000
-{{< /highlight >}}
+```
 
 
 常用工具
@@ -313,7 +307,7 @@ $ jobs
 * -executable，可执行文件
 * -exec，执行相关命令
 
-{{< highlight sh>}}
+```sh
 # 文件名匹配ind*.html的文件
 ➜  hjlarry.github.io git:(master) ✗ find . -iname ind*.html
 ./tags/index.html
@@ -326,7 +320,7 @@ $ jobs
 ➜  hjlarry.github.io git:(master) ✗ find . -type f -size +2M | xargs ls -lh
 -r--r--r-- 1 hejl hejl 5.7M Apr  4 17:41 ./.git/modules/themes/book/objects/pack/pack-3a8d2ad7db7fe81a41409e60d27dce22b77b6c68.pack
 -r--r--r-- 1 hejl hejl 3.0M Apr 20 14:36 ./.git/objects/pack/pack-472a07bf934d028116265bd13cbea79d367c5e90.pack
-{{< /highlight >}}
+```
 
 ### grep
 使用该命令可以从文件或管道中查找具体的内容，其支持多文件名，支持通配符，内容匹配时支持正则表达式。常用的参数为:
@@ -342,7 +336,7 @@ $ jobs
 * -Bn，输出其前n行内容
 * -Cn，输出其前后n行内容
 
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac $ grep -c "main" *
 alpine.sh:0
 grep: assem: Is a directory
@@ -359,4 +353,4 @@ tt:17
   452339:	48 3b 61 10          	cmp    rsp,QWORD PTR [rcx+0x10]
 --
   4523ae:	eb 80                	jmp    452330 <main.main>
-{{< /highlight >}}
+```
