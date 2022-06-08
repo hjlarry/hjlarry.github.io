@@ -1,8 +1,3 @@
----
-title: "锁的原理"
-draft: false
----
-
 # 锁的原理
 
 锁是怎么实现的？怎么做到独占的？实际上得从原子操作说起。
@@ -20,7 +15,7 @@ draft: false
 
 我们在Go的源码中也能看到大量这样的代码:
 
-{{< highlight asm>}}
+```asm
 // src/runtime/internal/atomic/asm_amd64.s
 TEXT runtime∕internal∕atomic·Cas(SB),NOSPLIT,$0-17
 	MOVQ	ptr+0(FP), BX
@@ -30,7 +25,7 @@ TEXT runtime∕internal∕atomic·Cas(SB),NOSPLIT,$0-17
 	CMPXCHGL	CX, 0(BX)
 	SETEQ	ret+16(FP)
 	RET
-{{< /highlight >}}
+```
 
 随着现在CPU核数逐步增多，这种LOCK前缀锁总线的方式带来的性能问题就凸显了出来，所以现在的体系遇到LOCK前缀时，不是去锁整个总线，而是先检查一下要锁的内容是不是在cache中，如果在的话只锁那一行cacheline，只有同时访问这一个cacheline的其他core才会被锁住，就像数据库的表锁和行锁。这样一来，性能的影响没那么大了，但是原子操作还是会带来性能影响的，只是硬件层面的东西我们作为程序员改变不了什么也就很少去提。
 
@@ -88,9 +83,7 @@ Go语言中的锁
 
 Linux手册中提供了这种锁的[调用方式](http://man7.org/linux/man-pages/man2/futex.2.html)，包括锁定、等待、唤醒等参数。Go中调用其API:
 
-{{< highlight go>}}
-// src/runtime/os_linux.go
-
+```go title="src/runtime/os_linux.go"
 func futex(addr unsafe.Pointer, op int32, val uint32, ts, addr2 unsafe.Pointer, val3 uint32) int32
 
 // Linux futex.
@@ -126,13 +119,11 @@ func futexwakeup(addr *uint32, cnt uint32) {
 
 	*(*int32)(unsafe.Pointer(uintptr(0x1006))) = 0x1006
 }
-{{< /highlight >}}
+```
 
 有了API，并不能直接用，还要对其进行包装:
 
-{{< highlight go>}}
-// src/runtime/lock_futex.go
-
+```go title="src/runtime/lock_futex.go"
 func lock(l *mutex) {
 	gp := getg()
 
@@ -203,7 +194,7 @@ func unlock(l *mutex) {
 		gp.stackguard0 = stackPreempt
 	}
 }
-{{< /highlight >}}
+```
 
 其一开始尝试拿锁属于投机，先以最乐观的情况考虑，如果没人竞争就能直接拿到锁，这种概率并不低，我们自己做性能设计时也可以参考它先设计乐观的情况。尝试失败则进入自旋状态，自旋状态打个比方，就是你在火车上上厕所，发现厕所有人，你在外面焦急的转圈等待；它是次一级的理想状态，因为厕所的人出来你马上就能进去，若是回到座位上可能被人插队；`procyield(active_spin_cnt)`背后会调用一个专门的CPU指令[PAUSE](http://c9x.me/x86/html/file_module_x86_id_232.html)，它可以降低自旋状态时CPU的功耗并进入一个短暂的等待。自旋时没拿到锁则进入另一个状态，相当于回到座位上但是盯着厕所的门，这个状态下执行的`osyield()`是操作系统提供的等待，这种等待的时长就比CPU指令长很多，同时涉及到状态切换开销也会大很多。这种积极的尝试如果仍然失败，则进入睡眠状态，等待厕所里面的人出来唤醒它，唤醒后重新进入这个循环。
 
@@ -215,19 +206,18 @@ func unlock(l *mutex) {
 信号量，可以控制同时执行的数量，如果数量是1就相当于互斥锁，如果都在执行了再进来人就得排队。
 
 首先，它的结构是这样的:
-{{< highlight go>}}
-// src/runtime/sema.go
+```go title="src/runtime/sema.go"
 type semaRoot struct {
 	lock  mutex
 	treap *sudog // root of balanced tree of unique waiters.
 	nwait uint32 // Number of waiters. Read w/o the lock.
 }
-{{< /highlight >}}
+```
 
 `lock` 就是之前设计的那种锁，在这之上提供了一个`treap`这样的平衡树结构，它是等待人(G对象)的列表，还有`nwait`计数器存储等待人的数量。
 
 它的核心获取锁的逻辑:
-{{< highlight go>}}
+```go
 func semacquire1(addr *uint32, lifo bool, profile semaProfileFlags, skipframes int) {
     //简单的情况，即直接成功获取锁
 	if cansemacquire(addr) {
@@ -270,11 +260,11 @@ func cansemacquire(addr *uint32) bool {
 		}
 	}
 }
-{{< /highlight >}}
+```
 首先尝试去锁定，并给等待者的数量加上1，然后通过`cansemacquire`检查一下能不能获得这把锁，能获得则减1退出循环。不能获得则加入到队列中，`goparkunlock`休眠。信号量归根结底是用原子操作来维护某个地址上的信号量加减，用一个锁来维护一个等待者计数器，这里的`&root.lock`是为了保护对计数器的操作和入队的操作。
 
 接着我们看看释放:
-{{< highlight go>}}
+```go
 func semrelease1(addr *uint32, handoff bool, skipframes int) {
 	root := semroot(addr)
 	atomic.Xadd(addr, 1)
@@ -312,7 +302,7 @@ func semrelease1(addr *uint32, handoff bool, skipframes int) {
 		}
 	}
 }
-{{< /highlight >}}
+```
 
 首先，释放必然使地址上的信号量加1。其次，去查看是否有人等，没人等则直接退出；如果有人等，则从队列中dequeue一个等待者、计数器减一，等待者可能是按地址排序的，但这属于其内部实现，我们没法确定弹出的是谁。最后如果传入的`handoff`为true表示要进行权限转移，会给这个弹出的等待者发一张票，之前`semacquire1`的for循环中`goparkunlock`休眠后被唤醒的第一件事就是检查有没有拿到票，拿到了则可以短路出去，没必要再走一次for循环和别人竞争抢锁`&root.lock`。
 
@@ -322,8 +312,7 @@ func semrelease1(addr *uint32, handoff bool, skipframes int) {
 ### Mutex
 
 给用户使用的锁在标准库中，我们来看看它的实现:
-{{< highlight go>}}
-// src/sync/mutex.go 
+```go title="src/sync/mutex.go"
 type Mutex struct {
 	state int32
 	sema  uint32
@@ -334,12 +323,12 @@ const (
 	mutexStarving
 	mutexWaiterShift = iota
 )
-{{< /highlight >}}
+```
 
 Mutex结构包括一个状态和一个计数，这个状态分为四种，即锁定、唤醒(这里可以理解为自旋)、饥饿、等待者转移。怎样会出现饥饿状态呢？比如A、B竞争一把锁的时候，A拿到了，B经过不断尝试最终进入了睡眠状态，A释放锁的时候又有C去竞争锁，C此时可能处于自旋状态，同理C后面可能还有D、E，B就一直拿不到锁处于饥饿状态。这种状态在并发编程中并不少见。
 
 接着我们看看其锁定的过程:
-{{< highlight go>}}
+```go
 func (m *Mutex) Lock() {
 	// 进入快速路径，乐观状态，没有竞争
 	if atomic.CompareAndSwapInt32(&m.state, 0, mutexLocked) {
@@ -426,7 +415,7 @@ func (m *Mutex) lockSlow() {
 		race.Acquire(unsafe.Pointer(m))
 	}
 }
-{{< /highlight >}}
+```
 
 
 总结

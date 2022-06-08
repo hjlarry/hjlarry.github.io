@@ -1,7 +1,6 @@
 ---
-title: Go内存分配
-type: docs
-bookToc: false
+hide:
+  - toc
 ---
 
 # 内存分配
@@ -40,8 +39,7 @@ bookToc: false
 
 小对象中还有两种特殊的对象，一种是长度为0的对象，另一种是微小对象。对于长度为0的对象，比如空结构体，我们不应该为其分配内存，但得给它一个合法的地址。Go专门有一个全局变量叫ZeroBase，不管是什么对象，只要它长度为0就会去指向这个全局变量的地址。
 
-{{< highlight go>}}
-// src/runtime/malloc.go
+```go title="src/runtime/malloc.go"
 // base address for all 0-byte allocations
 var zerobase uintptr
 
@@ -55,7 +53,7 @@ func mallocgc(size uintptr, typ *_type, needzero bool) unsafe.Pointer {
 	}
     ...
 }
-{{< /highlight >}}
+```
 
 微小对象则属于分配中比较常见的，例如短字符串等。如果发现需要分配一批微小对象，每个都占用一个1#Span中的Object可能不太合适有太多的浪费，就会从一个2#Span中提取出一个Object(16字节)，对它特殊记录并把多个微小对象都放进去，这有助于节约内存。但是这些微小对象中不能包含指针，因为它不能去引用其他地方，这样垃圾回收器才会把它当做一个整体去扫描。
 

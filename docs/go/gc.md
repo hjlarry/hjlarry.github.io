@@ -1,8 +1,3 @@
----
-title: "垃圾回收器"
-draft: false
----
-
 # 垃圾回收器的设计
 
 背景知识
@@ -70,19 +65,19 @@ worker分为三种，第一种属于正式工，专门做垃圾回收；第二�
 
 ### 写屏障
 
-但还有个问题没有解决，标记的同时用户代码也在执行，如果已经标记为黑色的对象又引用了一个白色对象C怎么办，因为不会对黑色对象进行二次扫描，在最终清理时就会把这个C也误杀掉。为了解决这个问题，在编译期编译器就会对指针写操作的语句插入一段**写屏障**代码，这段代码会判断如果当前正在垃圾回收，指针的写操作不会立即执行，而是先执行写屏障逻辑。写屏障逻辑会判断这个指针若是黑色的，就把它重新变成灰色的加入队列进行二次扫描。
+但还有个问题没有解决，标记的同时用户代码也在执行，如果已经标记为黑色的对象又引用了一个白色对象C怎么办，因为不会对黑色对象进行二次扫描，在最终清理时就会把这个C也误杀掉。为了解决这个问题，在编译期编译器就会对指针写操作的语句插入一段​**写屏障**​代码，这段代码会判断如果当前正在垃圾回收，指针的写操作不会立即执行，而是先执行写屏障逻辑。写屏障逻辑会判断这个指针若是黑色的，就把它重新变成灰色的加入队列进行二次扫描。
 
 具体如何加入写屏障的，我们可以看如下示例:
-{{< highlight go>}}
+```go
 var x *int
 func main(){
     x = new(int)
     println(x)
 }
-{{< /highlight >}}
+```
 
 然后我们编译并反汇编:
-{{< highlight sh "hl_lines=11-14 25-27">}}
+```sh hl_lines="11-14 25-27"
 [ubuntu] ~/.mac $ go tool objdump -s "main\.main" test
 TEXT main.main(SB) /root/.mac/test.go
   test.go:5		0x452330		64488b0c25f8ffffff	MOVQ FS:0xfffffff8, CX
@@ -112,12 +107,11 @@ TEXT main.main(SB) /root/.mac/test.go
   test.go:6		0x4523a7		ebc9			JMP 0x452372
   test.go:5		0x4523a9		e8f27affff		CALL runtime.morestack_noctxt(SB)
   test.go:5		0x4523ae		eb80			JMP main.main(SB)
-{{< /highlight >}}
+```
 
 我们看到`new(int)`对应`CALL runtime.newobject(SB)`，之后通过`CMPL $0x0, runtime.writeBarrier(SB)`进行比较，比较结果为真则跳转至下面的`CALL runtime.gcWriteBarrier(SB)`，执行完了再跳转回去继续赋值。
 
-{{< highlight go>}}
-// src/runtime/mgc.go 
+```go title="src/runtime/mgc.go"
 var writeBarrier struct {
 	enabled bool    // compiler emits a check of this before calling write barrier
 	pad     [3]byte // compiler uses 32-bit load for "enabled" field
@@ -125,7 +119,7 @@ var writeBarrier struct {
 	cgo     bool    // whether we need a write barrier for a cgo check
 	alignme uint64  // guarantee alignment so that compiler can use a 32 or 64-bit load
 }
-{{< /highlight >}}
+```
 
 我们通过写屏障的定义也就知道了`$0x0`是和这里的enabled进行比较的，这种简单的比较对性能的影响是非常小的。
 
