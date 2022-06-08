@@ -131,7 +131,7 @@ nav:
    - 内存管理: python/memory.md
    - 解释器: python/interpreter.md
    - 技巧工具: python/tools.md
- - Mysql: 
+ - MySQL: 
    - 查询: mysql/query.md
    - 原理: mysql/theory.md
  - 其他: 

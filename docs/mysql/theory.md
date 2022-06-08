@@ -1,8 +1,3 @@
----
-title: "Mysql原理"
-draft: false
----
-
 # Mysql的原理
 
 
@@ -19,7 +14,7 @@ Server层包括连接器、查询缓存、分析器、优化器、执行器等�
 客户端一般通过TCP与服务端建立连接，用户名密码认证通过后，连接器先到权限列表中查出你拥有的权限，之后这个连接里的权限判断逻辑都依赖于此时读取到的，也就是说对这个权限的修改不会影响到已经正在连接的用户。
 
 正在连接的客户端可以这样查看到:
-{{< highlight mysql>}}
+```mysql
 mysql> show processlist;
 +----+------+-----------------+---------+---------+------+----------+------------------+
 | Id | User | Host            | db      | Command | Time | State    | Info             |
@@ -29,7 +24,7 @@ mysql> show processlist;
 |  8 | root | localhost:58135 | NULL    | Sleep   |    2 |          | NULL             |
 +----+------+-----------------+---------+---------+------+----------+------------------+
 3 rows in set (0.00 sec)
-{{< /highlight >}}
+```
 Command列中显示为Sleep就表示该连接当前是空闲的，如果连接空闲太长时间就会被连接器自动断开，默认是8小时，可通过`wait_timeout`控制。
 
 #### 查询缓存
@@ -59,7 +54,7 @@ InnoDB
 `InnoDB`是一个将表中的数据存储到磁盘上的存储引擎，真正处理数据的过程是发生在内存上的，所以需要把数据从磁盘加载到内存中，如果是处理写入或更新时，还需要把内存中的内容写回磁盘中。`InnoDB`将数据划分为若干个页，每页大小为16KB，**以页做为硬盘和内存交互的基本单位**，一般情况下，每次至少会读取或写回16KB的内容。
 
 ### 数据页
-这些页有很多的种类，例如存放空间头部信息的页、存放日志信息的页等等。我们先来了解存放记录的页，也就是数据页，官方称为**索引页**。
+这些页有很多的种类，例如存放空间头部信息的页、存放日志信息的页等等。我们先来了解存放记录的页，也就是数据页，官方称为​**索引页**。
 
 数据页被分为7个部分，有的部分占用固定大小的空间，有的不固定:
 
@@ -80,7 +75,7 @@ InnoDB
 `File Header`主要存了上一页和下一页的编号，使得所有的数据页构成一个双向链表。而`File Trailer`会加入一些效验值，以保证从内存至硬盘同步数据的完整性。
 
 ### 行格式
-每条用户记录在磁盘上的存放方式也被称为**行格式**或**记录格式**，行格式被分为四种，即`Compact`、`Redundant`、`Dynamic`和`Compressed`。它们原理上大体相同，所以我们以Compact格式为例来详细了解一下。
+每条用户记录在磁盘上的存放方式也被称为​**行格式**​或​**记录格式**​，行格式被分为四种，即`Compact`、`Redundant`、`Dynamic`和`Compressed`。它们原理上大体相同，所以我们以Compact格式为例来详细了解一下。
 
 如图所示，每条记录被分为两个部分，记录的真实数据和记录的额外信息。
 ![record](./images/record.jpg)
@@ -116,7 +111,7 @@ Mysql支持一些变长的数据类型，如VARCHAR、各种TEXT、各种BLOB等
 
 ### 数据目录
 InnoDB、MyISAM这样的存储引擎会把数据存储在硬盘上的数据目录中，它不是安装目录，可通过如下命令查看:
-{{< highlight mysql>}}
+```mysql
 mysql> SHOW VARIABLES LIKE 'datadir';
 +---------------+-----------------------+
 | Variable_name | Value                 |
@@ -124,7 +119,7 @@ mysql> SHOW VARIABLES LIKE 'datadir';
 | datadir       | /usr/local/var/mysql/ |
 +---------------+-----------------------+
 1 row in set (0.00 sec)
-{{< /highlight >}}
+```
 
 在这个目录中，我们每新建一个新的数据库，Mysql会帮我们创建一个同名的文件夹，并在该文件夹内创建一个`db.opt`的文件，它包含了这个数据库的属性，例如数据库的字符集和比较规则等。之后我们在某数据库创建一个表时，Mysql会为我们创建一个`表名.frm`的文件，它存储了表结构的定义；InnoDB会为我们创建一个`表名.ibd`的文件，它是一个独立的表空间文件，存储了一页页的数据。
 
@@ -148,7 +143,7 @@ Mysql的视图是虚拟表，也会在对应的库文件夹下创建一个frm文
 
 数据页中我们暂时认为每页存储三条记录就满了，每条记录我们只关注record_type，0表示普通记录，2表示最小记录，3表示最大记录，以及next_record表示下一条记录。
 
-接下来对于数据的增删改操作，我们必须通过一些诸如记录移动的操作来始终保证这个状态一直成立:**下一个数据⻚中用户记录的主键值必须大于上一个⻚中用户记录的主键值**。这个过程称为**⻚分裂**。有了这个状态的保证，我们可以给每个页建立一个目录项，每个目录项包括其对应的页号以及页中用户记录的最小的主键值，大概是这样的:
+接下来对于数据的增删改操作，我们必须通过一些诸如记录移动的操作来始终保证这个状态一直成立:**下一个数据⻚中用户记录的主键值必须大于上一个⻚中用户记录的主键值**。这个过程称为​**⻚分裂**。有了这个状态的保证，我们可以给每个页建立一个目录项，每个目录项包括其对应的页号以及页中用户记录的最小的主键值，大概是这样的:
 
 ![simple_index](./images/simple_index.jpg)
 
@@ -160,7 +155,7 @@ Mysql的视图是虚拟表，也会在对应的库文件夹下创建一个frm文
 
 ![clustered_index](./images/clustered_index.jpg)
 
-如果一个目录页放满了，就新增一个目录页，同时在其上再加一层目录页记录这两个目录页。这种数据组织方式就是**B+树**。
+如果一个目录页放满了，就新增一个目录页，同时在其上再加一层目录页记录这两个目录页。这种数据组织方式就是​**B+树**。
 
 这种组织方式有两个特点:
 
@@ -172,14 +167,14 @@ Mysql的视图是虚拟表，也会在对应的库文件夹下创建一个frm文
 
 2、B+树的叶子节点存储的是完整的用户记录，即记录中包含了所有列的值。
 
-我们把符合这两个特点的B+树称为**聚簇索引**，InnoDB会自动为我们创建聚簇索引，而由于所有的记录都在叶子节点上，也就是所谓的**索引即数据，数据即索引**。
+我们把符合这两个特点的B+树称为​**聚簇索引**，InnoDB会自动为我们创建聚簇索引，而由于所有的记录都在叶子节点上，也就是所谓的​**索引即数据，数据即索引**。
 
 ### 二级索引
 上面的聚簇索引只在搜索条件是主键是才起作用，如果以别的列为搜索条件又怎么办呢？我们可以多建几颗B+树。效果如图所示:
 
 ![secondary_index](./images/secondary_index.jpg)
 
-这颗B+树假设我们以x列去建立索引，那么每个数据页内的记录就是按照x列的大小顺序排列的，和上面的类似，不同的是这条记录只有一个x列的值和其对应的主键的值。所以，当我们去按x=3这样的搜索条件查找数据时，就会先根据这颗新的B+树确定x=3时对应的主键是什么，在根据主键去聚簇索引中查找到完整的一条记录。这个过程也被称为**回表**。`二级索引(Secondary index)`这个名称也正是因为需要两颗B+树，操作两次。
+这颗B+树假设我们以x列去建立索引，那么每个数据页内的记录就是按照x列的大小顺序排列的，和上面的类似，不同的是这条记录只有一个x列的值和其对应的主键的值。所以，当我们去按x=3这样的搜索条件查找数据时，就会先根据这颗新的B+树确定x=3时对应的主键是什么，在根据主键去聚簇索引中查找到完整的一条记录。这个过程也被称为​**回表**。`二级索引(Secondary index)`这个名称也正是因为需要两颗B+树，操作两次。
 
 我们观察到上图中存储目录项的记录只包含了x的值和页号，实际上这在二级索引中会存在bug，有可能很多条记录中x的值都是相同的，此时再插入一条记录就不知道要插在哪个位置了。因此这颗B+树中叶子节点每条记录是x的值和主键的值，x相同则按主键大小顺序排列，目录项节点的每条记录是x的值、主键的值、页的号码，x相同时也可按主键排序。
 
@@ -188,7 +183,7 @@ Mysql的视图是虚拟表，也会在对应的库文件夹下创建一个frm文
 
 ### 使用场景
 哪些情况能用到索引，哪些情况无法用到呢？我们通过一个例子来看:
-{{< highlight mysql>}}
+```mysql
 CREATE TABLE person_info(
     id INT NOT NULL auto_increment,
     name VARCHAR(100) NOT NULL,
@@ -198,7 +193,7 @@ CREATE TABLE person_info(
     PRIMARY KEY (id),
     KEY idx_name_birthday_phone_number (name, birthday, phone_number) 
 );
-{{< /highlight >}}
+```
 先建了一个表，其中有一个自动为主键id建立的聚簇索引，和一个二级索引idx_name_birthday_phone_number，它是由三个列组成的联合索引。如下情况可以使用到索引:
 
 #### 全值匹配
@@ -217,7 +212,7 @@ CREATE TABLE person_info(
 对于同一个联合索引来说，虽然对多个列进行范围查找时只能用到最左边那个索引列，但如果左边的列是精确查找，则右边的列可以用范围查找，如`SELECT * FROM person_info WHERE name = 'Ashburn' AND birthday > '1980-01-01' AND birthday < '2000- 12-31' AND phone_number > '15100000000';`，name和birthday能用到索引，phone_number无法用到索引。
 
 #### 用于排序
-如果没有索引的话，我们会把所有的记录加载到内存中，然后通过一些排序算法例如快排等对这些记录排序，如果内存中放不下可能还会借助硬盘中的空间，最后排序完成后再返还给客户端。在Mysql中，把这种在内存中或硬盘中进行排序的方式称为**文件排序(filesort)**，是非常慢的。借助索引可以直接提取出数据，再进行回表拿到其他数据就可以了，例如`SELECT * FROM person_info ORDER BY name, birthday, phone_number LIMIT 10;`。但是，各个排序列的排序顺序要一致，某列asc、某列desc一起混用是无法索引的。另外，用于排序的多个列需要是同一个索引里的，索引列也不能是修饰过的形式，如`SELECT * FROM person_info ORDER BY UPPER(name) LIMIT 10;`。
+如果没有索引的话，我们会把所有的记录加载到内存中，然后通过一些排序算法例如快排等对这些记录排序，如果内存中放不下可能还会借助硬盘中的空间，最后排序完成后再返还给客户端。在Mysql中，把这种在内存中或硬盘中进行排序的方式称为​**文件排序(filesort)**，是非常慢的。借助索引可以直接提取出数据，再进行回表拿到其他数据就可以了，例如`SELECT * FROM person_info ORDER BY name, birthday, phone_number LIMIT 10;`。但是，各个排序列的排序顺序要一致，某列asc、某列desc一起混用是无法索引的。另外，用于排序的多个列需要是同一个索引里的，索引列也不能是修饰过的形式，如`SELECT * FROM person_info ORDER BY UPPER(name) LIMIT 10;`。
 
 #### 用于分组
 其实和排序类似，如`SELECT name, birthday, phone_number, COUNT(*) FROM person_info GROUP BY name, birthday, phone_number`。
@@ -225,7 +220,7 @@ CREATE TABLE person_info(
 ### 代价
 使用索引在空间和时间上都有代价，每建立一个索引都需要一颗B+树，大的B+树由很多数据页组成，算是不小的存储空间。每次对表进行增、删、改操作时，都可能要修改各个索引。B+树每层节点都是按照索引列的值按从小到大的顺序排序而组成了双向链表。不论是叶子节点的记录，还是内节点的记录都是按照索引列的值从小到大的顺序而形成了一个单向链表。而增、删、改操作可能会对节点和记录的排序造成破坏，所以存储引擎需要额外的时间进行一些记录移位，⻚面分裂、⻚面回收等操作来维护好节点和记录的排序。所以说，一个表上索引建的越多，就会占用越多的存储空间，在增删改记录的时候性能就越差。
 
-此外，回表也是有代价的。二级索引B+树记录在磁盘上的数据是相连的，集中分布在一个或几个数据页中，我们可以很快的把它们读出来，这种读取方式也叫**顺序读取**；读取到之后，其对应的主键并不相连，要读取到完整记录就需要在不同的数据页中去找，这种读取方式叫**随机读取**。需要回表的记录越多，使用二级索引的效率就越低，甚至让某些查询宁愿使用全表扫描也不使用二级索引。比如name值在Asa~Barlow之间的用户记录数量占全部记录数量90%以上，那么如果使用idx_name_birthday_phone_number索引的话，有90%多的id值需要回表，就还不如全表扫描。查询优化器会帮我们判断何时该用全表扫描代替二级索引回表。
+此外，回表也是有代价的。二级索引B+树记录在磁盘上的数据是相连的，集中分布在一个或几个数据页中，我们可以很快的把它们读出来，这种读取方式也叫​**顺序读取**；读取到之后，其对应的主键并不相连，要读取到完整记录就需要在不同的数据页中去找，这种读取方式叫​**随机读取**。需要回表的记录越多，使用二级索引的效率就越低，甚至让某些查询宁愿使用全表扫描也不使用二级索引。比如name值在Asa~Barlow之间的用户记录数量占全部记录数量90%以上，那么如果使用idx_name_birthday_phone_number索引的话，有90%多的id值需要回表，就还不如全表扫描。查询优化器会帮我们判断何时该用全表扫描代替二级索引回表。
 
 ### 优化策略
 #### 覆盖索引
@@ -242,14 +237,14 @@ CREATE TABLE person_info(
 
 #### 索引字符串值的前缀
 也就是说在二级索引的记录中只保留字符串的前几个值，查找时虽不能精确的定位到记录的位置，但能定位到相应前缀的位置，在空间和时间上取得平衡。在字符串类型能存储的值较多的情况下，这种方式是非常鼓励的，如:
-{{< highlight mysql>}}
+```mysql
 CREATE TABLE person_info(
     name VARCHAR(100) NOT NULL,
     birthday DATE NOT NULL,
     phone_number CHAR(11) NOT NULL,
     KEY idx_name_birthday_phone_number (name(10), birthday) 
 );
-{{< /highlight >}}
+```
 就表示用name的前10个字符来做为索引。但这种方式不能用name列来排序了，如`SELECT * FROM person_info ORDER BY name LIMIT 10;`则用不到索引。
 
 #### 让索引列在比较表达式中单独出现
@@ -265,7 +260,7 @@ CREATE TABLE person_info(
 我们平时所写的查询语句本质上只是一种声明式语法，只是告诉MySQL我们要获取的数据符合哪些规则，至于MySQL背地里是怎么把查询结果搞出来的那是MySQL自己的事儿。我们把MySQL执行查询语句的方式称之为访问方法或者访问类型。同一个查询语句可能可以使用多种不同的访问方法来执行，虽然最后的查询结果都是一样的，但是执行的时间可能差距很大。
 
 我们以此表格为例，看看不同的访问方法:
-{{< highlight mysql>}}
+```mysql
 CREATE TABLE single_table (
     id INT NOT NULL AUTO_INCREMENT,
     key1 VARCHAR(100),
@@ -281,40 +276,40 @@ CREATE TABLE single_table (
     KEY idx_key3 (key3),
     KEY idx_key_part(key_part1, key_part2, key_part3)
 ) Engine=InnoDB CHARSET=utf8;
-{{< /highlight >}}
+```
 它有主键id、唯一二级索引key2、普通二级索引key1和key3、联合索引。
 
 #### const
-当我们可以直接通过主键列或唯一二级索引列来与常数的等值比较来定位到一条记录时，速度是非常快的，这种访问方法称为**const**。例如:`SELECT * FROM single_table WHERE id = 1438;`、`SELECT * FROM single_table WHERE key2 = 3841;`。主键列只需要一次定位，唯一索引列也只需要两次定位。
+当我们可以直接通过主键列或唯一二级索引列来与常数的等值比较来定位到一条记录时，速度是非常快的，这种访问方法称为​**const**。例如:`SELECT * FROM single_table WHERE id = 1438;`、`SELECT * FROM single_table WHERE key2 = 3841;`。主键列只需要一次定位，唯一索引列也只需要两次定位。
 
 对于唯一二级索引来说，查询该列为NULL值的情况比较特殊，因为唯一索引并不限制其列为NULL值的数量，所以使用`SELECT * FROM single_table WHERE key2 IS NULL;`查询时不会用const访问方法。
 
 #### ref
-对于某个普通二级索引列和常数值的等值比较，比如`SELECT * FROM single_table WHERE key1 = 'abc';`，由于普通索引并不限制索引列值的唯一性，所以可能找到多条对应的记录，那么这种方式的代价取决于匹配到的二级索引记录的条数，如果匹配的记录较少，则回表代价较低。这种方法称为**ref**，它的效率比const差了一些。
+对于某个普通二级索引列和常数值的等值比较，比如`SELECT * FROM single_table WHERE key1 = 'abc';`，由于普通索引并不限制索引列值的唯一性，所以可能找到多条对应的记录，那么这种方式的代价取决于匹配到的二级索引记录的条数，如果匹配的记录较少，则回表代价较低。这种方法称为​**ref**，它的效率比const差了一些。
 
 如果最左边的连续索引列是与常数的等值比较就可能采用ref的方法，如`SELECT * FROM single_table WHERE key_part1 ='god like'AND key_part2 = 'legendary';`，但如果不全是等值比较的话，它的访问方法就不会是ref了，如`SELECT * FROM single_table WHERE key_part1 ='god like'AND key_part2 > 'legendary';`
 
 普通二级索引或唯一二级索引使用`Key IS NULL`这样的方式作为搜索条件时，可能使用ref的访问方法。
 
 #### ref_or_null
-当我们不仅想找出某个索引列的值等于某个常数的记录，还同时想找出该列为NULL的记录时，例如`SELECT * FROM single_demo WHERE key1 = 'abc' OR key1 ISNULL;`。这种查询使用的访问方法为**ref_or_null**。它的查询也会分为两个步骤，先分别定位key1=abc和key1是null的连续记录并找到这些记录对应的主键值，再从聚簇索引上根据主键找到完整的用户记录。
+当我们不仅想找出某个索引列的值等于某个常数的记录，还同时想找出该列为NULL的记录时，例如`SELECT * FROM single_demo WHERE key1 = 'abc' OR key1 ISNULL;`。这种查询使用的访问方法为​**ref_or_null**。它的查询也会分为两个步骤，先分别定位key1=abc和key1是null的连续记录并找到这些记录对应的主键值，再从聚簇索引上根据主键找到完整的用户记录。
 
 #### range
-之前的方式都是和常数等值比较，但有时我们面对的搜索条件会更复杂，例如`SELECT * FROM single_table WHERE key2 IN (1438,6328) OR (key2 >= 38AND key2 <= 79);`，除了可能使用全表扫描的访问方法，也可能使用二级索引+回表的访问方法。如果采用回表的方式，索引列就需要匹配某个或某些范围的值，这种利用索引进行范围匹配的访问方法称为**range**。
+之前的方式都是和常数等值比较，但有时我们面对的搜索条件会更复杂，例如`SELECT * FROM single_table WHERE key2 IN (1438,6328) OR (key2 >= 38AND key2 <= 79);`，除了可能使用全表扫描的访问方法，也可能使用二级索引+回表的访问方法。如果采用回表的方式，索引列就需要匹配某个或某些范围的值，这种利用索引进行范围匹配的访问方法称为​**range**。
 
 该例中，会分为三个范围，即key2=1438、key2=6328、key2∈[38,79]。范围一、范围二被称为单点区间，范围三称为连续范围空间。
 
 #### index
 看这个查询`SELECT key_part1, key_part2, key_part3 FROMsingle_table WHERE key_part2 = 'abc';`，由于key_part2不是联合索引idx_key_part的最左索引列，所以我们无法使用ref的访问方法来执行这个语句。但这个语句有两个特点，一是它的查询列表只有三个列key_part1、key_part2、key_part3且都被联合索引包含，二是搜索条件只有key_part2列也被包含在联合索引中。
 
-也就是说我们可以直接遍历idx_key_part这颗B+树的叶子节点来得到结果，而不需要回表，因为这棵树比聚簇索引的树小的多，它的成本也要小很多，我们把这种访问方法称为**index**。
+也就是说我们可以直接遍历idx_key_part这颗B+树的叶子节点来得到结果，而不需要回表，因为这棵树比聚簇索引的树小的多，它的成本也要小很多，我们把这种访问方法称为​**index**。
 
 #### all
-最直接的查询执行方式就是全表扫描，对于InnoDB来说就是直接扫描聚簇索引，这种访问方法称为**all**。
+最直接的查询执行方式就是全表扫描，对于InnoDB来说就是直接扫描聚簇索引，这种访问方法称为​**all**。
 
 ### EXPLAIN
 一条查询语句在经过MySQL查询优化器的各种基于成本和规则的优化后会生成一个执行计划，这个执行计划展示了接下来具体执行查询的方式，比如多表连接的顺序是什么，对于每个表采用什么访问方法来具体执行查询等等。EXPLAIN能帮助我们查看到某个查询语句的具体执行计划。例如:
-{{< highlight mysql>}}
+```mysql
 mysql> explain select 1;
 +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+
 | id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra          |
@@ -322,7 +317,7 @@ mysql> explain select 1;
 |  1 | SIMPLE      | NULL  | NULL       | NULL | NULL          | NULL | NULL    | NULL | NULL |     NULL | No tables used |
 +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+
 1 row in set, 1 warning (0.00 sec)
-{{< /highlight >}}
+```
 
 各列的详细解释如下:
 
@@ -342,7 +337,7 @@ mysql> explain select 1;
 |`Extra`|一些额外的信息|
 
 #### table
-{{< highlight mysql>}}
+```mysql
 mysql> explain select * from s1, s2;
 +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+
 | id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra                                 |
@@ -351,7 +346,7 @@ mysql> explain select * from s1, s2;
 |  1 | SIMPLE      | s2    | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    1 |   100.00 | Using join buffer (Block Nested Loop) |
 +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+
 2 rows in set, 1 warning (0.00 sec)
-{{< /highlight >}}
+```
 我们看到EXPLAIN语句输出的每条记录都对应着某个单表的访问方法，该条记录的table列代表了该表的表名。
 
 #### id
@@ -361,7 +356,7 @@ mysql> explain select * from s1, s2;
 * 查询语句包含UNION语句，如`SELECT * FROM s1 UNION SELECT * FROM s2;`
 
 每多一个select关键字，就会给它分配一个唯一的id值。对于连接查询来说，这个id是相同的，出现在前面的就是驱动表，后面的是被驱动表。如:
-{{< highlight mysql>}}
+```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN(SELECT key1 FROM s2) OR key3 = 'a';
 +----+--------------------+-------+------------+----------------+---------------+----------+---------+------+------+----------+-------------+
 | id | select_type        | table | partitions | type           | possible_keys | key      | key_len | ref  | rows | filtered | Extra       |
@@ -370,10 +365,10 @@ mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN(SELECT key1 FROM s2) OR key3 = 'a'
 |  2 | DEPENDENT SUBQUERY | s2    | NULL       | index_subquery | idx_key1      | idx_key1 | 303     | func |    1 |   100.00 | Using index |
 +----+--------------------+-------+------------+----------------+---------------+----------+---------+------+------+----------+-------------+
 2 rows in set, 1 warning (0.00 sec)
-{{< /highlight >}}
+```
 
 但是查询优化器可能会将子查询转换为连接查询，所以会看到两个相同的id:
-{{< highlight mysql>}}
+```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN(SELECT key3 FROM s2 WHERE common_field = 'a');
 +----+-------------+-------+------------+------+---------------+----------+---------+-----------------+------+----------+-----------------------------+
 | id | select_type | table | partitions | type | possible_keys | key      | key_len | ref             | rows | filtered | Extra                       |
@@ -382,10 +377,10 @@ mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN(SELECT key3 FROM s2 WHERE common_f
 |  1 | SIMPLE      | s2    | NULL       | ref  | idx_key3      | idx_key3 | 303     | awesome.s1.key1 |    1 |   100.00 | Using where; FirstMatch(s1) |
 +----+-------------+-------+------------+------+---------------+----------+---------+-----------------+------+----------+-----------------------------+
 2 rows in set, 1 warning (0.00 sec)
-{{< /highlight >}}
+```
 
 UNION子句会通过创建临时表把多个查询的结果合并起来进行去重，所以会有一条NULL的记录，UNION ALL不去重就不会有这条记录:
-{{< highlight mysql>}}
+```mysql
 mysql> EXPLAIN SELECT * FROM s1  UNION SELECT *FROM s2;
 +----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+
 | id | select_type  | table      | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra           |
@@ -395,7 +390,7 @@ mysql> EXPLAIN SELECT * FROM s1  UNION SELECT *FROM s2;
 | NULL | UNION RESULT | <union1,2> | NULL       | ALL  | NULL          | NULL | NULL    | NULL | NULL |     NULL | Using temporary |
 +----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+
 3 rows in set, 1 warning (0.00 sec)
-{{< /highlight >}}
+```
 
 #### select_type
 每个select关键字都代表着一个小的查询语句，select_type就是描述这个小的查询语句在大的查询中扮演的角色，它的取值有这些可能:
@@ -435,7 +430,7 @@ mysql> EXPLAIN SELECT * FROM s1  UNION SELECT *FROM s2;
 
 #### possible_keys和key
 possible_keys表示一开始的查询语句可能使用到的索引，而key表示经过了查询优化器计算使用不同的索引成本之后，实际上会使用到的索引。例如:
-{{< highlight mysql>}}
+```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z'AND key3 = 'a';
 +----+-------------+-------+------------+------+-------------------+----------+---------+-------+------+----------+-------------+
 | id | select_type | table | partitions | type | possible_keys     | key      | key_len | ref   | rows | filtered | Extra       |
@@ -443,7 +438,7 @@ mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z'AND key3 = 'a';
 |  1 | SIMPLE      | s1    | NULL       | ref  | idx_key1,idx_key3 | idx_key3 | 303     | const |    1 |   100.00 | Using where |
 +----+-------------+-------+------------+------+-------------------+----------+---------+-------+------+----------+-------------+
 1 row in set, 1 warning (0.01 sec)
-{{< /highlight >}}
+```
 
 有个特例是当使用index为访问方法时，possible_keys列是空的。此外，possible_keys列中的值越多，可能用到的索引就越多，查询优化器计算查询成本时就得花费更多的时间去比较，如果可能的话，尽量删除用不到的索引。
 
@@ -457,7 +452,7 @@ mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z'AND key3 = 'a';
 
 #### ref
 当使用索引列等值匹配的条件去执行查询时，即const、eq_ref、ref、ref_or_null、unique_subquery之一，该列会展示出与索引列做等值匹配的是一个常数或者是某个列。例如:
-{{< highlight mysql>}}
+```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 = 'a';
 +----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+
 | id | select_type | table | partitions | type | possible_keys | key      | key_len | ref   | rows | filtered | Extra |
@@ -474,7 +469,7 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.id = s2.id;
 |  1 | SIMPLE      | s2    | NULL       | eq_ref | PRIMARY       | PRIMARY | 4       | awesome.s1.id |    1 |   100.00 | NULL  |
 +----+-------------+-------+------------+--------+---------------+---------+---------+---------------+------+----------+-------+
 2 rows in set, 1 warning (0.00 sec)
-{{< /highlight >}}
+```
 
 #### rows
 * 如果查询优化器决定使用全表扫描执行查询计划，rows列代表预计需要扫描的行数
@@ -485,7 +480,7 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.id = s2.id;
 * 如果查询优化器决定使用索引执行单表查询，那么会估计出满足除使用到对应索引的搜索条件外的其他搜索条件的记录有多少条。
 
 对于单表查询，filtered列的值意义不大。但对于连接查询，例如:
-{{< highlight mysql>}}
+```mysql
 mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.common_field = 'a';
 +----+-------------+-------+------------+------+---------------+----------+---------+-------------------+------+----------+-------------+
 | id | select_type | table | partitions | type | possible_keys | key      | key_len | ref               | rows | filtered | Extra       |
@@ -494,7 +489,7 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
 |  1 | SIMPLE      | s2    | NULL       | ref  | idx_key1      | idx_key1 | 303     | awesome.s1.key1 |    1 |   100.00 | NULL        |
 +----+-------------+-------+------------+------+---------------+----------+---------+-------------------+------+----------+-------------+
 2 rows in set, 1 warning (0.00 sec)
-{{< /highlight >}}
+```
 我们可以看到驱动表s1表的执行计划的rows列为9688， filtered列为10.00，这意味着驱动表s1的扇出值就是`9688 × 10.00% = 968.8`，这说明还要对被驱动表执行大约968次查询。
 
 #### extra
@@ -505,7 +500,7 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
 **Impossible WHERE**，当WHERE子句永远为FALSE时提示。
 
 **No matching min/max row**，查询列表处有MIN或MAX聚集函数，但是没有符合where子句中搜索条件的记录时，例如:
-{{< highlight mysql>}}
+```mysql
 mysql> EXPLAIN SELECT MIN(key1) FROM s1 WHERE key1 = 'abcdefg';
 +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------------------+
 | id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra                   |
@@ -513,12 +508,12 @@ mysql> EXPLAIN SELECT MIN(key1) FROM s1 WHERE key1 = 'abcdefg';
 |  1 | SIMPLE      | NULL  | NULL       | NULL | NULL          | NULL | NULL    | NULL | NULL |     NULL | No matching min/max row |
 +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------------------+
 1 row in set, 1 warning (0.00 sec)
-{{< /highlight >}}
+```
 
 **Using index**，出现索引覆盖而无需回表时。
 
 **Using index condition**，当查询语句执行会用到索引下推时。例如:
-{{< highlight mysql>}}
+```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 >'z' AND key1 LIKE '%b';
 +----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+-----------------------+
 | id | select_type | table | partitions | type  | possible_keys | key      | key_len | ref  | rows | filtered | Extra                 |
@@ -526,12 +521,12 @@ mysql> EXPLAIN SELECT * FROM s1 WHERE key1 >'z' AND key1 LIKE '%b';
 |  1 | SIMPLE      | s1    | NULL       | range | idx_key1      | idx_key1 | 303     | NULL |    1 |   100.00 | Using index condition |
 +----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+-----------------------+
 1 row in set, 1 warning (0.00 sec)
-{{< /highlight >}}
+```
 
-`key1 >'z'`能使用到索引，而`key1 LIKE '%b'`不能。它的执行过程是根据`key1 >'z'`这个条件，定位到二级索引idx_key1中对应的二级索引记录；对于这些记录先不去回表，而是先检测是否满足`key1 LIKE '%b'`这个条件；满足条件的才执行回表操作。这个过程就叫**索引下推**。
+`key1 >'z'`能使用到索引，而`key1 LIKE '%b'`不能。它的执行过程是根据`key1 >'z'`这个条件，定位到二级索引idx_key1中对应的二级索引记录；对于这些记录先不去回表，而是先检测是否满足`key1 LIKE '%b'`这个条件；满足条件的才执行回表操作。这个过程就叫​**索引下推**。
 
 **Using where**，当全表扫描且where子句有针对该表的搜索条件时，或索引访问但where子句有索引列之外的其他搜索条件时。例如:
-{{< highlight mysql>}}
+```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 ='a' AND common_field = 'a';
 +----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------------+
 | id | select_type | table | partitions | type | possible_keys | key      | key_len | ref   | rows | filtered | Extra       |
@@ -539,7 +534,7 @@ mysql> EXPLAIN SELECT * FROM s1 WHERE key1 ='a' AND common_field = 'a';
 |  1 | SIMPLE      | s1    | NULL       | ref  | idx_key1      | idx_key1 | 303     | const |    1 |   100.00 | Using where |
 +----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------------+
 1 row in set, 1 warning (0.00 sec)
-{{< /highlight >}}
+```
 
 **Using join buffer (Block Nested Loop)**，连接查询时，被驱动表不能有效利用索引加快访问速度时，join buffer可以减少访问被驱动表的次数。
 
