@@ -114,7 +114,6 @@ markdown_extensions:
 
 # Page tree
 nav: 
- - 主页: index.md
  - 计算机基础: 
    - 硬件: sicp/hardware.md
    - 软件: sicp/software.md

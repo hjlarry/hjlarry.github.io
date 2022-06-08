@@ -1,8 +1,3 @@
----
-title: "程序"
-draft: false
----
-
 # 计算机科学基础知识之程序部分
 
 
@@ -37,7 +32,7 @@ draft: false
 源代码被输入到扫描器(Scanner)，扫描器运用有限状态机(Finite State Machine)的算法将源代码的字符序列分割成一系列的记号(Token)并给它们分好类。比如`array[index] = (index + 4) * (2 + 6)`这样一行源码经过扫描后会产生如下记号:
 
 | 记号(Token) | 类型 |
-| --- | --- |
+| :---: | :---: |
 | array | 标识符 |
 | [ | 左方括号 |
 | index | 标识符 |
@@ -91,7 +86,7 @@ array[index] = t2
 
 #### 目标代码生成与优化
 编译器后端主要包括代码生成器(Code Generator)和目标代码优化器(Target Code Optimizer)。由于目标机器有不同的字长、寄存器、整数数据类型等，代码生成器也就不相同，以x86为例，上例中间代码生成的汇编代码为:
-```
+```asm
 movl index, %ecx
 addl $4, %ecx
 mull $8, %ecx
@@ -100,7 +95,7 @@ movl %ecx, array(,eax,4)
 ```
 
 接着，目标代码优化器会进行优化，例如选择合适的寻址方式、通过位移来代替乘法运算、删除冗余指令等。上例中乘法可以由一条相对复杂的基址比例变址寻址(Basic Index Scale Addressing)的lea指令来完成，优化后的代码为:
-```
+```asm
 movl index, %edx
 leal 32(,%edx,8), %eax
 movl %eax, array(,%edx,4)
@@ -127,12 +122,12 @@ movl %eax, array(,%edx,4)
 
 ![ELF](./images/elf.png)  
 
-一个**可执行程序**看上去像是单个文件的数据库，我们以ELF格式的可执行文件为例，它包括头部元数据、Section header table、Program header table和各个section段。
+一个​**可执行程序**​看上去像是单个文件的数据库，我们以ELF格式的可执行文件为例，它包括头部元数据、Section header table、Program header table和各个section段。
 
 ### Head
 文件头部包含一些元数据，用于进程加载找入口地址等:
 
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ readelf -h hello
 ELF Header:
   Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00      // 魔法数，可以快速读取出来用于预判整个文件是不是一个合法的内容
@@ -154,12 +149,12 @@ ELF Header:
   Size of section headers:           64 (bytes)
   Number of section headers:         8
   Section header string table index: 7
-{{< /highlight >}}
+```
 
 ### Section
-头部之后紧跟着各种各样的表，我们称之为**Section**(段)，各个section被计入可执行文件的Section header table中，我们可以这样查看:
+头部之后紧跟着各种各样的表，我们称之为​**Section**​(段)，各个section被计入可执行文件的Section header table中，我们可以这样查看:
 
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ readelf -S hello
 There are 8 section headers, starting at offset 0x2e0:
 Section Headers:
@@ -186,7 +181,7 @@ Key to Flags:
   L (link order), O (extra OS processing required), G (group), T (TLS),
   C (compressed), x (unknown), o (OS specific), E (exclude),
   l (large), p (processor specific)
-{{< /highlight >}}
+```
 
 其中，`Address`表示这个section加载到进程中的虚拟内存地址，`Offset`表示这个section相对于文件头部的偏移量，有了`Offset`+`Size`进程才知道如何安排相应的`Address`。`Flags`表示权限标志位，`A`表示这个section的内容需要在内存中载入，`X`表示可执行的权限，`W`表示可写入的权限。
 
@@ -203,9 +198,9 @@ Key to Flags:
 对于程序运行来讲，符号表没有什么用，CPU不管什么符号、类型，它只需要内存地址。符号就相当于是内存地址的助记符，主要是便于我们调试和反汇编使用的。
 
 ### Segment
-执行的时候，我们需要告诉操作系统，有哪些section需要载入为内存中的**segment**，这个信息被链接器放在Program header table中，操作系统的载入器以此信息来安排程序在内存中的样子，我们可以这样查看:
+执行的时候，我们需要告诉操作系统，有哪些section需要载入为内存中的​**segment**​，这个信息被链接器放在Program header table中，操作系统的载入器以此信息来安排程序在内存中的样子，我们可以这样查看:
 
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ readelf -l hello
 Elf file type is EXEC (Executable file)
 Entry point 0x4000b0
@@ -221,7 +216,7 @@ Program Headers:
   Segment Sections...
    00     .text
    01     .data
-{{< /highlight >}}
+```
 
 上面的section to segment mapping就表示把section中的`.text`段的内容放在内存中`00`号的segment上。在可执行文件中会把section分的很细，但在内存中可能会把一些section合并起来，忽略掉一些section，起到节约内存的目的。
 
@@ -229,28 +224,28 @@ Program Headers:
 函数调用
 -------
 
-**函数**本身相当于一个图纸，出了设计院它就是只读的，放在`.text`段中，线程参考图纸来执行。线程通过`IP/PC`寄存器知道执行到图纸的哪里，下一条指令是什么，主线程通过可执行文件的入口地址找到第一条指令。
+**函数**​本身相当于一个图纸，出了设计院它就是只读的，放在`.text`段中，线程参考图纸来执行。线程通过`IP/PC`寄存器知道执行到图纸的哪里，下一条指令是什么，主线程通过可执行文件的入口地址找到第一条指令。
 
 ### 调用堆栈
 那么每个CPU核心只有一个IP寄存器，线程却有很多个怎么办？实际上在同一时刻，只有一个线程绑定了一套物理寄存器，若它的时间片用完了则由操作系统保存它对应的寄存器状态在某段内存中，下次轮到它执行时再恢复寄存器的状态。那么我们可以在抽象层面上理解为每个线程都有一套自己的寄存器。同时，这种切换线程需要消耗一定的资源，用于保存和恢复状态，用于内核态和用户态的切换。
 
-函数执行过程中需要在线程中保存参数、返回值、局部变量等，这块内存叫做**栈**(Stack)。那么如果是嵌套调用，如何保存各函数的状态呢？
+函数执行过程中需要在线程中保存参数、返回值、局部变量等，这块内存叫做​**栈**​(Stack)。那么如果是嵌套调用，如何保存各函数的状态呢？
 
 ![](./images/func.jpg)
 
-如左图所示，A函数嵌套了B函数，A要等待B执行完成之后再接着执行自己的逻辑。所以我们一般把栈内存竖着画，由底部的高位向低位分配，函数执行结束则把其对应的内存区域销毁，如右图所示。我们把每一个函数所占的格子叫**栈帧**(Stack Frame)，把整个A、B、C的调用层次称为**调用堆栈**(Call Stack)。程序出错时候我们看到一级级的错误信息就是通过调用堆栈追溯到的。
+如左图所示，A函数嵌套了B函数，A要等待B执行完成之后再接着执行自己的逻辑。所以我们一般把栈内存竖着画，由底部的高位向低位分配，函数执行结束则把其对应的内存区域销毁，如右图所示。我们把每一个函数所占的格子叫​**栈帧**​(Stack Frame)，把整个A、B、C的调用层次称为​**调用堆栈**​(Call Stack)。程序出错时候我们看到一级级的错误信息就是通过调用堆栈追溯到的。
 
-调用一个函数，在指令级别上还是有很大的开销的，所以有了**内联**(inline)的优化手段。
+调用一个函数，在指令级别上还是有很大的开销的，所以有了​**内联**​(inline)的优化手段。
 
 ### 调用约定
-接下来的问题是A调用B的时候，如何给B传递参数，如何接收B的返回值，要么A划定区域，要么B划定区域，要么用寄存器，要么用内存，我们把这种约定称为**调用约定**。以Go语言为例，若A调用B，则A会把自己的栈帧一分为二，下半部分存本地局部变量，上半部分存给B用的参数和B的返回值。若A调用B、C、D等多个函数，则上半部分占用多大空间按哪个函数的参数和返回值最大来算。如此一来，栈帧的大小是在编译期就能确定的，访问栈内某块内存只需根据相对位置，基于栈顶做加法或栈底做减法即可。
+接下来的问题是A调用B的时候，如何给B传递参数，如何接收B的返回值，要么A划定区域，要么B划定区域，要么用寄存器，要么用内存，我们把这种约定称为​**调用约定**。以Go语言为例，若A调用B，则A会把自己的栈帧一分为二，下半部分存本地局部变量，上半部分存给B用的参数和B的返回值。若A调用B、C、D等多个函数，则上半部分占用多大空间按哪个函数的参数和返回值最大来算。如此一来，栈帧的大小是在编译期就能确定的，访问栈内某块内存只需根据相对位置，基于栈顶做加法或栈底做减法即可。
 
 一般会把栈顶的地址放在SP寄存器，把栈底的地址放在BP寄存器。理论上，SP或者BP使用一个就够了，每个语言都有自己的选择。Go早期只用SP，后来也引入了BP，因为很多的调试器、自动化检测工具需要使用BP确定栈底的位置。
 
-如果SP/BP用来存当前正在执行的B函数的栈帧，B执行完以后如何知道调用它的A函数的栈帧有多大呢？所以在两个栈帧之间还有一段空间用来存储A的BP/SP、IP，A在调用B的时候就把自己的BP/SP写进去，把自己调用完B之后下一条要执行什么指令写进IP，这叫**保存现场**。B执行完以后，通过这段空间恢复现场。接着，我们看看C语言和Go语言的保存现场和恢复现场分别是怎么做的。
+如果SP/BP用来存当前正在执行的B函数的栈帧，B执行完以后如何知道调用它的A函数的栈帧有多大呢？所以在两个栈帧之间还有一段空间用来存储A的BP/SP、IP，A在调用B的时候就把自己的BP/SP写进去，把自己调用完B之后下一条要执行什么指令写进IP，这叫​**保存现场**。B执行完以后，通过这段空间恢复现场。接着，我们看看C语言和Go语言的保存现场和恢复现场分别是怎么做的。
 
 #### Go语言
-{{< highlight go>}}
+```go title="call.go"
 func add(x, y int) int {
 	z := x + y
 	return z
@@ -261,10 +256,10 @@ func main() {
 	s := add(a, b)
 	println(s)
 }
-{{< /highlight >}}
+```
 
 通过`go build -gcflags "-N -l" call.go`接着进行gdb调试:
-{{< highlight sh>}}
+```sh
 (gdb) b 4
 Breakpoint 1 at 0x452347: file /root/.mac/gocode/call.go, line 4.
 (gdb) r
@@ -284,14 +279,14 @@ Dump of assembler code for function main.add:
    0x000000000045235f <+47>:	add    rsp,0x10
    0x0000000000452363 <+51>:	ret
 End of assembler dump.
-{{< /highlight >}}
+```
 
 我们可以把它的栈帧变化情况画出来:
 
 ![](./images/go_func.jpg)
 
 #### C语言
-{{< highlight c>}}
+```c title="frame.c"
 int __attribute__((noinline, optimize("-O0"))) add(int x, int y)
 {
     int z;
@@ -307,10 +302,10 @@ int __attribute__((noinline)) main(int argc, char **argv)
     a = add(x, y);
     printf("%d\n", a);
 }
-{{< /highlight >}}
+```
 
 通过`gcc -g -O0 -o frame frame.c`接着进行gdb调试:
-{{< highlight sh>}}
+```sh
 (gdb) b 5
 Breakpoint 1 at 0x654: file frame.c, line 5.
 (gdb) r
@@ -330,7 +325,7 @@ Dump of assembler code for function add:
    0x0000555555554662 <+24>:	pop    rbp
    0x0000555555554663 <+25>:	ret
 End of assembler dump.
-{{< /highlight >}}
+```
 同样可以画出图来:
 ![](./images/c_func.jpg)
 
@@ -344,4 +339,4 @@ End of assembler dump.
 ### 栈和堆
 堆、栈既是两种数据结构，也是函数执行单位，在不同的场景有不同的概念。
 
-对于栈内存来讲，它是整块的，不需要垃圾回收器参与，访问的时候只需要根据BP、SP按相对位置进行访问，所以它的效率是非常高的。而堆内存是和单个线程无关的，是共享的，就会涉及到很复杂的内存管理方式，分配的时候要找到大小和位置合适的块，释放的时候要尽可能的避免内存碎片化。所以说，编译器有责任尽可能把数据分配在栈上。但是，栈上内存是按栈帧整块释放的，某些情况下如果某个变量要在不同的栈帧中维持，它的生命周期发生了改变，这种情况这个变量的内存就要在堆上分配了，这种现象就叫**逃逸**。逃逸也会带来严重的性能问题。
+对于栈内存来讲，它是整块的，不需要垃圾回收器参与，访问的时候只需要根据BP、SP按相对位置进行访问，所以它的效率是非常高的。而堆内存是和单个线程无关的，是共享的，就会涉及到很复杂的内存管理方式，分配的时候要找到大小和位置合适的块，释放的时候要尽可能的避免内存碎片化。所以说，编译器有责任尽可能把数据分配在栈上。但是，栈上内存是按栈帧整块释放的，某些情况下如果某个变量要在不同的栈帧中维持，它的生命周期发生了改变，这种情况这个变量的内存就要在堆上分配了，这种现象就叫​**逃逸**​。逃逸也会带来严重的性能问题。

@@ -1,8 +1,3 @@
----
-title: "汇编语言"
-draft: false
----
-
 # 汇编语言
 
 
@@ -22,7 +17,7 @@ draft: false
 -------
 
 Hello world示例程序:
-{{< highlight asm>}}
+```asm
 global _start 
 
 section .data
@@ -38,7 +33,7 @@ section .text
         mov rax, 60     ; 'exit' syscall number
         xor rdi, rdi
         syscall
-{{< /highlight >}}
+```
 
 ### 编译
 把每一个源码文件(可能是`.c`,`.s`,`.go`等格式)翻译为一个目标文件(可能是`.o`)，它和可执行文件很像，也是由一个个表构成，但问题是A文件若调用B文件的函数，A是不知道B在哪的，编译器就会把这个B的位置空下来，并把这个信息写在表中某个位置等待之后进行重定位。
@@ -51,7 +46,7 @@ section .text
 链接就是把编译后的目标文件合并在一起，通过起始地址就能计算出各个目标文件的偏移量，也就知道了编译时需要重定位的那些函数的地址，再把它填进去。
 
 我们使用GNU通用的链接器来链接，也可以对比出目标文件和链接后的可执行文件的区别:
-{{< highlight sh "hl_lines=12 15 25 28">}}
+```sh hl_lines="12 15 25 28"
 [ubuntu] ~/.mac/assem $ nasm -g -f elf64 -o hello.o hello.s
 [ubuntu] ~/.mac/assem $ ld -o hello hello.o
 
@@ -86,12 +81,12 @@ Disassembly of section .text:
   4000cb:	b8 3c 00 00 00       	mov    eax,0x3c
   4000d0:	48 31 ff             	xor    rdi,rdi
   4000d3:	0f 05                	syscall
-{{< /highlight >}}
+```
 
 通过反编译发现目标文件的起始地址_start是0，所以此时的`movabs rsi,0x0`也表示不知道hello的地址，而链接之后这些地址都有了。链接器也支持一些常见的参数，例如`-e`去指定一个非默认的入口标签，`-s`去移除所有的符号信息，`-S`仅移除调试信息。
 
 我们再来看看Go的编译和链接过程:
-{{< highlight sh "hl_lines=9 23">}}
+```sh hl_lines="9 23"
 [ubuntu] ~/.mac/gocode $ go build -x main.go
 WORK=/tmp/go-build182029561
 mkdir -p $WORK/b001/
@@ -118,7 +113,7 @@ cd .
 /usr/local/go/pkg/tool/linux_amd64/buildid -w $WORK/b001/exe/a.out # internal
 cp $WORK/b001/exe/a.out main
 rm -r $WORK/b001/
-{{< /highlight >}}
+```
 
 它也有自己的编译器和链接器，只是它的目标文件通过`-pack`参数进行了打包，打包为一个个`.a`格式再进行链接。
 
@@ -129,7 +124,7 @@ rm -r $WORK/b001/
 汇编语言都是对内存的处理，其本身没有函数的概念，为了便于维护和写跳转之类的语句，就有了标签代表相应的内存地址，放在不同的section中。
 
 ### 标签
-{{< highlight asm>}}
+```asm
 global _start 
 
 section .text 
@@ -139,7 +134,7 @@ section .text
         syscall
     _start:
         jmp main 
-{{< /highlight >}}
+```
 
 上述源码中`main`与`_start`称为标签，可以使用`jmp`跳转至某个标签，或者`call`调用某个标签的内容。
 
@@ -147,7 +142,7 @@ section .text
 
 
 ### 本地标签
-{{< highlight asm>}}
+```asm
 section .text 
     main:
         jmp .hello
@@ -155,7 +150,7 @@ section .text
         mov rax, 60
         xor rdi, rdi
         syscall
-{{< /highlight >}}
+```
 
 以`.`开头的称为本地标签，例如上面的`.hello`，编译器会把它翻译为其前一个标签+本地标签，即`main.hello`，这样就形成了一种类似于名字空间的效果。让大段的逻辑分成多个片段，不需要担心命名上的冲突，属于汇编这门语言提供的一个功能。它和本地符号无关，`main.hello`也可以是一个全局的符号，代表的一种身份，而`.hello`依然是一个本地标签，相当于一个称谓。
 
@@ -166,7 +161,7 @@ GNU的链接器默认使用一个特殊符号`_start`当做程序的入口，如
 
 ### 段标签与内存地址
 可以使用`$`表示当前这行指令的内存地址，`$$`表示当前section的起始地址，同时我们也可以通过反汇编观察到跳转时标签和内存地址一一对应的关系:
-{{< highlight asm>}}
+```asm
 global _start 
 section .text 
     main:
@@ -180,9 +175,9 @@ section .text
         syscall
     _start:
         jmp main
-{{< /highlight >}}
+```
 
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ nasm -g -F dwarf -f elf64 -o hello.o hello.s
 [ubuntu] ~/.mac/assem $ ld -o hello hello.o
 [ubuntu] ~/.mac/assem $ objdump -d -M intel hello
@@ -203,7 +198,7 @@ Disassembly of section .text:
   4000b0:	0f 05                	syscall
 00000000004000b2 <_start>:
   4000b2:	eb cc                	jmp    400080 <main>
-{{< /highlight >}}
+```
 
 
 语言规范
@@ -223,7 +218,7 @@ Disassembly of section .text:
 
 ### 变量
 可以在`.data`和`.bss`段中定义变量，定义示例:
-{{< highlight asm>}}
+```asm
 section .data
     x dq 0x8070605040302010    
     y db 1,2,3
@@ -236,13 +231,13 @@ section .data
 section .bss
     xx resq 2 
     yy times 2 resb 8
-{{< /highlight >}}
+```
 `x`是变量名称，代表符号的地址，变量的起始地址；`dq`代表它的长度；`0x8070605040302010`代表它的初始化值。
 
 字符和它代表的长度如下表所示:
 
 .data中|长度(bytes)|.bss中
----|---|---
+:---:|:---:|:---:
 db|1|resb
 dw|2|resw
 dd|4|resd
@@ -291,36 +286,36 @@ dz|64|resz
 跳转一般都是指跳转到某个label，分为三种，第一种`jmp`类似于goto，属于无条件跳转。
 
 第二种`test`则是针对其两个参数进行二进制AND逻辑操作，并根据结果设置标志寄存器的ZF标志位。之后配合`jz`(和je等价)、`jnz`(和jne等价)指令，它们会判断ZF标志位的值完成跳转。
-{{< highlight asm>}}
+```asm
     _start:
         mov     rax, 1
         test    rax, rax ; 如果AX为0，则把ZF设为1，否则把ZF设为0
         jne     .exit    ; 如果ZF为0，则跳转至.exit标签
-{{< /highlight >}}
+```
 
 第三种是使用`cmp`比较两个参数，比较的结果存到相应的状态寄存器中，根据状态寄存器的值再配合相关指令完成跳转:
 
 * je (==), jne (!=), jz (==0), jnz (!=0) 
 * jg (>), jge (>=), jl (<), jle (<=)
 
-{{< highlight asm>}}
+```asm
 _start:
     mov rax, 1 
     mov rbx, 2 
     cmp rax, rbx 
     jne .exit
-{{< /highlight >}}
+```
 
 #### 循环
 循环需要先将循环多少次放到`rcx`寄存器中，然后执行循环体逻辑，最后调用loop指令，该指令在rcx寄存器大于0时会减一并跳转到其参数的位置，等于0时则会接着向下执行。
-{{< highlight asm>}}
+```asm
 _start:
     xor rax, rax
     mov rcx, 3
 .abc:
     inc rax
     loop .abc
-{{< /highlight >}}
+```
 类似于do(sth...) until{rcx==0}。
 
 ### 数据结构
@@ -335,17 +330,17 @@ string db `\u6c49\xe5\xad\x97 \u263a \n` ; 汉字, ☺ -> UTF-8
 
 #### 数组
 数组实际上就是一个连续的存储空间，里面只有元素，没有别的东西。数组定义时得告诉编译器其长度，编译器才好安排地址。汇编里没有数组这种语法，我们的做法只是保留一段内存空间，本质上我们对数组的操作就是对其内存地址的操作。
-{{< highlight asm>}}
+```asm
 section .bss
     %assign num 10
     %assign size 8
     array resq num * size
-{{< /highlight >}}
+```
 通过`num*size`计算出数组的长度，array代表数组的起始地址，要拿到array[i]的地址就可以通过`array+size*i`。
 
 #### 结构体
 结构体实际上也是一个连续的存储空间，只是其内部字段的长度不同，在汇编中还是按照起始地址加偏移量去数格子定位到不同的字段。那么它还是一个编译器的语法糖，通过反汇编是看不到的。
-{{< highlight asm>}}
+```asm
 struc User
     .name : resb 10
     .age : resq 1
@@ -359,7 +354,7 @@ section .data
 
 section .bss
     u2  resb User_size
-{{< /highlight >}}
+```
 这段代码先定义的是一个内存布局，成员字段代表的是偏移量。接着使用`istruc`在data段中去初始化一个变量u1。又使用u2定义了一个未初始化值的User，`User_size`也是编译器语法糖，帮助编译器算出User结构体的长度。
 
 ### 宏
@@ -367,7 +362,7 @@ section .bss
 
 #### %define
 单行宏定义，和`%assign`只支持常量不同，`%define`可以支持参数。属于汇编语言的一种功能，和汇编不是一回事，因为汇编是目标语言。
-{{< highlight asm>}}
+```asm
 section .text
     %define SYS_EXIT 60
     %define DEMO(x)         mov rax, [rbx+x]
@@ -379,11 +374,11 @@ section .text
         mov     rax, SYS_EXIT
         xor     rdi, rdi
         syscall
-{{< /highlight >}}
+```
 
 #### %macro
 有点像是定义函数，中间可以包含多行代码。
-```
+```asm
 %macro <name> <args_count> 
 ...
 %endmacro
@@ -398,7 +393,7 @@ section .text
 
 这种方式需要使用main作为函数入口，并使用extern声明要用到的libc函数，然后用寄存器传参(依次为rdi,rsi,rdx,rcx,r8,r9)和接收返回值(rax)，且需要使用gcc作为链接器。
 
-{{< highlight asm>}}
+```asm
 global main
 extern printf
 
@@ -417,10 +412,10 @@ section .text
         mov     rax, 0
         pop     rbx     ;恢复现场
         ret
-{{< /highlight >}}
+```
 
 可以这样编译运行它，并查看它的依赖:
-{{< highlight sh>}}
+```sh
 [ubuntu] ~/.mac/assem $ nasm -g -F dwarf -f elf64 -o libc.o libc.s
 [ubuntu] ~/.mac/assem $ gcc -no-pie -o libc libc.o
 [ubuntu] ~/.mac/assem $ ./libc
@@ -429,4 +424,4 @@ hello world!
 	linux-vdso.so.1 (0x00007ffc2f180000)
 	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fe329bdd000)
 	/lib64/ld-linux-x86-64.so.2 (0x00007fe329fce000)
-{{< /highlight >}}
+```
