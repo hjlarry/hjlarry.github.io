@@ -186,8 +186,15 @@ SameSite=Lax; Expires=Fri, 1 Nov 2021 00:00:00 GMT
 
 XSS(cross site scripting) is a code injection vulnerablity, it's caused when untrusted user data unexpected becomes code. The unexpected code is JavaScript in an HTML document. If successful, attacker gains the ablility to do anything the target can do through their browser, like view/exfiltrate their cookies, send any HTTP request to the site with the user's cookies!
 
-### Reflected XSS attack
+XSS is prevalent, the web has so many different languages, data can be used in many different contexts! Even within HTML, there are at least 5 contexts to understand. And each context has different "control characters". If you slip up in even one place, you're completely vulnerable!
+
+### Attack Type
+
+Usually there are two types attack, reflected XSS attack and stored XSS attack.
+
 In reflected XSS, the attack code is placed into the HTTP request itself, the attacker goal is to find a URL that can make target visit, URL includes attack code. So the limitation is attack code must be added to the URL path or query parameters.
+
+In stored XSS, the attack code is persisted into the database, the attacker goal is to use any means to get attack code into the database. Once there, server includes it in all pages sent to clients.
 
 If the server code is:
 ```js
@@ -204,3 +211,6 @@ app.get('/', (req, res) => {
 
 The attack url can be:  
 `http://localhost:4000/?source=%3Cscript%3Ealert(%27hey%20there!%27)%3C/script%3E`
+
+This is a typical reflected XSS, the server does not stored attack code into database, attacker need to send url to goal.
+
