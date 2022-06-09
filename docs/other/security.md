@@ -214,3 +214,49 @@ The attack url can be:
 
 This is a typical reflected XSS, the server does not stored attack code into database, attacker need to send url to goal.
 
+### Attack Example
+
+#### HTML elements
+```html title="HTML template"
+<p>Search result for USER_DATA_HERE</p>
+```
+```html title="Resulting page(no escape)"
+<p>Search result for <script>alert(document.cookie)</script></p>
+```
+what is the fix?  
+
+ - change all `<` to `&lt;`
+ - change all `&` to `&amp;`
+
+#### HTML attributes
+```html title="HTML template"
+<img src='avatar.png' alt='USER_DATA_HERE' />
+```
+```html title="Resulting page(no escape)"
+<img src='avatar.png' alt='Feross' onload='alert(document.cookie)' />
+```
+what is the fix?  
+
+ - change all `'` to `&apos;`
+ - change all `"` to `&quot;`
+ - change all `&` to `&amp;`
+
+what about set html attributes without quotes?
+```html title="HTML template"
+<img src='avatar.png' alt=USER_DATA_HERE />
+```
+```html title="Resulting page(escaping ' and double quotes and &)"
+<img src=avatar.png alt=Feross onload=alert(document.cookie) />
+```
+It's a bad idea! Should always quotes attributes!
+
+```html title="HTML template"
+<div onmouseover='handleHover(USER_DATA_HERE)'>
+```
+```html title="Resulting page(escaping ' and double quotes)"
+<div onmouseover='handleHover(); alert(document.cookie)'>
+```
+
+what is the fix? escape one more char `;`
+
+For most attributes, escaping attributes is sufficient. But certain attributes like `src`,`href`,`data:`,`javascript:` can never be safe, even if you escape the attribute value!
