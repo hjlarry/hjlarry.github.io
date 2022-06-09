@@ -260,3 +260,62 @@ It's a bad idea! Should always quotes attributes!
 what is the fix? escape one more char `;`
 
 For most attributes, escaping attributes is sufficient. But certain attributes like `src`,`href`,`data:`,`javascript:` can never be safe, even if you escape the attribute value!
+
+#### Script elements
+```js title="HTML template"
+<script>
+  let username = 'USER_DATA_HERE'
+  alert(`Hi there, ${username}`)
+</script>
+```
+```js title="Resulting page(no escape)"
+<script>
+  let username = 'Feross'; alert(document.cookie); //'
+  alert(`Hi there, ${username}`)
+</script>
+```
+If we just change all `'` to `\'` , `"` to `\"`, it still work!  
+The user input can be `Feross\'; alert(document.cookie) //` .
+
+If we change one more `\` to `\\`, it still broken!  
+The user input can be `</script><script>alert(document.cookie)</script><script>`.
+
+what is the fix?
+
+ - Hex encode user data to produce a string with characters 0-9, A-F.
+ - Include it inside a JavaScript string
+ - Then, decode the hex string
+
+```js
+<script>
+  let username = hexDecode('HEX_ENCODED_USER_DATA')
+  alert(`Hi there, ${username}`)
+</script>
+```
+
+Now if the user still input `</script><script>alert(document.cookie)</script><script>`, the result will be `hexDecode('3c2f736372697074...')`. It works!
+
+Another solution is use a `<template>` tag to store data that won't visibly render, then the escaping rules are simple and the same as for HTML elements, just HTML encode `<` and `&` characters.
+
+```html
+<template id='username'>HTML_ENCODED_USER_DATA</template>
+<script>
+  let username = document.getElementById('username').textContent
+  alert(`Hi there, ${username}`)
+</script>
+```
+
+#### Never safe context
+
+There are some context never safe, we should avoid!
+```html
+<script>USER_DATA_HERE</script>
+
+<!-- USER_DATA_HERE -->
+
+<USER_DATA_HERE href='/'>Link</USER_DATA_HERE>
+
+<div USER_DATA_HERE='some value'></div>
+
+<style>USER_DATA_HERE</style>
+```
