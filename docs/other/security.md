@@ -349,11 +349,7 @@ The Same Origin Policy is to prevent some other sites making certain requests to
 
 CSP is an added layer of security against XSS, even if attacker code is running on user's browser in our site's context, we can limit the damage they can do.
 
-CSP blocks HTTP requests which would violate the policy. Add the Content-Security-Policy header to an HTTP response to control the resources the page is allowed to load, like this:
-
-```http
-Content-Security-Policy: <policy-directive>; <policy-directive>
-```
+CSP blocks HTTP requests which would violate the policy. Add the Content-Security-Policy header to an HTTP response to control the resources the page is allowed to load.
 
 #### Using CSP
 The snippet below shows a CSP response heeader with a minimal policy configuration:
@@ -375,3 +371,32 @@ For example:
 <!-- Allowed! Relative URLs are loaded from the same origin -->
 <script src="/code.js"></script>
 ```
+
+#### Directives and Values
+The CSP syntax is:
+```http
+Content-Security-Policy: <policy-directive>; <policy-directive>
+```
+Where `<policy-directive>` consists of: `<directive> <value> <value2>` with no internal punctuation. 
+
+The CSP fetch directives control the locaions from which certain resource types may be loaded. Some commonly used directives are as follows:
+
+ - default-src, Serves as a fallback for other fetch directives
+ - connect-src, Restricts sources from "script interfaces": fetch, XHR, WebSocket, `<a ping>` etc.
+ - frame-src, Restricts sources for nested browsing contexts: `<frame>`, `<iframe>`
+ - img-src, Restricts sources for images, favicons
+ - script-src, Restricts sources for `<script>` elements
+ - style-src, Restricts sources for `<style>` and `<link rel='stylesheet'>` elements
+ - media-src, Restricts sources for media: `<audio>`, `<video>`, `<track>`
+
+There are also some directives do not inherit from `defalut-src`, include `base-uri`, `form-action`, `frame-ancestors`, `navigate-to`, `upgrade-insecure-requests`.
+
+An overview of the allowed values are listed below:
+
+ - none, Won't allow loading of any resources
+ - self, Only allow resources from the current origin
+ - unsafe-inline, Allow use of inline resources
+ - Host, Only allow loading of resources from a specific host, also can add the path part. e.g. `*.a.com`, `b.com/c/`
+ - Scheme, Only allow loading resources over a specific scheme. e.g. `http:`, `https:`, `data:`
+
+
