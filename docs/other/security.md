@@ -343,3 +343,35 @@ Because even if you are sure that you control all possible ways for data to get 
 **how to escape**
 
 Use your framework's built-in HTML escaping functionality, if bugs are found, you will get the fix for free! Also, make sure you know the contexts where it is safe to use the output.
+
+### CSP
+The Same Origin Policy is to prevent some other sites making certain requests to our site. CSP is inverse, it prevent our site from make requests to other sites.
+
+CSP is an added layer of security against XSS, even if attacker code is running on user's browser in our site's context, we can limit the damage they can do.
+
+CSP blocks HTTP requests which would violate the policy. Add the Content-Security-Policy header to an HTTP response to control the resources the page is allowed to load, like this:
+
+```http
+Content-Security-Policy: <policy-directive>; <policy-directive>
+```
+
+#### Using CSP
+The snippet below shows a CSP response heeader with a minimal policy configuration:
+
+```http
+Content-Security-Policy: script-src 'self'
+```
+
+The server includes this header on the response that sends an HTML page to the browser. The policy configuration tells the browser that ths page can only execute scripts coming from its own origin.This means that if the application is running on `https://example.com/app`, the browser only executes remote JavaScript code comming from `https://example.com`, anyting else is blocked, include `*.example.com`.
+
+For example:
+```html
+<!-- Not allowed! Inline scripts are prevented -->
+<img src="none.png" onerror="evilCode()">
+<!-- Not allowed! Inline scripts are prevented  -->
+<script>evilCode()</script>
+<!-- Not allowed! Remote script comes from a different origin  -->
+<script src="https://evil.com/code.js"></script>
+<!-- Allowed! Relative URLs are loaded from the same origin -->
+<script src="/code.js"></script>
+```
