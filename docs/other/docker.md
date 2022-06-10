@@ -44,12 +44,14 @@ gcr.azk8s.cn/google_containers/hyperkube-amd64   v1.9.2              583687acb4d
 ### 定制镜像
 镜像的定制实际上就是定制每层所添加的配置和文件，我们可以把每一层的修改、安装、构建、操作的命令都写入一个Dockerfile，通过它来构建、定制镜像。
 
-#### FROM
+**FROM**
+
 用来指定基础镜像。定制镜像一定是以一个镜像为基础，在其上进行定制，FROM是必备的且必须是第一条指令。
 
 我们一般可以用一些服务类的镜像作为基础镜像，例如nginx、redis、python、golang等，也可以使用更为基础的操作系统镜像，如ubuntu、centos、alpine等。还以为用scratch作为基础镜像，它表示一个空白的镜像，接下来所写的指令为镜像的第一层，因为有一些静态编译的程序并不需要操作系统提供运行时支持。
 
-#### RUN
+**RUN**
+
 用来执行命令行命令的，可以像shell脚本一样使用，但我们不应该把每个命令都去对应一个RUN，例如:
 ```dockerfile
 FROM debian:stretch
@@ -81,7 +83,8 @@ RUN buildDeps='gcc libc6-dev make wget' \
 ```
 所有的命令都是一个目的，即编译、安装redis可执行文件，没必要多层。此外，这组命令的最后添加了清理工作的命令，删除为了编译构建所需的文件，清理了所有下载、展开的文件，还清理了apt的缓存文件。镜像构建时，一定要确保每一层只添加真正需要添加的东西，任何无关的东西都应该清理掉。
 
-#### COPY
+**COPY**
+
 该指令从构建上下文的目录中复制文件到镜像内的目标路径位置，源路径可以是多个，也可以用通配符，通配符规则是Go的[filepath.Match](https://golang.org/pkg/path/filepath/#Match)规则。还可以通过添加`--chown=<user>:<group>`选项来改变文件的所属用户和组。例如:
 ```
 COPY hom* /mydir/
@@ -90,17 +93,20 @@ COPY --chown=55:mygroup files* /mydir/
 COPY --chown=bin files* /mydir/
 ```
 
-#### ADD
+**ADD**
+
 该命令和COPY的格式和性质基本一致，按最佳实践，COPY的语义更加明确应尽可能的使用，尽在需要自动解压缩的场合使用ADD。
 
-#### CMD
+**CMD**
+
 因为容器是进程，那么在启动容器的时候，就需要指定所运行的程序及参数，CMD就用来指定默认的容器主进程的启动命令。比如，ubuntu镜像的CMD设置的是/bin/bash，所以我们运行容器`docker run -it ubuntu`会进入到bash，但当我们使用`docker run -it ubuntu cat /etc/os-release`运行容器时就用`cat /etc/os-release`替换掉了`/bin/bash`命令。
 
 该指令既支持shell格式，`CMD <命令>`，也支持exec格式，`CMD ["可执行文件", "参数1", "参数2"...]`。但是shell格式会被包装一个`sh -c`的参数。例如`CMD echo $HOME`在实际的执行时会被替换为`CMD [ "sh", "-c", "echo $HOME" ]`。
 
 另外，docker中的应用都是以前台执行的，而不是像虚拟机、物理机那样，可以用systemd去启动一个后台服务，容器内没有后台服务的概念。类似于`CMD service nginx start`会发现容器执行后就立即退出了，甚至`systemctl`命令结果却根本执行不了，因为容器就是为了主进程而存在的，主进程退出容器就没有存在的意义也会退出，这条命令会被翻译为`CMD [ "sh", "-c", "service nginx start"]`，sh是主进程，当`service nginx start`命令结束后，sh就结束了，主进程退出自然容器就会退出。正确的做法是直接执行nginx可执行文件并以前台形式运行，如`CMD ["nginx", "-g", "daemon off;"]`。
 
-#### ENV
+**ENV**
+
 用来设置环境变量，设置后无论是之后的指令，还是运行时的应用都可以直接使用定义的环境变量。支持格式:
 
 * ENV <key> <value>
@@ -112,18 +118,22 @@ ENV VERSION=1.0 DEBUG=on NAME="Happy Feet"
 RUN curl -SLO "https://nodejs.org/dist/v$VERSION/node-v$NAME-linux-x64.tar.xz"
 ```
 
-#### ARG
+**ARG**
+
 和ENV类似，也是设置环境变量，只是它在容器运行时不会存在这些环境变量。
 
-#### VOLUME
+**VOLUME**
+
 因为容器的运行应保持容器存储层不发生写操作，那么对于数据库类需要动态保存数据的应用，其数据库文件应保存于卷(volume)中。该指令用于挂载一个目录为匿名卷，如果容器运行时用户未指定匿名卷，就会用它做匿名卷，向其写入数据即可避免向容器存储层写入大量数据；如果用户指定，则会覆盖掉这个指令中的设置。
 
 其格式为`VOLUME <路径>`或`VOLUME ["<路径1>", "<路径2>"...]`。用户指定命名卷可以这样写`docker run -d -v mydata:/data xxxx`，即把mydata这个命名卷挂载到了/data位置，会替代Dockerfile中定义的匿名卷挂载配置。
 
-#### EXPOSE
+**EXPOSE**
+
 只是一个声明，容器运行时提供的服务端口。容器不会因为这个声明就自动开启这个端口的服务，只是帮助镜像使用者理解，或是使用`docker run -P`做随机端口映射时可自动映射到该指令设置的端口。
 
-#### WORKDIR
+**WORKDIR**
+
 使用该指令可以指定当前目录(或者称为工作目录)，以后各层的当前目录就被设置为它，如该目录不存在则会自动创建该目录。
 
 比如我们可能会这样写:
@@ -134,7 +144,8 @@ RUN echo "hello" > world.txt
 
 这样构建运行后，会发现找不到/app/world.txt这个文件，因为两个RUN代表两层，它们的执行环境不同，运行到第二层时启动的是一个全新的容器。这个时候就应该用`WORKDIR`指令进行设置。
 
-#### USER
+**USER**
+
 使用该指令可以切换到指定的用户，其后的每一层执行RUN、CMD以及ENTRYPOINT之类命令都会是这个新的身份。这个用户必须是事先建立好的。
 
 ### 构建镜像
@@ -288,7 +299,8 @@ Compose的定位是定义和运行多个Docker容器的应用，其中有两个�
 ### 主要命令
 对于Compose来说，大部分命令的对象既可以是项目本身，也可以是项目中的服务，如不特别说明，命令的对象就是项目，也就是说项目中的所有服务都会受到命令的影响。
 
-#### build
+**build**
+
 用于构建或重新构建项目中的服务容器。
 
 服务容器一旦构建后，将会带上一个标记名，例如对于web项目中的一个db容器，可能是web_db。
@@ -299,13 +311,16 @@ Compose的定位是定义和运行多个Docker容器的应用，其中有两个�
 * --no-cache，构建镜像过程中不使用缓存
 * --pull，始终尝试通过pull来获取更新版本的镜像
 
-#### config
+**config**
+
 验证`docker-compose.yml`文件中的格式是否正确，如果正确会显示配置，错误则显示错误原因。
 
-#### exec
+**exec**
+
 进入指定的容器，容器必须是运行状态的。例如`docker-compose exec web sh`
 
-#### run
+**run**
+
 用于在指定服务上运行一个命令。
 
 类似于启动容器后运行指定的命令，相关的卷、链接等也会按照配置自动创建，如果存在关联的服务则关联的服务也会自动启动。但指定命令会覆盖掉原有的自动运行的命令，且不会自动创建端口以免冲突。
@@ -320,7 +335,8 @@ Compose的定位是定义和运行多个Docker容器的应用，其中有两个�
 
 例如: `docker-compose run --no-deps web python manage.py shell`
 
-#### up
+**up**
+
 它将尝试自动完成包括构建镜像、(重新)创建服务，启动服务，并关联服务相关容器的一系列操作。大部分时候可以通过该命令来启动一个项目。
 
 默认情况下，启动的容器都在前台，会输出容器的输出信息便于调试。生产环境下建议后台启动。
@@ -338,7 +354,8 @@ Compose的定位是定义和运行多个Docker容器的应用，其中有两个�
 
 每个服务都必须通过image指令或build指令来自动构建生成镜像，如果使用build，Dockerfile中设置的选项(如CMD、EXPOSE、VOLUME、ENV)将会自动被获取，无需在模板文件中重复设置。
 
-#### build
+**build**
+
 指定Dockerfile所在文件夹的路径，可以是绝对路径或是相对于`docker-compose.yml`文件的相对路径。如:
 ```yml
 version: '3'
@@ -361,7 +378,8 @@ services:
         buildno: 1
 ```
 
-#### command
+**command**
+
 会覆盖掉容器启动后默认执行的命令。例如:
 ```yml
 version: "3"
@@ -374,10 +392,12 @@ services:
 ```
 没有command时只启动`mysqld`，加上以后变为`mysqld --character-set-server=utf8mb4`
 
-#### depends_on
+**depends_on**
+
 解决容器之间的依赖、启动先后问题。
 
-#### environment
+**environment**
+
 设置环境变量，可以使用如下两种格式:
 ```yml
 environment:
@@ -390,8 +410,10 @@ environment:
 ```
 在这里设置的环境变量，不能用于容器的构建过程中，只能在容器运行以后才能获取到。例如若dockerfie中有一层是`RUN flask db migrate`，则它无法获取到`docker-compose.yml`中设置的数据库连接的环境变量。正确的方法是dockerfile中没有这一层，而是通过`docker-compose run --rm web flask db migrate`来达到目的。
 
-#### expose
+**expose**
+
 暴漏端口，但不映射到宿主机，只有被连接的服务能通过该端口访问。
 
-#### image
+**image**
+
 指定为镜像名称或镜像ID，如果镜像在本地不存在，将会尝试拉取这个镜像。

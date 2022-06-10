@@ -12,6 +12,7 @@ def isSameOrigin(url1, url2):
 ```
 
 If two sites do not comply with same origin policy, they can't:
+
   - Read each other's Cookie,LocalStorage,IndexdDB
   - Get each other's DOM
   - Send to each other AJAX request
@@ -49,7 +50,8 @@ document.getElementById("myIFrame").contentWindow.document
 ```
 There are 3 ways to resolve this situation.
 
-#### fragment identifier
+**fragment identifier**
+
 For a url `http://example.com/x.html#fragment`, the content after `#` is fragment, when you change the fragment, the page does not refresh.
 
 So the parent window can write data to child window's fragment like this:
@@ -69,14 +71,16 @@ The child window also can change parent window's fragment:
 parent.location.href= target + "#" + hash;
 ```
 
-#### window.name
+**window.name**
+
 Each browser window has a `window.name` property, this property has a quality, even if the page jump to a new location, the `window.name` will still be retained.
 
 For example, the `http://parent.com/a.html` has a iframe src to `http://child.com`. When the child page loaded it can set it's `window.name=data`, and then use `location.href='http://parent.com/empty'`to redirect the same origin page as parent. Now the parent can get the data simple use `$('iframe').contentWindow.name`.
 
 This property can exchange serveral MB data once, but monitor the child window name change is a performance loss.
 
-#### window.postMessage
+**window.postMessage**
+
 The above methods are hack method, the `window.postMessage` is a new cross-document messaging API design to resolve this situation. It can be used for complicated objects, handle cycles, read/write localstorage etc.
 
 For example, when the parent window want to send a message to child:
@@ -154,7 +158,8 @@ The browser helpfully includes bank.com cookies in all requests to bank.com, eve
 
 How to mitigate CSRF?
 
-The answer is use SameSite cookie attributes, this will prevent cookie from being sent with requests initiated by other sites.
+The answer is use SameSite cookie attributes, this will prevent cookie from being sent with requests initiated by other sites.  
+
  - SameSite=None - default, always send cookies
  - SameSite=Lax - withhold cookies on subresource requests originating from other sites, allow them on top-level requests
  - SameSite=Strict - only send cookies if the request originates from the website that set the cookie
@@ -323,16 +328,18 @@ There are some context never safe, we should avoid!
 ### XSS defenses
 The code injection is caused when untrusted user data unexpectedly becomes code. So we need to escape or sanitize user input before combing it with code(the HTML template).
 
-#### untrusted data comes from
+**where untrusted data comes from**
 
 - HTTP request from user, like query parameters, form fields, headers, cookies, file uploads
 - Data from a database. When you works in a large team, who knows how the data got into the database?
 - Third-party services. We don't know it's safe, maybe the service gets hacked and sending unsafe data
 
-#### when to escape
+**when to escape**
+
 On the way into the database or on the way out at render time? We should always on the way out at render time.
 
 Because even if you are sure that you control all possible ways for data to get into the database, you don't know in advance what context the data will appear in. Different contexts have different control characters.
 
-#### how to escape
+**how to escape**
+
 Use your framework's built-in HTML escaping functionality, if bugs are found, you will get the fix for free! Also, make sure you know the contexts where it is safe to use the output.

@@ -196,25 +196,25 @@ CREATE TABLE person_info(
 ```
 先建了一个表，其中有一个自动为主键id建立的聚簇索引，和一个二级索引idx_name_birthday_phone_number，它是由三个列组成的联合索引。如下情况可以使用到索引:
 
-#### 全值匹配
+**全值匹配**  
 当我们的搜索条件中的列和索引中的列一致时，如`SELECT * FROM person_info WHERE name = 'Ashburn' AND birthday = '1990-09-27' AND phone_number = '15123983239';`，若调换name、birthday、phone_number的顺序也是可以使用到索引的，因为Mysql的查询优化器会帮我们优化这种情况。
 
-#### 匹配左边的列
+**匹配左边的列**  
 在搜索语句中，也可以不包含全部索引的列，只匹配左边的部分列。如`SELECT * FROM person_info WHERE name = 'Ashburn';`是可以用到索引的，搜索条件中的列只要是从联合索引列的最左边开始的、连续的列就能匹配到。
 
-#### 匹配列前缀
+**匹配列前缀**  
 对于字符串而言，其排序的本质就是比较字符串的大小，一般的规则就是比较逐个字符的大小，也就是说只匹配字符串的前n个字符也是可以用到索引的，如`SELECT * FROM person_info WHERE name LIKE 'As%';`，但若没有从第一个字符开始匹配则用不到索引。有时候我们有匹配字符串后缀的需求，例如某一列是url，其前缀都是www，这种情况我们可以把表中的数据逆序存储，再使用匹配列前缀的方式就可以用到索引了。
 
-#### 匹配范围值
+**匹配范围值**  
 当我们需要一个范围的值时也可以用到索引，因为所有记录都是按照索引列的值由小到大的顺序排列的。如`SELECT * FROM person_info WHERE name > 'Asa' AND name < 'Barlow' AND birthday > '1980-01-01';`可以用到name列的索引，但无法用到birthday的索引，因为name查出来的记录中可能并不是按birthday再排序过的。
 
-#### 精确匹配某一列并范围匹配另外一列
+**精确匹配某一列并范围匹配另外一列**  
 对于同一个联合索引来说，虽然对多个列进行范围查找时只能用到最左边那个索引列，但如果左边的列是精确查找，则右边的列可以用范围查找，如`SELECT * FROM person_info WHERE name = 'Ashburn' AND birthday > '1980-01-01' AND birthday < '2000- 12-31' AND phone_number > '15100000000';`，name和birthday能用到索引，phone_number无法用到索引。
 
-#### 用于排序
+**用于排序**  
 如果没有索引的话，我们会把所有的记录加载到内存中，然后通过一些排序算法例如快排等对这些记录排序，如果内存中放不下可能还会借助硬盘中的空间，最后排序完成后再返还给客户端。在Mysql中，把这种在内存中或硬盘中进行排序的方式称为​**文件排序(filesort)**，是非常慢的。借助索引可以直接提取出数据，再进行回表拿到其他数据就可以了，例如`SELECT * FROM person_info ORDER BY name, birthday, phone_number LIMIT 10;`。但是，各个排序列的排序顺序要一致，某列asc、某列desc一起混用是无法索引的。另外，用于排序的多个列需要是同一个索引里的，索引列也不能是修饰过的形式，如`SELECT * FROM person_info ORDER BY UPPER(name) LIMIT 10;`。
 
-#### 用于分组
+**用于分组**  
 其实和排序类似，如`SELECT name, birthday, phone_number, COUNT(*) FROM person_info GROUP BY name, birthday, phone_number`。
 
 ### 代价
@@ -223,19 +223,19 @@ CREATE TABLE person_info(
 此外，回表也是有代价的。二级索引B+树记录在磁盘上的数据是相连的，集中分布在一个或几个数据页中，我们可以很快的把它们读出来，这种读取方式也叫​**顺序读取**；读取到之后，其对应的主键并不相连，要读取到完整记录就需要在不同的数据页中去找，这种读取方式叫​**随机读取**。需要回表的记录越多，使用二级索引的效率就越低，甚至让某些查询宁愿使用全表扫描也不使用二级索引。比如name值在Asa~Barlow之间的用户记录数量占全部记录数量90%以上，那么如果使用idx_name_birthday_phone_number索引的话，有90%多的id值需要回表，就还不如全表扫描。查询优化器会帮我们判断何时该用全表扫描代替二级索引回表。
 
 ### 优化策略
-#### 覆盖索引
+**覆盖索引**  
 为了避免回表时的损耗，最好在查询列表里只包含索引，如`SELECT name, birthday, phone_number FROM person_info WHERE name > 'Asa' AND name < 'Barlow'`。不鼓励使用`*`号查询列表，最好把需要查询的列依次标明。
 
-#### 只为用于搜索、排序或分组的列创建索引
+**只为用于搜索、排序或分组的列创建索引**  
 出现在查询列表中的列就没必要索引了。如`SELECT birthday, country FROM person_name WHERE name = 'Ashburn'`只需为name创建索引，birthday和country就不需要了。
 
-#### 为列的基数大的列创建索引
+**为列的基数大的列创建索引**  
 列的基数是说该列中不重复的数的个数，比如性别这样的列，其基数也就2个，如果为其建立索引重复的值会特别的多，效果就不会好。
 
-#### 索引列的类型尽量小
+**索引列的类型尽量小**  
 这里的类型指的是其表示的数据范围，例如整型分为TINYINT、MEDIUMINT、INT、BIGINT几种，在能表示出所需整数的前提下，能用INT就不要用BIGINT。因为数据类型越小，CPU做数字比较时就越快，同时索引占用的空间就越小，一个数据页中就能有更多的记录，缓存在内存中的数据也就越多。这点对于主键来说更是如此，因为二级索引也需要存储主键值。
 
-#### 索引字符串值的前缀
+**索引字符串值的前缀**  
 也就是说在二级索引的记录中只保留字符串的前几个值，查找时虽不能精确的定位到记录的位置，但能定位到相应前缀的位置，在空间和时间上取得平衡。在字符串类型能存储的值较多的情况下，这种方式是非常鼓励的，如:
 ```mysql
 CREATE TABLE person_info(
@@ -247,13 +247,13 @@ CREATE TABLE person_info(
 ```
 就表示用name的前10个字符来做为索引。但这种方式不能用name列来排序了，如`SELECT * FROM person_info ORDER BY name LIMIT 10;`则用不到索引。
 
-#### 让索引列在比较表达式中单独出现
+**让索引列在比较表达式中单独出现**  
 例如`WHERE col * 2 < 4`就用不到索引，但若写成`WHERE col < 4/2`就能用到索引，所以如果索引列在比较表达式中不是以单独列的形式出现，而是以某个表达式，或者函数调用形式出现的话，是用不到索引的。
 
-#### 让主键自增
+**让主键自增**  
 如果主键是自增(AUTO_INCREMENT)的，那我们每插满一个数据页就会去插下一个数据页。而如果插入的主键值忽大忽小，就可能会发生页分裂和记录移动，造成不必要的性能损耗。
 
-#### 避免冗余重复索引
+**避免冗余重复索引**  
 这往往发生在某个索引已经被联合索引包含到了，或者对某个列既建立了唯一索引和普通索引。
 
 ### 访问方法
@@ -279,32 +279,37 @@ CREATE TABLE single_table (
 ```
 它有主键id、唯一二级索引key2、普通二级索引key1和key3、联合索引。
 
-#### const
+**const**
+
 当我们可以直接通过主键列或唯一二级索引列来与常数的等值比较来定位到一条记录时，速度是非常快的，这种访问方法称为​**const**。例如:`SELECT * FROM single_table WHERE id = 1438;`、`SELECT * FROM single_table WHERE key2 = 3841;`。主键列只需要一次定位，唯一索引列也只需要两次定位。
 
 对于唯一二级索引来说，查询该列为NULL值的情况比较特殊，因为唯一索引并不限制其列为NULL值的数量，所以使用`SELECT * FROM single_table WHERE key2 IS NULL;`查询时不会用const访问方法。
 
-#### ref
+**ref**
+
 对于某个普通二级索引列和常数值的等值比较，比如`SELECT * FROM single_table WHERE key1 = 'abc';`，由于普通索引并不限制索引列值的唯一性，所以可能找到多条对应的记录，那么这种方式的代价取决于匹配到的二级索引记录的条数，如果匹配的记录较少，则回表代价较低。这种方法称为​**ref**，它的效率比const差了一些。
 
 如果最左边的连续索引列是与常数的等值比较就可能采用ref的方法，如`SELECT * FROM single_table WHERE key_part1 ='god like'AND key_part2 = 'legendary';`，但如果不全是等值比较的话，它的访问方法就不会是ref了，如`SELECT * FROM single_table WHERE key_part1 ='god like'AND key_part2 > 'legendary';`
 
 普通二级索引或唯一二级索引使用`Key IS NULL`这样的方式作为搜索条件时，可能使用ref的访问方法。
 
-#### ref_or_null
+**ref_or_null**
+
 当我们不仅想找出某个索引列的值等于某个常数的记录，还同时想找出该列为NULL的记录时，例如`SELECT * FROM single_demo WHERE key1 = 'abc' OR key1 ISNULL;`。这种查询使用的访问方法为​**ref_or_null**。它的查询也会分为两个步骤，先分别定位key1=abc和key1是null的连续记录并找到这些记录对应的主键值，再从聚簇索引上根据主键找到完整的用户记录。
 
-#### range
+**range**
+
 之前的方式都是和常数等值比较，但有时我们面对的搜索条件会更复杂，例如`SELECT * FROM single_table WHERE key2 IN (1438,6328) OR (key2 >= 38AND key2 <= 79);`，除了可能使用全表扫描的访问方法，也可能使用二级索引+回表的访问方法。如果采用回表的方式，索引列就需要匹配某个或某些范围的值，这种利用索引进行范围匹配的访问方法称为​**range**。
 
 该例中，会分为三个范围，即key2=1438、key2=6328、key2∈[38,79]。范围一、范围二被称为单点区间，范围三称为连续范围空间。
 
-#### index
+**index**
+
 看这个查询`SELECT key_part1, key_part2, key_part3 FROMsingle_table WHERE key_part2 = 'abc';`，由于key_part2不是联合索引idx_key_part的最左索引列，所以我们无法使用ref的访问方法来执行这个语句。但这个语句有两个特点，一是它的查询列表只有三个列key_part1、key_part2、key_part3且都被联合索引包含，二是搜索条件只有key_part2列也被包含在联合索引中。
 
 也就是说我们可以直接遍历idx_key_part这颗B+树的叶子节点来得到结果，而不需要回表，因为这棵树比聚簇索引的树小的多，它的成本也要小很多，我们把这种访问方法称为​**index**。
 
-#### all
+**all**
 最直接的查询执行方式就是全表扫描，对于InnoDB来说就是直接扫描聚簇索引，这种访问方法称为​**all**。
 
 ### EXPLAIN
@@ -336,7 +341,8 @@ mysql> explain select 1;
 |`filtered`|某个表经过搜索条件过滤后剩余记录条数的百分比|
 |`Extra`|一些额外的信息|
 
-#### table
+**table**
+
 ```mysql
 mysql> explain select * from s1, s2;
 +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+
@@ -349,7 +355,8 @@ mysql> explain select * from s1, s2;
 ```
 我们看到EXPLAIN语句输出的每条记录都对应着某个单表的访问方法，该条记录的table列代表了该表的表名。
 
-#### id
+**id**
+
 查询语句一般以select关键字开头，简单的查询语句只有一个select，但有两种情况会出现多个select:
 
 * 查询语句包含子查询，如`SELECT * FROM s1 WHERE key1 IN (SELECT * FROM s2);`
@@ -392,7 +399,8 @@ mysql> EXPLAIN SELECT * FROM s1  UNION SELECT *FROM s2;
 3 rows in set, 1 warning (0.00 sec)
 ```
 
-#### select_type
+**select_type**
+
 每个select关键字都代表着一个小的查询语句，select_type就是描述这个小的查询语句在大的查询中扮演的角色，它的取值有这些可能:
 
 |名称|描述|
@@ -409,10 +417,12 @@ mysql> EXPLAIN SELECT * FROM s1  UNION SELECT *FROM s2;
 |`UNCACHEABLE SUBQUERY`|不常用|
 |`UNCACHEABLE UNION`|不常用|
 
-#### partitions
+**partitions**
+
 分区信息，一般该列值都为NULL。
 
-#### type
+**type**
+
 代表Mysql对这个表执行查询时的访问方法，[之前](./#访问方法)已经提到过部分，这列可能的值有:
 
 * system，表中只有一条记录且该表使用的存储引擎的统计数据是精确的，比如MyISAM、Memory
@@ -428,7 +438,8 @@ mysql> EXPLAIN SELECT * FROM s1  UNION SELECT *FROM s2;
 * index，对应[index](./#index)
 * ALL，对应[all](./#all)
 
-#### possible_keys和key
+**possible_keys和key**
+
 possible_keys表示一开始的查询语句可能使用到的索引，而key表示经过了查询优化器计算使用不同的索引成本之后，实际上会使用到的索引。例如:
 ```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z'AND key3 = 'a';
@@ -442,7 +453,8 @@ mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z'AND key3 = 'a';
 
 有个特例是当使用index为访问方法时，possible_keys列是空的。此外，possible_keys列中的值越多，可能用到的索引就越多，查询优化器计算查询成本时就得花费更多的时间去比较，如果可能的话，尽量删除用不到的索引。
 
-#### key_len
+**key_len**
+
 表示当查询优化器决定使用某个索引执行查询时，该索引记录的最大长度，这个最大长度是这样计算的:
 
 * 对于使用固定长度类型的索引列来说，它实际占用的存储空间最大长度就是该固定值
@@ -450,7 +462,8 @@ mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z'AND key3 = 'a';
 * 如果索引列可以存储NULL值，则key_len比不可以存储时多1个字节
 * 对于变长字段，都会有2个字节的空间来存储该变长列的实际长度
 
-#### ref
+**ref**
+
 当使用索引列等值匹配的条件去执行查询时，即const、eq_ref、ref、ref_or_null、unique_subquery之一，该列会展示出与索引列做等值匹配的是一个常数或者是某个列。例如:
 ```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 = 'a';
@@ -471,11 +484,13 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.id = s2.id;
 2 rows in set, 1 warning (0.00 sec)
 ```
 
-#### rows
+**rows**
+
 * 如果查询优化器决定使用全表扫描执行查询计划，rows列代表预计需要扫描的行数
 * 如果查询优化器决定使用索引执行查询计划，rows列代表预计扫描的索引记录行数
 
-#### filtered
+**filtered**
+
 * 如果查询优化器决定使用全表扫描执行单表查询，那么会估计出满足搜索条件的记录有多少条
 * 如果查询优化器决定使用索引执行单表查询，那么会估计出满足除使用到对应索引的搜索条件外的其他搜索条件的记录有多少条。
 
@@ -492,7 +507,8 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
 ```
 我们可以看到驱动表s1表的执行计划的rows列为9688， filtered列为10.00，这意味着驱动表s1的扇出值就是`9688 × 10.00% = 968.8`，这说明还要对被驱动表执行大约968次查询。
 
-#### extra
+**extra**
+
 该列用来说明一些额外信息，有很多种，这里只列出比较常见的一些:
 
 **No tables used**，当查询语句中没有FROM子句时，也就是不去读表时。

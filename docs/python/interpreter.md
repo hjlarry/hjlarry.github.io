@@ -913,7 +913,8 @@ PUSH(b);
 ![](./images/value_stack.png)
 有很多字节操作码opcode是直接操作栈的，例如PUSH()、POP()、PEEK()、DUP_TOP()、ROT_TWO()等。所有的opcode都会对栈有一个影响，这被定义在[stack_effect()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L878)方法中。
 
-#### 举例:向list中添加一个元素
+**举例:向list中添加一个元素**
+
 在Python中，我们通过append()方法添加元素:
 ```python
 my_list = []
@@ -961,7 +962,8 @@ my_list.append(obj)
 ```
 其后的PREDICT(JUMP_ABSOLUTE)属于一种预测手段，它会猜下一个opcode可能是JUMP_ABSOLUTE，这样CPU就可以直接跳转过去而不需要重新跑一遍主循环了。
 
-#### 调用追踪
+**调用追踪**
+
 有一些指令例如CALL_FUNCTION、CALL_METHOD，它们的参数opcode实际上是另一个已经编译好的函数。那么另一个frame就会压入当前线程的执行栈帧中，主循环会先把这个新的函数运行完以后在运行原函数。每次新的frame创建时，它会有一个f_back属性就是指向当前的frame。
 
 例如有这样一段python代码:
