@@ -319,3 +319,20 @@ There are some context never safe, we should avoid!
 
 <style>USER_DATA_HERE</style>
 ```
+
+### XSS defenses
+The code injection is caused when untrusted user data unexpectedly becomes code. So we need to escape or sanitize user input before combing it with code(the HTML template).
+
+#### untrusted data comes from
+
+- HTTP request from user, like query parameters, form fields, headers, cookies, file uploads
+- Data from a database. When you works in a large team, who knows how the data got into the database?
+- Third-party services. We don't know it's safe, maybe the service gets hacked and sending unsafe data
+
+#### when to escape
+On the way into the database or on the way out at render time? We should always on the way out at render time.
+
+Because even if you are sure that you control all possible ways for data to get into the database, you don't know in advance what context the data will appear in. Different contexts have different control characters.
+
+#### how to escape
+Use your framework's built-in HTML escaping functionality, if bugs are found, you will get the fix for free! Also, make sure you know the contexts where it is safe to use the output.
