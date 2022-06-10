@@ -7,7 +7,7 @@
 
 在一个具有一致性、容错性的集群中，同一时刻所有节点对存储在其中的某个值应该有相同的结果，且当少数节点失效的时候，不影响集群的正常工作，当大多数集群中的节点失效的时候，集群则会停止服务（而非返回一个错误的结果）。
 
-我们以[MIT6.824的lab3](https://pdos.csail.mit.edu/6.824/labs/lab-kvraft.html)中构建的容错键值服务为例，大概看一下基于raft算法的工作流程：
+我们以[MIT6.824的lab3](https://pdos.csail.mit.edu/6.824/labs/lab-kvraft.html){:target="_blank"}中构建的容错键值服务为例，大概看一下基于raft算法的工作流程：
 
 ![raft](./images/raft_summary.png)
 

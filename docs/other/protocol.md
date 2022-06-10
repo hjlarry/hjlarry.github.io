@@ -124,14 +124,14 @@ Socket在Linux中以文件的形式存在，它是一种特殊的文件，是对
 #### 多线程
 每次和一个客户端连接就创建一个进程是很奢侈的事情，相对而言，创建一个线程就要轻量级很多。这些线程共享文件描述符列表、进程空间，也可以通过已连接的socket来处理客户端请求。
 
-但是一台机器无法创建过多的进程或线程，著名的[C10K](https://en.wikipedia.org/wiki/C10k_problem)问题就是指单机操作系统无法维护过多的进程或线程，在早期成为一个瓶颈。为了解决这个问题，就发明了IO多路复用的方式。
+但是一台机器无法创建过多的进程或线程，著名的[C10K](https://en.wikipedia.org/wiki/C10k_problem){:target="_blank"}问题就是指单机操作系统无法维护过多的进程或线程，在早期成为一个瓶颈。为了解决这个问题，就发明了IO多路复用的方式。
 
 #### IO多路复用-select
 select的方式是有一个线程专门去监控所有的socket，因为socket是文件描述符，所有的socket都可以放在一个叫做fd_set的集合中，然后select函数来监听这个集合是否有变化。一旦有变化，就依次查看每个文件描述符，那些发生变化的文件描述符在fd_set中对应的位会设为1，表示socket可读或可写，从而可以进行读写操作。接着再次调用select函数，进入下一轮变化的监听。
 
 但是select仍然有个问题，就是当连接过多的时候，每次都通过轮询查看一遍fd_set效率不高。它虽然比多线程效率高很多，但仍然没有完全解决C10K的问题，于是有了epoll的方案。
 
-[示例程序](https://github.com/hjlarry/practise-py/blob/master/standard_library/Concurrency/Select/select_echo_server.py)
+[示例程序](https://github.com/hjlarry/practise-py/blob/master/standard_library/Concurrency/Select/select_echo_server.py){:target="_blank"}
 
 #### IO多路复用-epoll
 epoll通过注册callback函数，当某个文件描述符发生变化的时候，就会主动通知。
@@ -140,7 +140,7 @@ epoll_create会创建一个epoll对象，它也是一个文件，对应一个文
 
 epoll并非在所有情况都比select高效，例如在少于1024个文件描述符监听，且大多数socket都是处于活跃繁忙状态的时候，select会比epoll更高效，因为epoll会有更多次的系统调用，内核态和用户态的切换更为频繁。
 
-[示例程序](https://github.com/hjlarry/practise-py/blob/master/standard_library/Concurrency/Select/select_poll_echo_server.py)
+[示例程序](https://github.com/hjlarry/practise-py/blob/master/standard_library/Concurrency/Select/select_poll_echo_server.py){:target="_blank"}
 
 HTTP
 -------
@@ -206,7 +206,7 @@ TCP层发送每个报文时都会加上自己的地址和目标的地址，把�
 响应构建好之后，也只是把请求发送的过程逆向来发送回去。
 
 ### HTTP 2.0
-HTTP1.1在应用层是以纯文本的方式通信的，每次通信都要带上HTTP头部，在不考虑[pipeline](https://zh.wikipedia.org/wiki/HTTP%E7%AE%A1%E7%B7%9A%E5%8C%96)模式的情况下，每次的过程都是一去一回，这样在实时性和并发性上都有问题。
+HTTP1.1在应用层是以纯文本的方式通信的，每次通信都要带上HTTP头部，在不考虑[pipeline](https://zh.wikipedia.org/wiki/HTTP%E7%AE%A1%E7%B7%9A%E5%8C%96){:target="_blank"}模式的情况下，每次的过程都是一去一回，这样在实时性和并发性上都有问题。
 
 为了解决这些问题，HTTP 2.0对HTTP头进行了压缩，将原来每次都要携带的头部key-value在两端都建立了一个索引表，对相同的字段只发送表中的索引即可。
 

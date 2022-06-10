@@ -106,7 +106,7 @@ first commit
 ```
 tree表示本次提交产生的另一个tree类型git对象的路径地址。author和committer大多数情况相同，但有时比如说我们把别人分支的一个commit通过`cherry-pick`加入我们的分支，这时committer是我们自己，author仍然是别人。这里author需要包含username、email(所以刚使用git时要求在gitconfig中设置用户名和邮箱)、时间戳。紧跟着是提交的message。
 
-实际上完整的commit对象的内容正是邮件的一种简单的格式，源于[RFC2822](https://www.ietf.org/rfc/rfc2822.txt)。还包括一个parent，指向本次提交的父commit对象的路径地址，因为现在是第一次提交，没有parent。以及一个gpgsig，通过PGP签名了一下这个对象，通过`cat-file`看不到。
+实际上完整的commit对象的内容正是邮件的一种简单的格式，源于[RFC2822](https://www.ietf.org/rfc/rfc2822.txt){:target="_blank"}。还包括一个parent，指向本次提交的父commit对象的路径地址，因为现在是第一次提交，没有parent。以及一个gpgsig，通过PGP签名了一下这个对象，通过`cat-file`看不到。
 
 也就是说我们通过`git log`查看提交日志的信息，就是一层层的递归查看父对象拿到的。
 
@@ -461,7 +461,7 @@ HEAD@{3} 重置操作: 重置至5665
 这种工作流程使用起来会比较麻烦，因为维护了两个长期分支，可能需要经常切换。它比较适合软件项目，而不是网站项目，因为大多数网站是持续发布的，一有代码变动可能就会更新一次，这时候往往master和develop分支的区别不大，也就没有必要同时维护两套了。
 
 ### Github Flow
-这套工作流程在Git Flow上做了简化，只有一个长期分支master，适合于持续发布的场景，是github官方使用的工作流程，它们也做了相关的[介绍](https://guides.github.com/introduction/flow/index.html)。其具体流程是这样的:
+这套工作流程在Git Flow上做了简化，只有一个长期分支master，适合于持续发布的场景，是github官方使用的工作流程，它们也做了相关的[介绍](https://guides.github.com/introduction/flow/index.html){:target="_blank"}。其具体流程是这样的:
 
 1. 你从master中拉出新分支，不区分是功能还是补丁
 2. 新分支开发完成后，就向master发起一个PR
@@ -471,7 +471,7 @@ HEAD@{3} 重置操作: 重置至5665
 这种流程也有一个问题，它假设master分支和产品的发布是一致的。这在一些场景，例如苹果Appstore的发布可能因为审核要延迟，或有些产品是要指定时间发布的，一个master分支就显得不够了。
 
 ### Gitlab Flow
-Gitlab结合了Git flow和Github flow的优点，既能适应不同开发环境的弹性，又仍然只需维护单一分支，官网也有相关[介绍](https://docs.gitlab.com/ee/topics/gitlab_flow.html)。
+Gitlab结合了Git flow和Github flow的优点，既能适应不同开发环境的弹性，又仍然只需维护单一分支，官网也有相关[介绍](https://docs.gitlab.com/ee/topics/gitlab_flow.html){:target="_blank"}。
 
 它定义了一个原则即上游优先，只存在一个主分支master，它是其他分支的上游。只有上游分支变化了，才能应用到其他的分支。
 
@@ -523,10 +523,10 @@ reset的本质是把HEAD移动到某个commit的位置，那么该分支从新HE
 相关链接
 -------
 
-* [图解git](https://marklodato.github.io/visual-git-guide/index-zh-cn.html)
-* [Pro git V2](https://git-scm.com/book/zh/v2)
-* [Write yourself a Git!](https://wyag.thb.lt/)
-* [Dulwich---Pure-Python Git implementation](https://github.com/dulwich/dulwich)
-* [Oh Shit, Git!?!](https://ohshitgit.com/)
-* [git可视化](http://onlywei.github.io/explain-git-with-d3/#commit)
-* [LearnGitBranching](https://learngitbranching.js.org/)
+* [图解git](https://marklodato.github.io/visual-git-guide/index-zh-cn.html){:target="_blank"}
+* [Pro git V2](https://git-scm.com/book/zh/v2){:target="_blank"}
+* [Write yourself a Git!](https://wyag.thb.lt/){:target="_blank"}
+* [Dulwich---Pure-Python Git implementation](https://github.com/dulwich/dulwich){:target="_blank"}
+* [Oh Shit, Git!?!](https://ohshitgit.com/){:target="_blank"}
+* [git可视化](http://onlywei.github.io/explain-git-with-d3/#commit){:target="_blank"}
+* [LearnGitBranching](https://learngitbranching.js.org/){:target="_blank"}

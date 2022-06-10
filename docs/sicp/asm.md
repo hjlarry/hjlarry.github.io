@@ -8,7 +8,7 @@
 
 汇编是面向机器编程的语言，不同的硬件的指令可能是不同的，它能直接访问硬件的存储和端口，最大程度发挥出硬件的能力。它还有一些其他的使用场景，例如优化代码追求极致效率、直接调试和修改没有源码的程序、诊断恶意软件、进行逆向分析等。汇编的缺点也显而易见，对多数人而言，汇编代码难懂，不易维护，难于调试，不易移植，开发效率低。
 
-汇编语言的风格分为两种，Intel的和AT&T的，相当于用不同的方言描述机器语言。AT&T风格主要是GNU使用的，汇编器主要是GAS/as;Intel风格主要是windows使用的，汇编器有MASM、NASM、TASM、FASM。它们的主要区别在于AT&T会在寄存器名字前加%，在立即操作数前加$前缀，且源和目标操作数的顺序和Intel相反。详细区别可参考[wiki](https://zh.wikipedia.org/wiki/%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80#%E7%B5%84%E8%AD%AF%E9%A2%A8%E6%A0%BC)，以及[这篇文章](https://developer.ibm.com/articles/l-gas-nasm/)。
+汇编语言的风格分为两种，Intel的和AT&T的，相当于用不同的方言描述机器语言。AT&T风格主要是GNU使用的，汇编器主要是GAS/as;Intel风格主要是windows使用的，汇编器有MASM、NASM、TASM、FASM。它们的主要区别在于AT&T会在寄存器名字前加%，在立即操作数前加$前缀，且源和目标操作数的顺序和Intel相反。详细区别可参考[wiki](https://zh.wikipedia.org/wiki/%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80#%E7%B5%84%E8%AD%AF%E9%A2%A8%E6%A0%BC){:target="_blank"}，以及[这篇文章](https://developer.ibm.com/articles/l-gas-nasm/){:target="_blank"}。
 
 本文使用NASM汇编器，它采用Intel语法风格，支持很多种格式，包括ELF、COFF、Mach-O、Win32、Win64等，可使用`nasm -hf`查看其所有支持的格式。
 
@@ -277,7 +277,7 @@ dz|64|resz
 * 位移: shl, shr
 * 字节数组或字符串: rep, movsb, cmpsb, scasb, stomb
 
-有时由于指令集的限制禁止一些操作，例如mov不能用于内存到内存的操作，这些都可以通过[x86手册](http://www.cs.virginia.edu/~evans/cs216/guides/x86.html)查看到。
+有时由于指令集的限制禁止一些操作，例如mov不能用于内存到内存的操作，这些都可以通过[x86手册](http://www.cs.virginia.edu/~evans/cs216/guides/x86.html){:target="_blank"}查看到。
 
 ### 控制流
 在汇编语言中，基本的控制流就是跳转和循环，其他的控制流也只是基于这两种的组合。高级语言里的控制流也只是看上去更方便，本质上在CPU眼里仍然是跳转和循环。

@@ -29,7 +29,7 @@ usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw
   0   1 100   0   0|   0     0 |   0     0 |   0     0 | 169   391
 ```
 
-生产环境下我们程序出错的时候，应该先从大的方面入手定位到具体是哪个方面的问题，看看当前的系统环境有没有问题，是不是我们的程序在当前的系统环境下水土不服。比如程序是IO密集型的，系统中有另一个程序在和它抢磁盘资源等。可以通过`dstat --list`查看它能对哪些细分项目查看其情况。[查看更多使用示例](http://dag.wiee.rs/home-made/dstat/)
+生产环境下我们程序出错的时候，应该先从大的方面入手定位到具体是哪个方面的问题，看看当前的系统环境有没有问题，是不是我们的程序在当前的系统环境下水土不服。比如程序是IO密集型的，系统中有另一个程序在和它抢磁盘资源等。可以通过`dstat --list`查看它能对哪些细分项目查看其情况。[查看更多使用示例](http://dag.wiee.rs/home-made/dstat/){:target="_blank"}
 
 
 ### sysstat
@@ -46,7 +46,7 @@ Linux 4.9.184-linuxkit (cabd4e519687) 	12/09/19 	_x86_64_	(2 CPU)
 ```
 我们把tmux当做是自己写的某个程序，每2秒输出一次信息。minflt/s就代表一些小范围的缺页异常，可能是一些数据不需要了只要补上相应的物理内存即可。而majflt/s代表了需要从硬盘换入内存，这可能就意味着我们程序是不是有的任务优先级太低被操作系统换出到硬盘上了，我们可能需要通过系统调用告诉操作系统把某段内存锁死。
 
-更详细的使用方法，请参考[官方文档](http://sebastien.godard.pagesperso-orange.fr/documentation.html)。
+更详细的使用方法，请参考[官方文档](http://sebastien.godard.pagesperso-orange.fr/documentation.html){:target="_blank"}。
 
 ### strace
 接着我们可以深入到自己程序的逻辑中去，比如使用strace检查我们程序的系统调用。可能只是一个简单的程序:
@@ -115,7 +115,7 @@ hello world!
 开发工具
 -------
 
-GNU通用的开发工具，也叫​**binutils**，是一个标准，属于随身带的瑞士军刀，任何语言编写的程序都适用，但可能与语言自带的工具链细节上有些出入。[官方网站](https://www.gnu.org/software/binutils/)
+GNU通用的开发工具，也叫​**binutils**，是一个标准，属于随身带的瑞士军刀，任何语言编写的程序都适用，但可能与语言自带的工具链细节上有些出入。[官方网站](https://www.gnu.org/software/binutils/){:target="_blank"}
 
 它主要包括:
 
@@ -380,9 +380,9 @@ vim提供了多种操作模式，它的设计基于大多数时间都花在阅�
 调试工具
 -------
 
-GNU通用的调试工具，也叫​**gdb**。binutils属于静态的观察，而gdb就可以动态的观察到每一个汇编指令的执行。[官方网站](https://www.gnu.org/software/gdb/)
+GNU通用的调试工具，也叫​**gdb**。binutils属于静态的观察，而gdb就可以动态的观察到每一个汇编指令的执行。[官方网站](https://www.gnu.org/software/gdb/){:target="_blank"}
 
-也可以使用一些带图形界面的类似工具，例如[gdbgui](https://www.gdbgui.com/)。还有些[cheatsheet](https://kapeli.com/cheat_sheets/GDB.docset/Contents/Resources/Documents/index)很好用。
+也可以使用一些带图形界面的类似工具，例如[gdbgui](https://www.gdbgui.com/){:target="_blank"}。还有些[cheatsheet](https://kapeli.com/cheat_sheets/GDB.docset/Contents/Resources/Documents/index){:target="_blank"}很好用。
 
 常用指令
 
@@ -410,7 +410,7 @@ x/10xb [addr]| 查看内存地址addr开始的10组数据，16进制的，单位
 -------
 
 ### 构建工具
-GNU的自动构建工具为​**make**，有些像脚本语言，把一堆命令放一起批量执行。使用它做编译属于增量编译，即通过对比修改时间来判断是否需要重新执行。[官方网站](https://www.gnu.org/software/make/)
+GNU的自动构建工具为​**make**，有些像脚本语言，把一堆命令放一起批量执行。使用它做编译属于增量编译，即通过对比修改时间来判断是否需要重新执行。[官方网站](https://www.gnu.org/software/make/){:target="_blank"}
 
 ```make
 hello: hello.s
@@ -434,7 +434,7 @@ clean:
 
 试想一下，如果你的项目使用了软件A中的某个函数，当软件A升级以后该函数也移除掉了，那么会造成你的项目也无法运行。版本控制就是为了解决这个问题，我们可以指定当前项目需要基于某个版本或者某个范围的版本构建。这样也许解决了项目的运行问题，但如果软件A出现了安全漏洞，需要进行升级，怎么样让依赖它的项目都进行升级呢？
 
-因此，人们定义了一套比较常用的版本号标准，称为[Semantic Version](https://semver.org/)。它使用`major.minor.patch`的形式，例如Python的`3.7.3`，其中:
+因此，人们定义了一套比较常用的版本号标准，称为[Semantic Version](https://semver.org/){:target="_blank"}。它使用`major.minor.patch`的形式，例如Python的`3.7.3`，其中:
 
 - 如果新的版本中没有改变任何API，应该将patch number递增
 - 如果添加了API且改动是向后兼容的，应该将minor number递增

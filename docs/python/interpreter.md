@@ -4,7 +4,7 @@
 编码规范
 -------
 
-像`PEP8`一样，CPython也有自己的一套编码规范，为[PEP7](https://www.python.org/dev/peps/pep-0007/)，有一些命名规范可以帮助我们更好的阅读源码:
+像`PEP8`一样，CPython也有自己的一套编码规范，为[PEP7](https://www.python.org/dev/peps/pep-0007/){:target="_blank"}，有一些命名规范可以帮助我们更好的阅读源码:
 
 * 使用`Py`前缀的方法为公共方法，但不会用于静态方法。`Py_`前缀是为`Py_FatalError`这样的全局服务性函数保留的，对于特殊的类型(比如某类对象的API)会使用更长的前缀，例如`PyString_`都是字符串类的方法
 * 公共函数和变量使用驼峰加上下划线，例如PyObject_GetAttr, Py_BuildValue, PyExc_TypeError等
@@ -96,7 +96,7 @@ static void pymain_run_python(_PyMain *pymain)
 ![](./images/exe_process.png)
 
 ### 运行时环境
-通过上图，我们可以看到无论执行任何python代码，运行时首先会建立相关环境。这个环境在`Include/cpython/initconfig.h`中定义为[PyConfig](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/cpython/initconfig.h#L407)，该结构体中的数据包括:
+通过上图，我们可以看到无论执行任何python代码，运行时首先会建立相关环境。这个环境在`Include/cpython/initconfig.h`中定义为[PyConfig](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/cpython/initconfig.h#L407){:target="_blank"}，该结构体中的数据包括:
 
 * 运行模式的标记，比如debug或optimized模式
 * 执行的模式，比如是以文件的方式、或者模块的方式、stdin的方式
@@ -118,7 +118,7 @@ sys.flags(debug=0, inspect=0, interactive=0, optimize=0, dont_write_bytecode=0, 
 
 ![pymain_run_command](./images/pymain_run_command.png)
 
-[pymain_run_command()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Modules/main.c#L240)的核心逻辑如下:
+[pymain_run_command()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Modules/main.c#L240){:target="_blank"}的核心逻辑如下:
 ```c
 // 首个参数就是-c传递的指令
 // wchar_t*类型通常是CPython中用于存储Unicode数据的低级存储类型，因为该类型的大小也可以存储UTF8字符
@@ -136,7 +136,7 @@ pymain_run_command(wchar_t *command, PyCompilerFlags *cf)
 }
 ```
 
-而[PyRun_SimpleStringFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L453)的目的是创建一个Python模块`__main__`，和一个字典，再将命令一起打包调用[PyRun_StringFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1008)，这个函数将创建一个假的文件名，接着就是调用Python解析器创建AST并返回模块mod了:
+而[PyRun_SimpleStringFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L453){:target="_blank"}的目的是创建一个Python模块`__main__`，和一个字典，再将命令一起打包调用[PyRun_StringFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1008){:target="_blank"}，这个函数将创建一个假的文件名，接着就是调用Python解析器创建AST并返回模块mod了:
 ```c
 int
 PyRun_SimpleStringFlags(const char *command, PyCompilerFlags *flags)
@@ -164,7 +164,7 @@ PyRun_StringFlags(const char *str, int start, PyObject *globals,
 ### -m的方式
 另一种执行Python命令的方式是-m选项和模块名称，例如`python -m unittest`可以运行标准库中的unittest模块。实际上它就是在sys.path中去搜索名为unittest的模块然后去执行。
 
-CPython是先通过一个C的API函数[PyImport_ImportModule()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/import.c#L1409)来导入标准库`runpy`，它返回的是一个PyObject核心对象类型，然后需要一些特殊的方法获取它的属性再调用。例如`hi.upper()`相当于`hi.upper.__call__()`，在C中[PyObject_GetAttrString()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/object.c#L831)就是用来获得hi的upper属性，然后通过[PyObject_Call()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/call.c#L214)就是去执行__call__()。
+CPython是先通过一个C的API函数[PyImport_ImportModule()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/import.c#L1409){:target="_blank"}来导入标准库`runpy`，它返回的是一个PyObject核心对象类型，然后需要一些特殊的方法获取它的属性再调用。例如`hi.upper()`相当于`hi.upper.__call__()`，在C中[PyObject_GetAttrString()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/object.c#L831){:target="_blank"}就是用来获得hi的upper属性，然后通过[PyObject_Call()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/call.c#L214){:target="_blank"}就是去执行__call__()。
 
 ```c
 // modname就是通过-m传递进来的参数
@@ -198,7 +198,7 @@ pymain_run_module(const wchar_t *modname, int set_argv0)
 runpy模块同样也可以用来执行某个目录或者zip文件。
 
 ### file的方式
-如果是`python test.py`这种方式，CPython会打开一个文件句柄，然后传递给`Python/pythonrun.c`中的[PyRun_SimpleFileExFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L372)方法:
+如果是`python test.py`这种方式，CPython会打开一个文件句柄，然后传递给`Python/pythonrun.c`中的[PyRun_SimpleFileExFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L372){:target="_blank"}方法:
 ```c
 int
 PyRun_SimpleFileExFlags(FILE *fp, const char *filename, int closeit,
@@ -227,7 +227,7 @@ PyRun_SimpleFileExFlags(FILE *fp, const char *filename, int closeit,
 }
 ```
 
-而[PyRun_FileExFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1032)和前文介绍的通过-c输入的PyRun_SimpleStringFlags()作用类似，都是去创建AST返回mod然后运行mod:
+而[PyRun_FileExFlags()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1032){:target="_blank"}和前文介绍的通过-c输入的PyRun_SimpleStringFlags()作用类似，都是去创建AST返回mod然后运行mod:
 ```c
 PyObject *
 PyRun_FileExFlags(FILE *fp, const char *filename_str, int start, PyObject *globals,
@@ -241,7 +241,7 @@ PyRun_FileExFlags(FILE *fp, const char *filename_str, int start, PyObject *globa
 }
 ```
 
-[run_mod()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1125)负责把模块发送给AST编译为一个代码对象，即文章开头提到过的存储字节码以及保存在.pyc文件中的对象:
+[run_mod()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1125){:target="_blank"}负责把模块发送给AST编译为一个代码对象，即文章开头提到过的存储字节码以及保存在.pyc文件中的对象:
 ```c
 static PyObject *
 run_mod(mod_ty mod, PyObject *filename, PyObject *globals, PyObject *locals,
@@ -256,7 +256,7 @@ run_mod(mod_ty mod, PyObject *filename, PyObject *globals, PyObject *locals,
 ```
 之后的run_eval_code_obj()就属于执行逻辑了，后文中再描述。
 
-[run_pyc_file()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1145)可以理解为省略了创建AST的过程，而是通过marshal把pyc文件中的内容复制到内存并将其转换为特定的数据结构。硬盘上的pyc文件就是CPython编译器缓存已编译代码的方式，因此无需每次调用脚本时再编译一次:
+[run_pyc_file()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1145){:target="_blank"}可以理解为省略了创建AST的过程，而是通过marshal把pyc文件中的内容复制到内存并将其转换为特定的数据结构。硬盘上的pyc文件就是CPython编译器缓存已编译代码的方式，因此无需每次调用脚本时再编译一次:
 ```c
 static PyObject *
 run_pyc_file(FILE *fp, const char *filename, PyObject *globals,
@@ -299,7 +299,7 @@ PyParser_ASTFromFileObject(FILE *fp, PyObject *filename, const char* enc,
     return mod;
 }
 ```
-在[PyParser_ASTFromFileObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L772)方法中，会将文件句柄、编译器标志、以及内存块对象打包给[PyParser_ParseFileObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/parsetok.c#L163)转换为一个node对象:
+在[PyParser_ASTFromFileObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L772){:target="_blank"}方法中，会将文件句柄、编译器标志、以及内存块对象打包给[PyParser_ParseFileObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/parsetok.c#L163){:target="_blank"}转换为一个node对象:
 ```c
 node *
 PyParser_ParseFileObject(FILE *fp, PyObject *filename,
@@ -317,9 +317,9 @@ PyParser_ParseFileObject(FILE *fp, PyObject *filename,
     return parsetok(tok, g, start, err_ret, flags);
 }
 ```
-该方法把两项重要的任务组合了起来，一是使用[PyTokenizer_FromFile()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/tokenizer.h#L78)实例化一个tok_state，tok_state也只是一个数据结构(容器)，存储由tokenizer生成的临时数据；二是使用[parsetok()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/parsetok.c#L232)将token转换为一个具体的解析树(节点列表)。
+该方法把两项重要的任务组合了起来，一是使用[PyTokenizer_FromFile()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/tokenizer.h#L78){:target="_blank"}实例化一个tok_state，tok_state也只是一个数据结构(容器)，存储由tokenizer生成的临时数据；二是使用[parsetok()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/parsetok.c#L232){:target="_blank"}将token转换为一个具体的解析树(节点列表)。
 
-在parsetok()中，将循环调用[tok_get()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/tokenizer.c#L1110)方法，该方法像是一个迭代器，不断获取解析树的下一个token，parsetok()在根据不同token设置tok_state中相关的值。它也是CPython中最复杂的方法之一，因为要兼容各种各样的边缘情况、数十年的历史原因、新的语言特性等等原因。我们来看其中一种简单的解析，如何把每行结尾变为token`NEWLINE`的:
+在parsetok()中，将循环调用[tok_get()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Parser/tokenizer.c#L1110){:target="_blank"}方法，该方法像是一个迭代器，不断获取解析树的下一个token，parsetok()在根据不同token设置tok_state中相关的值。它也是CPython中最复杂的方法之一，因为要兼容各种各样的边缘情况、数十年的历史原因、新的语言特性等等原因。我们来看其中一种简单的解析，如何把每行结尾变为token`NEWLINE`的:
 ```c
 static int
 tok_get(struct tok_state *tok, char **p_start, char **p_end)
@@ -426,7 +426,7 @@ CPython的下一个阶段就是将CST转换为能够执行的、更有逻辑的�
 
 用C语言编译AST并不是一件容易的事，所以实际上真正的编译模块有5000行代码，在`Python/ast.c`中。
 
-具体到核心代码流程来说，之前通过PyParser_ParseFileObject()得到的CST对象node，接着传入[PyAST_FromNodeObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L772)，并附带文件名、编译flag和PyArena。得到函数返回的mod_ty，是一个容器结构，属于Python5种模块类型之一:Module、Interactive、Expression、FunctionType、Suite。在`Include/Python-ast.h`中能看到每种类型需要的字段:
+具体到核心代码流程来说，之前通过PyParser_ParseFileObject()得到的CST对象node，接着传入[PyAST_FromNodeObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L772){:target="_blank"}，并附带文件名、编译flag和PyArena。得到函数返回的mod_ty，是一个容器结构，属于Python5种模块类型之一:Module、Interactive、Expression、FunctionType、Suite。在`Include/Python-ast.h`中能看到每种类型需要的字段:
 ```c
 enum _mod_kind {Module_kind=1, Interactive_kind=2, Expression_kind=3,
                  FunctionType_kind=4, Suite_kind=5};
@@ -512,12 +512,12 @@ PyAST_FromNodeObject(const node *n, PyCompilerFlags *flags,
 }
 ```
 
-遍历孩子节点并创建相应的AST语句节点逻辑在[ast_for_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L4512)中，该函数内还需要再根据不同的语句类型调用不同的函数创建节点，都是类似于ast_for_*()，例如`2**4`这样的语句最终能找到ast_for_power()这样的方法。
+遍历孩子节点并创建相应的AST语句节点逻辑在[ast_for_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ast.c#L4512){:target="_blank"}中，该函数内还需要再根据不同的语句类型调用不同的函数创建节点，都是类似于ast_for_*()，例如`2**4`这样的语句最终能找到ast_for_power()这样的方法。
 
 ### 编译过程
 现在解释器有了AST，也就有了每个操作、函数、类和名字空间所需要的属性，下一步就是把AST编译为CPU能够理解的东西，这就是编译。编译可以分为两个部分:一是遍历树并创建一个控制流图(control-flow-graph)，用来表示逻辑执行的顺序；另外就是将控制流图中的节点转换为较小的可执行语句，称为字节码。
 
-[PyAST_CompileObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L312)函数是编译器部分的主要入口，它以Python模块作为主要参数，同解释器进程早期创建过的文件名称、全局变量、局部变量以及PyArena一起打包传入。然后先创建一个全局的编译器状态结构体，用来存储一些属性、编译标识、栈等等:
+[PyAST_CompileObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L312){:target="_blank"}函数是编译器部分的主要入口，它以Python模块作为主要参数，同解释器进程早期创建过的文件名称、全局变量、局部变量以及PyArena一起打包传入。然后先创建一个全局的编译器状态结构体，用来存储一些属性、编译标识、栈等等:
 ```c title="cpython/Python/compile.c"
 struct compiler {
     PyObject *c_filename;
@@ -610,7 +610,7 @@ struct symtable {
 >>> [symbol.__dict__ for symbol in s.get_symbols()]
 [{'_Symbol__name': 'b', '_Symbol__flags': 6160, '_Symbol__scope': 3, '_Symbol__namespaces': ()}]
 ```
-核心的C代码在[PySymtable_BuildObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/symtable.c#L262)函数中，它也是依据传入的mod_ty类型的不同使用不同的访问函数，有[symtable_visit_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/symtable.c#L1176)、symtable_visit_expr()等，这些访问函数里面也是一个巨长的switch语句对应着定义在Parser/Python.asdl中的每种语句类型以及各自的逻辑。例如对于一个函数定义，它需要做的特殊处理有:检测递归深度超过限制则引发异常、将函数名称加入到局部变量中、解析顺序参数和关键字参数的默认值、解析参数和返回值的类型注释、解析函数的装饰器等等。
+核心的C代码在[PySymtable_BuildObject()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/symtable.c#L262){:target="_blank"}函数中，它也是依据传入的mod_ty类型的不同使用不同的访问函数，有[symtable_visit_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/symtable.c#L1176){:target="_blank"}、symtable_visit_expr()等，这些访问函数里面也是一个巨长的switch语句对应着定义在Parser/Python.asdl中的每种语句类型以及各自的逻辑。例如对于一个函数定义，它需要做的特殊处理有:检测递归深度超过限制则引发异常、将函数名称加入到局部变量中、解析顺序参数和关键字参数的默认值、解析参数和返回值的类型注释、解析函数的装饰器等等。
 
 #### 核心编译过程
 现在PyAST_CompileObject()有了一个编译器状态、一个符号表、一个模块形式的AST，真正的编译才开始。这个阶段的目标是将state、symtable、AST转化为CFG，以及捕获逻辑和代码异常并抛出。
@@ -623,7 +623,7 @@ In [2]: _.co_code
 Out[2]: b'e\x00d\x00\x17\x00S\x00'
 ```
 
-怎样得到这个代码对象的，实际就是[compiler_mod()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L1782):
+怎样得到这个代码对象的，实际就是[compiler_mod()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L1782){:target="_blank"}:
 ```c
 static PyCodeObject *
 compiler_mod(struct compiler *c, mod_ty mod)
@@ -648,7 +648,7 @@ compiler_mod(struct compiler *c, mod_ty mod)
 }
 ```
 
-[compiler_body()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L1743)循环访问模块中的每条语句，和symtable的工作方式类似:
+[compiler_body()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L1743){:target="_blank"}循环访问模块中的每条语句，和symtable的工作方式类似:
 ```c
 static int
 compiler_body(struct compiler *c, asdl_seq *stmts)
@@ -662,14 +662,14 @@ compiler_body(struct compiler *c, asdl_seq *stmts)
     return 1;
 }
 ```
-[asdl_seq_GET()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/asdl.h#L32)查看每个AST节点的类型得到语句的类型，然后通过宏，VISIT调用compiler_visit_*函数:
+[asdl_seq_GET()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/asdl.h#L32){:target="_blank"}查看每个AST节点的类型得到语句的类型，然后通过宏，VISIT调用compiler_visit_*函数:
 ```c
 #define VISIT(C, TYPE, V) {\
     if (!compiler_visit_ ## TYPE((C), (V))) \
         return 0; \
 }
 ```
-对于语句类型来说，就是到[compiler_visit_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L3310)函数，然后具体每条语句也有自己的编译函数:
+对于语句类型来说，就是到[compiler_visit_stmt()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L3310){:target="_blank"}函数，然后具体每条语句也有自己的编译函数:
 ```c
 static int
 compiler_visit_stmt(struct compiler *c, stmt_ty s)
@@ -745,7 +745,7 @@ compiler_for(struct compiler *c, stmt_ty s)
 当这一步执行完，编译器就有了一组frame block，其中的每一个都包含一组指令以及指向下一个block的指针。
 
 ### 汇编器
-通过编译器状态，汇编器对block进行深度优先搜索，并把它们的指令合并为一个字节码序列。核心方法[assemble()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5971)的主要任务有:
+通过编译器状态，汇编器对block进行深度优先搜索，并把它们的指令合并为一个字节码序列。核心方法[assemble()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5971){:target="_blank"}的主要任务有:
 * 计算出有多少个block，以便于分配内存
 * 确保所有最后的block都返回None，这也是每个方法都返回None不管它有没有return语句的原因
 * 解决所有的标记为相对跳转语句的偏移量
@@ -753,10 +753,10 @@ compiler_for(struct compiler *c, stmt_ty s)
 * 把所有的指令提交给编译器
 * 调用makecode()方法并传入编译器状态，用来生成PyCodeObject
 
-[dfs()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5397)方法是通过每一个block的b_next指针进行深度优先遍历的，遍历过的会标记该block的b_seen，然后按相反的顺序把它们添加至汇编器的**a_postorder列表中。
+[dfs()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5397){:target="_blank"}方法是通过每一个block的b_next指针进行深度优先遍历的，遍历过的会标记该block的b_seen，然后按相反的顺序把它们添加至汇编器的**a_postorder列表中。
 
 ### 创建代码对象
-[makecode()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5854)方法通过编译器状态、一些汇编器的属性，然后调用[PyCode_New()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/codeobject.c#L246)把它们放在一个PyCodeObject中:
+[makecode()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L5854){:target="_blank"}方法通过编译器状态、一些汇编器的属性，然后调用[PyCode_New()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/codeobject.c#L246){:target="_blank"}把它们放在一个PyCodeObject中:
 ```c
 static PyCodeObject *
 makecode(struct compiler *c, struct assembler *a)
@@ -784,7 +784,7 @@ makecode(struct compiler *c, struct assembler *a)
     return co;
 }
 ```
-变量名称、常量等都是code对象的属性，此外[PyCode_Optimize()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/peephole.c#L230)方法还对字节码进行了一定程度的优化，这个优化器叫窥孔优化器，被放在一个专门的`Python/peephole.c`中，它会仔细检查每条指令，并在合适的情况下将部分指令替换为其他指令。例如其中有一项优化叫常量展开，它能把语句`a = 1 + 5`优化为`a = 6`。
+变量名称、常量等都是code对象的属性，此外[PyCode_Optimize()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/peephole.c#L230){:target="_blank"}方法还对字节码进行了一定程度的优化，这个优化器叫窥孔优化器，被放在一个专门的`Python/peephole.c`中，它会仔细检查每条指令，并在合适的情况下将部分指令替换为其他指令。例如其中有一项优化叫常量展开，它能把语句`a = 1 + 5`优化为`a = 6`。
 
 ### 字节码
 字节码被存储在代码对象(即`__code__`)的`co_code`中，以一个函数为例:
@@ -815,20 +815,20 @@ makecode(struct compiler *c, struct assembler *a)
   3           8 LOAD_FAST                2 (z)
              10 RETURN_VALUE
 ```
-指令所对应的源码行这个信息其实保存在代码对象的两个相关属性中，`co_firstlineno`用来存储该段代码起始的行号，`co_lnotab`由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。每条字节码指令代表的意义可通过官方文档[此处](https://docs.python.org/3/library/dis.html)查询到。
+指令所对应的源码行这个信息其实保存在代码对象的两个相关属性中，`co_firstlineno`用来存储该段代码起始的行号，`co_lnotab`由每两个数字一组组成，前一个为字节码偏移的位置，后一个为相对前一组行号的增量。每条字节码指令代表的意义可通过官方文档[此处](https://docs.python.org/3/library/dis.html){:target="_blank"}查询到。
 
 
 执行
 -------
 
-执行的入口是在`Python/pythonrun.c`的[run_eval_code_obj()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1094)函数中，它需要一个code对象，不管是从.pyc文件中来的还是一步步编译来的。然后该函数将globals、locals、PyArena和编译好的PyCodeObject传给[PyEval_EvalCode()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L716)。
+执行的入口是在`Python/pythonrun.c`的[run_eval_code_obj()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/pythonrun.c#L1094){:target="_blank"}函数中，它需要一个code对象，不管是从.pyc文件中来的还是一步步编译来的。然后该函数将globals、locals、PyArena和编译好的PyCodeObject传给[PyEval_EvalCode()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L716){:target="_blank"}。
 
 PyEval_EvalCode()是执行一个code对象的公共API，它会在执行栈的顶部构建一个执行frame。一个frame对象的结构像这样:
 
 ![PyFrameObject](./images/PyFrameObject.png)
 
 ### 构建frame
-构建第一个执行frame需要很多步，都在[_PyEval_EvalCodeWithName()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L4045)方法中。它的3个参数通过PyEval_EvalCode()传入，即:
+构建第一个执行frame需要很多步，都在[_PyEval_EvalCodeWithName()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L4045){:target="_blank"}方法中。它的3个参数通过PyEval_EvalCode()传入，即:
 
 * _co，PyCodeObject对象
 * globals，PyDict对象，存储变量名及它们的值
@@ -850,7 +850,7 @@ PyEval_EvalCode()是执行一个code对象的公共API，它会在执行栈的�
 
 其具体的步骤可分为:
 
-1. 构建线程状态，在执行一个frame之前，首先需要在线程中引用它。CPython可以在一个解释器中随时运行多个线程，这些线程通过链表放在解释器状态中。线程结构称为[PyThreadState](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/pystate.h#L23)，在整个ceval.c中有很多地方引用它。
+1. 构建线程状态，在执行一个frame之前，首先需要在线程中引用它。CPython可以在一个解释器中随时运行多个线程，这些线程通过链表放在解释器状态中。线程结构称为[PyThreadState](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Include/pystate.h#L23){:target="_blank"}，在整个ceval.c中有很多地方引用它。
 2. 构建frames
 3. 将关键字参数转换为一个字典。如果函数的定义中包含`**kwargs`形式的关键字参数，则创建一个新的字典，并将`kwargs`作为变量名指向该字典
 4. 将位置参数转换为变量。如果函数的定义中包含位置参数，需要将它们设为本地局部变量。
@@ -867,7 +867,7 @@ PyEval_EvalCode()是执行一个code对象的公共API，它会在执行栈的�
 ### 执行frame
 在之前的编译器和AST小节中，我们知道了code对象包含了一个待执行的二进制编码的字节码，以及变量列表和符号表。局部变量和全局变量都是运行时根据函数、模块或者代码块的调用方式决定的，这些信息通过_PyEval_EvalCodeWithName()添加到frame中。此外，frame还有一些其他用途，例如协程装饰器，它可以动态生成一个frame并把目标作为变量。
 
-frame在[_PyEval_EvalFrameDefault()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L745)内的3000多行代码的主循环中执行。这个函数是整个CPython的核心，它包含了数十年的变化，即使是一行代码的改变也可能对整个CPython的性能产生重大影响。
+frame在[_PyEval_EvalFrameDefault()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/ceval.c#L745){:target="_blank"}内的3000多行代码的主循环中执行。这个函数是整个CPython的核心，它包含了数十年的变化，即使是一行代码的改变也可能对整个CPython的性能产生重大影响。
 
 我们可以在Python3.7以上的版本中通过在当前线程启用追踪来跟踪每一步frame的执行，例如如下代码可以打印每一步反汇编的opcode，调用了哪个code对象，执行至第几行，返回值是什么:
 ```python
@@ -911,7 +911,7 @@ PUSH(b);
 ```
 运行前后如图:
 ![](./images/value_stack.png)
-有很多字节操作码opcode是直接操作栈的，例如PUSH()、POP()、PEEK()、DUP_TOP()、ROT_TWO()等。所有的opcode都会对栈有一个影响，这被定义在[stack_effect()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L878)方法中。
+有很多字节操作码opcode是直接操作栈的，例如PUSH()、POP()、PEEK()、DUP_TOP()、ROT_TWO()等。所有的opcode都会对栈有一个影响，这被定义在[stack_effect()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Python/compile.c#L878){:target="_blank"}方法中。
 
 **举例:向list中添加一个元素**
 
@@ -1069,7 +1069,7 @@ static PyObject *bool_and(PyObject *a, PyObject *b)
 }
 ```
 
-long类型会复杂一些，因为它需要更大的内存。Python3已经舍弃掉了Python2中对int类型的支持，而是都使用long类型，而long又非常特殊，因为它可以存储的是一个变长整数。它的结构由一个PyObject的头部和一个数字的列表组成，数字列表一开始设置为只有1个数字，但初始化之后会调用 [_PyLong_New()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/longobject.c#L262)方法重新分配内存，并调整为一个更大的长度:
+long类型会复杂一些，因为它需要更大的内存。Python3已经舍弃掉了Python2中对int类型的支持，而是都使用long类型，而long又非常特殊，因为它可以存储的是一个变长整数。它的结构由一个PyObject的头部和一个数字的列表组成，数字列表一开始设置为只有1个数字，但初始化之后会调用 [_PyLong_New()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/longobject.c#L262){:target="_blank"}方法重新分配内存，并调整为一个更大的长度:
 ```c
 struct _longobject {
     PyObject_VAR_HEAD
@@ -1156,7 +1156,7 @@ Python中的生成器是指使用yield，通过连续的调用以生成更多的
 * gi_qualname，生成器的限定名称
 * gi_exc_state，是一个存储异常的元组，存储生成器调用过程中的异常
 
-当我们每次在Python中调用生成器的__next__方法时，其背后的gi_code字段会在一个新的frame中执行，并将返回值push到值栈中。它本质上调用的是[gen_send_ex()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/genobject.c#L153)方法，这个方法将生成器对象转换为下一个产生结果的函数，它和之前通过代码对象构造frame有很多类似之处:
+当我们每次在Python中调用生成器的__next__方法时，其背后的gi_code字段会在一个新的frame中执行，并将返回值push到值栈中。它本质上调用的是[gen_send_ex()](https://github.com/python/cpython/blob/d93605de7232da5e6a182fd1d5c220639e900159/Objects/genobject.c#L153){:target="_blank"}方法，这个方法将生成器对象转换为下一个产生结果的函数，它和之前通过代码对象构造frame有很多类似之处:
 ```c
 static PyObject *
 gen_send_ex(PyGenObject *gen, PyObject *arg, int exc, int closing)

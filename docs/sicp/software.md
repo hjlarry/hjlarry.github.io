@@ -66,7 +66,7 @@ section .text
 ```
 C语言、Go语言通过标准库进行系统调用，他们的标准库中的函数也只是在汇编之上的一种包装。在汇编语言中通过在不同寄存器中放不同的参数，再执行`syscall`这条指令就可以进行系统调用。`syscall`是64位操作系统改进的一条指令，x86下是`int 0x80`，这种改进效率上也更高一些。
 
-RAX寄存器存放不同系统调用的序号，相当于函数名称；RDI、RSI、RDX、R10、R8、R9依次存放参数；再用RAX存返回值。这是系统调用的调用约定。可以通过[这里](http://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/)查看到系统调用函数有哪些，分别是如何传参的。
+RAX寄存器存放不同系统调用的序号，相当于函数名称；RDI、RSI、RDX、R10、R8、R9依次存放参数；再用RAX存返回值。这是系统调用的调用约定。可以通过[这里](http://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/){:target="_blank"}查看到系统调用函数有哪些，分别是如何传参的。
 
 
 文件系统
@@ -89,7 +89,7 @@ RAX寄存器存放不同系统调用的序号，相当于函数名称；RDI、RS
 * /var，最初这样命名是因为它经常变化，存储日志等内容
 * /tmp，临时文件，重启系统后里面的文件都会被删除
 
-更多的目录结构及用途见[wiki](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)。
+更多的目录结构及用途见[wiki](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard){:target="_blank"}。
 
 
 进程和线程
@@ -390,7 +390,7 @@ section .text
         syscall
 ```
 
-标志寄存器有很多个位，ZF就是其中的一个位。哪个指令对哪个标志位有影响，都有手册可以查到，例如test指令可以通过[这里](https://baike.baidu.com/item/test/10804276#viewPageContent)查到，[jne](https://baike.baidu.com/item/jne)也是。
+标志寄存器有很多个位，ZF就是其中的一个位。哪个指令对哪个标志位有影响，都有手册可以查到，例如test指令可以通过[这里](https://baike.baidu.com/item/test/10804276#viewPageContent){:target="_blank"}查到，[jne](https://baike.baidu.com/item/jne){:target="_blank"}也是。
 
 接着，我们在gdb中观察:
 ```sh

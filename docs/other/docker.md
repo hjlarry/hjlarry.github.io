@@ -5,7 +5,7 @@
 
 操作系统分为内核空间和用户空间。对于Linux，内核启动后，会挂载root文件系统为其提供用户空间支持。而Docker中的镜像(Image)，就相当于是一个root文件系统，只是它有些特殊，除了提供容器运行时所需的程序、库、资源、配置等文件外，还会包含一些为运行时准备的配置参数(如匿名卷、环境变量、用户等)。镜像不包含任何动态数据，其内容在构建之后不会改变。
 
-Docker使用[Union FS](https://en.wikipedia.org/wiki/Union_mount)技术，将镜像设计为分层存储的架构。构建时，会一层层构建，前一层是后一层的基础，每层构建完就不会改变，后一层的任何改变只是发生在自己这一层。例如，删除前一层的文件并不是真正的删除，而只是在本层中标记上一层的文件是删除的。
+Docker使用[Union FS](https://en.wikipedia.org/wiki/Union_mount){:target="_blank"}技术，将镜像设计为分层存储的架构。构建时，会一层层构建，前一层是后一层的基础，每层构建完就不会改变，后一层的任何改变只是发生在自己这一层。例如，删除前一层的文件并不是真正的删除，而只是在本层中标记上一层的文件是删除的。
 
 ### 获取镜像
 使用如下命令可以从镜像仓库中拉取镜像:
@@ -85,7 +85,7 @@ RUN buildDeps='gcc libc6-dev make wget' \
 
 **COPY**
 
-该指令从构建上下文的目录中复制文件到镜像内的目标路径位置，源路径可以是多个，也可以用通配符，通配符规则是Go的[filepath.Match](https://golang.org/pkg/path/filepath/#Match)规则。还可以通过添加`--chown=<user>:<group>`选项来改变文件的所属用户和组。例如:
+该指令从构建上下文的目录中复制文件到镜像内的目标路径位置，源路径可以是多个，也可以用通配符，通配符规则是Go的[filepath.Match](https://golang.org/pkg/path/filepath/#Match){:target="_blank"}规则。还可以通过添加`--chown=<user>:<group>`选项来改变文件的所属用户和组。例如:
 ```
 COPY hom* /mydir/
 COPY hom?.txt /mydir/
@@ -154,7 +154,7 @@ RUN echo "hello" > world.txt
 #### 上下文
 我们经常使用`docker build .`，往往会理解为`.`表示当前目录，下意识的认为这是dockerfile的所在路径，但这么理解是不准确的，实际上这是在指定上下文路径。
 
-那么什么是上下文呢？Docker在运行时分为服务端守护进程和客户端工具，我们输入docker相关命令都是客户端操作，通过[Docker Remote API](https://docs.docker.com/develop/sdk/)与服务端docker引擎交互。当我们进行镜像构建时，就是通过`docker build`在服务端进行构建，上下文路径中的内容会被发送过去，这个`.`就是在指定上下文路径，这样当在dockerfile中遇到文件复制这样的语句，例如`COPY ./package.json /app/`时并不是要复制dockerfile下的package.json，而是去复制上下文路径下的package.json。所以类似`COPY ../package.json /app/`或者`COPY /opt/*** /app`都超出了上下文路径而无效，如果需要它们的话就得把它们复制到上下文目录中去。
+那么什么是上下文呢？Docker在运行时分为服务端守护进程和客户端工具，我们输入docker相关命令都是客户端操作，通过[Docker Remote API](https://docs.docker.com/develop/sdk/){:target="_blank"}与服务端docker引擎交互。当我们进行镜像构建时，就是通过`docker build`在服务端进行构建，上下文路径中的内容会被发送过去，这个`.`就是在指定上下文路径，这样当在dockerfile中遇到文件复制这样的语句，例如`COPY ./package.json /app/`时并不是要复制dockerfile下的package.json，而是去复制上下文路径下的package.json。所以类似`COPY ../package.json /app/`或者`COPY /opt/*** /app`都超出了上下文路径而无效，如果需要它们的话就得把它们复制到上下文目录中去。
 
 dockerfile一般放在一个空目录或项目的根目录下，如果有东西不希望发送给docker引擎，可以使用`.dockerignore`剔除掉。默认情况下，会将上下文目录下的名为`Dockerfile`的文件作为Dockerfile，实际上可以通过如`-f ../Dockerfile.php`指定某个文件为Dockerfile。
 
