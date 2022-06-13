@@ -399,4 +399,35 @@ An overview of the allowed values are listed below:
  - Host, Only allow loading of resources from a specific host, also can add the path part. e.g. `*.a.com`, `b.com/c/`
  - Scheme, Only allow loading resources over a specific scheme. e.g. `http:`, `https:`, `data:`
 
+#### CSP Level 2
 
+Unsurprisingly, such a CSP policy is wildly incompatible with many applications. Even today, we often rely on inline code blocks to load JavaScript code into application. CSP Level 2 aims to make CSP more compatible with real-world applications without compromising security. It introduces two mechanims: hashes and nonces.
+
+```html
+<button id="hello">Say Hello!</button>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("hello")
+      .addEventListener("click", () => { alert("Hello!")});
+})
+</script>
+```
+For this simplified example, if we use hashes mechanims, we need to calculates the hash of the script block and add it to the CSP policy.
+```http
+Content-Security-Policy: script-src 'sha256-6X6+1K/DKkKDJXeIXoOfaIX+FzybN9LaGtutkR5DWpQ='
+```
+If you change any charactor of the script, the hashes will need to update. So typically we do not calculate these hashes manually.If you load application in a Chromium-based browser, you can find the expected hash in the error messages of the developer console, as shown below:
+```
+Refused to execute inline script because it violates the following Content Security Policy directive: "script-src 'self'".
+Either the 'unsafe-inline' keyword, a hash ('sha256-6X6+1K/DKkKDJXeIXoOfaIX+FzybN9LaGtutkR5DWpQ='), or a nonce ('nonce-...') is required to enable inline execution.
+```
+
+The nonces mechanims need you configured both script block and CSP policy with a nonce attribute and with same value.
+```
+Content-Security-Policy: script-src 'nonce-1f40e4a23493'
+```
+It supports both inline codes and remote code files.
+```html
+<script src="https://analytics.example.com/1.js" nonce="1f40e4a23493"></script>
+```
+Nonces should be generated from a cryptographically secure random source and should never be re-used. Otherwise, an attacker can predict the nonce and include a valid nonce on injected code blocks.
