@@ -438,3 +438,19 @@ The CSP above has an issue, which is many real-world CSP policies contain patter
 To make this work, we need a mechanism to enable cascading JavaScript loading. So, the `strict-dynamic` comes. If we set this keyword to our CSP policy, it tells the browser: If you encouter a script that was loaded with a hash or a nonce, you can allow that script to load remote code dependencies by inserting additional script elements into the page. 
 
 Since `strict-dynamic` was introduced to counter URL-based bypass attacks, it is incompatible with URLs. `strict-dynamic` only allow scripts that have been approved with a nonce or a hash to load additional resources. In fact, when a browser encounters `strict-dynamic`, it will automatically ignore URL-based expressions.
+
+#### Universal CSP Policy
+How you build a policy depends a bit on your specific situation. But we can refer to Google's policy, which offers effective protection against XSS vulnerablities without potentially breaking any of their applications. The snippet is formatted for readablity:
+
+```http
+Content-Security-Policy: 
+  script-src 'report-sample' 'nonce-3YCIqzKGd5cxaIoTibrW/A' 'unsafe-inline'
+             'strict-dynamic' https: http: 'unsafe-eval';
+  object-src 'none';
+  base-uri 'self';
+  report-uri /webchat/_/cspreport
+```
+
+A modern browser see this policy, will recognizes the nonce which causes the `unsafe-inline` keyword to be ignored. It will also recognizes `strict-dynamic`, which causes any URL-based expressions(i.e., `http: https:`) to be ignored.
+
+The legacy browsers that only support CSP Level 2, or even Level 1 , will see a different policy which will ignore `strict-dynamic` or `nonces`. Maybe cause some XSS attack, but the application is still work well.
