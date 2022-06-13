@@ -431,3 +431,10 @@ It supports both inline codes and remote code files.
 <script src="https://analytics.example.com/1.js" nonce="1f40e4a23493"></script>
 ```
 Nonces should be generated from a cryptographically secure random source and should never be re-used. Otherwise, an attacker can predict the nonce and include a valid nonce on injected code blocks.
+
+#### strict-dynamic
+The CSP above has an issue, which is many real-world CSP policies contain patterns that allow an attacker to bypass the policy. [This famous paper](https://research.google/pubs/pub45542/){:target="_blank"} descripe how to bypass the policy. The paper recommends abandoning URL-based policies in favor of hash-based and nonce-based policies.
+
+To make this work, we need a mechanism to enable cascading JavaScript loading. So, the `strict-dynamic` comes. If we set this keyword to our CSP policy, it tells the browser: If you encouter a script that was loaded with a hash or a nonce, you can allow that script to load remote code dependencies by inserting additional script elements into the page. 
+
+Since `strict-dynamic` was introduced to counter URL-based bypass attacks, it is incompatible with URLs. `strict-dynamic` only allow scripts that have been approved with a nonce or a hash to load additional resources. In fact, when a browser encounters `strict-dynamic`, it will automatically ignore URL-based expressions.
