@@ -454,3 +454,12 @@ Content-Security-Policy:
 A modern browser see this policy, will recognizes the nonce which causes the `unsafe-inline` keyword to be ignored. It will also recognizes `strict-dynamic`, which causes any URL-based expressions(i.e., `http: https:`) to be ignored.
 
 The legacy browsers that only support CSP Level 2, or even Level 1 , will see a different policy which will ignore `strict-dynamic` or `nonces`. Maybe cause some XSS attack, but the application is still work well.
+
+## SQL Injection
+The SQL injection's goal is execute arbitrary queries to the database via a vulnerable application.Read sensitive data from the database, modify database data, execute administration operations on the database, and sometimes issue commands to the operating system.
+
+This kind of attack is possible when an application combines unsafe user supplied data(like forms, cookies, HTTP headers, etc.) with a SQL query "template".
+
+### Attack Example
+
+### Defenses
