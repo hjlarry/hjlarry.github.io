@@ -462,4 +462,35 @@ This kind of attack is possible when an application combines unsafe user supplie
 
 ### Attack Example
 
+#### Common example
+Think about this vulnerable code:
+```js
+const { username, password } = req.body
+const query = `SELECT * FROM users WHERE username = "${username}"`
+const results = db.all(query)
+if (results.length > 0) {
+  // user exists!
+  const user = results[0]
+  if (user.password === password) {
+  // success
+  }
+}
+```
+The expected input is `{username: 'larry'}`, but malicious input is `{username: '" OR 1=1 --'}`. The `--` is a SQL comment, will comment any sql statement after it, and the `1=1` will always be true.
+So the result is:
+```js
+const { username, password } = req.body
+ // { username: '" OR 1=1 --', password: '...' }
+const query = `SELECT * FROM users WHERE username = "${username}"`
+ // SELECT * FROM users WHERE username = "" OR 1=1 --"
+const results = db.all(query)
+ // all rows in the users table!
+if (results.length > 0) {
+ // will always be true!
+}
+```
+The attacker will get all the user table data. How about the malicious input `{username: '";drop table users --'}`?
+
+#### Blind SQL injection
+
 ### Defenses
