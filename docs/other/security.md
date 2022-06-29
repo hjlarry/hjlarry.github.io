@@ -171,6 +171,42 @@ Sec-WebSocket-Protocol: chat
 ```
 
 #### CORS
+Once the browser detects there is an cross-origin AJAX request, will automatic add some more request header attribute. And the server found this addional information, respect the CORS protocal send back the response, they can communicate.
+
+The browser divided CORS request into two categories, simple request and not-so-simple request.If a request met the following two conditions, it is a simple request, otherwise, it is a not-so-simple request.
+
+```
+1. request method is HEAD, GET or POST
+2. request header attribute does not exceed the following fields:
+* Accept
+* Accept-Language
+* Content-Language
+* Last-Event-ID
+* Content-Type：application/x-www-form-urlencoded、multipart/form-data、text/plain(other value is not obey)
+```
+
+**Simple request**   
+For the simple request, the browser will auto add an Origin field on the header of request, the origin contain current scheme, domain and port.
+
+If the server want to response this origin, it must add some response header:  
+
+- Access-Control-Allow-Origin. It can be the origin of request header, or a `*` means any domain
+- Access-Control-Allow-Credentials. If this is `true`, means the ajax request can contains the cookie
+- Access-Control-Expose-Headers. The `getResponseHeader()` of a `XMLHttpRequest` object can only get 6 basic response header field, if want more, you must add the field to this attribute.
+
+**Not-so-simple request**   
+For the not-so-simple request,the browser will send a preflight requst before the formal request.
+
+The preflight request is an `OPTIONS` request, and it will add `Access-Control-Request-Method` field express the formal request's method, add `Access-Control-Request-Headers` if the formal request has some other request header fields.
+
+The server receive preflight request, will check `Origin`, `Access-Control-Request-Method` and `Access-Control-Request-Headers`field to decide whether allow this cross-origin request. If allowed, the response header should be:
+
+- Access-Control-Allow-Methods. It means all the allow request method of the server.
+- Access-Control-Allow-Headers. It means all request header fields the server can support.
+- Access-Control-Allow-Credentials. Same as simple request.
+- Access-Control-Max-Age. It specify the validity period of this preflight request.
+
+Once the server allow this preflight request, the later CORS request will all same as simple request.
 
 ## Session Attack
 
