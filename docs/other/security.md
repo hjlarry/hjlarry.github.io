@@ -499,3 +499,15 @@ There are two kinds of blind SQL injection. One is Content-based, if the page re
 Let's take a look at Time-based sql injection. We can use a slow SQL expression, like `SELECT 123=LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB(100000000/2))))`. Then use a SQL if-statement(CASE) to run the slow expression only when the answer to our question is `true`, like `SELECT CASE expression WHEN cond THEN slow ELSE speedy END`. Then we change the username or other things in the cond to get what is key information.
 
 ### Defenses
+The sql injection defenses key idea is never build SQL queries with string concatenation.Instead, we can use Parameterized SQL, or use an Object Relational Mappers(ORMs).
+
+```js
+// Vulnerable code:
+const query = `SELECT * FROM users WHERE username = "${username}"`
+const results = db.all(query)
+
+// Safe code:
+const query = 'SELECT * FROM users WHERE username = ?'
+const results = db.all(query, username)
+```
+This will automatically handle escaping untrusted user input for you. ORM do this either.
