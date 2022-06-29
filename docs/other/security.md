@@ -116,6 +116,37 @@ function receiveMessage(event) {
 ```
 
 ### AJAX
+Except for build a proxy server to respect same origin policy, there are other 3 ways,  JSONP, WebSocket and CORS.
+
+#### JSONP
+The JSONP is an old hack method for client and server cross origin communicate.It can support old browser and small change for the server side.
+
+The key idea is client add a html element `<script>`, through the attribute `src` send request to the server side. When the server side reponse data, they put data into a particular callback function.
+
+```js
+function addScriptTag(src) {
+  var script = document.createElement('script');
+  script.setAttribute("type","text/javascript");
+  script.src = src;
+  document.body.appendChild(script);
+}
+
+window.onload = function () {
+  addScriptTag('http://example.com/ip?callback=foo');
+}
+
+function foo(data) {
+  console.log('Your public IP address is: ' + data.ip);
+};
+```
+The above code dynamic add the `<script>` element and sent request to `example.com`, and the request url contains a callback parameter names `foo`. Then the server recive the request and put data into the callback funtion to response.
+```
+foo({
+  "ip":"8.8.8.8"
+})
+```
+Because of the html element `<script>` request script will directly run in the browser, and the function `foo` is defined before, so it will be call.
+
 
 ## Session Attack
 
