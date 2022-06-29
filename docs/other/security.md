@@ -147,6 +147,30 @@ foo({
 ```
 Because of the html element `<script>` request script will directly run in the browser, and the function `foo` is defined before, so it will be call.
 
+#### WebSocket
+The WebSocket is a kind of communicate protocol, it use `ws://` and `wss://`(encrypt) for the scheme. This protocol does not obey the same origin policy. If the server side supported, you can communicate with different origin.
+
+The browser send request like this:
+```html
+GET /chat HTTP/1.1
+Host: server.example.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Protocol: chat, superchat
+Sec-WebSocket-Version: 13
+Origin: http://example.com
+```
+The server side can decide whether not send response back base on the `origin` attribute.
+```html
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: HSmrc0sMlYUkAGmm5OPpG2HaGWk=
+Sec-WebSocket-Protocol: chat
+```
+
+#### CORS
 
 ## Session Attack
 
