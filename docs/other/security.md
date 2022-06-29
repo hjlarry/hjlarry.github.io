@@ -492,5 +492,10 @@ if (results.length > 0) {
 The attacker will get all the user table data. How about the malicious input `{username: '";drop table users --'}`?
 
 #### Blind SQL injection
+When the database does not output data to the web page, an attacker is forced to steal data by asking the database a series of true or false questions. The web app may be configured to show generic error messages instead of printing useful data to the user, but still vulnerable to SQL injection.
+
+There are two kinds of blind SQL injection. One is Content-based, if the page responds differently depending on if the query matches something or not, attacker can use this to ask "yes or no" questions.The other is Time-based, make the database pause for a specified amount of time when the query matches something, otherwise return immediately, different timings are observable by attacker.
+
+Let's take a look at Time-based sql injection. We can use a slow SQL expression, like `SELECT 123=LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB(100000000/2))))`. Then use a SQL if-statement(CASE) to run the slow expression only when the answer to our question is `true`, like `SELECT CASE expression WHEN cond THEN slow ELSE speedy END`. Then we change the username or other things in the cond to get what is key information.
 
 ### Defenses
