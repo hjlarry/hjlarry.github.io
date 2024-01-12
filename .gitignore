@@ -3,3 +3,4 @@ yulib.resource/
 hugo.exe
 .hugo_build.lock
 .venv/
+.idea/
