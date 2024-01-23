@@ -14,7 +14,7 @@ theme:
   icon:
     repo: fontawesome/brands/github
 
- # Default values, taken from mkdocs_theme.yml
+  # Default values, taken from mkdocs_theme.yml
   language: zh
   features:
     - content.code.annotate
@@ -97,33 +97,34 @@ markdown_extensions:
       alternate_style: true
 
 # Page tree
-nav: 
- - 计算机基础: 
-   - 硬件: sicp/hardware.md
-   - 软件: sicp/software.md
-   - 程序: sicp/program.md 
-   - 汇编: sicp/asm.md 
- - GO语言: 
-   - 字典: go/map.md
-   - 闭包: go/closure.md
-   - 延迟调用: go/defer.md
-   - 并发调度: go/goroutine.md
-   - 内存分配: go/alloc.md
-   - 垃圾回收: go/gc.md
-   - 锁: go/lock.md
- - Python语言: 
-   - 内存管理: python/memory.md
-   - 解释器: python/interpreter.md
-   - 技巧工具: python/tools.md
- - MySQL: 
-   - 查询: mysql/query.md
-   - 原理: mysql/theory.md
- - 其他: 
-   - git: other/git.md
-   - docker: other/docker.md
-   - raft: other/raft.md
-   - shell: other/shell.md
-   - security: other/security.md
-   - 面向对象: other/oop.md
-   - 网络协议: other/protocol.md
-   - 系统工具: other/tools.md
+nav:
+  - 计算机基础:
+      - 硬件: sicp/hardware.md
+      - 软件: sicp/software.md
+      - 程序: sicp/program.md
+      - 汇编: sicp/asm.md
+  - GO语言:
+      - 字典: go/map.md
+      - 闭包: go/closure.md
+      - 延迟调用: go/defer.md
+      - 并发调度: go/goroutine.md
+      - 内存分配: go/alloc.md
+      - 垃圾回收: go/gc.md
+      - 锁: go/lock.md
+  - Python语言:
+      - 内存管理: python/memory.md
+      - 解释器: python/interpreter.md
+      - 技巧工具: python/tools.md
+  - MySQL:
+      - 查询: mysql/query.md
+      - 原理: mysql/theory.md
+  - 其他:
+      - AI: ai/gai.md
+      - git: other/git.md
+      - docker: other/docker.md
+      - raft: other/raft.md
+      - shell: other/shell.md
+      - security: other/security.md
+      - 面向对象: other/oop.md
+      - 网络协议: other/protocol.md
+      - 系统工具: other/tools.md

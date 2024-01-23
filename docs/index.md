@@ -17,3 +17,4 @@ hide:
 * [计算机科学](/mind/computer_science.html){:target="_blank"}
 * [数据结构](/mind/data_structure.html){:target="_blank"}
 * [雨痕学堂](/mind/yuhen.html){:target="_blank"}
+* [AI](/mind/ai.html){:target="_blank"}
