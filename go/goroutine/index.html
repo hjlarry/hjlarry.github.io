@@ -1,0 +1,1656 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="非法操作">
+      
+      
+        <link rel="canonical" href="https://hjlarry.github.io/go/goroutine/">
+      
+      
+        <link rel="prev" href="../defer/">
+      
+      
+        <link rel="next" href="../alloc/">
+      
+      
+      <link rel="icon" href="../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.9">
+    
+    
+      
+        <title>并发调度 - 非法操作的笔记</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.f2e4d321.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#go" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="非法操作的笔记" class="md-header__button md-logo" aria-label="非法操作的笔记" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            非法操作的笔记
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              并发调度
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="white"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/hjlarry/hjlarry.github.io" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hjlarry/hjlarry.github.io
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="非法操作的笔记" class="md-nav__button md-logo" aria-label="非法操作的笔记" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    非法操作的笔记
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/hjlarry/hjlarry.github.io" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hjlarry/hjlarry.github.io
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    计算机基础
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            计算机基础
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/hardware/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    硬件
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/software/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    软件
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/program/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    程序
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/asm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    汇编
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    GO语言
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            GO语言
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../map/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    字典
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../closure/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    闭包
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../defer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    延迟调用
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    并发调度
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    并发调度
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      背景知识
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="背景知识">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      并发与并行
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      线程与协程
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      运行时
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      任务平衡
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="任务平衡">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      正向分析
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      逆向分析
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      调度执行
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="调度执行">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pm" class="md-nav__link">
+    <span class="md-ellipsis">
+      P、M解绑
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      任务饿死
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alloc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    内存分配
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    垃圾回收
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lock/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    锁
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Python语言
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Python语言
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/memory/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    内存管理
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/interpreter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    解释器
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    技巧工具
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    MySQL
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            MySQL
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mysql/query/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    查询
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mysql/theory/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    原理
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    其他
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            其他
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ai/gai/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/git/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    git
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/raft/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    raft
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/shell/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    shell
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/security/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    security
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/oop/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    面向对象
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/protocol/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    网络协议
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    系统工具
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      背景知识
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="背景知识">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      并发与并行
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      线程与协程
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      运行时
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      任务平衡
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="任务平衡">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      正向分析
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      逆向分析
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      调度执行
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="调度执行">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pm" class="md-nav__link">
+    <span class="md-ellipsis">
+      P、M解绑
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      任务饿死
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="go">Go并发调度<a class="headerlink" href="#go" title="Permanent link">&para;</a></h1>
+<h2 id="_1">背景知识<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>GO和其他语言不同的就是我们很少在GO中听到多线程的概念，其提供的API中也没有创建线程这种东西。因为这门语言从用户写的第一行代码开始就是并发状态的。</p>
+<h3 id="_2">并发与并行<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p><strong>并发</strong>​是指多个逻辑可以同时执行，把CPU时间分成不同的时间片段，这些时间片段分配给不同的逻辑，构成一个完整的CPU执行时间序列。
+而​<strong>并行</strong>​​是一种特殊的并发，不同逻辑由于CPU的多核，分配在不同的核上可以在物理时间上同时执行。这种状态其实很难实现，因为往往任一操作系统，它本身跑的程序非常多，远大于CPU核数。</p>
+<h3 id="_3">线程与协程<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p><strong>线程</strong>​是执行单位，相当于工厂里的生产线。操作系统是按线程分配时间片，所以程序的线程越多获得的执行时间也就越长。线程是在系统空间实现的，而​<strong>协程</strong>​是在用户空间实现的，操作系统根本不知道协程。</p>
+<p>比如某个线程上有A、B两个任务，若A有死循环或者A等待网络响应等就会发生B被饿死的情况，为了避免这种情况，A就会主动让给B或者调度器去执行。这就是协程的工作方式，任务之间相互协商，属于协作式多任务系统，通常是在用户空间实现一个框架。而多线程是抢占式调度，不管某个程序会不会主动让出，当前时间片执行完就会被操作系统强迫分给其他线程。</p>
+<p>程序等于算法加数据，算法相当于一个解决问题的过程，数据又分为系统数据和用户数据。用户数据保存在用户堆栈上。操作系统为每个线程分配一个栈，大多用来保存局部变量，通常编译期就能确定，运行期通过寄存器访问，无需垃圾回收。而堆内存属于进程，进程内的线程共享，需要运行期动态分配以及垃圾回收。</p>
+<h2 id="_4">运行时<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>现代的编程语言创建一个线程往往是使用一个标准库或者第三方库提供API的，分配内存也往往会向操作系统提前申请一大块内存，通过这样一层抽象来减少用户态和内核态的切换来提升效率，我们把这层抽象叫做​<strong>runtime</strong>(运行时)。它就像一个弱化版的操作系统，可以针对用户空间内的代码，结合当前语言的特性做大量的优化。</p>
+<p>Go运行时第一个抽象出的概念就是P(Processor)，相当于处理器。物理上有多少个CPU、有多少个核，runtime并不关心，它是在OS上的一层抽象，os才是在硬件的上一层抽象。runtime认为在当前的环境内只有一个程序，所以我们可以通过P来设定并发的数量，同时能执行这个程序内的多少个并发任务。</p>
+<p>第二个抽象是M(Machine)，对应了一个系统线程，是对线程的包装，也就是说P控制了同时有多少个M在执行。它是实际执行体，和P绑定，以调度循环方式不断执行G并发任务。</p>
+<p>第三个抽象就是G(Goroutine)，实际上就是任务载体，或者说资源包，包括了函数地址，需要的参数，所需的内存。当我们使用<code>go func(){}()</code>时，实际上就是创建了一个G对象。</p>
+<p>为什么G需要内存，按说M相当于线程也就应该有了栈内存？实际上它们都有自己的内存，G中的内存为G.stack(默认大小2KB)，M中的内存为G0。G在M上运行，就像是列车在线路上运行，线路本身也需要去投入资源维护。而把两块内存分开，是因为M所需的内存比较连续、相对固定、逻辑完整，G却会因为各种各样的原因或者异常可能会调度到别的M上去。</p>
+<p><em>G、M、P共同构成了多任务并发执行的基本模式，P用来控制同时有多少个并发任务执行，M对应到某个线程，G代表了go func语句翻译的一个任务包，最终还得有个调度器统合起来，把G放到合适的M上去执行。</em></p>
+<h2 id="_5">任务平衡<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h3 id="_6">正向分析<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>当我们在一个for循环中创建了成千上万个并发任务时，它们并不是立即执行的，而是打包成一个个G对象保存在两个队列中(P本地队列和G全局队列)。</p>
+<p>假设当前只有4个P，在main函数执行的时候就需要一个P1/M1绑定体，main中创建的其他go func就会打包成G对象放在P1.queue中。也就是说任一M内创建的G都会保存在当前这个P的本地队列中，为什么不能放在P2、P3、P4的队列中？放在别的队列就需要去判断这个P是不是闲置的，还可能需要加锁等等，会变得很复杂。</p>
+<p>那么如果在main中创建了1000个G，它们就得等P1/M1中当前的任务执行完了才会得到执行，可能P2、P3、P4都是闲置的，这明显不合理。如何在多个P之间去平衡任务呢？使用了两种方法，一种是规定了每个P本地队列只能放256个G，一次放的过多时会按一定规则比如放一半到全局队列中去；另一种是某个P若闲置了就会在全局队列中去找(可能有很多P都在全局中找，就需要排队去找)，找到了就把一部分任务移动到自己的本地队列中，没有找到就会去其他P中偷一部分任务过来，从全局队里或其他P中偷都是需要加锁的，效率相对会低一些。</p>
+<p>这样的平衡方式也就决定了我们没有办法确定哪个方法先执行，哪个后执行，除非我们自己写逻辑去判断先后。我们再来看一个关于执行顺序的示例:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nx">runtime</span><span class="p">.</span><span class="nx">GOMAXPROCS</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="c1">// 设置P为1</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="p">&lt;</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="o">++</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="k">go</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">id</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 创建10个G</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">            </span><span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">            </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="p">}(</span><span class="nx">i</span><span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">}</span>
+</code></pre></div>
+<p>执行结果:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>~/.mac/gocode<span class="w"> </span>$<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>goroutine.go
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="m">9</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="m">0</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="m">1</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="m">2</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="m">3</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="m">4</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="m">5</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="m">6</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="m">7</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="m">8</span>
+</code></pre></div>
+<blockquote>
+<p>为什么当P为1的时候，它不是顺序输出的，9总是在第一个？  </p>
+</blockquote>
+<p>每个P的本地队列中其实包含两个部分，runnext[1]和runq[256]。当我们每次添加一个任务的时候，它会先放在runnext中，再添加一个任务时，会把新添加的放在runnext，之前添加的放在runq中。runnext总是保留用户最后创建的任务，执行的时候先查runnext去执行。</p>
+<blockquote>
+<p>为什么要有runnext的设计？</p>
+</blockquote>
+<p>假设只创建了一个并发任务，也放在runq中让别的P去抢没有必要，而且大多数情况下我们不会去批量创建G；另外若runq既用来P1执行又让P2、P3去偷，那就又会涉及到加锁。</p>
+<blockquote>
+<p>那么为什么是G9放在runnext，而不是G0？</p>
+</blockquote>
+<p>因为放在runnext以后我们无法保证还有多少逻辑执行完才轮到它，就可能会runq中的任务都被偷走了且执行完了G0才会执行，这对G0很不公平。</p>
+<p><em>显然任务被分成了三个性能层次，runnext是完全私有的，runq属于原子操作(原子操作对CPU来讲也是锁，锁的是地址总线)，Global属于一定要加mutex锁的，这三个层次产生资源竞争的可能性逐步增大。</em></p>
+<h3 id="_7">逆向分析<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p>在最开始的时候，我们先设计为一个循环队列，它底层结构可能就是一个数组。问题在于，当有多个人去竞争的时候，这个数组就会存在资源竞争效应，我们就会考虑加入锁，显然这种效率是最低的。  </p>
+<p>假设现在有3个P/M，我们就可以把一个大的队列拆分成3个小的队列，让每个P/M持有一个私有的队列，这种优化策略使得锁的问题可以解决掉。但也带来新的问题，可能P1已执行完自己的任务，P2、P3还得执行很久，我们可能一开始按任务的数量平均分配至各个私有队列，但有的任务执行时间很长，有的任务很快就能执行完。  </p>
+<p>因此，P1应该去P2、P3中拿取任务才是合理的，所有人有义务去完成整个系统的任务。P1直接去拿就会和P2、P3打起来形成竞争效应，第二步的优化策略就是保留一个全局队列，P1可以先去全局队列里找，而P2、P3有很大概率是在本地队列去找的，P1获得锁的概率就会更大，全局队列使得锁的压力被分摊，同时也使得P2、P3中若有多余的任务也可以放进去。 </p>
+<p>当P1的本地队列已执行完，全局队列中的任务也被执行完时，它就会任选P2或P3，形成直接的竞争。这时候我们考虑的优化策略，就是把本地队列一分为二，上面是runnext用于本地执行，下面是runq[256]用来给P1偷的。</p>
+<p><img alt="task queue" src="../images/queue.png" /></p>
+<p>这种结构很像CPU的存储结构，通过分散距离、增加存储层次来减少直接竞争冲突的概率。</p>
+<h2 id="_8">调度执行<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<h3 id="pm">P、M解绑<a class="headerlink" href="#pm" title="Permanent link">&para;</a></h3>
+<p>当我们创建一个G的时候，实际上是背后的调度器在当前M上的G0去执行的，它发现有新的任务出现时，会发出一个唤醒信号，去检查有没有P空闲的，以及有没有M是休眠状态的？若P空闲且没有休眠的M，就会去创建一个M对象。所以唤醒操作要有意义，就得有P闲着没事干。</p>
+<p>那么M是怎样变为休眠状态的？</p>
+<p>当一个P和M绑定之后，它会进入到一个调度程序(Schedule函数)，调度程序会去找G对象(按runnext、runq、Global、other P的顺序)，找到之后内存由G0上执行切换到G.stack上去执行，执行完成之后进入收尾阶段，清理现场把G当做一个包装对象让它能重复使用。然后重新回到Schedule函数形成一个调度循环。</p>
+<p>这个循环可能因为找不到G对象而中断，比如说当前就只有一个任务。那么P和M就会解绑，M会进入休眠状态。</p>
+<p>还有一种P和M解绑的情况，比如当前在进行一个系统调用，而这个系统调用花了很长时间，调度器就会把这个P拿走干别的事，而M压根不知道，因为它在内核态，等系统调用结束以后M发现找不到P，那它就没法继续执行，只能把当前的任务状态保存回G.stack，在把执行一半的任务重新放回队列，M再次进入休眠状态，执行一半的任务再下次遇到P/M时接着执行。</p>
+<p>这就可能导致一个问题，创建出大量的空闲的M，不会被回收。M是会在操作系统内核中创建一个线程，尽管这种休眠状态下的M不会被CPU分配时间片，但仍然会占用管理资源，另外每个M上都带着G0内存，相当于资源泄漏了。我们通过如下代码来模拟这种情况：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">(){</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">:=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="p">&lt;</span><span class="mi">1000</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">{</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="k">go</span><span class="w"> </span><span class="kd">func</span><span class="p">(){</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">            </span><span class="nx">runtime</span><span class="p">.</span><span class="nx">LockOSThread</span><span class="p">()</span><span class="w"> </span><span class="c1">//通过锁模拟系统调用</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">            </span><span class="k">defer</span><span class="w"> </span><span class="nx">runtime</span><span class="p">.</span><span class="nx">UnlockOSThread</span><span class="p">()</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">            </span><span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="o">*</span><span class="mi">5</span><span class="p">)</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">        </span><span class="p">}()</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Minute</span><span class="p">)</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">}</span>
+</code></pre></div>
+<p>通过<code>go build test.go &amp;&amp; GODEBUG=schedtrace=1000 ./test</code>运行：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>SCHED<span class="w"> </span>0ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">5</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>SCHED<span class="w"> </span>1002ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>SCHED<span class="w"> </span>2008ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>SCHED<span class="w"> </span>3013ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>SCHED<span class="w"> </span>4014ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>SCHED<span class="w"> </span>5015ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">127</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>SCHED<span class="w"> </span>6017ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">1007</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>SCHED<span class="w"> </span>7025ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">1007</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>SCHED<span class="w"> </span>8027ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">1007</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>SCHED<span class="w"> </span>9029ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">1007</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>SCHED<span class="w"> </span>10031ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">1007</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+</code></pre></div>
+<p>我们发现任务开始的时候共创建了1010个线程，任务执行完以后，仍然有1007个休眠的线程。当我们把<code>runtime.LockOSThread()</code>注释掉，重新运行：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>SCHED<span class="w"> </span>0ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">5</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">48</span><span class="w"> </span><span class="m">49</span><span class="w"> </span><span class="m">133</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>SCHED<span class="w"> </span>1004ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">9</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>SCHED<span class="w"> </span>2008ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">9</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>SCHED<span class="w"> </span>3010ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">9</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>SCHED<span class="w"> </span>4015ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">9</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>SCHED<span class="w"> </span>5026ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">9</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">7</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>SCHED<span class="w"> </span>6031ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">9</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">7</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+</code></pre></div>
+<p>发现没有系统调用，那就根本不会有那么多线程。我们再把<code>runtime.LockOSThread()</code>保留，<code>defer runtime.UnlockOSThread()</code>去掉，运行结果如下：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>SCHED<span class="w"> </span>0ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">5</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">152</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>SCHED<span class="w"> </span>1000ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>SCHED<span class="w"> </span>2001ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>SCHED<span class="w"> </span>3008ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>SCHED<span class="w"> </span>4016ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">1010</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>SCHED<span class="w"> </span>5019ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">938</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">18</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="m">7</span><span class="o">]</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>SCHED<span class="w"> </span>6027ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">13</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">10</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>SCHED<span class="w"> </span>7037ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">13</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">10</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>SCHED<span class="w"> </span>8042ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">13</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">10</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>SCHED<span class="w"> </span>9044ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">13</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">10</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>cSCHED<span class="w"> </span>10047ms:<span class="w"> </span><span class="nv">gomaxprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">idleprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">threads</span><span class="o">=</span><span class="m">13</span><span class="w"> </span><span class="nv">spinningthreads</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">idlethreads</span><span class="o">=</span><span class="m">10</span><span class="w"> </span><span class="nv">runqueue</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="o">]</span>
+</code></pre></div>
+<p>我们发现那些创建的线程是会被回收的，线程没有被解锁意味着线程的状态没有被解除而陷入了死锁状态，线程不能再去接收新的任务没有存在的意义自然会被杀掉。</p>
+<p><em>综上，我们发现P往往是恒定的，而G和M是可复用的，复用虽然可能造成资源的浪费，但它避免了重新创建时的可能造成的竞争效应。对于一些长期运行的东西，我们需要再创建还是释放之间做一些权衡。</em></p>
+<h3 id="_9">任务饿死<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<p>假设当前的P/M正在执行一个G，这时候G里面创建了一个G1，G1会被放到当前P的runnext中，但它可能迟迟得不到执行被饿死，因为G中可能还有大量的逻辑代码执行完才轮到runnext，这显然是不合理的。怎么解决这个问题呢？是否可以让当前这个P/M交替的执行G和G1？P不是真正的CPU，没法实现基于时间片的抢占式调度，只能实现类似于协程那样的协作式调度。很多语言里都使用类似于Gosched()这样的函数来主动交出执行权，但Go中却很少见；还有一种形式是runtime带一个计数器，每执行一个任务后累加计数，当到达一个指定的计数就会被认为是使用完了时间片，向当前执行的P/M发出一个抢占式的信号，然后G主动让出执行权限。Go到底是怎样做的？我们来看如下示例：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// GODEBUG=schedtrace=1000,scheddetail=1 ./test  可查看运行期GMP状态</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">(){</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nx">runtime</span><span class="p">.</span><span class="nx">GOMAXPROCS</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="nx">i</span><span class="o">:=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="p">&lt;</span><span class="mi">3</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">{</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">        </span><span class="k">go</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">id</span><span class="w"> </span><span class="kt">int</span><span class="p">){</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">            </span><span class="nb">println</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">            </span><span class="nx">x</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">            </span><span class="k">for</span><span class="p">{</span><span class="w">  </span><span class="c1">// 死循环</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">                </span><span class="nx">x</span><span class="o">++</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">                </span><span class="c1">//print()</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">            </span><span class="p">}</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">        </span><span class="p">}(</span><span class="nx">i</span><span class="p">)</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="p">}</span>
+</code></pre></div>
+<p>我们模拟了只有一个P/M，这时候创建了3个G，让第一个G执行的过程中进入死循环，运行结果就是只打印出了任务0，其他G被饿死了。但当我们在死循环内x++后面加入一个函数，则任务0、1、2都会被打印出。问题就出在这个函数上。</p>
+<p>我们先使用一个简单的函数来观察：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">//go:noinline</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">func</span><span class="w"> </span><span class="nx">test</span><span class="p">(){</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="nb">println</span><span class="p">()</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="p">}</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">(){</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="nx">test</span><span class="p">()</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">}</span>
+</code></pre></div>
+<p>使用<code>go build &amp;&amp; go tool objdump -s "main\.test" test</code>反汇编：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>TEXT<span class="w"> </span>main.test<span class="o">(</span>SB<span class="o">)</span><span class="w"> </span>/mnt/hgfs/disk/test.go
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span>test.go:5<span class="w">     </span>0x4525b0<span class="w">        </span>64488b0c25f8ffffff<span class="w">  </span>MOVQ<span class="w"> </span>FS:0xfffffff8,<span class="w"> </span>CX<span class="w">          </span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span>test.go:5<span class="w">     </span>0x4525b9<span class="w">        </span>483b6110<span class="w">        </span>CMPQ<span class="w"> </span>0x10<span class="o">(</span>CX<span class="o">)</span>,<span class="w"> </span>SP<span class="w">           </span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span>test.go:5<span class="w">     </span>0x4525bd<span class="w">        </span><span class="m">7624</span><span class="w">            </span>JBE<span class="w"> </span>0x4525e3<span class="w">                </span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span>test.go:5<span class="w">     </span>0x4525bf<span class="w">        </span>4883ec08<span class="w">        </span>SUBQ<span class="w"> </span><span class="nv">$0</span>x8,<span class="w"> </span>SP<span class="w">               </span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span>test.go:5<span class="w">     </span>0x4525c3<span class="w">        </span>48892c24<span class="w">        </span>MOVQ<span class="w"> </span>BP,<span class="w"> </span><span class="m">0</span><span class="o">(</span>SP<span class="o">)</span><span class="w">              </span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span>test.go:5<span class="w">     </span>0x4525c7<span class="w">        </span>488d2c24<span class="w">        </span>LEAQ<span class="w"> </span><span class="m">0</span><span class="o">(</span>SP<span class="o">)</span>,<span class="w"> </span>BP<span class="w">              </span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span>test.go:6<span class="w">     </span>0x4525cb<span class="w">        </span>e80031fdff<span class="w">      </span>CALL<span class="w"> </span>runtime.printlock<span class="o">(</span>SB<span class="o">)</span><span class="w">      </span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span>test.go:6<span class="w">     </span>0x4525d0<span class="w">        </span>e88b33fdff<span class="w">      </span>CALL<span class="w"> </span>runtime.printnl<span class="o">(</span>SB<span class="o">)</span><span class="w">        </span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span>test.go:6<span class="w">     </span>0x4525d5<span class="w">        </span>e87631fdff<span class="w">      </span>CALL<span class="w"> </span>runtime.printunlock<span class="o">(</span>SB<span class="o">)</span><span class="w">        </span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span>test.go:7<span class="w">     </span>0x4525da<span class="w">        </span>488b2c24<span class="w">        </span>MOVQ<span class="w"> </span><span class="m">0</span><span class="o">(</span>SP<span class="o">)</span>,<span class="w"> </span>BP<span class="w">              </span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">  </span>test.go:7<span class="w">     </span>0x4525de<span class="w">        </span>4883c408<span class="w">        </span>ADDQ<span class="w"> </span><span class="nv">$0</span>x8,<span class="w"> </span>SP<span class="w">               </span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">  </span>test.go:7<span class="w">     </span>0x4525e2<span class="w">        </span>c3<span class="w">          </span>RET<span class="w">                 </span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">  </span>test.go:5<span class="w">     </span>0x4525e3<span class="w">        </span>e8187bffff<span class="w">      </span>CALL<span class="w"> </span>runtime.morestack_noctxt<span class="o">(</span>SB<span class="o">)</span><span class="w">   </span>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">  </span>test.go:5<span class="w">     </span>0x4525e8<span class="w">        </span>ebc6<span class="w">            </span>JMP<span class="w"> </span>main.test<span class="o">(</span>SB<span class="o">)</span><span class="w">   </span>
+</code></pre></div>
+<p>我们发现头部的三条指令和尾部的两条指令都是编译器插入的。<code>runtime.morestack_noctxt</code>会做两件事情，一是检查当前栈帧空间是否足够，如果不够可以帮助扩容；二是检查是否有人发出了抢占式调度信号，如果发现了信号，它就让出执行权限。函数前使用<code>go:nosplit</code>可以禁止编译器插入这样的指令。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/hjlarry" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:ultrahe@gmail.com" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M64 112c-8.8 0-16 7.2-16 16v22.1l172.5 141.6c20.7 17 50.4 17 71.1 0L464 150.1V128c0-8.8-7.2-16-16-16H64zM48 212.2V384c0 8.8 7.2 16 16 16h384c8.8 0 16-7.2 16-16V212.2L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128c0-35.3 28.7-64 64-64h384c35.3 0 64 28.7 64 64v256c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/hjlarry" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://paypal.me/hjlarry" target="_blank" rel="noopener" title="paypal.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M111.4 295.9c-3.5 19.2-17.4 108.7-21.5 134-.3 1.8-1 2.5-3 2.5H12.3c-7.6 0-13.1-6.6-12.1-13.9L58.8 46.6c1.5-9.6 10.1-16.9 20-16.9 152.3 0 165.1-3.7 204 11.4 60.1 23.3 65.6 79.5 44 140.3-21.5 62.6-72.5 89.5-140.1 90.3-43.4.7-69.5-7-75.3 24.2zM357.1 152c-1.8-1.3-2.5-1.8-3 1.3-2 11.4-5.1 22.5-8.8 33.6-39.9 113.8-150.5 103.9-204.5 103.9-6.1 0-10.1 3.3-10.9 9.4-22.6 140.4-27.1 169.7-27.1 169.7-1 7.1 3.5 12.9 10.6 12.9h63.5c8.6 0 15.7-6.3 17.4-14.9.7-5.4-1.1 6.1 14.4-91.3 4.6-22 14.3-19.7 29.3-19.7 71 0 126.4-28.8 142.9-112.3 6.5-34.8 4.6-71.4-23.8-92.6z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.annotate", "content.tabs.link", "content.tooltips", "navigation.indexes", "navigation.sections", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      
+    
+  </body>
+</html>

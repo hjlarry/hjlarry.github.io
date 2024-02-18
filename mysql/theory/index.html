@@ -1,0 +1,2399 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="非法操作">
+      
+      
+        <link rel="canonical" href="https://hjlarry.github.io/mysql/theory/">
+      
+      
+        <link rel="prev" href="../query/">
+      
+      
+        <link rel="next" href="../../ai/gai/">
+      
+      
+      <link rel="icon" href="../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.9">
+    
+    
+      
+        <title>原理 - 非法操作的笔记</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.f2e4d321.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#mysql" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="非法操作的笔记" class="md-header__button md-logo" aria-label="非法操作的笔记" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            非法操作的笔记
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              原理
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="white"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/hjlarry/hjlarry.github.io" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hjlarry/hjlarry.github.io
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="非法操作的笔记" class="md-nav__button md-logo" aria-label="非法操作的笔记" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    非法操作的笔记
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/hjlarry/hjlarry.github.io" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hjlarry/hjlarry.github.io
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    计算机基础
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            计算机基础
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/hardware/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    硬件
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/software/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    软件
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/program/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    程序
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/asm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    汇编
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    GO语言
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            GO语言
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/map/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    字典
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/closure/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    闭包
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/defer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    延迟调用
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/goroutine/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    并发调度
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/alloc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    内存分配
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/gc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    垃圾回收
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/lock/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    锁
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Python语言
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Python语言
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/memory/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    内存管理
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/interpreter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    解释器
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    技巧工具
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    MySQL
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            MySQL
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../query/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    查询
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    原理
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    原理
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      查询执行过程
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="查询执行过程">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      连接器
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      查询缓存
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      分析器
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      优化器
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      执行器
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#innodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      InnoDB
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="InnoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      数据页
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      行格式
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      数据目录
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      表空间
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      索引
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="索引">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      聚簇索引
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      二级索引
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      联合索引
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用场景
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      代价
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      优化策略
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      访问方法
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="访问方法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#const" class="md-nav__link">
+    <span class="md-ellipsis">
+      const
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ref" class="md-nav__link">
+    <span class="md-ellipsis">
+      ref
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ref_or_null" class="md-nav__link">
+    <span class="md-ellipsis">
+      ref_or_null
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#range" class="md-nav__link">
+    <span class="md-ellipsis">
+      range
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#index" class="md-nav__link">
+    <span class="md-ellipsis">
+      index
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all" class="md-nav__link">
+    <span class="md-ellipsis">
+      all
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explain" class="md-nav__link">
+    <span class="md-ellipsis">
+      EXPLAIN
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    其他
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            其他
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ai/gai/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/git/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    git
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/raft/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    raft
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/shell/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    shell
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/security/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    security
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/oop/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    面向对象
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/protocol/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    网络协议
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../other/tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    系统工具
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      查询执行过程
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="查询执行过程">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      连接器
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      查询缓存
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      分析器
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      优化器
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      执行器
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#innodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      InnoDB
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="InnoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      数据页
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      行格式
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      数据目录
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      表空间
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      索引
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="索引">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      聚簇索引
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      二级索引
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      联合索引
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用场景
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      代价
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      优化策略
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      访问方法
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="访问方法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#const" class="md-nav__link">
+    <span class="md-ellipsis">
+      const
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ref" class="md-nav__link">
+    <span class="md-ellipsis">
+      ref
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ref_or_null" class="md-nav__link">
+    <span class="md-ellipsis">
+      ref_or_null
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#range" class="md-nav__link">
+    <span class="md-ellipsis">
+      range
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#index" class="md-nav__link">
+    <span class="md-ellipsis">
+      index
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all" class="md-nav__link">
+    <span class="md-ellipsis">
+      all
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explain" class="md-nav__link">
+    <span class="md-ellipsis">
+      EXPLAIN
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="mysql">Mysql的原理<a class="headerlink" href="#mysql" title="Permanent link">&para;</a></h1>
+<h2 id="_1">查询执行过程<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>一条SQL查询语句在Mysql中是如何执行的呢？我们可以通过它的基本结构图看到各个模块在执行过程中起到的作用:</p>
+<p><img alt="structure" src="../images/structure.jpg" /></p>
+<p>Server层包括连接器、查询缓存、分析器、优化器、执行器等，涵盖Mysql大多数核心服务功能，以及所有的内置函数、跨存储引擎的功能实现(如存储过程、触发器、视图等)。而存储引擎属于插件式架构，支持InnoDB、MyISAM、Memory等多个存储引擎，不同引擎共用一个Server层。</p>
+<h4 id="_2">连接器<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h4>
+<p>客户端一般通过TCP与服务端建立连接，用户名密码认证通过后，连接器先到权限列表中查出你拥有的权限，之后这个连接里的权限判断逻辑都依赖于此时读取到的，也就是说对这个权限的修改不会影响到已经正在连接的用户。</p>
+<p>正在连接的客户端可以这样查看到:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">show</span><span class="w"> </span><span class="k">processlist</span><span class="p">;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">+----+------+-----------------+---------+---------+------+----------+------------------+</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">|</span><span class="w"> </span><span class="n">Id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">User</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Host</span><span class="w">            </span><span class="o">|</span><span class="w"> </span><span class="n">db</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">Command</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">Time</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">State</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="n">Info</span><span class="w">             </span><span class="o">|</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">+----+------+-----------------+---------+---------+------+----------+------------------+</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="o">|</span><span class="w">  </span><span class="mi">4</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">localhost</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="n">awesome</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Query</span><span class="w">   </span><span class="o">|</span><span class="w">    </span><span class="mi">0</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">starting</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">show</span><span class="w"> </span><span class="k">processlist</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="o">|</span><span class="w">  </span><span class="mi">7</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">localhost</span><span class="o">:</span><span class="mi">58134</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">boss</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="n">Sleep</span><span class="w">   </span><span class="o">|</span><span class="w">    </span><span class="mi">3</span><span class="w"> </span><span class="o">|</span><span class="w">          </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">             </span><span class="o">|</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="o">|</span><span class="w">  </span><span class="mi">8</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">localhost</span><span class="o">:</span><span class="mi">58135</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="n">Sleep</span><span class="w">   </span><span class="o">|</span><span class="w">    </span><span class="mi">2</span><span class="w"> </span><span class="o">|</span><span class="w">          </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">             </span><span class="o">|</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="o">+----+------+-----------------+---------+---------+------+----------+------------------+</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="mi">3</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="kt">set</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div>
+Command列中显示为Sleep就表示该连接当前是空闲的，如果连接空闲太长时间就会被连接器自动断开，默认是8小时，可通过<code>wait_timeout</code>控制。</p>
+<h4 id="_3">查询缓存<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h4>
+<p>大多数情况下，我们往往不使用查询缓存，因为它是弊大于利的。它的失效非常的频繁，只要对一个表有更新，这个表上的所有查询缓存都会被清空。对于更新压力大的数据库来讲，查询缓存的命中效率很低。</p>
+<p>Mysql8.0以上版本直接将该功能删掉了，所以我们的结构图上也只是把它画成一条支线。</p>
+<h4 id="_4">分析器<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h4>
+<p>词法分析就是根据一些关键词判断出你要做什么，例如<code>select</code>表示这是一个查询语句。那么接下来就会把字符串<code>T</code>识别为表名<code>T</code>，字符串<code>ID</code>识别为列名<code>ID</code>。</p>
+<p>接着进行语法分析，就是判断输入的语句是否满足语法规则。语法错误的提示就是在这个阶段触发的，例如<code>You have an error in your SQL syntax</code>。</p>
+<h4 id="_5">优化器<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h4>
+<p>优化器是在表里有多个索引的时候决定使用哪个索引；或者有多表关联的时候决定各个表的连接顺序。例如<code>select * from t1 join t2 using(id) where t1.c=10 and t2.d=20</code>，就可以有两种处理方式:</p>
+<ul>
+<li>先从表t1中取出c=10的记录的id，根据id关联到表t2，判断t2中d的值是否为20</li>
+<li>先从表t2中取出d=20的记录的id，根据id关联到表t1，判断t1中c的值是否为10</li>
+</ul>
+<p>这两种方法执行的效率可能不同，优化器就是用来决定使用哪种方案更合理。</p>
+<h4 id="_6">执行器<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h4>
+<p>执行时，先去判断该用户有没有对这个表的要做的操作的权限，如果没有会返回相应的错误。有权限的话则打开表继续执行，执行器会根据表的引擎定义，使用过这个引擎提供的接口来执行。</p>
+<h2 id="innodb">InnoDB<a class="headerlink" href="#innodb" title="Permanent link">&para;</a></h2>
+<p><code>InnoDB</code>是一个将表中的数据存储到磁盘上的存储引擎，真正处理数据的过程是发生在内存上的，所以需要把数据从磁盘加载到内存中，如果是处理写入或更新时，还需要把内存中的内容写回磁盘中。<code>InnoDB</code>将数据划分为若干个页，每页大小为16KB，<strong>以页做为硬盘和内存交互的基本单位</strong>，一般情况下，每次至少会读取或写回16KB的内容。</p>
+<h3 id="_7">数据页<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p>这些页有很多的种类，例如存放空间头部信息的页、存放日志信息的页等等。我们先来了解存放记录的页，也就是数据页，官方称为​<strong>索引页</strong>。</p>
+<p>数据页被分为7个部分，有的部分占用固定大小的空间，有的不固定:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">名称</th>
+<th style="text-align: center;">中文名</th>
+<th style="text-align: center;">占用空间</th>
+<th style="text-align: center;">简单描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><code>File Header</code></td>
+<td style="text-align: center;">文件头部</td>
+<td style="text-align: center;"><code>38</code>字节</td>
+<td style="text-align: center;">页的一些通用信息</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>Page Header</code></td>
+<td style="text-align: center;">页面头部</td>
+<td style="text-align: center;"><code>56</code>字节</td>
+<td style="text-align: center;">数据页专有的一些信息</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>Infimum + Supremum</code></td>
+<td style="text-align: center;">最小和最大记录</td>
+<td style="text-align: center;"><code>26</code>字节</td>
+<td style="text-align: center;">两个虚拟的行记录</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>User Records</code></td>
+<td style="text-align: center;">用户记录</td>
+<td style="text-align: center;">不确定</td>
+<td style="text-align: center;">实际存储的行记录内容</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>Free Space</code></td>
+<td style="text-align: center;">空闲空间</td>
+<td style="text-align: center;">不确定</td>
+<td style="text-align: center;">页中尚未使用的空间</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>Page Directory</code></td>
+<td style="text-align: center;">页面目录</td>
+<td style="text-align: center;">不确定</td>
+<td style="text-align: center;">页中的某些记录的相对位置</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>File Trailer</code></td>
+<td style="text-align: center;">文件尾部</td>
+<td style="text-align: center;"><code>8</code>字节</td>
+<td style="text-align: center;">校验页是否完整</td>
+</tr>
+</tbody>
+</table>
+<p>在⻚的7个组成部分中，我们自己存储的记录会按照我们指定的行格式存储到User Records中。但在一开始生成⻚的时候，其实并没有User Records这个部分，每当我们插入一条记录，都会从Free Space中申请一个记录大小的空间划分到User Records，当Free Space的空间全部被替换掉后，也就意味着这个⻚使用完 了，如果还有新的记录插入的话，就需要去申请新的⻚了。</p>
+<p>每条记录的头信息中有一个<code>next_record</code>属性，从而使页中的数据串联成一个单链表，链表中的各个节点按主键的值由小到大连接起来。Innodb会把这些记录分成若干个不同的组，每组的最后一条记录的地址偏移量会存放在<code>Page Directory</code>中，这样通过主键在一个页中查找到一条记录就会非常的快，首先通过二分法查到它应该在哪个组中，接着遍历这个组找到相应的记录。</p>
+<p><code>File Header</code>主要存了上一页和下一页的编号，使得所有的数据页构成一个双向链表。而<code>File Trailer</code>会加入一些效验值，以保证从内存至硬盘同步数据的完整性。</p>
+<h3 id="_8">行格式<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<p>每条用户记录在磁盘上的存放方式也被称为​<strong>行格式</strong>​或​<strong>记录格式</strong>​，行格式被分为四种，即<code>Compact</code>、<code>Redundant</code>、<code>Dynamic</code>和<code>Compressed</code>。它们原理上大体相同，所以我们以Compact格式为例来详细了解一下。</p>
+<p>如图所示，每条记录被分为两个部分，记录的真实数据和记录的额外信息。
+<img alt="record" src="../images/record.jpg" /></p>
+<p>Mysql支持一些变长的数据类型，如VARCHAR、各种TEXT、各种BLOB等类型，对于这类变长字段，除了存放它们真正的数据内容，还需要存它们占用了多大空间，在Compact中，会把它们占用多大空间按列的逆序存放在每条记录的头部。所以第一部分就是变长字段长度列表，它只存非NULL值的变长字段的列，如果表中没有变长字段，那就没有这一部分。但是如果当前表采用的字符集是变长字符集，那么对于CHAR类型的字段所占用的空间也会被加入到变长字段长度列表中。</p>
+<p>为了让NULL值不占用过多的空间，Compact把NULL值的列统一管理在一个地方。它首先会统计表中哪些列允许有NULL值，即忽略掉主键列和被<code>NOT NULL</code>修饰的列；其次将这些统计出来的列逆序的对应一个个二进制位，每位为1时就代表这列当前的值为NULL。同样的，若表中没有允许存储NULL的列，那么这部分也不存在。</p>
+<p>而记录的头信息都是一些二进制位，共计40位:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">名称</th>
+<th style="text-align: center;">大小(bit)</th>
+<th style="text-align: center;">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><code>预留位1</code></td>
+<td style="text-align: center;"><code>1</code></td>
+<td style="text-align: center;">没有使用</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>预留位2</code></td>
+<td style="text-align: center;"><code>1</code></td>
+<td style="text-align: center;">没有使用</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>delete_mask</code></td>
+<td style="text-align: center;"><code>1</code></td>
+<td style="text-align: center;">标记该记录是否被删除</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>min_rec_mask</code></td>
+<td style="text-align: center;"><code>1</code></td>
+<td style="text-align: center;">B+树的每层非叶子节点中的最小记录都会添加该标记</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>n_owned</code></td>
+<td style="text-align: center;"><code>4</code></td>
+<td style="text-align: center;">表示当前记录拥有的记录数</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>heap_no</code></td>
+<td style="text-align: center;"><code>13</code></td>
+<td style="text-align: center;">表示当前记录在记录堆的位置信息</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>record_type</code></td>
+<td style="text-align: center;"><code>3</code></td>
+<td style="text-align: center;">表示当前记录的类型</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>next_record</code></td>
+<td style="text-align: center;"><code>16</code></td>
+<td style="text-align: center;">表示下一条记录的相对位置</td>
+</tr>
+</tbody>
+</table>
+<p>对于记录的真实数据部分，Mysql会为每条记录默认的添加一些列，也就是隐藏列，包括:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">列名</th>
+<th style="text-align: center;">是否必须</th>
+<th style="text-align: center;">占用空间</th>
+<th style="text-align: center;">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><code>DB_ROW_ID</code></td>
+<td style="text-align: center;">否</td>
+<td style="text-align: center;"><code>6</code>字节</td>
+<td style="text-align: center;">行ID，唯一标识一条记录</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>DB_TRX_ID</code></td>
+<td style="text-align: center;">是</td>
+<td style="text-align: center;"><code>6</code>字节</td>
+<td style="text-align: center;">事务ID</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>DB_ROLL_PTR</code></td>
+<td style="text-align: center;">是</td>
+<td style="text-align: center;"><code>7</code>字节</td>
+<td style="text-align: center;">回滚指针</td>
+</tr>
+</tbody>
+</table>
+<p>对于主键，优先使用用户定义的，如果未定义则选取一个<code>Unique</code>键作为主键，如果没有<code>Unique</code>键则会添加一个<code>DB_ROW_ID</code>的隐藏列作为主键，所以这个隐藏列可能不存在。</p>
+<p>之前提到一个数据页只有16KB，也就是16384字节，而VARCHAR、CHAR、TEXT、BLOB等字段都有可能大于它，这就造成了一个页存放不了一条记录的情况。我们把这种现象称为行溢出。对于这种情况，Compact会在记录的真实数据部分只存储这条记录的一部分，剩余的数据分散在其他的页中，然后真实数据部分还有20个字节指向这些页的地址。Dynamic、Compressed的行格式和Compact很像，只是在处理行溢出时有些不同罢了，它们只在记录的真实数据处存其他页面的地址，数据都在其他页面。Compressed采用压缩算法对页面进行压缩以节省空间。Mysql5.7默认的行格式就是Dynamic，Redundant属于Mysql5.0之前的快被淘汰的格式。</p>
+<h3 id="_9">数据目录<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<p>InnoDB、MyISAM这样的存储引擎会把数据存储在硬盘上的数据目录中，它不是安装目录，可通过如下命令查看:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">SHOW</span><span class="w"> </span><span class="k">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;datadir&#39;</span><span class="p">;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">+---------------+-----------------------+</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="o">|</span><span class="w"> </span><span class="n">Variable_name</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Value</span><span class="w">                 </span><span class="o">|</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="o">+---------------+-----------------------+</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="o">|</span><span class="w"> </span><span class="n">datadir</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="k">local</span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">mysql</span><span class="o">/</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="o">+---------------+-----------------------+</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="mi">1</span><span class="w"> </span><span class="k">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="kt">set</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div></p>
+<p>在这个目录中，我们每新建一个新的数据库，Mysql会帮我们创建一个同名的文件夹，并在该文件夹内创建一个<code>db.opt</code>的文件，它包含了这个数据库的属性，例如数据库的字符集和比较规则等。之后我们在某数据库创建一个表时，Mysql会为我们创建一个<code>表名.frm</code>的文件，它存储了表结构的定义；InnoDB会为我们创建一个<code>表名.ibd</code>的文件，它是一个独立的表空间文件，存储了一页页的数据。</p>
+<p>Mysql有四个系统库，但information_schema库被特殊对待，没有相应的文件夹，它保存着MySQL服务器维护的所有其他数据库的信息，比如有哪些表、哪些视图、哪些触发器、哪些列、哪些索引，都是一些元数据；mysql库存储了MySQL的用户账户和权限信息，一些存储过程、事件的定义信息，一些运行过程中产生的日志信息，一些帮助信息以及时区信息等；performance_schema库主要保存MySQL服务器运行过程中的一些状态信息，算是对MySQL服务器的一个性能监控，包括统计最近执行了哪些语句，在执行过程的每个阶段都话费了多⻓时间，内存的使用情况等；sys库主要是通过视图的形式把information_schema和performance_schema结合起来，让程序员可以更方便的了解MySQL服务器的一些性能信息。</p>
+<p>此外，默认情况下，InnoDB还会在该目录下创建<code>ibdata1</code>这样一个文件，表示系统表空间。MySQL5.5.7到MySQL5.6.6之间的各版本，表中的数据都会被默认存储到这个系统表空间。该目录下还包含服务器进程文件，服务器日志文件，自动生成的RSA、SSL证书和密钥文件等。</p>
+<p>Mysql的视图是虚拟表，也会在对应的库文件夹下创建一个frm文件存储。</p>
+<h3 id="_10">表空间<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<h2 id="_11">索引<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<p>在没有索引的情况下，我们无法快速定位到数据所在的页，只能从第一个页沿着双向链表依次向下找每个页，在每个页中如果查找的不是主键，还得依次去比对每条记录。显然，这种查询效率是非常低的。</p>
+<h3 id="_12">聚簇索引<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<p>我们先来考虑一种简单的索引方式，先把页的结构简化来看。</p>
+<p><img alt="data_page" src="../images/data_page.jpg" /></p>
+<p>数据页中我们暂时认为每页存储三条记录就满了，每条记录我们只关注record_type，0表示普通记录，2表示最小记录，3表示最大记录，以及next_record表示下一条记录。</p>
+<p>接下来对于数据的增删改操作，我们必须通过一些诸如记录移动的操作来始终保证这个状态一直成立:<strong>下一个数据⻚中用户记录的主键值必须大于上一个⻚中用户记录的主键值</strong>。这个过程称为​<strong>⻚分裂</strong>。有了这个状态的保证，我们可以给每个页建立一个目录项，每个目录项包括其对应的页号以及页中用户记录的最小的主键值，大概是这样的:</p>
+<p><img alt="simple_index" src="../images/simple_index.jpg" /></p>
+<p>这形成了一个简单的索引方案，我们把这些目录项放到一个数组中，当通过主键查找时就能通过这个数组找到对应的数据页，在根据数据页的Page Directory和二分法就可以迅速找到记录。</p>
+<p>这个方案的问题是我们需要一段连续的物理空间来放这个存储目录项的数组，但Mysql只能保证页的数据是连续的，即16KB的连续空间。随着表中的数据越来越多，多到16KB根本放不下这些目录项怎么办？另一个问题是如果我们删除数据记录使得某一页中没有内容，那么这页就没必要存在，那么这页对应的目录项也没必要存在，把目录项删除后其后的目录项都得向前移动一下，这显然不是好的设计。</p>
+<p>因此InnoDB复用了数据页来存储目录项，每条记录就是一个目录项，只不过这条记录的record_type是1，表示这是一条目录项记录，现在变成了这样:</p>
+<p><img alt="clustered_index" src="../images/clustered_index.jpg" /></p>
+<p>如果一个目录页放满了，就新增一个目录页，同时在其上再加一层目录页记录这两个目录页。这种数据组织方式就是​<strong>B+树</strong>。</p>
+<p>这种组织方式有两个特点:</p>
+<p>1、使用记录主键值的大小进行记录和⻚的排序，这包括三个方面的含义:</p>
+<ul>
+<li>⻚内的记录是按照主键的大小顺序排成一个单向链表</li>
+<li>各个存放用户记录的⻚是根据⻚中用户记录的主键大小顺序排成一个双向链表</li>
+<li>存放目录项记录的⻚分为不同的层次，在同一层次中的⻚是根据⻚中目录项记录的主键大小顺序排成一个双向链表</li>
+</ul>
+<p>2、B+树的叶子节点存储的是完整的用户记录，即记录中包含了所有列的值。</p>
+<p>我们把符合这两个特点的B+树称为​<strong>聚簇索引</strong>，InnoDB会自动为我们创建聚簇索引，而由于所有的记录都在叶子节点上，也就是所谓的​<strong>索引即数据，数据即索引</strong>。</p>
+<h3 id="_13">二级索引<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
+<p>上面的聚簇索引只在搜索条件是主键是才起作用，如果以别的列为搜索条件又怎么办呢？我们可以多建几颗B+树。效果如图所示:</p>
+<p><img alt="secondary_index" src="../images/secondary_index.jpg" /></p>
+<p>这颗B+树假设我们以x列去建立索引，那么每个数据页内的记录就是按照x列的大小顺序排列的，和上面的类似，不同的是这条记录只有一个x列的值和其对应的主键的值。所以，当我们去按x=3这样的搜索条件查找数据时，就会先根据这颗新的B+树确定x=3时对应的主键是什么，在根据主键去聚簇索引中查找到完整的一条记录。这个过程也被称为​<strong>回表</strong>。<code>二级索引(Secondary index)</code>这个名称也正是因为需要两颗B+树，操作两次。</p>
+<p>我们观察到上图中存储目录项的记录只包含了x的值和页号，实际上这在二级索引中会存在bug，有可能很多条记录中x的值都是相同的，此时再插入一条记录就不知道要插在哪个位置了。因此这颗B+树中叶子节点每条记录是x的值和主键的值，x相同则按主键大小顺序排列，目录项节点的每条记录是x的值、主键的值、页的号码，x相同时也可按主键排序。</p>
+<h3 id="_14">联合索引<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h3>
+<p>联合索引就是同时以多个列作为排序规则，比如列x和列y的联合索引就是先以x为排序依据，x相等时以y作为排序依据。只需要根据二级索引的B+树稍作改造即可，每条记录存放x、y和主键的值即可。</p>
+<h3 id="_15">使用场景<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
+<p>哪些情况能用到索引，哪些情况无法用到呢？我们通过一个例子来看:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">person_info</span><span class="p">(</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="kt">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="k">auto_increment</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="k">name</span><span class="w"> </span><span class="kt">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="no">NULL</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="n">birthday</span><span class="w"> </span><span class="kt">DATE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="no">NULL</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="n">phone_number</span><span class="w"> </span><span class="kt">CHAR</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="no">NULL</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="n">country</span><span class="w"> </span><span class="kt">varchar</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="no">NULL</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="k">KEY</span><span class="w"> </span><span class="n">idx_name_birthday_phone_number</span><span class="w"> </span><span class="p">(</span><span class="k">name</span><span class="p">,</span><span class="w"> </span><span class="n">birthday</span><span class="p">,</span><span class="w"> </span><span class="n">phone_number</span><span class="p">)</span><span class="w"> </span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">);</span>
+</code></pre></div>
+先建了一个表，其中有一个自动为主键id建立的聚簇索引，和一个二级索引idx_name_birthday_phone_number，它是由三个列组成的联合索引。如下情况可以使用到索引:</p>
+<p><strong>全值匹配</strong><br />
+当我们的搜索条件中的列和索引中的列一致时，如<code>SELECT * FROM person_info WHERE name = 'Ashburn' AND birthday = '1990-09-27' AND phone_number = '15123983239';</code>，若调换name、birthday、phone_number的顺序也是可以使用到索引的，因为Mysql的查询优化器会帮我们优化这种情况。</p>
+<p><strong>匹配左边的列</strong><br />
+在搜索语句中，也可以不包含全部索引的列，只匹配左边的部分列。如<code>SELECT * FROM person_info WHERE name = 'Ashburn';</code>是可以用到索引的，搜索条件中的列只要是从联合索引列的最左边开始的、连续的列就能匹配到。</p>
+<p><strong>匹配列前缀</strong><br />
+对于字符串而言，其排序的本质就是比较字符串的大小，一般的规则就是比较逐个字符的大小，也就是说只匹配字符串的前n个字符也是可以用到索引的，如<code>SELECT * FROM person_info WHERE name LIKE 'As%';</code>，但若没有从第一个字符开始匹配则用不到索引。有时候我们有匹配字符串后缀的需求，例如某一列是url，其前缀都是www，这种情况我们可以把表中的数据逆序存储，再使用匹配列前缀的方式就可以用到索引了。</p>
+<p><strong>匹配范围值</strong><br />
+当我们需要一个范围的值时也可以用到索引，因为所有记录都是按照索引列的值由小到大的顺序排列的。如<code>SELECT * FROM person_info WHERE name &gt; 'Asa' AND name &lt; 'Barlow' AND birthday &gt; '1980-01-01';</code>可以用到name列的索引，但无法用到birthday的索引，因为name查出来的记录中可能并不是按birthday再排序过的。</p>
+<p><strong>精确匹配某一列并范围匹配另外一列</strong><br />
+对于同一个联合索引来说，虽然对多个列进行范围查找时只能用到最左边那个索引列，但如果左边的列是精确查找，则右边的列可以用范围查找，如<code>SELECT * FROM person_info WHERE name = 'Ashburn' AND birthday &gt; '1980-01-01' AND birthday &lt; '2000- 12-31' AND phone_number &gt; '15100000000';</code>，name和birthday能用到索引，phone_number无法用到索引。</p>
+<p><strong>用于排序</strong><br />
+如果没有索引的话，我们会把所有的记录加载到内存中，然后通过一些排序算法例如快排等对这些记录排序，如果内存中放不下可能还会借助硬盘中的空间，最后排序完成后再返还给客户端。在Mysql中，把这种在内存中或硬盘中进行排序的方式称为​<strong>文件排序(filesort)</strong>，是非常慢的。借助索引可以直接提取出数据，再进行回表拿到其他数据就可以了，例如<code>SELECT * FROM person_info ORDER BY name, birthday, phone_number LIMIT 10;</code>。但是，各个排序列的排序顺序要一致，某列asc、某列desc一起混用是无法索引的。另外，用于排序的多个列需要是同一个索引里的，索引列也不能是修饰过的形式，如<code>SELECT * FROM person_info ORDER BY UPPER(name) LIMIT 10;</code>。</p>
+<p><strong>用于分组</strong><br />
+其实和排序类似，如<code>SELECT name, birthday, phone_number, COUNT(*) FROM person_info GROUP BY name, birthday, phone_number</code>。</p>
+<h3 id="_16">代价<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h3>
+<p>使用索引在空间和时间上都有代价，每建立一个索引都需要一颗B+树，大的B+树由很多数据页组成，算是不小的存储空间。每次对表进行增、删、改操作时，都可能要修改各个索引。B+树每层节点都是按照索引列的值按从小到大的顺序排序而组成了双向链表。不论是叶子节点的记录，还是内节点的记录都是按照索引列的值从小到大的顺序而形成了一个单向链表。而增、删、改操作可能会对节点和记录的排序造成破坏，所以存储引擎需要额外的时间进行一些记录移位，⻚面分裂、⻚面回收等操作来维护好节点和记录的排序。所以说，一个表上索引建的越多，就会占用越多的存储空间，在增删改记录的时候性能就越差。</p>
+<p>此外，回表也是有代价的。二级索引B+树记录在磁盘上的数据是相连的，集中分布在一个或几个数据页中，我们可以很快的把它们读出来，这种读取方式也叫​<strong>顺序读取</strong>；读取到之后，其对应的主键并不相连，要读取到完整记录就需要在不同的数据页中去找，这种读取方式叫​<strong>随机读取</strong>。需要回表的记录越多，使用二级索引的效率就越低，甚至让某些查询宁愿使用全表扫描也不使用二级索引。比如name值在Asa~Barlow之间的用户记录数量占全部记录数量90%以上，那么如果使用idx_name_birthday_phone_number索引的话，有90%多的id值需要回表，就还不如全表扫描。查询优化器会帮我们判断何时该用全表扫描代替二级索引回表。</p>
+<h3 id="_17">优化策略<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h3>
+<p><strong>覆盖索引</strong><br />
+为了避免回表时的损耗，最好在查询列表里只包含索引，如<code>SELECT name, birthday, phone_number FROM person_info WHERE name &gt; 'Asa' AND name &lt; 'Barlow'</code>。不鼓励使用<code>*</code>号查询列表，最好把需要查询的列依次标明。</p>
+<p><strong>只为用于搜索、排序或分组的列创建索引</strong><br />
+出现在查询列表中的列就没必要索引了。如<code>SELECT birthday, country FROM person_name WHERE name = 'Ashburn'</code>只需为name创建索引，birthday和country就不需要了。</p>
+<p><strong>为列的基数大的列创建索引</strong><br />
+列的基数是说该列中不重复的数的个数，比如性别这样的列，其基数也就2个，如果为其建立索引重复的值会特别的多，效果就不会好。</p>
+<p><strong>索引列的类型尽量小</strong><br />
+这里的类型指的是其表示的数据范围，例如整型分为TINYINT、MEDIUMINT、INT、BIGINT几种，在能表示出所需整数的前提下，能用INT就不要用BIGINT。因为数据类型越小，CPU做数字比较时就越快，同时索引占用的空间就越小，一个数据页中就能有更多的记录，缓存在内存中的数据也就越多。这点对于主键来说更是如此，因为二级索引也需要存储主键值。</p>
+<p><strong>索引字符串值的前缀</strong><br />
+也就是说在二级索引的记录中只保留字符串的前几个值，查找时虽不能精确的定位到记录的位置，但能定位到相应前缀的位置，在空间和时间上取得平衡。在字符串类型能存储的值较多的情况下，这种方式是非常鼓励的，如:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">person_info</span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="k">name</span><span class="w"> </span><span class="kt">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="no">NULL</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="n">birthday</span><span class="w"> </span><span class="kt">DATE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="no">NULL</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="n">phone_number</span><span class="w"> </span><span class="kt">CHAR</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="no">NULL</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="k">KEY</span><span class="w"> </span><span class="n">idx_name_birthday_phone_number</span><span class="w"> </span><span class="p">(</span><span class="k">name</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span><span class="w"> </span><span class="n">birthday</span><span class="p">)</span><span class="w"> </span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">);</span>
+</code></pre></div>
+就表示用name的前10个字符来做为索引。但这种方式不能用name列来排序了，如<code>SELECT * FROM person_info ORDER BY name LIMIT 10;</code>则用不到索引。</p>
+<p><strong>让索引列在比较表达式中单独出现</strong><br />
+例如<code>WHERE col * 2 &lt; 4</code>就用不到索引，但若写成<code>WHERE col &lt; 4/2</code>就能用到索引，所以如果索引列在比较表达式中不是以单独列的形式出现，而是以某个表达式，或者函数调用形式出现的话，是用不到索引的。</p>
+<p><strong>让主键自增</strong><br />
+如果主键是自增(AUTO_INCREMENT)的，那我们每插满一个数据页就会去插下一个数据页。而如果插入的主键值忽大忽小，就可能会发生页分裂和记录移动，造成不必要的性能损耗。</p>
+<p><strong>避免冗余重复索引</strong><br />
+这往往发生在某个索引已经被联合索引包含到了，或者对某个列既建立了唯一索引和普通索引。</p>
+<h3 id="_18">访问方法<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h3>
+<p>我们平时所写的查询语句本质上只是一种声明式语法，只是告诉MySQL我们要获取的数据符合哪些规则，至于MySQL背地里是怎么把查询结果搞出来的那是MySQL自己的事儿。我们把MySQL执行查询语句的方式称之为访问方法或者访问类型。同一个查询语句可能可以使用多种不同的访问方法来执行，虽然最后的查询结果都是一样的，但是执行的时间可能差距很大。</p>
+<p>我们以此表格为例，看看不同的访问方法:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">single_table</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="kt">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="k">AUTO_INCREMENT</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="n">key1</span><span class="w"> </span><span class="kt">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="n">key2</span><span class="w"> </span><span class="kt">INT</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="n">key3</span><span class="w"> </span><span class="kt">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="n">key_part1</span><span class="w"> </span><span class="kt">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="n">key_part2</span><span class="w"> </span><span class="kt">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="n">key_part3</span><span class="w"> </span><span class="kt">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="n">common_field</span><span class="w"> </span><span class="kt">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="k">KEY</span><span class="w"> </span><span class="n">idx_key1</span><span class="w"> </span><span class="p">(</span><span class="n">key1</span><span class="p">),</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">idx_key2</span><span class="w"> </span><span class="p">(</span><span class="n">key2</span><span class="p">),</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="k">KEY</span><span class="w"> </span><span class="n">idx_key3</span><span class="w"> </span><span class="p">(</span><span class="n">key3</span><span class="p">),</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="k">KEY</span><span class="w"> </span><span class="n">idx_key_part</span><span class="p">(</span><span class="n">key_part1</span><span class="p">,</span><span class="w"> </span><span class="n">key_part2</span><span class="p">,</span><span class="w"> </span><span class="n">key_part3</span><span class="p">)</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">)</span><span class="w"> </span><span class="k">Engine</span><span class="o">=</span><span class="n">InnoDB</span><span class="w"> </span><span class="k">CHARSET</span><span class="o">=</span><span class="n">utf8</span><span class="p">;</span>
+</code></pre></div>
+它有主键id、唯一二级索引key2、普通二级索引key1和key3、联合索引。</p>
+<h4 id="const"><strong>const</strong><a class="headerlink" href="#const" title="Permanent link">&para;</a></h4>
+<p>当我们可以直接通过主键列或唯一二级索引列来与常数的等值比较来定位到一条记录时，速度是非常快的，这种访问方法称为​<strong>const</strong>。例如:<code>SELECT * FROM single_table WHERE id = 1438;</code>、<code>SELECT * FROM single_table WHERE key2 = 3841;</code>。主键列只需要一次定位，唯一索引列也只需要两次定位。</p>
+<p>对于唯一二级索引来说，查询该列为NULL值的情况比较特殊，因为唯一索引并不限制其列为NULL值的数量，所以使用<code>SELECT * FROM single_table WHERE key2 IS NULL;</code>查询时不会用const访问方法。</p>
+<h4 id="ref"><strong>ref</strong><a class="headerlink" href="#ref" title="Permanent link">&para;</a></h4>
+<p>对于某个普通二级索引列和常数值的等值比较，比如<code>SELECT * FROM single_table WHERE key1 = 'abc';</code>，由于普通索引并不限制索引列值的唯一性，所以可能找到多条对应的记录，那么这种方式的代价取决于匹配到的二级索引记录的条数，如果匹配的记录较少，则回表代价较低。这种方法称为​<strong>ref</strong>，它的效率比const差了一些。</p>
+<p>如果最左边的连续索引列是与常数的等值比较就可能采用ref的方法，如<code>SELECT * FROM single_table WHERE key_part1 ='god like'AND key_part2 = 'legendary';</code>，但如果不全是等值比较的话，它的访问方法就不会是ref了，如<code>SELECT * FROM single_table WHERE key_part1 ='god like'AND key_part2 &gt; 'legendary';</code></p>
+<p>普通二级索引或唯一二级索引使用<code>Key IS NULL</code>这样的方式作为搜索条件时，可能使用ref的访问方法。</p>
+<h4 id="ref_or_null"><strong>ref_or_null</strong><a class="headerlink" href="#ref_or_null" title="Permanent link">&para;</a></h4>
+<p>当我们不仅想找出某个索引列的值等于某个常数的记录，还同时想找出该列为NULL的记录时，例如<code>SELECT * FROM single_demo WHERE key1 = 'abc' OR key1 ISNULL;</code>。这种查询使用的访问方法为​<strong>ref_or_null</strong>。它的查询也会分为两个步骤，先分别定位key1=abc和key1是null的连续记录并找到这些记录对应的主键值，再从聚簇索引上根据主键找到完整的用户记录。</p>
+<h4 id="range"><strong>range</strong><a class="headerlink" href="#range" title="Permanent link">&para;</a></h4>
+<p>之前的方式都是和常数等值比较，但有时我们面对的搜索条件会更复杂，例如<code>SELECT * FROM single_table WHERE key2 IN (1438,6328) OR (key2 &gt;= 38AND key2 &lt;= 79);</code>，除了可能使用全表扫描的访问方法，也可能使用二级索引+回表的访问方法。如果采用回表的方式，索引列就需要匹配某个或某些范围的值，这种利用索引进行范围匹配的访问方法称为​<strong>range</strong>。</p>
+<p>该例中，会分为三个范围，即key2=1438、key2=6328、key2∈[38,79]。范围一、范围二被称为单点区间，范围三称为连续范围空间。</p>
+<h4 id="index"><strong>index</strong><a class="headerlink" href="#index" title="Permanent link">&para;</a></h4>
+<p>看这个查询<code>SELECT key_part1, key_part2, key_part3 FROMsingle_table WHERE key_part2 = 'abc';</code>，由于key_part2不是联合索引idx_key_part的最左索引列，所以我们无法使用ref的访问方法来执行这个语句。但这个语句有两个特点，一是它的查询列表只有三个列key_part1、key_part2、key_part3且都被联合索引包含，二是搜索条件只有key_part2列也被包含在联合索引中。</p>
+<p>也就是说我们可以直接遍历idx_key_part这颗B+树的叶子节点来得到结果，而不需要回表，因为这棵树比聚簇索引的树小的多，它的成本也要小很多，我们把这种访问方法称为​<strong>index</strong>。</p>
+<h4 id="all"><strong>all</strong><a class="headerlink" href="#all" title="Permanent link">&para;</a></h4>
+<p>最直接的查询执行方式就是全表扫描，对于InnoDB来说就是直接扫描聚簇索引，这种访问方法称为​<strong>all</strong>。</p>
+<h3 id="explain">EXPLAIN<a class="headerlink" href="#explain" title="Permanent link">&para;</a></h3>
+<p>一条查询语句在经过MySQL查询优化器的各种基于成本和规则的优化后会生成一个执行计划，这个执行计划展示了接下来具体执行查询的方式，比如多表连接的顺序是什么，对于每个表采用什么访问方法来具体执行查询等等。EXPLAIN能帮助我们查看到某个查询语句的具体执行计划。例如:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="o">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="o">|</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">select_type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">partitions</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">possible_keys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">key</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">key_len</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Extra</span><span class="w">          </span><span class="o">|</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="o">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">          </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w">     </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">No</span><span class="w"> </span><span class="k">tables</span><span class="w"> </span><span class="n">used</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="o">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="mi">1</span><span class="w"> </span><span class="k">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">set</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div></p>
+<p>各列的详细解释如下:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">列名</th>
+<th style="text-align: left;">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><code>id</code></td>
+<td style="text-align: left;">在一个查询语句中每个<code>SELECT</code>关键字都对应一个唯一<code>id</code></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>select_type</code></td>
+<td style="text-align: left;"><code>SELECT</code>关键字对应的查询的类型</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>table</code></td>
+<td style="text-align: left;">表名</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>partitions</code></td>
+<td style="text-align: left;">匹配的分区信息</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>type</code></td>
+<td style="text-align: left;">针对单表的访问方法</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>possible_keys</code></td>
+<td style="text-align: left;">可能用到的索引</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>key</code></td>
+<td style="text-align: left;">实际上使用的索引</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>key_len</code></td>
+<td style="text-align: left;">实际使用到的索引长度</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>ref</code></td>
+<td style="text-align: left;">当使用索引列等值查询时，与索引列进行等值匹配的对象信息</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>rows</code></td>
+<td style="text-align: left;">预估的需要读取的记录条数</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>filtered</code></td>
+<td style="text-align: left;">某个表经过搜索条件过滤后剩余记录条数的百分比</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>Extra</code></td>
+<td style="text-align: left;">一些额外的信息</td>
+</tr>
+</tbody>
+</table>
+<p><strong>table</strong></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">s1</span><span class="p">,</span><span class="w"> </span><span class="n">s2</span><span class="p">;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="o">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="o">|</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">select_type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">partitions</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">possible_keys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">key</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">key_len</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Extra</span><span class="w">                                 </span><span class="o">|</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="o">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s1</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="k">ALL</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">          </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">                                  </span><span class="o">|</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s2</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="k">ALL</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">          </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Using</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="p">(</span><span class="k">Block</span><span class="w"> </span><span class="k">Nested</span><span class="w"> </span><span class="k">Loop</span><span class="p">)</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="o">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="mi">2</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">set</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div>
+我们看到EXPLAIN语句输出的每条记录都对应着某个单表的访问方法，该条记录的table列代表了该表的表名。</p>
+<p><strong>id</strong></p>
+<p>查询语句一般以select关键字开头，简单的查询语句只有一个select，但有两种情况会出现多个select:</p>
+<ul>
+<li>查询语句包含子查询，如<code>SELECT * FROM s1 WHERE key1 IN (SELECT * FROM s2);</code></li>
+<li>查询语句包含UNION语句，如<code>SELECT * FROM s1 UNION SELECT * FROM s2;</code></li>
+</ul>
+<p>每多一个select关键字，就会给它分配一个唯一的id值。对于连接查询来说，这个id是相同的，出现在前面的就是驱动表，后面的是被驱动表。如:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">key1</span><span class="w"> </span><span class="k">IN</span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">key1</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">s2</span><span class="p">)</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">key3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;a&#39;</span><span class="p">;</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="o">+----+--------------------+-------+------------+----------------+---------------+----------+---------+------+------+----------+-------------+</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="o">|</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">select_type</span><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">partitions</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">type</span><span class="w">           </span><span class="o">|</span><span class="w"> </span><span class="n">possible_keys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">key</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">key_len</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Extra</span><span class="w">       </span><span class="o">|</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="o">+----+--------------------+-------+------------+----------------+---------------+----------+---------+------+------+----------+-------------+</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w">            </span><span class="o">|</span><span class="w"> </span><span class="n">s1</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="k">ALL</span><span class="w">            </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key3</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Using</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="o">|</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">DEPENDENT</span><span class="w"> </span><span class="n">SUBQUERY</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">s2</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="n">index_subquery</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="mi">303</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">func</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Using</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="o">+----+--------------------+-------+------------+----------------+---------------+----------+---------+------+------+----------+-------------+</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="mi">2</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">set</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div></p>
+<p>但是查询优化器可能会将子查询转换为连接查询，所以会看到两个相同的id:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">key1</span><span class="w"> </span><span class="k">IN</span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">key3</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">common_field</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;a&#39;</span><span class="p">);</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="o">+----+-------------+-------+------------+------+---------------+----------+---------+-----------------+------+----------+-----------------------------+</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="o">|</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">select_type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">partitions</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">possible_keys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">key</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">key_len</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">             </span><span class="o">|</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Extra</span><span class="w">                       </span><span class="o">|</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="o">+----+-------------+-------+------------+------+---------------+----------+---------+-----------------+------+----------+-----------------------------+</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s1</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="k">ALL</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">            </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Using</span><span class="w"> </span><span class="k">where</span><span class="w">                 </span><span class="o">|</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s2</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key3</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key3</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="mi">303</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">awesome</span><span class="p">.</span><span class="n">s1</span><span class="p">.</span><span class="n">key1</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Using</span><span class="w"> </span><span class="k">where</span><span class="p">;</span><span class="w"> </span><span class="n">FirstMatch</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="o">+----+-------------+-------+------------+------+---------------+----------+---------+-----------------+------+----------+-----------------------------+</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="mi">2</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">set</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div></p>
+<p>UNION子句会通过创建临时表把多个查询的结果合并起来进行去重，所以会有一条NULL的记录，UNION ALL不去重就不会有这条记录:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">s1</span><span class="w">  </span><span class="k">UNION</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="k">FROM</span><span class="w"> </span><span class="n">s2</span><span class="p">;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="o">+----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="o">|</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">select_type</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="k">table</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="k">partitions</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">possible_keys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">key</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">key_len</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Extra</span><span class="w">           </span><span class="o">|</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="o">+----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s1</span><span class="w">         </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="k">ALL</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">          </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">            </span><span class="o">|</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="o">|</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">UNION</span><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="n">s2</span><span class="w">         </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="k">ALL</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">          </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">            </span><span class="o">|</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">UNION</span><span class="w"> </span><span class="n">RESULT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="o">&lt;</span><span class="n">union1</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="k">ALL</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">          </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w">     </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Using</span><span class="w"> </span><span class="k">temporary</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="o">+----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="mi">3</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">set</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>select_type</strong></p>
+<p>每个select关键字都代表着一个小的查询语句，select_type就是描述这个小的查询语句在大的查询中扮演的角色，它的取值有这些可能:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">名称</th>
+<th style="text-align: left;">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><code>SIMPLE</code></td>
+<td style="text-align: left;">不包含UNION或子查询的话都是该类型</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>PRIMARY</code></td>
+<td style="text-align: left;">对于大查询来说，最左边的小查询</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>UNION</code></td>
+<td style="text-align: left;">对于包含UNION的大查询，除最左边的小查询以外的小查询</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>UNION RESULT</code></td>
+<td style="text-align: left;">对于UNION会创建临时表，针对该临时表的查询</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>SUBQUERY</code></td>
+<td style="text-align: left;">子查询是相关子查询时，它的第一个SELECT代表的查询</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>DEPENDENT SUBQUERY</code></td>
+<td style="text-align: left;">子查询是不相关子查询时，它的第一个SELECT代表的查询</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>DEPENDENT UNION</code></td>
+<td style="text-align: left;">包含UNION或UNION ALL的大查询，如果各小查询依赖外层查询，除最左边的小查询之外的小查询</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>DERIVED</code></td>
+<td style="text-align: left;">对于采用物化方式执行的包含派生表的查询，对于派生表的子查询</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>MATERIALIZED</code></td>
+<td style="text-align: left;">若查询优化器选择将子查询物化之后与外层查询进行连接查询</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>UNCACHEABLE SUBQUERY</code></td>
+<td style="text-align: left;">不常用</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>UNCACHEABLE UNION</code></td>
+<td style="text-align: left;">不常用</td>
+</tr>
+</tbody>
+</table>
+<p><strong>partitions</strong></p>
+<p>分区信息，一般该列值都为NULL。</p>
+<p><strong>type</strong></p>
+<p>代表Mysql对这个表执行查询时的访问方法，<a href="#_18">之前</a>已经提到过部分，这列可能的值有:</p>
+<ul>
+<li>system，表中只有一条记录且该表使用的存储引擎的统计数据是精确的，比如MyISAM、Memory</li>
+<li>const，对应<a href="#const">const</a></li>
+<li>eq_ref，连接查询时，若被驱动表是通过主键或者唯一二级索引列等值匹配的方式进行访问的</li>
+<li>ref，对应<a href="#ref">ref</a></li>
+<li>fulltext，全文索引</li>
+<li>ref_or_null，对应<a href="#ref_or_null">ref_or_null</a></li>
+<li>index_merge，一般对某表的查询只能用一个索引，但某些场景可以使用Intersection、Union、Sort-Union这三种索引合并的方式</li>
+<li>unique_subquery，在一些包含IN的子查询语句，若查询优化器决定将IN转换为EXISTS子查询且它可以用到主键进行等值匹配</li>
+<li>index_subquery，和unique_subquery类似，只是访问子查询的表时使用的普通索引</li>
+<li>range，对应<a href="#range">range</a></li>
+<li>index，对应<a href="#index">index</a></li>
+<li>ALL，对应<a href="#all">all</a></li>
+</ul>
+<p><strong>possible_keys和key</strong></p>
+<p>possible_keys表示一开始的查询语句可能使用到的索引，而key表示经过了查询优化器计算使用不同的索引成本之后，实际上会使用到的索引。例如:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">key1</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="s1">&#39;z&#39;</span><span class="k">AND</span><span class="w"> </span><span class="n">key3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;a&#39;</span><span class="p">;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="o">+----+-------------+-------+------------+------+-------------------+----------+---------+-------+------+----------+-------------+</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="o">|</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">select_type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">partitions</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">possible_keys</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="k">key</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">key_len</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">   </span><span class="o">|</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Extra</span><span class="w">       </span><span class="o">|</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="o">+----+-------------+-------+------------+------+-------------------+----------+---------+-------+------+----------+-------------+</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s1</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="p">,</span><span class="n">idx_key3</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key3</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="mi">303</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">const</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Using</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="o">+----+-------------+-------+------------+------+-------------------+----------+---------+-------+------+----------+-------------+</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="mi">1</span><span class="w"> </span><span class="k">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">set</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="p">(</span><span class="mf">0.01</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div></p>
+<p>有个特例是当使用index为访问方法时，possible_keys列是空的。此外，possible_keys列中的值越多，可能用到的索引就越多，查询优化器计算查询成本时就得花费更多的时间去比较，如果可能的话，尽量删除用不到的索引。</p>
+<p><strong>key_len</strong></p>
+<p>表示当查询优化器决定使用某个索引执行查询时，该索引记录的最大长度，这个最大长度是这样计算的:</p>
+<ul>
+<li>对于使用固定长度类型的索引列来说，它实际占用的存储空间最大长度就是该固定值</li>
+<li>对于指定字符集的变长类型的索引来说，比如VARCHAR(100)-UTF8，那么就是100*3=300字节</li>
+<li>如果索引列可以存储NULL值，则key_len比不可以存储时多1个字节</li>
+<li>对于变长字段，都会有2个字节的空间来存储该变长列的实际长度</li>
+</ul>
+<p><strong>ref</strong></p>
+<p>当使用索引列等值匹配的条件去执行查询时，即const、eq_ref、ref、ref_or_null、unique_subquery之一，该列会展示出与索引列做等值匹配的是一个常数或者是某个列。例如:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">key1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;a&#39;</span><span class="p">;</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="o">+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="o">|</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">select_type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">partitions</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">possible_keys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">key</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">key_len</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">   </span><span class="o">|</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Extra</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="o">+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s1</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="mi">303</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">const</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">  </span><span class="o">|</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="o">+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="mi">1</span><span class="w"> </span><span class="k">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">set</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">s1</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s2</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="o">+----+-------------+-------+------------+--------+---------------+---------+---------+---------------+------+----------+-------+</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="o">|</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">select_type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">partitions</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">type</span><span class="w">   </span><span class="o">|</span><span class="w"> </span><span class="n">possible_keys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">key</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">key_len</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">           </span><span class="o">|</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Extra</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="o">+----+-------------+-------+------------+--------+---------------+---------+---------+---------------+------+----------+-------+</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s1</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="k">ALL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">          </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">  </span><span class="o">|</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s2</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="n">eq_ref</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="mi">4</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="n">awesome</span><span class="p">.</span><span class="n">s1</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">  </span><span class="o">|</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="o">+----+-------------+-------+------------+--------+---------------+---------+---------+---------------+------+----------+-------+</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="mi">2</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">set</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>rows</strong></p>
+<ul>
+<li>如果查询优化器决定使用全表扫描执行查询计划，rows列代表预计需要扫描的行数</li>
+<li>如果查询优化器决定使用索引执行查询计划，rows列代表预计扫描的索引记录行数</li>
+</ul>
+<p><strong>filtered</strong></p>
+<ul>
+<li>如果查询优化器决定使用全表扫描执行单表查询，那么会估计出满足搜索条件的记录有多少条</li>
+<li>如果查询优化器决定使用索引执行单表查询，那么会估计出满足除使用到对应索引的搜索条件外的其他搜索条件的记录有多少条。</li>
+</ul>
+<p>对于单表查询，filtered列的值意义不大。但对于连接查询，例如:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">s1</span><span class="p">.</span><span class="n">key1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s2</span><span class="p">.</span><span class="n">key1</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">s1</span><span class="p">.</span><span class="n">common_field</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;a&#39;</span><span class="p">;</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="o">+----+-------------+-------+------------+------+---------------+----------+---------+-------------------+------+----------+-------------+</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="o">|</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">select_type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">partitions</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">possible_keys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">key</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">key_len</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">               </span><span class="o">|</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Extra</span><span class="w">       </span><span class="o">|</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="o">+----+-------------+-------+------------+------+---------------+----------+---------+-------------------+------+----------+-------------+</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s1</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="k">ALL</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">              </span><span class="o">|</span><span class="w"> </span><span class="mi">9688</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mf">10.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Using</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s2</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="mi">303</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">awesome</span><span class="p">.</span><span class="n">s1</span><span class="p">.</span><span class="n">key1</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">        </span><span class="o">|</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="o">+----+-------------+-------+------------+------+---------------+----------+---------+-------------------+------+----------+-------------+</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="mi">2</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">set</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div>
+我们可以看到驱动表s1表的执行计划的rows列为9688， filtered列为10.00，这意味着驱动表s1的扇出值就是<code>9688 × 10.00% = 968.8</code>，这说明还要对被驱动表执行大约968次查询。</p>
+<p><strong>extra</strong></p>
+<p>该列用来说明一些额外信息，有很多种，这里只列出比较常见的一些:</p>
+<p><strong>No tables used</strong>，当查询语句中没有FROM子句时，也就是不去读表时。</p>
+<p><strong>Impossible WHERE</strong>，当WHERE子句永远为FALSE时提示。</p>
+<p><strong>No matching min/max row</strong>，查询列表处有MIN或MAX聚集函数，但是没有符合where子句中搜索条件的记录时，例如:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="nf">MIN</span><span class="p">(</span><span class="n">key1</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">key1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;abcdefg&#39;</span><span class="p">;</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="o">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------------------+</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="o">|</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">select_type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">partitions</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">possible_keys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">key</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">key_len</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Extra</span><span class="w">                   </span><span class="o">|</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="o">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------------------+</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">          </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w">     </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">No</span><span class="w"> </span><span class="n">matching</span><span class="w"> </span><span class="n">min</span><span class="o">/</span><span class="n">max</span><span class="w"> </span><span class="k">row</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="o">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------------------+</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="mi">1</span><span class="w"> </span><span class="k">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">set</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Using index</strong>，出现索引覆盖而无需回表时。</p>
+<p><strong>Using index condition</strong>，当查询语句执行会用到索引下推时。例如:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">key1</span><span class="w"> </span><span class="o">&gt;</span><span class="s1">&#39;z&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">key1</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;%b&#39;</span><span class="p">;</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="o">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+-----------------------+</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="o">|</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">select_type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">partitions</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">type</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">possible_keys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">key</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">key_len</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Extra</span><span class="w">                 </span><span class="o">|</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="o">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+-----------------------+</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s1</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="mi">303</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Using</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="k">condition</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="o">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+-----------------------+</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="mi">1</span><span class="w"> </span><span class="k">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">set</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div></p>
+<p><code>key1 &gt;'z'</code>能使用到索引，而<code>key1 LIKE '%b'</code>不能。它的执行过程是根据<code>key1 &gt;'z'</code>这个条件，定位到二级索引idx_key1中对应的二级索引记录；对于这些记录先不去回表，而是先检测是否满足<code>key1 LIKE '%b'</code>这个条件；满足条件的才执行回表操作。这个过程就叫​<strong>索引下推</strong>。</p>
+<p><strong>Using where</strong>，当全表扫描且where子句有针对该表的搜索条件时，或索引访问但where子句有索引列之外的其他搜索条件时。例如:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">key1</span><span class="w"> </span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">common_field</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;a&#39;</span><span class="p">;</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="o">+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------------+</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="o">|</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">select_type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">partitions</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">possible_keys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">key</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">key_len</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">   </span><span class="o">|</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Extra</span><span class="w">       </span><span class="o">|</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="o">+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------------+</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="o">|</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">SIMPLE</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">s1</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NULL</span><span class="w">       </span><span class="o">|</span><span class="w"> </span><span class="n">ref</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">idx_key1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="mi">303</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">const</span><span class="w"> </span><span class="o">|</span><span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">|</span><span class="w">   </span><span class="mf">100.00</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">Using</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="o">|</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="o">+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------------+</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="mi">1</span><span class="w"> </span><span class="k">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">set</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">warning</span><span class="w"> </span><span class="p">(</span><span class="mf">0.00</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Using join buffer (Block Nested Loop)</strong>，连接查询时，被驱动表不能有效利用索引加快访问速度时，join buffer可以减少访问被驱动表的次数。</p>
+<p><strong>Not exists</strong>，使用外连接时，where子句要求被驱动表某列为NULL，但该列不允许存NULL值时。</p>
+<p><strong>Using intersect(...)、Using union(...)、Usingsort_union(...)</strong>，索引合并时会出现。</p>
+<p><strong>Zero limit</strong>，当我们的LIMIT子句的参数为0时，表示压根儿不打算从表中读出任何记录。</p>
+<p><strong>Using filesort</strong>，当无法使用索引排序，只能使用内存或硬盘排序时。</p>
+<p><strong>Using temporary</strong>，当查询执行可能借助临时表来完成一些功能，如去重、排序之类的时。</p>
+<p><strong>Start temporary, End temporary，LooseScan，FirstMatch(tbl_name)</strong>，查询优化器会尝试将IN子查询转换成semi-join，当semi-join的执行策略为DuplicateWeedout时，驱动表显示Start temporary，被驱动表显示End temporary；当semi-join的执行策略是LooseScan时，就显示LooseScan；当semi-join的执行策略是FirstMatch时，就显示FirstMatch(tbl_name)。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/hjlarry" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:ultrahe@gmail.com" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M64 112c-8.8 0-16 7.2-16 16v22.1l172.5 141.6c20.7 17 50.4 17 71.1 0L464 150.1V128c0-8.8-7.2-16-16-16H64zM48 212.2V384c0 8.8 7.2 16 16 16h384c8.8 0 16-7.2 16-16V212.2L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128c0-35.3 28.7-64 64-64h384c35.3 0 64 28.7 64 64v256c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/hjlarry" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://paypal.me/hjlarry" target="_blank" rel="noopener" title="paypal.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M111.4 295.9c-3.5 19.2-17.4 108.7-21.5 134-.3 1.8-1 2.5-3 2.5H12.3c-7.6 0-13.1-6.6-12.1-13.9L58.8 46.6c1.5-9.6 10.1-16.9 20-16.9 152.3 0 165.1-3.7 204 11.4 60.1 23.3 65.6 79.5 44 140.3-21.5 62.6-72.5 89.5-140.1 90.3-43.4.7-69.5-7-75.3 24.2zM357.1 152c-1.8-1.3-2.5-1.8-3 1.3-2 11.4-5.1 22.5-8.8 33.6-39.9 113.8-150.5 103.9-204.5 103.9-6.1 0-10.1 3.3-10.9 9.4-22.6 140.4-27.1 169.7-27.1 169.7-1 7.1 3.5 12.9 10.6 12.9h63.5c8.6 0 15.7-6.3 17.4-14.9.7-5.4-1.1 6.1 14.4-91.3 4.6-22 14.3-19.7 29.3-19.7 71 0 126.4-28.8 142.9-112.3 6.5-34.8 4.6-71.4-23.8-92.6z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.annotate", "content.tabs.link", "content.tooltips", "navigation.indexes", "navigation.sections", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      
+    
+  </body>
+</html>

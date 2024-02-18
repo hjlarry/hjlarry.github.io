@@ -1,0 +1,1883 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="非法操作">
+      
+      
+        <link rel="canonical" href="https://hjlarry.github.io/other/shell/">
+      
+      
+        <link rel="prev" href="../raft/">
+      
+      
+        <link rel="next" href="../security/">
+      
+      
+      <link rel="icon" href="../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.9">
+    
+    
+      
+        <title>shell - 非法操作的笔记</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.f2e4d321.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#shell" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="非法操作的笔记" class="md-header__button md-logo" aria-label="非法操作的笔记" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            非法操作的笔记
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              shell
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="white"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/hjlarry/hjlarry.github.io" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hjlarry/hjlarry.github.io
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="非法操作的笔记" class="md-nav__button md-logo" aria-label="非法操作的笔记" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    非法操作的笔记
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/hjlarry/hjlarry.github.io" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hjlarry/hjlarry.github.io
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    计算机基础
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            计算机基础
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/hardware/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    硬件
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/software/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    软件
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/program/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    程序
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/asm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    汇编
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    GO语言
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            GO语言
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/map/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    字典
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/closure/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    闭包
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/defer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    延迟调用
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/goroutine/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    并发调度
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/alloc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    内存分配
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/gc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    垃圾回收
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/lock/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    锁
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Python语言
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Python语言
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/memory/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    内存管理
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/interpreter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    解释器
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    技巧工具
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    MySQL
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            MySQL
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mysql/query/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    查询
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mysql/theory/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    原理
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    其他
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            其他
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ai/gai/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../git/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    git
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../raft/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    raft
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    shell
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    shell
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#shell_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      什么是shell
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      基础使用
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="基础使用">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      基础技巧
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      程序间的连接
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#root" class="md-nav__link">
+    <span class="md-ellipsis">
+      root
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      编写脚本
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="编写脚本">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      变量
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      函数
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      命令替换
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      控制流
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      通配符
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      脚本
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      任务控制
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      常用工具
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="常用工具">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#find" class="md-nav__link">
+    <span class="md-ellipsis">
+      find
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grep" class="md-nav__link">
+    <span class="md-ellipsis">
+      grep
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    security
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oop/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    面向对象
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../protocol/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    网络协议
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    系统工具
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#shell_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      什么是shell
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      基础使用
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="基础使用">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      基础技巧
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      程序间的连接
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#root" class="md-nav__link">
+    <span class="md-ellipsis">
+      root
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      编写脚本
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="编写脚本">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      变量
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      函数
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      命令替换
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      控制流
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      通配符
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      脚本
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      任务控制
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      常用工具
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="常用工具">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#find" class="md-nav__link">
+    <span class="md-ellipsis">
+      find
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grep" class="md-nav__link">
+    <span class="md-ellipsis">
+      grep
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="shell">Shell<a class="headerlink" href="#shell" title="Permanent link">&para;</a></h1>
+<h2 id="shell_1">什么是shell<a class="headerlink" href="#shell_1" title="Permanent link">&para;</a></h2>
+<p>现代计算机有越来越多的GUI程序、语音输入程序、甚至VR、AR程序，这些交互方式能解决我们80%的使用场景，但它们还是从根本上限制了我们使用计算机的方式，你没法点击一个不存在的按钮。为了充分利用计算机的能力，我们不得不回到最根本的方式，即​<strong>shell</strong>。</p>
+<p>所以，shell也是一种交互方式，有很多种类型的shell，例如系统自带的Windows的powershell、Linux的bash(Bourne-Again SHell)，还有开发者编写的zsh(Z Shell)、fish等都比较常见。</p>
+<h2 id="_1">基础使用<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h3 id="_2">基础技巧<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p><code>$</code>表示当前不是root用户，<code>#</code>表示当前是root用户。</p>
+<p>除了内置的函数，shell通过递归<code>$PATH</code>中的目录找到合适的执行程序:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/<span class="w"> </span>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$PATH</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>/usr/local/go/bin:/root/go/bin:/usr/local/go/bin:/root/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/<span class="w"> </span>$<span class="w"> </span>which<span class="w"> </span><span class="nb">echo</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>/bin/echo
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/<span class="w"> </span>$<span class="w"> </span>/bin/echo<span class="w"> </span><span class="nv">$PATH</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>/usr/local/go/bin:/root/go/bin:/usr/local/go/bin:/root/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+</code></pre></div></p>
+<p>当传递的参数包含空格时，应该使用单引号或双引号将其包起来，或者使用<code>\</code>转义一下，否则会被认为是两个参数:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>~<span class="w"> </span>$<span class="w"> </span>mkdir<span class="w"> </span>My<span class="w"> </span>Photo
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>~<span class="w"> </span>$<span class="w"> </span>ls
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>My<span class="w">  </span>Photo<span class="w">  </span>go1.13.linux-amd64.tar.gz
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>~<span class="w"> </span>$<span class="w"> </span>mkdir<span class="w"> </span>My<span class="se">\ </span>Photo
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>~<span class="w"> </span>$<span class="w"> </span>ls
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w"> </span>My<span class="w">  </span><span class="s1">&#39;My Photo&#39;</span><span class="w">   </span>Photo<span class="w">   </span>go1.13.linux-amd64.tar.gz
+</code></pre></div></p>
+<p><code>/</code>表示根目录，<code>~</code>表示home目录，<code>.</code>表示当前目录，<code>..</code>表示上级目录，还可以使用<code>-</code>来切换目录:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>~<span class="w"> </span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/tmp
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp<span class="w"> </span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>-
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>/root
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>~<span class="w"> </span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>-
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>/tmp
+</code></pre></div></p>
+<h3 id="_3">程序间的连接<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>在shell中，程序都有两个主要的流，即输入流和输出流。当程序需要读取数据时就是从输入流读取，这通常是你的键盘；当程序需要打印信息时，它会将信息放在输出流中，这通常是你的屏幕。然而我们也可以修改默认的输入输出流。</p>
+<p>例如，通过<code>&gt; file</code>我们可以把输出流的内容放在一个文件中，通过<code>&lt; file</code>我们可以从一个文件中读取内容作为输入流:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp<span class="w"> </span>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;hello world&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>hello.txt
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp<span class="w"> </span>$<span class="w"> </span>cat<span class="w"> </span>&lt;<span class="w"> </span>hello.txt<span class="w"> </span>&gt;<span class="w"> </span>hello2.txt
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp<span class="w"> </span>$<span class="w"> </span>cat<span class="w"> </span>hello2.txt
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>hello<span class="w"> </span>world
+</code></pre></div>
+也可以通过<code>&gt;&gt; file</code>把输出流的内容追加到文件的尾部，通过<code>|</code>把前面一个程序的输出作为后一个程序的输入:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp<span class="w"> </span>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="m">1234</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>hello2.txt
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp<span class="w"> </span>$<span class="w"> </span>cat<span class="w"> </span>hello2.txt
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>hello<span class="w"> </span>world
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="m">1234</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp<span class="w"> </span>$<span class="w"> </span>ls<span class="w"> </span>-l<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-n1
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>drwx------<span class="w">  </span><span class="m">2</span><span class="w"> </span>root<span class="w"> </span>root<span class="w">    </span><span class="m">4096</span><span class="w"> </span>Dec<span class="w">  </span><span class="m">6</span><span class="w">  </span><span class="m">2019</span><span class="w"> </span>tmux-0
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp<span class="w"> </span>$<span class="w"> </span>ls<span class="w"> </span>-l<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-n3
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>-rw-r--r--<span class="w">  </span><span class="m">1</span><span class="w"> </span>root<span class="w"> </span>root<span class="w">       </span><span class="m">1</span><span class="w"> </span>Jun<span class="w"> </span><span class="m">15</span><span class="w"> </span><span class="m">10</span>:13<span class="w"> </span>hello3.txt
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>-rwxr-xr-x<span class="w">  </span><span class="m">1</span><span class="w"> </span>root<span class="w"> </span>root<span class="w"> </span><span class="m">1148709</span><span class="w"> </span>Dec<span class="w">  </span><span class="m">9</span><span class="w">  </span><span class="m">2019</span><span class="w"> </span><span class="nb">test</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>drwx------<span class="w">  </span><span class="m">2</span><span class="w"> </span>root<span class="w"> </span>root<span class="w">    </span><span class="m">4096</span><span class="w"> </span>Dec<span class="w">  </span><span class="m">6</span><span class="w">  </span><span class="m">2019</span><span class="w"> </span>tmux-0
+</code></pre></div></p>
+<h3 id="root">root<a class="headerlink" href="#root" title="Permanent link">&para;</a></h3>
+<p>在大多数类Unix系统中，<code>root</code>用户都是很特殊的用户，它几乎可以不受限制的创建、读取、修改和删除系统中的任意文件。所以我们为避免对系统造成一定的破坏，通常不会使用root用户去登录，取而代之的是在需要的时候使用<code>sudo</code>命令。</p>
+<p>例如，Linux系统的笔记本的屏幕亮度是写在<code>/sys/class/backlight</code>文件中，我们通过修改它可以修改屏幕亮度，这就需要<code>sudo</code>，我们可能做这样的尝试:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/sys/class/backlight/thinkpad_screen
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>$<span class="w"> </span>sudo<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="m">3</span><span class="w"> </span>&gt;<span class="w"> </span>brightness
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>An<span class="w"> </span>error<span class="w"> </span>occurred<span class="w"> </span><span class="k">while</span><span class="w"> </span>redirecting<span class="w"> </span>file<span class="w"> </span><span class="s1">&#39;brightness&#39;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>open:<span class="w"> </span>Permission<span class="w"> </span>denied
+</code></pre></div>
+我们依然会得到错误的没有权限的提示，这是因为shell中<code>|</code>,<code>&gt;</code>,<code>&lt;</code>，各个具体的程序是不知道他们的存在的，echo只知道把内容写入到某个输入流中，具体哪个它不知道，所以我们应该使用:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>brightness
+</code></pre></div>
+这样打开brightness的是tee这个程序，且这个程序是有root权限的，才能正确的修改。</p>
+<h2 id="_4">编写脚本<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>大多数shell都有自己的一套脚本语言，包括变量、控制流和自己的语法。本文主要使用<code>bash</code>脚本，它是目前应用最广泛的脚本。</p>
+<h3 id="_5">变量<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>可以使用<code>foo=bar</code>来定义变量foo，但要注意空格。输出变量值时，单引号和双引号也有区别:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing<span class="w"> </span>$<span class="w"> </span><span class="nv">foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>bar
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>bash:<span class="w"> </span>foo:<span class="w"> </span><span class="nb">command</span><span class="w"> </span>not<span class="w"> </span>found
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing<span class="w"> </span>$<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>bar
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing<span class="w"> </span>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;this is $foo&#39;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>this<span class="w"> </span>is<span class="w"> </span><span class="nv">$foo</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing<span class="w"> </span>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;this is </span><span class="nv">$foo</span><span class="s2">&quot;</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>this<span class="w"> </span>is<span class="w"> </span>bar
+</code></pre></div></p>
+<p>同时，bash中也提供了一些特殊的变量:
+* <code>$0</code>，脚本名
+* <code>$1</code>至<code>$9</code>，脚本的第几个参数
+* <code>$@</code>，脚本的所有参数
+* <code>$#</code>，参数的个数
+* <code>$?</code>，前一个命令的返回值
+* <code>$$</code>，返回当前脚本的进程ID(PID)
+* <code>!!</code>，表示上一条命令，提示权限不足时可以使用<code>sudo !!</code>再次执行
+* <code>$_</code>，上一条命令的最后一个参数</p>
+<p>执行一条命令后，通常使用STDOUT返回输出的值，STDERR返回错误及错误码，正常执行的错误码是0，也就是<code>$?</code>得到的值。</p>
+<h3 id="_6">函数<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>可以在一个脚本中编写函数:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>mcd<span class="w"> </span><span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="o">}</span>
+</code></pre></div></p>
+<p>然后使用source导入就可以使用该函数:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing<span class="w"> </span>$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>./test.sh
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing<span class="w"> </span>$<span class="w"> </span>mcd<span class="w"> </span>tt
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$
+</code></pre></div></p>
+<h3 id="_7">命令替换<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p>可以通过<code>$(CMD)</code>的方式先来执行CMD，执行得到的结果替换掉$(CMD)。例如，<code>for file in $(ls)</code>使shell首先调用ls，然后遍历得到的这些返回值。此外，还可以通过<code>&lt;(CMD)</code>去先执行CMD，然后将结果输出到一个临时文件中，并将&lt;(CMD)替换成临时文件名。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp<span class="w"> </span>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Starting program at </span><span class="k">$(</span>date<span class="k">)</span><span class="s2">&quot;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>Starting<span class="w"> </span>program<span class="w"> </span>at<span class="w"> </span>Wed<span class="w"> </span>Jun<span class="w"> </span><span class="m">17</span><span class="w"> </span><span class="m">16</span>:13:34<span class="w"> </span>CST<span class="w"> </span><span class="m">2020</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp<span class="w"> </span>$<span class="w"> </span>diff<span class="w"> </span>&lt;<span class="o">(</span>ls<span class="w"> </span>go<span class="o">)</span><span class="w"> </span>&lt;<span class="o">(</span>ls<span class="w"> </span>missing<span class="o">)</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="m">1</span>,18c1,4
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>&lt;<span class="w"> </span>AUTHORS
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>&lt;<span class="w"> </span>CONTRIBUTING.md
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>...
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>---
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>&gt;<span class="w"> </span><span class="m">3</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>&gt;<span class="w"> </span>semester
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>&gt;<span class="w"> </span>test.sh
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>&gt;<span class="w"> </span>tt
+</code></pre></div></p>
+<h3 id="_8">控制流<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<p>我们先来看一个例子:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Starting program at </span><span class="k">$(</span>date<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="c1"># Date will be substituted</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Running program </span><span class="nv">$0</span><span class="s2"> with </span><span class="nv">$#</span><span class="s2"> arguments with pid </span><span class="nv">$$</span><span class="s2">&quot;</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="k">for</span><span class="w"> </span>file<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">    </span>grep<span class="w"> </span>foobar<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$file</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="w"> </span>/dev/null
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="c1"># When pattern is not found, grep has exit status 1</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">    </span><span class="c1"># We redirect STDOUT and STDERR to a null register since we do not care about them</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;File </span><span class="nv">$file</span><span class="s2"> does not have any foobar, adding one&quot;</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;# foobar&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$file</span><span class="s2">&quot;</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">    </span><span class="k">fi</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="k">done</span>
+</code></pre></div>
+例如，运行<code>./test.sh a b c</code>，则遍历a、b、c三个文件，分别去寻找<code>foobar</code>字符串，如果没找到，错误返回值就是1。接着使用<code>-ne</code>来做比较<code>$?</code>不等于0，则把<code># foobar</code>追加到这个文件中。</p>
+<p>注意，做比较时尽量使用双方括号<code>[[]]</code>，而非单方括号，可以降低犯错的几率。具体的原因和其他比较条件可参考<a href="http://mywiki.wooledge.org/BashFAQ/031" target="_blank">此文章</a>。</p>
+<h3 id="_9">通配符<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<p>在shell中，可能经常需要输入一批类似的参数，例如<code>mkdir foo1 foo2 foo3</code>等等，如果挨个输入会很不方便，因此有了通配符。</p>
+<p>可以分别使用<code>?</code>和<code>*</code>来匹配一个或任意个字符，花括号<code>{}</code>中可以包含一系列的指令。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>touch<span class="w"> </span>foo<span class="o">{</span><span class="m">1</span>..20<span class="o">}</span>.txt
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>ls
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>foo1.txt<span class="w">   </span>foo11.txt<span class="w">  </span>foo13.txt<span class="w">  </span>foo15.txt<span class="w">  </span>foo17.txt<span class="w">  </span>foo19.txt<span class="w">  </span>foo20.txt<span class="w">  </span>foo4.txt<span class="w">  </span>foo6.txt<span class="w">  </span>foo8.txt
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>foo10.txt<span class="w">  </span>foo12.txt<span class="w">  </span>foo14.txt<span class="w">  </span>foo16.txt<span class="w">  </span>foo18.txt<span class="w">  </span>foo2.txt<span class="w">   </span>foo3.txt<span class="w">   </span>foo5.txt<span class="w">  </span>foo7.txt<span class="w">  </span>foo9.txt
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>rm<span class="w"> </span>foo?
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>rm:<span class="w"> </span>cannot<span class="w"> </span>remove<span class="w"> </span><span class="s1">&#39;foo?&#39;</span>:<span class="w"> </span>No<span class="w"> </span>such<span class="w"> </span>file<span class="w"> </span>or<span class="w"> </span>directory
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>rm<span class="w"> </span>foo?.txt
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>ls
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>foo10.txt<span class="w">  </span>foo11.txt<span class="w">  </span>foo12.txt<span class="w">  </span>foo13.txt<span class="w">  </span>foo14.txt<span class="w">  </span>foo15.txt<span class="w">  </span>foo16.txt<span class="w">  </span>foo17.txt<span class="w">  </span>foo18.txt<span class="w">  </span>foo19.txt<span class="w">  </span>foo20.txt
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>rm<span class="w"> </span>foo*
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>ls
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>mkdir<span class="w"> </span><span class="o">{</span>foo,bar<span class="o">}</span><span class="m">123</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>ls
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>bar123<span class="w">  </span>foo123
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>touch<span class="w"> </span><span class="o">{</span>foo,bar<span class="o">}</span><span class="m">123</span>/<span class="o">{</span>a..h<span class="o">}</span>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>ls<span class="w"> </span>bar123
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>a<span class="w">  </span>b<span class="w">  </span>c<span class="w">  </span>d<span class="w">  </span>e<span class="w">  </span>f<span class="w">  </span>g<span class="w">  </span>h
+</code></pre></div></p>
+<h3 id="_10">脚本<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<p>脚本也可以使用其他语言编写，只要标记好<code>shebang</code>，例如:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="ch">#!/usr/local/bin/python</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="kn">import</span> <span class="nn">sys</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+</code></pre></div></p>
+<p>写完以后要赋予它权限，才能正确执行:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>./test.py
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>bash:<span class="w"> </span>./test.py:<span class="w"> </span>Permission<span class="w"> </span>denied
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>chmod<span class="w"> </span>a+x<span class="w"> </span>test.py
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>/tmp/missing/tt<span class="w"> </span>$<span class="w"> </span>./test.py<span class="w"> </span>a<span class="w"> </span>n<span class="w"> </span>cs
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>cs
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>n
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>a
+</code></pre></div></p>
+<p>但是其他电脑的python程序并不一定位于<code>/usr/local/bin/python</code>，如何让这个脚本通用呢？我们可以利用环境变量中的程序来解析该脚本，将shebang信息改为<code>#!/usr/bin/env python</code>即可。</p>
+<p>此外，shell函数和脚本是有一些不同点的:
+* 函数只能用shell语言，脚本可以用任意语言，只要脚本中包含shebang就行
+* 函数仅在定义时被加载，脚本是在每次执行时加载的。所以函数的加载略快，但每次修改得自己手动重新加载
+* 函数会在当前的shell环境中执行，脚本会在单独的进程中执行
+* 函数可以对环境变量直接进行修改，脚本则只能使用<code>export</code>将环境变量导出</p>
+<p><strong>那么使用<code>source script.sh</code>和<code>./script.sh</code>执行脚本有什么区别呢？</strong><br />
+实际上使用source命令是在当前shell的session中执行脚本，该脚本中执行的任何对当前环境的更改都会留存在当前会话中；而如果直接执行./script.sh的话，当前的shell会新建一个新的session，并在该session中执行命令，执行完成后对原session没有影响。</p>
+<h2 id="_11">任务控制<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<p>shell使用UNIX提供的信号机制来执行进程间的通信。当一个进程接收到信号时，它会停止执行、处理该信号并基于信号传递的信息来改变其执行，所以信号相当于是软件中断。</p>
+<p>例如当我们在键盘上输入<code>Ctrl-C</code>时，shell会发送一个<code>SIGINT</code>信号到进程，来终止这个程序。当然，进程中是可以捕获信号去做别的处理的，例如:
+<div class="highlight"><span class="filename">sigint.py</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="ch">#!/usr/bin/env python</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kn">import</span> <span class="nn">signal</span><span class="o">,</span> <span class="nn">time</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="n">signum</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">I got a SIGINT, but I am not stopping&quot;</span><span class="p">)</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">handler</span><span class="p">)</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">.1</span><span class="p">)</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div>
+此时，我们通过<code>Ctrl-C</code>就已经无法终止该程序了:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>$<span class="w"> </span>python<span class="w"> </span>sigint.py
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="m">24</span>^C
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>I<span class="w"> </span>got<span class="w"> </span>a<span class="w"> </span>SIGINT,<span class="w"> </span>but<span class="w"> </span>I<span class="w"> </span>am<span class="w"> </span>not<span class="w"> </span>stopping
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="m">26</span>^C
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>I<span class="w"> </span>got<span class="w"> </span>a<span class="w"> </span>SIGINT,<span class="w"> </span>but<span class="w"> </span>I<span class="w"> </span>am<span class="w"> </span>not<span class="w"> </span>stopping
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="m">30</span>^<span class="se">\[</span><span class="m">1</span><span class="o">]</span><span class="w">    </span><span class="m">39913</span><span class="w"> </span>quit<span class="w">       </span>python<span class="w"> </span>sigint.py
+</code></pre></div>
+我们可以通过发送其他中断信号来停止该程序，例如<code>SIGQUIT</code>或<code>SIGTERM</code>等。那么如果一个程序捕获了所有的信号，是不是它就无法被外部停止了？实际上有一个特殊的信号<code>SIGKILL</code>是无法被捕获的，也就是我们经常使用的<code>kill -9 &lt;pid&gt;</code>发出的信号。</p>
+<p>通过<code>man signal</code>能查看到信号的更多详细信息，<code>kill -l</code>显示出信号列表，然后<code>kill -&lt;信号名称&gt; &lt;pid&gt;</code>发送某个信号。</p>
+<p>我们可以使用命令加一个后缀<code>&amp;</code>来让该命令在后台运行，然后通过<code>jobs</code>命令能列出当前shell会话中未完成的全部任务。但后台进程仍然是当前终端会话进程的子进程，一旦关闭终端就会发送一个信号<code>SIGHUP</code>导致这些后台的进程被终止掉，命令前加<code>nohup</code>就是用来防止这种情况的。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>$<span class="w"> </span>sleep<span class="w"> </span><span class="m">1000</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>^Z<span class="w">      </span><span class="c1"># 使用ctrl+Z发送了一个SIGTSTP信号从而暂停了任务</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w">  </span>+<span class="w"> </span><span class="m">18653</span><span class="w"> </span>suspended<span class="w">  </span>sleep<span class="w"> </span><span class="m">1000</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>$<span class="w"> </span>nohup<span class="w"> </span>sleep<span class="w"> </span><span class="m">2000</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="o">[</span><span class="m">2</span><span class="o">]</span><span class="w"> </span><span class="m">18745</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>appending<span class="w"> </span>output<span class="w"> </span>to<span class="w"> </span>nohup.out
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>$<span class="w"> </span><span class="nb">jobs</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w">  </span>+<span class="w"> </span>suspended<span class="w">  </span>sleep<span class="w"> </span><span class="m">1000</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="o">[</span><span class="m">2</span><span class="o">]</span><span class="w">  </span>-<span class="w"> </span>running<span class="w">    </span>nohup<span class="w"> </span>sleep<span class="w"> </span><span class="m">2000</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>$<span class="w"> </span><span class="nb">bg</span><span class="w"> </span>%1<span class="w">     </span><span class="c1"># 后台接着启动暂停中的1号任务，也可以使用fg来前台启动</span>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w">  </span>-<span class="w"> </span><span class="m">18653</span><span class="w"> </span>continued<span class="w">  </span>sleep<span class="w"> </span><span class="m">1000</span>
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>$<span class="w"> </span><span class="nb">jobs</span>
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w">  </span>-<span class="w"> </span>running<span class="w">    </span>sleep<span class="w"> </span><span class="m">1000</span>
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="o">[</span><span class="m">2</span><span class="o">]</span><span class="w">  </span>+<span class="w"> </span>running<span class="w">    </span>nohup<span class="w"> </span>sleep<span class="w"> </span><span class="m">2000</span>
+<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a>
+<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a>$<span class="w"> </span><span class="nb">kill</span><span class="w"> </span>-SIGHUP<span class="w"> </span>%1<span class="w">   </span><span class="c1"># 也可以使用%任务编号的形式，不一定要用PID</span>
+<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w">  </span>+<span class="w"> </span><span class="m">18653</span><span class="w"> </span>hangup<span class="w">     </span>sleep<span class="w"> </span><span class="m">1000</span>
+<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a>
+<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a>$<span class="w"> </span><span class="nb">jobs</span>
+<a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a><span class="o">[</span><span class="m">2</span><span class="o">]</span><span class="w">  </span>+<span class="w"> </span>running<span class="w">    </span>nohup<span class="w"> </span>sleep<span class="w"> </span><span class="m">2000</span>
+</code></pre></div></p>
+<h2 id="_12">常用工具<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
+<p>可以使用<code>man</code>程序来查看一些其他shell程序的使用方法和参数，例如<code>man ls</code>。</p>
+<p>常用的开发编译相关工具可参考<a href="../tools/">这篇文章</a>。</p>
+<h3 id="find">find<a class="headerlink" href="#find" title="Permanent link">&para;</a></h3>
+<p>使用<code>find 起始目录 参数</code>可以方便的查找文件，常用的参数为:</p>
+<ul>
+<li>-name，按文件名，-iname也是按文件名但可忽略大小写</li>
+<li>-type，按文件类型，d为目录，f为文件</li>
+<li>-perm，按权限，例如0755</li>
+<li>-user，按所属用户查找</li>
+<li>-group，按所属用户组查找</li>
+<li>-mtime，按修改时间查找，+表示以前，-表示以内，在mac下，<code>-1d2h</code>表示1天2小时以内修改过的文件，在linux下只能跟一个数字，例如<code>-1</code>表示1天内，如果需要多少分钟内应该用-mmin</li>
+<li>-size，按大小查找，+表示大于，-表示小于，可以跟单位k、M、G、T</li>
+<li>-maxdepth，指定最大搜索深度</li>
+<li>-executable，可执行文件</li>
+<li>-exec，执行相关命令</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># 文件名匹配ind*.html的文件</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>➜<span class="w">  </span>hjlarry.github.io<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>find<span class="w"> </span>.<span class="w"> </span>-iname<span class="w"> </span>ind*.html
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>./tags/index.html
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>./docs/sicp/software-introduction/index.html
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1"># 文件修改时间在2小时内的文件</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>➜<span class="w">  </span>hjlarry.github.io<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-mmin<span class="w"> </span>-120<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span>ls<span class="w"> </span>-lh
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>-rw-rw-rw-<span class="w"> </span><span class="m">1</span><span class="w"> </span>hejl<span class="w"> </span>hejl<span class="w">   </span><span class="m">98</span><span class="w"> </span>May<span class="w"> </span><span class="m">24</span><span class="w"> </span><span class="m">10</span>:12<span class="w"> </span>./.git/FETCH_HEAD
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>-rw-r--r--<span class="w"> </span><span class="m">1</span><span class="w"> </span>hejl<span class="w"> </span>hejl<span class="w">   </span><span class="m">41</span><span class="w"> </span>May<span class="w"> </span><span class="m">24</span><span class="w"> </span><span class="m">10</span>:12<span class="w"> </span>./.git/ORIG_HEAD
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="c1"># 文件大小大于2M的文件</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>➜<span class="w">  </span>hjlarry.github.io<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-size<span class="w"> </span>+2M<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span>ls<span class="w"> </span>-lh
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>-r--r--r--<span class="w"> </span><span class="m">1</span><span class="w"> </span>hejl<span class="w"> </span>hejl<span class="w"> </span><span class="m">5</span>.7M<span class="w"> </span>Apr<span class="w">  </span><span class="m">4</span><span class="w"> </span><span class="m">17</span>:41<span class="w"> </span>./.git/modules/themes/book/objects/pack/pack-3a8d2ad7db7fe81a41409e60d27dce22b77b6c68.pack
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>-r--r--r--<span class="w"> </span><span class="m">1</span><span class="w"> </span>hejl<span class="w"> </span>hejl<span class="w"> </span><span class="m">3</span>.0M<span class="w"> </span>Apr<span class="w"> </span><span class="m">20</span><span class="w"> </span><span class="m">14</span>:36<span class="w"> </span>./.git/objects/pack/pack-472a07bf934d028116265bd13cbea79d367c5e90.pack
+</code></pre></div>
+<h3 id="grep">grep<a class="headerlink" href="#grep" title="Permanent link">&para;</a></h3>
+<p>使用该命令可以从文件或管道中查找具体的内容，其支持多文件名，支持通配符，内容匹配时支持正则表达式。常用的参数为:</p>
+<ul>
+<li>-r，递归搜索所有子目录</li>
+<li>-l，仅输出文件名</li>
+<li>-n，输出行号</li>
+<li>-c，按文件统计匹配次数</li>
+<li>-v，排除指定内容</li>
+<li>-i，忽略大小写</li>
+<li>-e，多模式匹配，命中其一即可</li>
+<li>-An，输出其后n行内容</li>
+<li>-Bn，输出其前n行内容</li>
+<li>-Cn，输出其前后n行内容</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>~/.mac<span class="w"> </span>$<span class="w"> </span>grep<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="w"> </span>*
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>alpine.sh:0
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>grep:<span class="w"> </span>assem:<span class="w"> </span>Is<span class="w"> </span>a<span class="w"> </span>directory
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>test.c:1
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>test.go:2
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>tt:17
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>~/.mac<span class="w"> </span>$<span class="w"> </span>grep<span class="w"> </span>-n<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;\bmain&quot;</span><span class="w"> </span>*.go
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="m">1</span>:package<span class="w"> </span>main
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="m">5</span>:func<span class="w"> </span>main<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="o">[</span>ubuntu<span class="o">]</span><span class="w"> </span>~/.mac<span class="w"> </span>$<span class="w"> </span>objdump<span class="w"> </span>-d<span class="w"> </span>-M<span class="w"> </span>intel<span class="w"> </span><span class="nb">test</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-A3<span class="w"> </span><span class="s2">&quot;&lt;main.main&gt;&quot;</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="m">0000000000452330</span><span class="w"> </span>&lt;main.main&gt;:
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">  </span><span class="m">452330</span>:<span class="w">   </span><span class="m">64</span><span class="w"> </span><span class="m">48</span><span class="w"> </span>8b<span class="w"> </span>0c<span class="w"> </span><span class="m">25</span><span class="w"> </span>f8<span class="w"> </span>ff<span class="w">    </span>mov<span class="w">    </span>rcx,QWORD<span class="w"> </span>PTR<span class="w"> </span>fs:0xfffffffffffffff8
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="w">  </span><span class="m">452337</span>:<span class="w">   </span>ff<span class="w"> </span>ff
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="w">  </span><span class="m">452339</span>:<span class="w">   </span><span class="m">48</span><span class="w"> </span>3b<span class="w"> </span><span class="m">61</span><span class="w"> </span><span class="m">10</span><span class="w">             </span>cmp<span class="w">    </span>rsp,QWORD<span class="w"> </span>PTR<span class="w"> </span><span class="o">[</span>rcx+0x10<span class="o">]</span>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a>--
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a><span class="w">  </span>4523ae:<span class="w">   </span>eb<span class="w"> </span><span class="m">80</span><span class="w">                   </span>jmp<span class="w">    </span><span class="m">452330</span><span class="w"> </span>&lt;main.main&gt;
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/hjlarry" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:ultrahe@gmail.com" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M64 112c-8.8 0-16 7.2-16 16v22.1l172.5 141.6c20.7 17 50.4 17 71.1 0L464 150.1V128c0-8.8-7.2-16-16-16H64zM48 212.2V384c0 8.8 7.2 16 16 16h384c8.8 0 16-7.2 16-16V212.2L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128c0-35.3 28.7-64 64-64h384c35.3 0 64 28.7 64 64v256c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/hjlarry" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://paypal.me/hjlarry" target="_blank" rel="noopener" title="paypal.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M111.4 295.9c-3.5 19.2-17.4 108.7-21.5 134-.3 1.8-1 2.5-3 2.5H12.3c-7.6 0-13.1-6.6-12.1-13.9L58.8 46.6c1.5-9.6 10.1-16.9 20-16.9 152.3 0 165.1-3.7 204 11.4 60.1 23.3 65.6 79.5 44 140.3-21.5 62.6-72.5 89.5-140.1 90.3-43.4.7-69.5-7-75.3 24.2zM357.1 152c-1.8-1.3-2.5-1.8-3 1.3-2 11.4-5.1 22.5-8.8 33.6-39.9 113.8-150.5 103.9-204.5 103.9-6.1 0-10.1 3.3-10.9 9.4-22.6 140.4-27.1 169.7-27.1 169.7-1 7.1 3.5 12.9 10.6 12.9h63.5c8.6 0 15.7-6.3 17.4-14.9.7-5.4-1.1 6.1 14.4-91.3 4.6-22 14.3-19.7 29.3-19.7 71 0 126.4-28.8 142.9-112.3 6.5-34.8 4.6-71.4-23.8-92.6z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.annotate", "content.tabs.link", "content.tooltips", "navigation.indexes", "navigation.sections", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      
+    
+  </body>
+</html>

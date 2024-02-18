@@ -1,0 +1,2374 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="非法操作">
+      
+      
+        <link rel="canonical" href="https://hjlarry.github.io/other/git/">
+      
+      
+        <link rel="prev" href="../../ai/gai/">
+      
+      
+        <link rel="next" href="../docker/">
+      
+      
+      <link rel="icon" href="../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.9">
+    
+    
+      
+        <title>git - 非法操作的笔记</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.f2e4d321.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#git" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="非法操作的笔记" class="md-header__button md-logo" aria-label="非法操作的笔记" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            非法操作的笔记
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              git
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="white"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/hjlarry/hjlarry.github.io" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hjlarry/hjlarry.github.io
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="非法操作的笔记" class="md-nav__button md-logo" aria-label="非法操作的笔记" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    非法操作的笔记
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/hjlarry/hjlarry.github.io" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hjlarry/hjlarry.github.io
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    计算机基础
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            计算机基础
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/hardware/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    硬件
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/software/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    软件
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/program/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    程序
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sicp/asm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    汇编
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    GO语言
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            GO语言
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/map/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    字典
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/closure/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    闭包
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/defer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    延迟调用
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/goroutine/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    并发调度
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/alloc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    内存分配
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/gc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    垃圾回收
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../go/lock/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    锁
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Python语言
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Python语言
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/memory/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    内存管理
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/interpreter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    解释器
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    技巧工具
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    MySQL
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            MySQL
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mysql/query/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    查询
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mysql/theory/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    原理
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    其他
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            其他
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ai/gai/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    git
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    git
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      原理
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="原理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      区域
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      对象
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="对象">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#blob" class="md-nav__link">
+    <span class="md-ellipsis">
+      blob
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commit" class="md-nav__link">
+    <span class="md-ellipsis">
+      commit
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      tree
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      tag
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      引用
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="引用">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      分支引用
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#head" class="md-nav__link">
+    <span class="md-ellipsis">
+      HEAD引用
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      标签引用
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      远程引用
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      常用操作
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="常用操作">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      合并
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="合并">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fast-forward" class="md-nav__link">
+    <span class="md-ellipsis">
+      FAST-FORWARD
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      三方合并
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      变基
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="变基">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      交互式变基
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      常用命令
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      其他技巧
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="其他技巧">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cherry-pick" class="md-nav__link">
+    <span class="md-ellipsis">
+      cherry-pick
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reflog" class="md-nav__link">
+    <span class="md-ellipsis">
+      reflog
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#submodule" class="md-nav__link">
+    <span class="md-ellipsis">
+      submodule
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      工作流
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="工作流">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#git-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Flow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Github Flow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitlab-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gitlab Flow
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    <span class="md-ellipsis">
+      FAQ
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      相关链接
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../raft/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    raft
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../shell/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    shell
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    security
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oop/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    面向对象
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../protocol/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    网络协议
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    系统工具
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      原理
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="原理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      区域
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      对象
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="对象">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#blob" class="md-nav__link">
+    <span class="md-ellipsis">
+      blob
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commit" class="md-nav__link">
+    <span class="md-ellipsis">
+      commit
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      tree
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      tag
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      引用
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="引用">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      分支引用
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#head" class="md-nav__link">
+    <span class="md-ellipsis">
+      HEAD引用
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      标签引用
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      远程引用
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      常用操作
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="常用操作">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      合并
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="合并">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fast-forward" class="md-nav__link">
+    <span class="md-ellipsis">
+      FAST-FORWARD
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      三方合并
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      变基
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="变基">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      交互式变基
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      常用命令
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      其他技巧
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="其他技巧">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cherry-pick" class="md-nav__link">
+    <span class="md-ellipsis">
+      cherry-pick
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reflog" class="md-nav__link">
+    <span class="md-ellipsis">
+      reflog
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#submodule" class="md-nav__link">
+    <span class="md-ellipsis">
+      submodule
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      工作流
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="工作流">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#git-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Flow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Github Flow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitlab-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gitlab Flow
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    <span class="md-ellipsis">
+      FAQ
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      相关链接
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="git">Git原理和技巧<a class="headerlink" href="#git" title="Permanent link">&para;</a></h1>
+<p>Git本质上是一个内容寻址(content-addressable)文件系统，并在此之上提供了一个版本控制系统的用户界面。了解底层原理，可以更好的帮助我们理清思路，知道真正在操作什么，而不会迷失在大量的指令和参数上。</p>
+<h2 id="_1">原理<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h3 id="_2">区域<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>工作区(Working Directory)，就是我们在电脑里看到的目录，我们对文件进行增、改、删都发生在这个目录中。</p>
+<p>在这里目录中，有一个隐藏目录<code>.git</code>就是git的版本库(Repository)。</p>
+<p>版本库中存了很多东西，其中还有一片区域，一般为<code>.git/index</code>文件，我们称为stage(或index)暂存区。</p>
+<p>再加上远程仓库，例如github上的repo，我们平时做的大量操作都是把文件在这四个区域之间相互移动。
+<img alt="area" src="../images/area.jpg" /></p>
+<h3 id="_3">对象<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>在git中，除了<code>init</code>、<code>clone</code>等我们常用的高层命令(被称为porcelain)之外，还有一些底层命令(被称为plumbing)。例如<code>git hash-object</code>把一个文件转换为一个git对象，<code>git cat-file</code>可以打印出一个git对象。</p>
+<p>那么git对象到底是什么呢？因为Git的核心是一个内容寻址文件系统，可以理解为一个简单的键值对数据库。当我们向它插入一个任意类型的内容时，它会返回一个键值对，通过键值对能够在任意时刻再次检索到该内容。</p>
+<p>当我们初始化时，<code>.git</code>中会有一个文件夹<code>objects</code>专门存储git对象:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git<span class="w"> </span>init
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Initialized<span class="w"> </span>empty<span class="w"> </span>Git<span class="w"> </span>repository<span class="w"> </span><span class="k">in</span><span class="w"> </span>/home/hejl/testgit/.git/
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>ls<span class="w"> </span>.git
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>HEAD<span class="w">  </span>branches<span class="w">  </span>config<span class="w">  </span>description<span class="w">  </span>hooks<span class="w">  </span>info<span class="w">  </span>objects<span class="w">  </span>refs
+</code></pre></div></p>
+<p>当我们添加一项内容的时候，这个objects文件夹就会多出一个文件:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;abc&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>test.txt
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>tree<span class="w"> </span>.git/objects/
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>.git/objects/
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>├──<span class="w"> </span>8b
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>│<span class="w">   </span>└──<span class="w"> </span>aef1b4abc478178b004d62031cf7fe6db6f903
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>├──<span class="w"> </span>info
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>└──<span class="w"> </span>pack
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="m">3</span><span class="w"> </span>directories,<span class="w"> </span><span class="m">1</span><span class="w"> </span>file
+</code></pre></div>
+它的过程实际上是通过<code>sha1</code>算法计算出文件内容也就是<code>abc</code>的hash值，是一个40位的16进制的字符串，字符串的前两位作为一个文件夹名称，后38位作为文件名称。因为大多数的文件系统都讨厌单个目录中包含太多的文件，这会减慢其爬取的速度，Git用这个方法使得第一级目录最多256个。文件本身就是Git object，它的头部定义了类型，紧跟着是一个ASCII的空格(0x20)，然后是对象的大小多少字节，紧跟着一个null(0x00)，最后是对象本身的内容。整个文件通过<code>zlib</code>压缩存储。</p>
+<p>有四种类型的对象，它们分别是<code>blob</code>,<code>commit</code>,<code>tree</code>,<code>tag</code>。对象的寻址我们也可以通过伪码来表达:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>type object = blob | commit | tree | tag
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>objects = map&lt;string, object&gt;
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>def store(object):
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    id = sha1(object)
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    objects[id] = object
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>def load(id):
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    return objects[id]
+</code></pre></div>
+而每种对象的数据结果也可以通过伪码表示:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>type blob = array&lt;byte&gt;
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>type tree = map&lt;string, tree | file&gt;
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>type commit = struct{
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    parent: array&lt;commit&gt;
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    author: string
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    message: string
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    snapshot: tree
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>}
+</code></pre></div></p>
+<h4 id="blob">blob<a class="headerlink" href="#blob" title="Permanent link">&para;</a></h4>
+<p>该种类型的对象存储的原始内容，例如刚才新增的对象就是这种类型:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>cat-file<span class="w"> </span>-t<span class="w"> </span>8bae
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>blob
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>cat-file<span class="w"> </span>-p<span class="w"> </span>8bae
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>abc
+</code></pre></div>
+但它也只存储内容，例如工作区中该文件的路径、文件名称、创建时间等都不存储在这种类型的git对象中。</p>
+<h4 id="commit">commit<a class="headerlink" href="#commit" title="Permanent link">&para;</a></h4>
+<p>当我们进行一次提交操作之后，就会产生两种类型的对象，一个是tree对象稍后再说，另一个就是commit对象。它的内容包括:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;first commit&quot;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="o">[</span>master<span class="w"> </span><span class="o">(</span>root-commit<span class="o">)</span><span class="w"> </span>37b766f<span class="o">]</span><span class="w"> </span>first<span class="w"> </span>commit
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w"> </span><span class="m">1</span><span class="w"> </span>file<span class="w"> </span>changed,<span class="w"> </span><span class="m">1</span><span class="w"> </span>insertion<span class="o">(</span>+<span class="o">)</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w"> </span>create<span class="w"> </span>mode<span class="w"> </span><span class="m">100644</span><span class="w"> </span>test.txt
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>tree<span class="w"> </span>.git/objects/
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>.git/objects/
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>├──<span class="w"> </span><span class="m">37</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>│<span class="w">   </span>└──<span class="w"> </span>b766ff8084b9ea2e9a159bdb35b286a3406d3e
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>├──<span class="w"> </span>8b
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>│<span class="w">   </span>└──<span class="w"> </span>aef1b4abc478178b004d62031cf7fe6db6f903
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>├──<span class="w"> </span><span class="m">93</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>│<span class="w">   </span>└──<span class="w"> </span>4a610d6024005decae12f6ec4c242caa2a4de4
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>├──<span class="w"> </span>info
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>└──<span class="w"> </span>pack
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="m">5</span><span class="w"> </span>directories,<span class="w"> </span><span class="m">3</span><span class="w"> </span>files
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>cat-file<span class="w"> </span>-p<span class="w"> </span>37b7
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>tree<span class="w"> </span>934a610d6024005decae12f6ec4c242caa2a4de4
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>author<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;<span class="w"> </span><span class="m">1582182460</span><span class="w"> </span>+0800
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>committer<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;<span class="w"> </span><span class="m">1582182460</span><span class="w"> </span>+0800
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>first<span class="w"> </span>commit
+</code></pre></div>
+tree表示本次提交产生的另一个tree类型git对象的路径地址。author和committer大多数情况相同，但有时比如说我们把别人分支的一个commit通过<code>cherry-pick</code>加入我们的分支，这时committer是我们自己，author仍然是别人。这里author需要包含username、email(所以刚使用git时要求在gitconfig中设置用户名和邮箱)、时间戳。紧跟着是提交的message。</p>
+<p>实际上完整的commit对象的内容正是邮件的一种简单的格式，源于<a href="https://www.ietf.org/rfc/rfc2822.txt" target="_blank">RFC2822</a>。还包括一个parent，指向本次提交的父commit对象的路径地址，因为现在是第一次提交，没有parent。以及一个gpgsig，通过PGP签名了一下这个对象，通过<code>cat-file</code>看不到。</p>
+<p>也就是说我们通过<code>git log</code>查看提交日志的信息，就是一层层的递归查看父对象拿到的。</p>
+<h4 id="tree">tree<a class="headerlink" href="#tree" title="Permanent link">&para;</a></h4>
+<p>树对象解决的是文件名保存的问题，并能够将多个文件组织到一起。我们新建一次提交，添加更多内容为例:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;abcdef&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>test.txt
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>mkdir<span class="w"> </span>adir
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;123&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>adir/tt.txt
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;third commit&quot;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="o">[</span>master<span class="w"> </span>79380b0<span class="o">]</span><span class="w"> </span>third<span class="w"> </span>commit
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w"> </span><span class="m">2</span><span class="w"> </span>files<span class="w"> </span>changed,<span class="w"> </span><span class="m">2</span><span class="w"> </span>insertions<span class="o">(</span>+<span class="o">)</span>,<span class="w"> </span><span class="m">1</span><span class="w"> </span>deletion<span class="o">(</span>-<span class="o">)</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w"> </span>create<span class="w"> </span>mode<span class="w"> </span><span class="m">100644</span><span class="w"> </span>adir/tt.txt
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>cat-file<span class="w"> </span>-p<span class="w"> </span>1bc4
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="m">040000</span><span class="w"> </span>tree<span class="w"> </span>f1af0a5ebfe47de9d2d6db753088462b797b2075<span class="w">    </span>adir
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="m">100644</span><span class="w"> </span>blob<span class="w"> </span>0373d9336f8c8ee90faff225de842888e884a48b<span class="w">    </span>test.txt
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>cat-file<span class="w"> </span>-p<span class="w"> </span>f1af
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="m">100644</span><span class="w"> </span>blob<span class="w"> </span>190a18037c64c43e6b11489df4bf0b9eb6d2c9bf<span class="w">    </span>tt.txt
+</code></pre></div>
+它会把当前的目录结构打一个快照，相当于以表格的形式记录该目录下每一个目标的权限、类型(通常是文件blob，或者是文件夹变成一个新的tree对象)、哈希值(也就相当于文件路径)、文件名。</p>
+<p>也就是说，当我们通过<code>git add *</code>时会把工作区文件的文件内容生成一个blob object，并把文件名和blob的sha1等其他信息更新到暂存区的index文件中；当我们通过<code>git commit -m</code>时，git会根据index信息生成一个tree object，并创建一个新的commit object关联到这个tree。commit object的parent指向了上一个commit，当前分支的指针也会移动到新的commit结点。</p>
+<h4 id="tag">tag<a class="headerlink" href="#tag" title="Permanent link">&para;</a></h4>
+<p>git中还有一种对象类型就是tag，它通常和commit差不多。见下文<a href="#_6">标签引用</a>。</p>
+<h3 id="_4">引用<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>引用本质上就是指向某个commit的指针，它被放在<code>.gits/refs</code>目录中。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>tree<span class="w"> </span>.git/refs/
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>.git/refs/
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>├──<span class="w"> </span>heads
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>│<span class="w">   </span>└──<span class="w"> </span>master
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>└──<span class="w"> </span>tags
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="m">2</span><span class="w"> </span>directories,<span class="w"> </span><span class="m">1</span><span class="w"> </span>file
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>cat<span class="w"> </span>.git/refs/heads/master
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>79380b0625150b1b71940cfac0b2a501793eac0c
+</code></pre></div>
+其可以用伪码来表示:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>references = map&lt;string, string&gt;
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>def update_ref(name, id):
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    references[name] = id
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>def read_ref(name):
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    return references[name]
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>def load_ref(name_or_id):
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    if name_or_id in references: # 说明是name
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>        return load(references[name_or_id])
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    else:   # 说明是id
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>        return load(name_or_id)
+</code></pre></div></p>
+<h4 id="_5">分支引用<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h4>
+<p>当我们新建一个分支时，就会在<code>.git/refs/heads</code>文件夹下多一个名称为分支名称的文件，内容就是一个commit的sha。当我们提交一次commit时，当前分支的引用的commit就会自动发生改变。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>6c27f42<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>branch<span class="w"> </span>testbranch
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testbranch<span class="o">)</span><span class="w"> </span>cat<span class="w"> </span>.git/refs/heads/testbranch
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>6c27f425aae198e6c1e5098c13d352b3f27edfca
+</code></pre></div></p>
+<h4 id="head">HEAD引用<a class="headerlink" href="#head" title="Permanent link">&para;</a></h4>
+<p>它是一个符号引用，指向当前所在的分支。它位于<code>.git/HEAD</code>文件。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>cat<span class="w"> </span>.git/HEAD
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>ref:<span class="w"> </span>refs/heads/master
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>6c27
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>Note:<span class="w"> </span>checking<span class="w"> </span>out<span class="w"> </span><span class="s1">&#39;6c27&#39;</span>.
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>You<span class="w"> </span>are<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s1">&#39;detached HEAD&#39;</span><span class="w"> </span>state.
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>6c27f42<span class="o">)</span><span class="w"> </span>cat<span class="w"> </span>.git/HEAD
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>6c27f425aae198e6c1e5098c13d352b3f27edfca
+</code></pre></div>
+当我们checkout某个commit时，HEAD会指向commit，这时候称为分离头指针(Detached HEAD)状态。</p>
+<h4 id="_6">标签引用<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h4>
+<p>我们通常创建的都是轻量级标签，它只是一个引用，位于<code>.gits/refs/tags</code>文件夹下。但还可以创建另一种附注标签，它会额外创建一个tag object。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testbranch<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>tag<span class="w"> </span>testmytag
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testbranch<span class="o">)</span><span class="w"> </span>cat<span class="w"> </span>.git/refs/tags/testmytag
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>6c27f425aae198e6c1e5098c13d352b3f27edfca
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testbranch<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>tag<span class="w"> </span>-a<span class="w"> </span>v1.0<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;test my tag&quot;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testbranch<span class="o">)</span><span class="w"> </span>cat<span class="w"> </span>.git/refs/tags/v1.0
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>0ee17848727b21f3086760c6bbc38cc9a12b5e08
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testbranch<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>cat-file<span class="w"> </span>-t<span class="w"> </span>0ee1
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>tag
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testbranch<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>cat-file<span class="w"> </span>-p<span class="w"> </span>0ee1
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>object<span class="w"> </span>6c27f425aae198e6c1e5098c13d352b3f27edfca
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="nb">type</span><span class="w"> </span>commit
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>tag<span class="w"> </span>v1.0
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>tagger<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;<span class="w"> </span><span class="m">1582267013</span><span class="w"> </span>+0800
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="nb">test</span><span class="w"> </span>my<span class="w"> </span>tag
+</code></pre></div>
+标签和分支的主要区别是:</p>
+<ul>
+<li>标签可以指向任意object，而分支只能指向commit object。</li>
+<li>分支在每次提交更新时会自动更新，而标签不会。</li>
+</ul>
+<h4 id="_7">远程引用<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h4>
+<p>当我们添加一个远程仓库，或者是从远程库clone过来时，就会有远程引用，它位于<code>.git/refs/remotes</code>文件夹下。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testbranch<span class="o">)</span><span class="w"> </span>tree<span class="w"> </span>~/my_git/.git/refs/remotes
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>/home/hejl/my_git/.git/refs/remotes
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>└──<span class="w"> </span>origin
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span>├──<span class="w"> </span>HEAD
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span>└──<span class="w"> </span>master
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="m">1</span><span class="w"> </span>directory,<span class="w"> </span><span class="m">2</span><span class="w"> </span>files
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testbranch<span class="o">)</span><span class="w"> </span>cat<span class="w"> </span>~/my_git/.git/refs/remotes/origin/HEAD
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>ref:<span class="w"> </span>refs/remotes/origin/master
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testbranch<span class="o">)</span><span class="w"> </span>cat<span class="w"> </span>~/my_git/.git/refs/remotes/origin/master
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>94985c6535a5493d493ce89631c7e417f5e7ecaa
+</code></pre></div>
+远程引用和分支之间最主要的区别在于远程引用是只读的。虽然可以checkout到某个远程引用，但是Git并不会将HEAD引用指向该远程引用，这种情况仍然是分离头指针状态。 </p>
+<h2 id="_8">常用操作<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<h3 id="_9">合并<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<h4 id="fast-forward">FAST-FORWARD<a class="headerlink" href="#fast-forward" title="Permanent link">&para;</a></h4>
+<p>当试图合并两个分支时，如果顺着一个分支一路走下去能到达另一个分支，那么Git的合并只是把指针往前推进，所以叫快进模式(即Fast-forward)。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>fixbug
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>Switched<span class="w"> </span>to<span class="w"> </span>a<span class="w"> </span>new<span class="w"> </span>branch<span class="w"> </span><span class="s1">&#39;fixbug&#39;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>fixbug<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;123&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>test.txt
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>fixbug<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>fixbug<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;9th commit&quot;</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="o">[</span>fixbug<span class="w"> </span>22a449d<span class="o">]</span><span class="w"> </span>9th<span class="w"> </span>commit
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w"> </span><span class="m">1</span><span class="w"> </span>file<span class="w"> </span>changed,<span class="w"> </span><span class="m">1</span><span class="w"> </span>insertion<span class="o">(</span>+<span class="o">)</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>fixbug<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>master
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>Switched<span class="w"> </span>to<span class="w"> </span>branch<span class="w"> </span><span class="s1">&#39;master&#39;</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>merge<span class="w"> </span>fixbug
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>Updating<span class="w"> </span>c658c0b..22a449d
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>Fast-forward
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="w"> </span>test.txt<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>+
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="w"> </span><span class="m">1</span><span class="w"> </span>file<span class="w"> </span>changed,<span class="w"> </span><span class="m">1</span><span class="w"> </span>insertion<span class="o">(</span>+<span class="o">)</span>
+</code></pre></div>
+合并时，会提示Fast-forward。</p>
+<p>另外，我们往往会把远程仓库的更新<code>git pull</code>下来，这背后实际上执行了两条指令，先<code>git fetch</code>再<code>git merge</code>，这种情况一般也属于Fast-forward合并。</p>
+<h4 id="_10">三方合并<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h4>
+<p>非FAST-FORWARD情况时，就是一次三方合并。三方指的是当前分支节点、要合并的分支的节点以及它们的共同祖父节点。这种情况会把它们的内容合并起来，如果没有冲突的话会自动形成一个新的commit。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>newfeature<span class="w"> </span>HEAD~2
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>Switched<span class="w"> </span>to<span class="w"> </span>a<span class="w"> </span>new<span class="w"> </span>branch<span class="w"> </span><span class="s1">&#39;newfeature&#39;</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>newfeature<span class="o">)</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;newfeature&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>newfeature.txt
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>newfeature<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>newfeature<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;add new feature&quot;</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="o">[</span>newfeature<span class="w"> </span>68212fe<span class="o">]</span><span class="w"> </span>add<span class="w"> </span>new<span class="w"> </span>feature
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w"> </span><span class="m">1</span><span class="w"> </span>file<span class="w"> </span>changed,<span class="w"> </span><span class="m">1</span><span class="w"> </span>insertion<span class="o">(</span>+<span class="o">)</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w"> </span>create<span class="w"> </span>mode<span class="w"> </span><span class="m">100644</span><span class="w"> </span>newfeature.txt
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>newfeature<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>master
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>Switched<span class="w"> </span>to<span class="w"> </span>branch<span class="w"> </span><span class="s1">&#39;master&#39;</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>merge<span class="w"> </span>newfeature
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>Merge<span class="w"> </span>made<span class="w"> </span>by<span class="w"> </span>the<span class="w"> </span><span class="s1">&#39;recursive&#39;</span><span class="w"> </span>strategy.
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w"> </span>newfeature.txt<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>+
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="w"> </span><span class="m">1</span><span class="w"> </span>file<span class="w"> </span>changed,<span class="w"> </span><span class="m">1</span><span class="w"> </span>insertion<span class="o">(</span>+<span class="o">)</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="w"> </span>create<span class="w"> </span>mode<span class="w"> </span><span class="m">100644</span><span class="w"> </span>newfeature.txt
+</code></pre></div>
+通过<code>git log --graph</code>可以观察到日志:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>*<span class="w">   </span>commit<span class="w"> </span>979309d67d62bd2fb3beeb009c20f750d362e93a<span class="w"> </span><span class="o">(</span>HEAD<span class="w"> </span>-&gt;<span class="w"> </span>master<span class="o">)</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="p">|</span><span class="se">\ </span><span class="w"> </span>Merge:<span class="w"> </span>22a449d<span class="w"> </span>68212fe
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>Author:<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>Date:<span class="w">   </span>Sun<span class="w"> </span>Feb<span class="w"> </span><span class="m">23</span><span class="w"> </span><span class="m">21</span>:46:55<span class="w"> </span><span class="m">2020</span><span class="w"> </span>+0800
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span><span class="w">     </span>Merge<span class="w"> </span>branch<span class="w"> </span><span class="s1">&#39;newfeature&#39;</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="p">|</span><span class="w"> </span>*<span class="w"> </span>commit<span class="w"> </span>68212fef9f5e17091bcd14b4d9be713bfc2c763b<span class="w"> </span><span class="o">(</span>newfeature<span class="o">)</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>Author:<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>Date:<span class="w">   </span>Sun<span class="w"> </span>Feb<span class="w"> </span><span class="m">23</span><span class="w"> </span><span class="m">21</span>:46:34<span class="w"> </span><span class="m">2020</span><span class="w"> </span>+0800
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span><span class="w">     </span>add<span class="w"> </span>new<span class="w"> </span>feature
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>*<span class="w"> </span><span class="p">|</span><span class="w"> </span>commit<span class="w"> </span>22a449d52fe269ed7c969c179c1788f89013ac2d<span class="w"> </span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>Author:<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>Date:<span class="w">   </span>Sun<span class="w"> </span>Feb<span class="w"> </span><span class="m">23</span><span class="w"> </span><span class="m">21</span>:39:01<span class="w"> </span><span class="m">2020</span><span class="w"> </span>+0800
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span>
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span><span class="w">     </span>9th<span class="w"> </span>commit
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a><span class="p">|</span><span class="w"> </span><span class="p">|</span>
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>*<span class="w"> </span><span class="p">|</span><span class="w"> </span>commit<span class="w"> </span>c658c0b8070ec1ab7dfe53351b64da79ae939e6d
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a><span class="p">|</span>/<span class="w">  </span>Author:<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;
+<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a><span class="p">|</span><span class="w">   </span>Date:<span class="w">   </span>Sun<span class="w"> </span>Feb<span class="w"> </span><span class="m">23</span><span class="w"> </span><span class="m">16</span>:57:12<span class="w"> </span><span class="m">2020</span><span class="w"> </span>+0800
+<a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a><span class="p">|</span>
+<a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a><span class="p">|</span><span class="w">       </span>8th<span class="w"> </span>commit
+</code></pre></div>
+我们观察merge时的那个commit object会发现它是有两个parent的:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>cat-file<span class="w"> </span>-p<span class="w"> </span><span class="m">9793</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>tree<span class="w"> </span>88cab0838dc7d8ae476592dbd60b4bda86dafbd8
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>parent<span class="w"> </span>22a449d52fe269ed7c969c179c1788f89013ac2d
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>parent<span class="w"> </span>68212fef9f5e17091bcd14b4d9be713bfc2c763b
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>author<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;<span class="w"> </span><span class="m">1582465615</span><span class="w"> </span>+0800
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>committer<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;<span class="w"> </span><span class="m">1582465615</span><span class="w"> </span>+0800
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>Merge<span class="w"> </span>branch<span class="w"> </span><span class="s1">&#39;newfeature&#39;</span>
+</code></pre></div></p>
+<p>三方合并时，也经常会遇到发生冲突的情况。这时候git会暂停合并，给出提示，并在冲突的地方做出标记。我们需要手工处理，选择某个分支或者自行再做修改都可以，然后再自行<code>git add</code>和<code>git commit</code>即可。</p>
+<h3 id="_11">变基<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<p>基于之前三方合并的示例，还有一种合并分支的方法就是变基。它会在当前分支上重演一遍目标分支的历史，最后形成一个线性的提交历史。当前分支的commit object由于变更了其parent就会发生改变，而目标分支的commit object往往不会改变。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>testrebase<span class="w"> </span>HEAD~
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>Switched<span class="w"> </span>to<span class="w"> </span>a<span class="w"> </span>new<span class="w"> </span>branch<span class="w"> </span><span class="s1">&#39;testrebase&#39;</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testrebase<span class="o">)</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;testrebase&#39;</span>&gt;test.txt
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testrebase<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testrebase<span class="o">)</span><span class="w"> </span>✗<span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;test rebase&quot;</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="o">[</span>testrebase<span class="w"> </span>7f4088a<span class="o">]</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>rebase
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w"> </span><span class="m">1</span><span class="w"> </span>file<span class="w"> </span>changed,<span class="w"> </span><span class="m">1</span><span class="w"> </span>insertion<span class="o">(</span>+<span class="o">)</span>,<span class="w"> </span><span class="m">3</span><span class="w"> </span>deletions<span class="o">(</span>-<span class="o">)</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>testrebase<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>master
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>Switched<span class="w"> </span>to<span class="w"> </span>branch<span class="w"> </span><span class="s1">&#39;master&#39;</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>log<span class="w"> </span>--graph
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>➜<span class="w">  </span>testgit<span class="w"> </span>git:<span class="o">(</span>master<span class="o">)</span><span class="w"> </span>git<span class="w"> </span>rebase<span class="w"> </span>testrebase
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>First,<span class="w"> </span>rewinding<span class="w"> </span>head<span class="w"> </span>to<span class="w"> </span>replay<span class="w"> </span>your<span class="w"> </span>work<span class="w"> </span>on<span class="w"> </span>top<span class="w"> </span>of<span class="w"> </span>it...
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>Applying:<span class="w"> </span>add<span class="w"> </span>new<span class="w"> </span>feature
+</code></pre></div>
+依然观察日志:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>*<span class="w"> </span>commit<span class="w"> </span>cd2c246f0cfcd2d98717af0a405ac17fd23636bc<span class="w"> </span><span class="o">(</span>HEAD<span class="w"> </span>-&gt;<span class="w"> </span>master<span class="o">)</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="p">|</span><span class="w"> </span>Author:<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="p">|</span><span class="w"> </span>Date:<span class="w">   </span>Sun<span class="w"> </span>Feb<span class="w"> </span><span class="m">23</span><span class="w"> </span><span class="m">21</span>:46:34<span class="w"> </span><span class="m">2020</span><span class="w"> </span>+0800
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="p">|</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="p">|</span><span class="w">     </span>add<span class="w"> </span>new<span class="w"> </span>feature
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="p">|</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>*<span class="w"> </span>commit<span class="w"> </span>7f4088a0254081c4349a253c2d3a74dd7a7f1234<span class="w"> </span><span class="o">(</span>testrebase<span class="o">)</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="p">|</span><span class="w"> </span>Author:<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="p">|</span><span class="w"> </span>Date:<span class="w">   </span>Sun<span class="w"> </span>Feb<span class="w"> </span><span class="m">23</span><span class="w"> </span><span class="m">22</span>:47:17<span class="w"> </span><span class="m">2020</span><span class="w"> </span>+0800
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="p">|</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="p">|</span><span class="w">     </span><span class="nb">test</span><span class="w"> </span>rebase
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="p">|</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>*<span class="w"> </span>commit<span class="w"> </span>22a449d52fe269ed7c969c179c1788f89013ac2d<span class="w"> </span><span class="o">(</span>fixbug<span class="o">)</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="p">|</span><span class="w"> </span>Author:<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="p">|</span><span class="w"> </span>Date:<span class="w">   </span>Sun<span class="w"> </span>Feb<span class="w"> </span><span class="m">23</span><span class="w"> </span><span class="m">21</span>:39:01<span class="w"> </span><span class="m">2020</span><span class="w"> </span>+0800
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="p">|</span>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="p">|</span><span class="w">     </span>9th<span class="w"> </span>commit
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="p">|</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a>*<span class="w"> </span>commit<span class="w"> </span>c658c0b8070ec1ab7dfe53351b64da79ae939e6d
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="p">|</span><span class="w"> </span>Author:<span class="w"> </span>hjlarry<span class="w"> </span>&lt;hjlarry@163.com&gt;
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="p">|</span><span class="w"> </span>Date:<span class="w">   </span>Sun<span class="w"> </span>Feb<span class="w"> </span><span class="m">23</span><span class="w"> </span><span class="m">16</span>:57:12<span class="w"> </span><span class="m">2020</span><span class="w"> </span>+0800
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="p">|</span>
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a><span class="p">|</span><span class="w">     </span>8th<span class="w"> </span>commit
+</code></pre></div></p>
+<p>它典型的使用场景，例如团队其他人维护的项目，我们在自己的分支上为其提供feature，然后把我们的分支变基到origin/master上，这样其他人只需要去FAST-FORWARD而无需人工整合。</p>
+<h4 id="_12">交互式变基<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h4>
+<p>通过<code>git rebase -i &lt;commit_id&gt;</code>就能进入一个交互式界面:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>pick<span class="w"> </span>2c70e0b<span class="w"> </span>second<span class="w"> </span>commit<span class="w"> </span>a
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>pick<span class="w"> </span>c351a72<span class="w"> </span>third<span class="w"> </span>commit
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Rebase 37b766f..c351a72 onto 37b766f (2 commands)</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="c1">#</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="c1"># Commands:</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="c1"># p, pick = use commit</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="c1"># r, reword = use commit, but edit the commit message</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="c1"># e, edit = use commit, but stop for amending</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="c1"># s, squash = use commit, but meld into previous commit</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="c1"># f, fixup = like &quot;squash&quot;, but discard this commit&#39;s log message</span>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="c1"># x, exec = run command (the rest of the line) using shell</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="c1"># d, drop = remove commit</span>
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="c1">#</span>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="c1"># These lines can be re-ordered; they are executed from top to bottom.</span>
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a><span class="c1">#</span>
+<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="c1"># If you remove a line here THAT COMMIT WILL BE LOST.</span>
+<a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a><span class="c1">#</span>
+<a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a><span class="c1"># However, if you remove everything, the rebase will be aborted.</span>
+<a id="__codelineno-19-20" name="__codelineno-19-20" href="#__codelineno-19-20"></a><span class="c1">#</span>
+<a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a><span class="c1"># Note that empty commits are commented out</span>
+</code></pre></div>
+它会列出这个<code>commit_id</code>(可以用commit的hash或者<code>HEAD~3</code>这样的形式)的child一直到当前分支的最后一个commit，我们可以在这个界面中编辑想对每一个commit做的操作：</p>
+<ul>
+<li>p，对这条commit不做任何变更</li>
+<li>r，使用这条commit，但修改它的commit message</li>
+<li>e，先暂停rebase，把这条commit修改编辑以后再继续，继续时使用<code>git rebase --continue</code>即可</li>
+<li>s，使用这条commit，但把它合并入前一条commit</li>
+<li>f, 和s相同，但丢弃掉它的commit message</li>
+<li>x, 在rebase过程中执行一些命令，例如<code>npm test</code>之类确保修改不会产生破坏性内容</li>
+<li>d, 移除这条commit</li>
+</ul>
+<p>我们在一些场景，例如修改老旧commit的msg、把连续或间隔的多个commit整理为1个等使用交互式变基都会比较方便。</p>
+<p>这种方式看起来没有办法修改最祖先的那条commit，实际上有这种场景时我们可以直接把祖先commit添加到头部即可。在交互式界面中也可以手动调整commit的顺序。有些操作例如修改commit msg，就会产生一个新的commit object，当然也会影响到它的所有child object，因为sha值变了，就得一层层的修改下去。</p>
+<h3 id="_13">常用命令<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>git diff</code></td>
+<td>比较工作区和暂存区所含文件的差异</td>
+</tr>
+<tr>
+<td><code>git diff HEAD</code></td>
+<td>比较工作区和HEAD所含文件的差异</td>
+</tr>
+<tr>
+<td><code>git diff --cached</code></td>
+<td>比较暂存区和HEAD所含文件的差异</td>
+</tr>
+<tr>
+<td><code>git diff -- &lt;file&gt;</code></td>
+<td>比较工作区和HEAD某个文件的差异</td>
+</tr>
+<tr>
+<td><code>git reset HEAD</code></td>
+<td>暂存区的所有文件恢复的和HEAD一样</td>
+</tr>
+<tr>
+<td><code>git reset HEAD &lt;file&gt;</code></td>
+<td>暂存区某个文件恢复为HEAD那个文件</td>
+</tr>
+<tr>
+<td><code>git checkout -- &lt;file&gt;</code></td>
+<td>工作区某个文件恢复为暂存区那个文件</td>
+</tr>
+<tr>
+<td><code>git reset --hard &lt;commit&gt;</code></td>
+<td>工作区恢复为该commit，回滚和未来均可</td>
+</tr>
+<tr>
+<td><code>git stash</code></td>
+<td>暂存工作现场</td>
+</tr>
+<tr>
+<td><code>git stash apply</code></td>
+<td>恢复工作现场</td>
+</tr>
+<tr>
+<td><code>git stash apply &lt;index&gt;</code></td>
+<td>恢复到某个工作现场</td>
+</tr>
+<tr>
+<td><code>git branch -av</code></td>
+<td>查看所有本地和远程的分支及其对应的commit</td>
+</tr>
+<tr>
+<td><code>git checkout -b &lt;name&gt; &lt;commit&gt;</code></td>
+<td>创建一个分支并切换过去，commit可省略</td>
+</tr>
+<tr>
+<td><code>git branch -f &lt;name&gt; &lt;commit&gt;</code></td>
+<td>强制把某个分支移动到commit处去</td>
+</tr>
+<tr>
+<td><code>git branch -u origin/A</code></td>
+<td>将本地当前分支和远程A分支关联</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_14">其他技巧<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h3>
+<h4 id="cherry-pick">cherry-pick<a class="headerlink" href="#cherry-pick" title="Permanent link">&para;</a></h4>
+<p>cherry-pick类似于一个定制化的merge，它可以把其它分支上的commit一个个摘下来，合并到当前分支。</p>
+<p>它的使用方法是<code>git cherry-pick &lt;commid_id1&gt; &lt;commid_id2&gt; ...</code>，就会把每个挑选的commit提交一次生成一个新的commit id。也可以通过<code>git cherry-pick -n &lt;commid_id1&gt; &lt;commid_id2&gt;</code>挑选出相应的commit至暂存区而不提交，后续自己可以再手动提交。</p>
+<h4 id="reflog">reflog<a class="headerlink" href="#reflog" title="Permanent link">&para;</a></h4>
+<p>引用日志记录了用户在本地更改的完整历史记录，通过<code>git reflog</code>可以查看到类似这样的信息
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>e1b4a61<span class="w"> </span><span class="o">(</span>HEAD<span class="o">)</span><span class="w"> </span>HEAD@<span class="o">{</span><span class="m">0</span><span class="o">}</span>:<span class="w"> </span>revert:<span class="w"> </span>Revert<span class="w"> </span><span class="s2">&quot;8th commit&quot;</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>979309d<span class="w"> </span>HEAD@<span class="o">{</span><span class="m">1</span><span class="o">}</span>:<span class="w"> </span>checkout:<span class="w"> </span>moving<span class="w"> </span>from<span class="w"> </span>master<span class="w"> </span>to<span class="w"> </span>HEAD@<span class="o">{</span><span class="m">11</span><span class="o">}</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>c658c0b<span class="w"> </span><span class="o">(</span>master<span class="o">)</span><span class="w"> </span>HEAD@<span class="o">{</span><span class="m">2</span><span class="o">}</span>:<span class="w"> </span>reset:<span class="w"> </span>moving<span class="w"> </span>to<span class="w"> </span>c658
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="m">5665150</span><span class="w"> </span>HEAD@<span class="o">{</span><span class="m">3</span><span class="o">}</span>:<span class="w"> </span>reset:<span class="w"> </span>moving<span class="w"> </span>to<span class="w"> </span><span class="m">5665</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>...
+</code></pre></div>
+翻译过来就是:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>HEAD@{0} 撤销操作: 撤销的消息
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>HEAD@{1} 切换操作: 从master切换至HEAD@{11}
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>HEAD@{2} 重置操作: 重置至c658
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>HEAD@{3} 重置操作: 重置至5665
+</code></pre></div>
+接着我们就可以使用<code>git checkout HEAD@{1}</code>这样的操作恢复到切换操作时的场景。</p>
+<h4 id="submodule">submodule<a class="headerlink" href="#submodule" title="Permanent link">&para;</a></h4>
+<p>使用场景，例如开发过程中有一些通用的部分希望抽出作为一个公共的库来维护，或者hugo中的某些皮肤也使用了submodule。</p>
+<p>包含子模块的项目，在clone主项目的时候需要带参数<code>git clone &lt;url&gt; --recurse-submodules</code>或者使用<code>git submodule init &amp;&amp; git submodule update</code>。</p>
+<p>如果子模块的内容我们做了变更，在主模块中使用<code>git add/commit</code>是无效的。如果子模块的远程仓库有更新，我们也需要进入子模块文件夹才能获取到更新。</p>
+<h2 id="_15">工作流<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h2>
+<p>工作流(workflow)是指在多人协作的时候，团队以什么样的工作流程有效的合作。</p>
+<h3 id="git-flow">Git Flow<a class="headerlink" href="#git-flow" title="Permanent link">&para;</a></h3>
+<p>该工作流为项目设定了两个长期分支，即主分支master和开发分支develop。master存放了对外发布的版本，任何时候在这个上面拿到的都是稳定的发布版。develop用于日常开发，存放最新的开发版本。</p>
+<p>其次，项目根据不同的目的设定了三个短期分支，包括功能分支(feature branch)、补丁分支(hotfix branch)和预发分支(release branch)。一旦完成相应的开发，短期分支被合并入develop或master，然后删除该短期分支。</p>
+<p>这种工作流程使用起来会比较麻烦，因为维护了两个长期分支，可能需要经常切换。它比较适合软件项目，而不是网站项目，因为大多数网站是持续发布的，一有代码变动可能就会更新一次，这时候往往master和develop分支的区别不大，也就没有必要同时维护两套了。</p>
+<h3 id="github-flow">Github Flow<a class="headerlink" href="#github-flow" title="Permanent link">&para;</a></h3>
+<p>这套工作流程在Git Flow上做了简化，只有一个长期分支master，适合于持续发布的场景，是github官方使用的工作流程，它们也做了相关的<a href="https://guides.github.com/introduction/flow/index.html" target="_blank">介绍</a>。其具体流程是这样的:</p>
+<ol>
+<li>你从master中拉出新分支，不区分是功能还是补丁</li>
+<li>新分支开发完成后，就向master发起一个PR</li>
+<li>PR会让其他人注意到你的请求，也是一种对话机制，让大家都能来参与评审你的代码，对话过程中也可以不断提交代码</li>
+<li>你的PR被接受并入master中，原本你拉出来的分支就会被删除</li>
+</ol>
+<p>这种流程也有一个问题，它假设master分支和产品的发布是一致的。这在一些场景，例如苹果Appstore的发布可能因为审核要延迟，或有些产品是要指定时间发布的，一个master分支就显得不够了。</p>
+<h3 id="gitlab-flow">Gitlab Flow<a class="headerlink" href="#gitlab-flow" title="Permanent link">&para;</a></h3>
+<p>Gitlab结合了Git flow和Github flow的优点，既能适应不同开发环境的弹性，又仍然只需维护单一分支，官网也有相关<a href="https://docs.gitlab.com/ee/topics/gitlab_flow.html" target="_blank">介绍</a>。</p>
+<p>它定义了一个原则即上游优先，只存在一个主分支master，它是其他分支的上游。只有上游分支变化了，才能应用到其他的分支。</p>
+<p>对于需要持续发布的项目，它建议在master之外，再根据不同的环境建立分支。例如开发环境定义为master是最上游，预开发环境定义为pre-production是开发环境的下游，生产环境定义为production是最下游。那么当生产环境出了bug，就要新建一个功能分支，先把它合并入master，确认没问题再cherry-pick至预开发环境，最终再进入生产环境。只有紧急情况才允许跳过上游直接并入下游。</p>
+<p>对于需要按版本发布的项目，建议的做法是每一个版本都要从master中拉出一个分支来，如<code>2-3-stable</code>。之后只有修补bug才允许将代码合并入这些分支，更新相应的小版本号。</p>
+<h2 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h2>
+<p><strong>每次commit，Git储存的是全新的文件快照还是储存文件的变更部分？</strong></p>
+<p>Git储存的是全新的文件快照，即使你只修改了文件的一行，也会产生一个新的blob对象。这种储存方式存储的对象格式被称为松散(loose)格式。</p>
+<p>这样势必会造成大量的空间浪费。但是，Git会时不时的把这些松散格式的文件打包成一个称为包文件(packfile)的二进制文件以节省空间和提升效率。手动执行<code>git gc</code>也可以达到这种效果。这也是<code>./git/objects/info</code>和<code>./git/objects/pack</code>两个文件夹的用途。</p>
+<p><strong>为什么要有暂存区的概念，不能直接存储么？</strong></p>
+<p>因为提交是需要原子性的，即一次提交下的文件，要么全部成功，要么全部失败。</p>
+<p>但在Git的命令行下，我们很难像SVN那样有一个图形界面，勾选要提交的文件，填入提交信息，点个按钮就能完成提交。需要<code>git add</code>这个命令帮助我们选择要提交的文件。</p>
+<p><strong>使用merge还是rebase合并分支？</strong></p>
+<p><code>git merge</code>和<code>git rebase</code>都被设计来将一个分支的更改并入另一个分支，但它们的方式却不太一样。</p>
+<p>merge是一个安全的操作，现有的分支不会被更改。但另一方面，每次合并一个feature分支时都会引入一个外来的合并提交，当同时进行的feature过多时会使得整个树看起来非常杂乱，增加了开发者了解项目历史的成本。</p>
+<p>rebase最大的好处就是使项目的历史非常的整洁、线性，可以从项目的起点开始浏览到终点不需要任何的分叉。但是不合理的rebase会给团队其他人协同开发带来很大的困扰。此外，rebase不能在合并提交时附带message，也就不能像merge那样看到feature分支的并入带来了哪些更改。</p>
+<p>所在，绝不能在公共的分支使用变基，也不能使用<code>git push -f</code>强制推送去修改远程仓库的历史。合理的使用场景应该像下面描述的这样:</p>
+<p>基于上游分支master拉出来一个dev的分支，自行在dev上开发完成后可能master已经有了其他人开发的新的内容，这时应该在dev分支上使用<code>git rebase master</code>把master分支的内容先同步过来，然后在master分支上使用<code>git merge dev</code>把dev分支的内容放回去。</p>
+<p>此外，一般有远程仓库，那么相应的可能是通过<code>git pull --rebase</code>把远程的变更内容拿回来，然后通过PR的方式由远程仓库的管理者决定如何并入远程分支。</p>
+<p><strong>使用revert、reset还是checkout回滚代码？</strong></p>
+<p>代码的回滚可以分为回滚某次提交，或者回滚某些文件两个层面。</p>
+<p>对于回滚提交，应该使用reset和revert。</p>
+<p>reset的本质是把HEAD移动到某个commit的位置，那么该分支从新HEAD到末端的这部分就处于悬挂状态，如果上面没有什么tag或branch引用的话，再下次git进行垃圾回收的时候就会被删除。reset本身有参数，<code>--mixed</code>为默认选项，表示暂存区和将要reset的提交同步，而工作区不受影响；使用<code>--hard</code>表示暂存区和工作区都和将要reset的提交同步；使用<code>--soft</code>表示暂存区和工作区都不做改变。</p>
+<p>而revert是不会改变提交的历史的，它会创建一个新的提交，而这个提交的内容是撤回的部分。所以revert往往用于公共的分支上。</p>
+<p>对于文件提交，应该使用reset和checkout。区别在于checkout用于把工作区中的某个文件恢复为某个commit中的该文件，而reset用于把暂存区中的某个文件恢复至某个commit的该文件，<code>--mixed</code>、<code>--soft</code>、<code>--hard</code>对于恢复文件的场景是无效的参数。</p>
+<h2 id="_16">相关链接<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://marklodato.github.io/visual-git-guide/index-zh-cn.html" target="_blank">图解git</a></li>
+<li><a href="https://git-scm.com/book/zh/v2" target="_blank">Pro git V2</a></li>
+<li><a href="https://wyag.thb.lt/" target="_blank">Write yourself a Git!</a></li>
+<li><a href="https://github.com/dulwich/dulwich" target="_blank">Dulwich---Pure-Python Git implementation</a></li>
+<li><a href="https://ohshitgit.com/" target="_blank">Oh Shit, Git!?!</a></li>
+<li><a href="http://onlywei.github.io/explain-git-with-d3/#commit" target="_blank">git可视化</a></li>
+<li><a href="https://learngitbranching.js.org/" target="_blank">LearnGitBranching</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/hjlarry" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:ultrahe@gmail.com" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M64 112c-8.8 0-16 7.2-16 16v22.1l172.5 141.6c20.7 17 50.4 17 71.1 0L464 150.1V128c0-8.8-7.2-16-16-16H64zM48 212.2V384c0 8.8 7.2 16 16 16h384c8.8 0 16-7.2 16-16V212.2L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128c0-35.3 28.7-64 64-64h384c35.3 0 64 28.7 64 64v256c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/hjlarry" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://paypal.me/hjlarry" target="_blank" rel="noopener" title="paypal.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M111.4 295.9c-3.5 19.2-17.4 108.7-21.5 134-.3 1.8-1 2.5-3 2.5H12.3c-7.6 0-13.1-6.6-12.1-13.9L58.8 46.6c1.5-9.6 10.1-16.9 20-16.9 152.3 0 165.1-3.7 204 11.4 60.1 23.3 65.6 79.5 44 140.3-21.5 62.6-72.5 89.5-140.1 90.3-43.4.7-69.5-7-75.3 24.2zM357.1 152c-1.8-1.3-2.5-1.8-3 1.3-2 11.4-5.1 22.5-8.8 33.6-39.9 113.8-150.5 103.9-204.5 103.9-6.1 0-10.1 3.3-10.9 9.4-22.6 140.4-27.1 169.7-27.1 169.7-1 7.1 3.5 12.9 10.6 12.9h63.5c8.6 0 15.7-6.3 17.4-14.9.7-5.4-1.1 6.1 14.4-91.3 4.6-22 14.3-19.7 29.3-19.7 71 0 126.4-28.8 142.9-112.3 6.5-34.8 4.6-71.4-23.8-92.6z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.annotate", "content.tabs.link", "content.tooltips", "navigation.indexes", "navigation.sections", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      
+    
+  </body>
+</html>
