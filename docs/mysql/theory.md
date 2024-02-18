@@ -279,13 +279,13 @@ CREATE TABLE single_table (
 ```
 它有主键id、唯一二级索引key2、普通二级索引key1和key3、联合索引。
 
-**const**
+#### **const**
 
 当我们可以直接通过主键列或唯一二级索引列来与常数的等值比较来定位到一条记录时，速度是非常快的，这种访问方法称为​**const**。例如:`SELECT * FROM single_table WHERE id = 1438;`、`SELECT * FROM single_table WHERE key2 = 3841;`。主键列只需要一次定位，唯一索引列也只需要两次定位。
 
 对于唯一二级索引来说，查询该列为NULL值的情况比较特殊，因为唯一索引并不限制其列为NULL值的数量，所以使用`SELECT * FROM single_table WHERE key2 IS NULL;`查询时不会用const访问方法。
 
-**ref**
+#### **ref**
 
 对于某个普通二级索引列和常数值的等值比较，比如`SELECT * FROM single_table WHERE key1 = 'abc';`，由于普通索引并不限制索引列值的唯一性，所以可能找到多条对应的记录，那么这种方式的代价取决于匹配到的二级索引记录的条数，如果匹配的记录较少，则回表代价较低。这种方法称为​**ref**，它的效率比const差了一些。
 
@@ -293,23 +293,23 @@ CREATE TABLE single_table (
 
 普通二级索引或唯一二级索引使用`Key IS NULL`这样的方式作为搜索条件时，可能使用ref的访问方法。
 
-**ref_or_null**
+#### **ref_or_null**
 
 当我们不仅想找出某个索引列的值等于某个常数的记录，还同时想找出该列为NULL的记录时，例如`SELECT * FROM single_demo WHERE key1 = 'abc' OR key1 ISNULL;`。这种查询使用的访问方法为​**ref_or_null**。它的查询也会分为两个步骤，先分别定位key1=abc和key1是null的连续记录并找到这些记录对应的主键值，再从聚簇索引上根据主键找到完整的用户记录。
 
-**range**
+#### **range**
 
 之前的方式都是和常数等值比较，但有时我们面对的搜索条件会更复杂，例如`SELECT * FROM single_table WHERE key2 IN (1438,6328) OR (key2 >= 38AND key2 <= 79);`，除了可能使用全表扫描的访问方法，也可能使用二级索引+回表的访问方法。如果采用回表的方式，索引列就需要匹配某个或某些范围的值，这种利用索引进行范围匹配的访问方法称为​**range**。
 
 该例中，会分为三个范围，即key2=1438、key2=6328、key2∈[38,79]。范围一、范围二被称为单点区间，范围三称为连续范围空间。
 
-**index**
+#### **index**
 
 看这个查询`SELECT key_part1, key_part2, key_part3 FROMsingle_table WHERE key_part2 = 'abc';`，由于key_part2不是联合索引idx_key_part的最左索引列，所以我们无法使用ref的访问方法来执行这个语句。但这个语句有两个特点，一是它的查询列表只有三个列key_part1、key_part2、key_part3且都被联合索引包含，二是搜索条件只有key_part2列也被包含在联合索引中。
 
 也就是说我们可以直接遍历idx_key_part这颗B+树的叶子节点来得到结果，而不需要回表，因为这棵树比聚簇索引的树小的多，它的成本也要小很多，我们把这种访问方法称为​**index**。
 
-**all**
+#### **all**
 最直接的查询执行方式就是全表扫描，对于InnoDB来说就是直接扫描聚簇索引，这种访问方法称为​**all**。
 
 ### EXPLAIN
@@ -423,20 +423,20 @@ mysql> EXPLAIN SELECT * FROM s1  UNION SELECT *FROM s2;
 
 **type**
 
-代表Mysql对这个表执行查询时的访问方法，[之前](./#访问方法)已经提到过部分，这列可能的值有:
+代表Mysql对这个表执行查询时的访问方法，[之前](#_18)已经提到过部分，这列可能的值有:
 
 * system，表中只有一条记录且该表使用的存储引擎的统计数据是精确的，比如MyISAM、Memory
-* const，对应[const](./#const)
+* const，对应[const](#const)
 * eq_ref，连接查询时，若被驱动表是通过主键或者唯一二级索引列等值匹配的方式进行访问的
-* ref，对应[ref](./#ref)
+* ref，对应[ref](#ref)
 * fulltext，全文索引
-* ref_or_null，对应[ref_or_null](./#ref-or-null)
+* ref_or_null，对应[ref_or_null](#ref_or_null)
 * index_merge，一般对某表的查询只能用一个索引，但某些场景可以使用Intersection、Union、Sort-Union这三种索引合并的方式
 * unique_subquery，在一些包含IN的子查询语句，若查询优化器决定将IN转换为EXISTS子查询且它可以用到主键进行等值匹配
 * index_subquery，和unique_subquery类似，只是访问子查询的表时使用的普通索引
-* range，对应[range](./#range)
-* index，对应[index](./#index)
-* ALL，对应[all](./#all)
+* range，对应[range](#range)
+* index，对应[index](#index)
+* ALL，对应[all](#all)
 
 **possible_keys和key**
 
